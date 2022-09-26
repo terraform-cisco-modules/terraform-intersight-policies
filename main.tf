@@ -54,9 +54,6 @@ module "adapter_configuration" {
 # GUI Location: Policies > Create Policy > Boot Order
 #__________________________________________________________________
 
-output "defaults" {
-  value = local.defaults.intersight.policies.boot_order
-}
 module "boot_order" {
   source  = "terraform-cisco-modules/policies-boot-order/intersight"
   version = ">= 1.0.1"
@@ -93,12 +90,22 @@ module "certificate_management" {
       local.modules.policies, "certificate_management", true
     )
   }
-  base64_certificate = lookup(each.value, "base64_certificate", 1)
-  base64_private_key = lookup(each.value, "base64_private_key", 1)
-  description        = lookup(each.value, "description", "")
-  name               = "${each.value.name}${local.defaults.intersight.policies.certificate_management.name_suffix}"
-  organization       = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
-  tags               = lookup(each.value, "tags", local.defaults.intersight.tags)
+  base64_certificate   = lookup(each.value, "base64_certificate", 1)
+  base64_certificate_1 = var.base64_certificate_1
+  base64_certificate_2 = var.base64_certificate_2
+  base64_certificate_3 = var.base64_certificate_3
+  base64_certificate_5 = var.base64_certificate_4
+  base64_certificate_4 = var.base64_certificate_5
+  base64_private_key   = lookup(each.value, "base64_private_key", 1)
+  base64_private_key_1 = var.base64_private_key_1
+  base64_private_key_2 = var.base64_private_key_2
+  base64_private_key_3 = var.base64_private_key_3
+  base64_private_key_4 = var.base64_private_key_4
+  base64_private_key_5 = var.base64_private_key_5
+  description          = lookup(each.value, "description", "")
+  name                 = "${each.value.name}${local.defaults.intersight.policies.certificate_management.name_suffix}"
+  organization         = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
+  tags                 = lookup(each.value, "tags", local.defaults.intersight.tags)
 }
 
 
@@ -500,6 +507,7 @@ module "ipmi_over_lan" {
   description  = lookup(each.value, "description", "")
   enabled      = lookup(each.value, "enabled", local.defaults.intersight.policies.ipmi_over_lan.enabled)
   ipmi_key     = lookup(each.value, "ipmi_key", null)
+  ipmi_key_1   = var.ipmi_key_1
   name         = "${each.value.name}${local.defaults.intersight.policies.ipmi_over_lan.name_suffix}"
   organization = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
   privilege    = lookup(each.value, "privilege", local.defaults.intersight.policies.ipmi_over_lan.privilege)
@@ -557,6 +565,7 @@ module "iscsi_boot" {
   authentication = lookup(
     each.value, "authentication", local.defaults.intersight.policies.iscsi_boot.authentication
   )
+  description = lookup(each.value, "description", "")
   dhcp_vendor_id_iqn = lookup(
     each.value, "dhcp_vendor_id_iqn", local.defaults.intersight.policies.iscsi_boot.dhcp_vendor_id_iqn
   )
@@ -571,9 +580,9 @@ module "iscsi_boot" {
   )
   iscsi_adapter_policy = length(compact([each.value.iscsi_adapter_policy])
   ) > 0 ? module.iscsi_adapter[each.value.iscsi_adapter_policy].moid : ""
-  description  = lookup(each.value, "description", "")
-  name         = "${each.value.name}${local.defaults.intersight.policies.ethernet_qos.name_suffix}"
-  organization = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
+  iscsi_boot_password = var.iscsi_boot_password
+  name                = "${each.value.name}${local.defaults.intersight.policies.ethernet_qos.name_suffix}"
+  organization        = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
   primary_target_policy = length(
     compact([each.value.primary_target_policy])
   ) > 0 ? module.iscsi_static_target[each.value.primary_target_policy].moid : ""
@@ -769,8 +778,9 @@ module "ldap" {
       each.value.binding_parameters, "timeout", local.defaults.intersight.policies.ldap.binding_parameters.bind_method
     )
   }
-  description       = lookup(each.value, "description", "")
-  enable_encryption = lookup(each.value, "enable_encryption", local.defaults.intersight.policies.ldap.enable_encryption)
+  binding_parameters_password = var.binding_parameters_password
+  description                 = lookup(each.value, "description", "")
+  enable_encryption           = lookup(each.value, "enable_encryption", local.defaults.intersight.policies.ldap.enable_encryption)
   enable_group_authorization = lookup(
     each.value, "enable_group_authorization", local.defaults.intersight.policies.ldap.enable_group_authorization
   )
@@ -889,8 +899,13 @@ module "local_user" {
   enforce_strong_password = lookup(
     each.value, "enforce_strong_password", local.defaults.intersight.policies.local_user.enforce_strong_password
   )
-  grace_period = lookup(each.value, "grace_period", local.defaults.intersight.policies.local_user.grace_period)
-  name         = "${each.value.name}${local.defaults.intersight.policies.local_user.name_suffix}"
+  grace_period          = lookup(each.value, "grace_period", local.defaults.intersight.policies.local_user.grace_period)
+  local_user_password_1 = var.local_user_password_1
+  local_user_password_2 = var.local_user_password_2
+  local_user_password_3 = var.local_user_password_3
+  local_user_password_4 = var.local_user_password_4
+  local_user_password_5 = var.local_user_password_5
+  name                  = "${each.value.name}${local.defaults.intersight.policies.local_user.name_suffix}"
   notification_period = lookup(
     each.value, "notification_period", local.defaults.intersight.policies.local_user.notification_period
   )
@@ -1065,18 +1080,18 @@ module "port" {
         lookup(v, "ethernet_network_group_policy", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.ethernet_network_group_policy)
       ].moid : ""
       flow_control_policy = length(compact([
-        lookup(v, "ethernet_network_group_policy", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.ethernet_network_group_policy)
-        ])) > 0 ? module.ethernet_network_control[
+        lookup(v, "flow_control_policy", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.ethernet_network_group_policy)
+        ])) > 0 ? module.flow_control[
         lookup(v, "flow_control_policy", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.flow_control_policy)
       ].moid : ""
       interfaces = lookup(v, "interfaces", [])
       link_aggregation_policy = length(compact([
-        lookup(v, "ethernet_network_group_policy", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.ethernet_network_group_policy)
+        lookup(v, "link_aggregation_policy", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.ethernet_network_group_policy)
         ])) > 0 ? module.link_aggregation[
         lookup(v, "link_aggregation_policy", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.link_aggregation_policy)
       ].moid : ""
       link_control_policy = length(compact([
-        lookup(v, "ethernet_network_group_policy", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.ethernet_network_group_policy)
+        lookup(v, "link_control_policy", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.ethernet_network_group_policy)
         ])) > 0 ? module.link_control[
         lookup(v, "link_control_policy", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.link_control_policy)
       ].moid : ""
@@ -1097,12 +1112,12 @@ module "port" {
       admin_speed = lookup(v, "admin_speed", local.defaults.intersight.policies.port.port_channel_fcoe_uplinks.admin_speed)
       interfaces  = lookup(v, "interfaces", [])
       link_aggregation_policy = length(compact([
-        lookup(v, "ethernet_network_group_policy", local.defaults.intersight.policies.port.port_channel_fcoe_uplinks.ethernet_network_group_policy)
+        lookup(v, "link_aggregation_policy", local.defaults.intersight.policies.port.port_channel_fcoe_uplinks.ethernet_network_group_policy)
         ])) > 0 ? module.link_aggregation[
         lookup(v, "link_aggregation_policy", local.defaults.intersight.policies.port.port_channel_fcoe_uplinks.link_aggregation_policy)
       ].moid : ""
       link_control_policy = length(compact([
-        lookup(v, "ethernet_network_group_policy", local.defaults.intersight.policies.port.port_channel_fcoe_uplinks.ethernet_network_group_policy)
+        lookup(v, "link_control_policy", local.defaults.intersight.policies.port.port_channel_fcoe_uplinks.ethernet_network_group_policy)
         ])) > 0 ? module.link_control[
         lookup(v, "link_control_policy", local.defaults.intersight.policies.port.port_channel_fcoe_uplinks.link_control_policy)
       ].moid : ""
@@ -1113,7 +1128,7 @@ module "port" {
     for v in lookup(each.value, "port_modes", []) : {
       custom_mode = lookup(v, "custom_mode", local.defaults.intersight.policies.port.port_modes.custom_mode)
       port_list   = v.port_list
-      slot_id     = lookup(v, "slot_id", 0)
+      slot_id     = lookup(v, "slot_id", 1)
     }
   ]
   port_role_appliances = [
@@ -1144,12 +1159,12 @@ module "port" {
       ].moid : ""
       fec = lookup(v, "fec", local.defaults.intersight.policies.port.port_role_ethernet_uplinks.fec)
       flow_control_policy = length(compact([
-        lookup(v, "ethernet_network_group_policy", local.defaults.intersight.policies.port.port_role_ethernet_uplinks.ethernet_network_group_policy)
-        ])) > 0 ? module.ethernet_network_control[
+        lookup(v, "flow_control_policy", local.defaults.intersight.policies.port.port_role_ethernet_uplinks.ethernet_network_group_policy)
+        ])) > 0 ? module.flow_control[
         lookup(v, "flow_control_policy", local.defaults.intersight.policies.port.port_role_ethernet_uplinks.flow_control_policy)
       ].moid : ""
       link_control_policy = length(compact([
-        lookup(v, "ethernet_network_group_policy", local.defaults.intersight.policies.port.port_role_ethernet_uplinks.ethernet_network_group_policy)
+        lookup(v, "link_control_policy", local.defaults.intersight.policies.port.port_role_ethernet_uplinks.ethernet_network_group_policy)
         ])) > 0 ? module.link_control[
         lookup(v, "link_control_policy", local.defaults.intersight.policies.port.port_role_ethernet_uplinks.link_control_policy)
       ].moid : ""
@@ -1183,7 +1198,7 @@ module "port" {
       interfaces       = lookup(v, "interfaces", [])
       fec              = lookup(v, "fec", local.defaults.intersight.policies.port.port_role_fcoe_uplinks.fec)
       link_control_policy = length(compact([
-        lookup(v, "ethernet_network_group_policy", local.defaults.intersight.policies.port.port_role_fcoe_uplinks.ethernet_network_group_policy)
+        lookup(v, "link_control_policy", local.defaults.intersight.policies.port.port_role_fcoe_uplinks.ethernet_network_group_policy)
         ])) > 0 ? module.link_control[
         lookup(v, "link_control_policy", local.defaults.intersight.policies.port.port_role_fcoe_uplinks.link_control_policy)
       ].moid : ""
@@ -1400,11 +1415,16 @@ module "snmp" {
       local.modules.policies, "snmp", true
     )
   }
-  access_community_string = lookup(each.value, "access_community_string", 0)
-  description             = lookup(each.value, "description", "")
-  enable_snmp             = lookup(each.value, "enable_snmp", local.defaults.intersight.policies.snmp.enable_snmp)
-  name                    = "${each.value.name}${local.defaults.intersight.policies.snmp.name_suffix}"
-  organization            = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
+  access_community_string   = lookup(each.value, "access_community_string", 0)
+  access_community_string_1 = var.access_community_string_1
+  access_community_string_2 = var.access_community_string_2
+  access_community_string_3 = var.access_community_string_3
+  access_community_string_4 = var.access_community_string_4
+  access_community_string_5 = var.access_community_string_5
+  description               = lookup(each.value, "description", "")
+  enable_snmp               = lookup(each.value, "enable_snmp", local.defaults.intersight.policies.snmp.enable_snmp)
+  name                      = "${each.value.name}${local.defaults.intersight.policies.snmp.name_suffix}"
+  organization              = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
   profiles = [
     for v in local.domains : {
       name        = v.moid
@@ -1413,17 +1433,32 @@ module "snmp" {
       v.snmp_policy, "${each.value.name}${local.defaults.intersight.policies.snmp.name_suffix}")
     ) > 0
   ]
-  snmp_community_access = lookup(each.value, "snmp_community_access", 0)
+  snmp_auth_password_1  = var.snmp_auth_password_1
+  snmp_auth_password_2  = var.snmp_auth_password_2
+  snmp_auth_password_3  = var.snmp_auth_password_3
+  snmp_auth_password_4  = var.snmp_auth_password_4
+  snmp_auth_password_5  = var.snmp_auth_password_5
+  snmp_community_access = lookup(each.value, "snmp_community_access", local.defaults.intersight.policies.snmp.snmp_community_access)
   snmp_engine_input_id = lookup(
     each.value, "snmp_engine_input_id", local.defaults.intersight.policies.snmp.snmp_engine_input_id
   )
-  snmp_port              = lookup(each.value, "snmp_port", local.defaults.intersight.policies.snmp.snmp_port)
-  snmp_trap_destinations = lookup(each.value, "snmp_trap_destinations", [])
-  snmp_users             = lookup(each.value, "snmp_users", [])
-  system_contact         = lookup(each.value, "system_contact", local.defaults.intersight.policies.snmp.system_contact)
-  system_location        = lookup(each.value, "system_location", local.defaults.intersight.policies.snmp.system_location)
-  tags                   = lookup(each.value, "tags", local.defaults.intersight.tags)
-  trap_community_string  = lookup(each.value, "trap_community_string", 0)
+  snmp_port               = lookup(each.value, "snmp_port", local.defaults.intersight.policies.snmp.snmp_port)
+  snmp_privacy_password_1 = var.snmp_privacy_password_1
+  snmp_privacy_password_2 = var.snmp_privacy_password_2
+  snmp_privacy_password_3 = var.snmp_privacy_password_3
+  snmp_privacy_password_4 = var.snmp_privacy_password_4
+  snmp_privacy_password_5 = var.snmp_privacy_password_5
+  snmp_trap_community_1   = var.snmp_trap_community_1
+  snmp_trap_community_2   = var.snmp_trap_community_2
+  snmp_trap_community_3   = var.snmp_trap_community_3
+  snmp_trap_community_4   = var.snmp_trap_community_4
+  snmp_trap_community_5   = var.snmp_trap_community_5
+  snmp_trap_destinations  = lookup(each.value, "snmp_trap_destinations", [])
+  snmp_users              = lookup(each.value, "snmp_users", [])
+  system_contact          = lookup(each.value, "system_contact", local.defaults.intersight.policies.snmp.system_contact)
+  system_location         = lookup(each.value, "system_location", local.defaults.intersight.policies.snmp.system_location)
+  tags                    = lookup(each.value, "tags", local.defaults.intersight.tags)
+  trap_community_string   = lookup(each.value, "trap_community_string", 0)
 }
 
 
@@ -1679,9 +1714,14 @@ module "virtual_media" {
   enable_virtual_media_encryption = lookup(
     each.value, "enable_virtual_media_encryption", local.defaults.intersight.policies.virtual_media.enable_virtual_media_encryption
   )
-  name         = "${each.value.name}${local.defaults.intersight.policies.virtual_media.name_suffix}"
-  organization = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
-  tags         = lookup(each.value, "tags", local.defaults.intersight.tags)
+  name              = "${each.value.name}${local.defaults.intersight.policies.virtual_media.name_suffix}"
+  organization      = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
+  tags              = lookup(each.value, "tags", local.defaults.intersight.tags)
+  vmedia_password_1 = var.vmedia_password_1
+  vmedia_password_2 = var.vmedia_password_2
+  vmedia_password_3 = var.vmedia_password_3
+  vmedia_password_4 = var.vmedia_password_4
+  vmedia_password_5 = var.vmedia_password_5
 }
 
 
