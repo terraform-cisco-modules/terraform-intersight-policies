@@ -8,7 +8,6 @@ locals {
   policies   = lookup(local.intersight, "policies", {})
 }
 
-
 #_________________________________________________________________
 #
 # Intersight Adapter Configuration Policy
@@ -55,6 +54,9 @@ module "adapter_configuration" {
 # GUI Location: Policies > Create Policy > Boot Order
 #__________________________________________________________________
 
+output "defaults" {
+  value = local.defaults.intersight.policies.boot_order
+}
 module "boot_order" {
   source  = "terraform-cisco-modules/policies-boot-order/intersight"
   version = ">= 1.0.1"
@@ -65,12 +67,12 @@ module "boot_order" {
     )
   }
   boot_devices = lookup(each.value, "boot_devices", [])
-  boot_mode    = lookup(each.value, "boot_mode", local.defaults.intersight.policies.boot_oder.boot_mode)
+  boot_mode    = lookup(each.value, "boot_mode", local.defaults.intersight.policies.boot_order.boot_mode)
   description  = lookup(each.value, "description", "")
   enable_secure_boot = lookup(
-    each.value, "enable_secure_boot", local.defaults.intersight.policies.boot_oder.enable_secure_boot
+    each.value, "enable_secure_boot", local.defaults.intersight.policies.boot_order.enable_secure_boot
   )
-  name         = "${each.value.name}${local.defaults.intersight.policies.boot_oder.name_suffix}"
+  name         = "${each.value.name}${local.defaults.intersight.policies.boot_order.name_suffix}"
   organization = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
   tags         = lookup(each.value, "tags", local.defaults.intersight.tags)
 }
@@ -118,11 +120,10 @@ module "device_connector" {
   configuration_lockout = lookup(
     each.value, "configuration_lockout", local.defaults.intersight.policies.device_connector.configuration_lockout
   )
-  base64_private_key = lookup(each.value, "base64_private_key", 1)
-  description        = lookup(each.value, "description", "")
-  name               = "${each.value.name}${local.defaults.intersight.policies.device_connector.name_suffix}"
-  organization       = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
-  tags               = lookup(each.value, "tags", local.defaults.intersight.tags)
+  description  = lookup(each.value, "description", "")
+  name         = "${each.value.name}${local.defaults.intersight.policies.device_connector.name_suffix}"
+  organization = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
+  tags         = lookup(each.value, "tags", local.defaults.intersight.tags)
 }
 
 
@@ -141,46 +142,46 @@ module "ethernet_adapter" {
       local.modules.policies, "ethernet_adapter", true
     )
   }
-  completion_queue_count                   = lookup(each.value, "completion_queue_count", local.defaults.intersight.policies.ethernet_adpater.completion_queue_count)
-  completion_ring_size                     = lookup(each.value, "completion_ring_size", local.defaults.intersight.policies.ethernet_adpater.completion_ring_size)
+  completion_queue_count                   = lookup(each.value, "completion_queue_count", local.defaults.intersight.policies.ethernet_adapter.completion_queue_count)
+  completion_ring_size                     = lookup(each.value, "completion_ring_size", local.defaults.intersight.policies.ethernet_adapter.completion_ring_size)
   description                              = lookup(each.value, "description", "")
-  enable_accelerated_receive_flow_steering = lookup(each.value, "enable_accelerated_receive_flow_steering", local.defaults.intersight.policies.ethernet_adpater.enable_accelerated_receive_flow_steering)
-  enable_advanced_filter                   = lookup(each.value, "enable_advanced_filter", local.defaults.intersight.policies.ethernet_adpater.enable_advanced_filter)
-  enable_geneve_offload                    = lookup(each.value, "enable_geneve_offload", local.defaults.intersight.policies.ethernet_adpater.enable_geneve_offload)
-  enable_interrupt_scaling                 = lookup(each.value, "enable_interrupt_scaling", local.defaults.intersight.policies.ethernet_adpater.enable_interrupt_scaling)
-  enable_nvgre_offload                     = lookup(each.value, "enable_nvgre_offload", local.defaults.intersight.policies.ethernet_adpater.enable_nvgre_offload)
-  enable_vxlan_offload                     = lookup(each.value, "enable_vxlan_offload", local.defaults.intersight.policies.ethernet_adpater.enable_vxlan_offload)
-  interrupt_coalescing_type                = lookup(each.value, "interrupt_coalescing_type", local.defaults.intersight.policies.ethernet_adpater.interrupt_coalescing_type)
-  interrupt_mode                           = lookup(each.value, "interrupt_mode", local.defaults.intersight.policies.ethernet_adpater.interrupt_mode)
-  interrupt_timer                          = lookup(each.value, "interrupt_timer", local.defaults.intersight.policies.ethernet_adpater.interrupt_timer)
-  interrupts                               = lookup(each.value, "interrupts", local.defaults.intersight.policies.ethernet_adpater.interrupts)
+  enable_accelerated_receive_flow_steering = lookup(each.value, "enable_accelerated_receive_flow_steering", local.defaults.intersight.policies.ethernet_adapter.enable_accelerated_receive_flow_steering)
+  enable_advanced_filter                   = lookup(each.value, "enable_advanced_filter", local.defaults.intersight.policies.ethernet_adapter.enable_advanced_filter)
+  enable_geneve_offload                    = lookup(each.value, "enable_geneve_offload", local.defaults.intersight.policies.ethernet_adapter.enable_geneve_offload)
+  enable_interrupt_scaling                 = lookup(each.value, "enable_interrupt_scaling", local.defaults.intersight.policies.ethernet_adapter.enable_interrupt_scaling)
+  enable_nvgre_offload                     = lookup(each.value, "enable_nvgre_offload", local.defaults.intersight.policies.ethernet_adapter.enable_nvgre_offload)
+  enable_vxlan_offload                     = lookup(each.value, "enable_vxlan_offload", local.defaults.intersight.policies.ethernet_adapter.enable_vxlan_offload)
+  interrupt_coalescing_type                = lookup(each.value, "interrupt_coalescing_type", local.defaults.intersight.policies.ethernet_adapter.interrupt_coalescing_type)
+  interrupt_mode                           = lookup(each.value, "interrupt_mode", local.defaults.intersight.policies.ethernet_adapter.interrupt_mode)
+  interrupt_timer                          = lookup(each.value, "interrupt_timer", local.defaults.intersight.policies.ethernet_adapter.interrupt_timer)
+  interrupts                               = lookup(each.value, "interrupts", local.defaults.intersight.policies.ethernet_adapter.interrupts)
   name                                     = "${each.value.name}${local.defaults.intersight.policies.ethernet_adapter.name_suffix}"
   organization                             = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
-  receive_side_scaling_enable              = lookup(each.value, "receive_side_scaling_enable", local.defaults.intersight.policies.ethernet_adpater.receive_side_scaling_enable)
-  roce_cos                                 = lookup(each.value, "roce_cos", local.defaults.intersight.policies.ethernet_adpater.roce_cos)
-  roce_enable                              = lookup(each.value, "roce_enable", local.defaults.intersight.policies.ethernet_adpater.roce_enable)
-  roce_memory_regions                      = lookup(each.value, "roce_memory_regions", local.defaults.intersight.policies.ethernet_adpater.roce_memory_regions)
-  roce_queue_pairs                         = lookup(each.value, "roce_queue_pairs", local.defaults.intersight.policies.ethernet_adpater.roce_queue_pairs)
-  roce_resource_groups                     = lookup(each.value, "roce_resource_groups", local.defaults.intersight.policies.ethernet_adpater.roce_resource_groups)
-  roce_version                             = lookup(each.value, "roce_version", local.defaults.intersight.policies.ethernet_adpater.roce_version)
-  rss_enable_ipv4_hash                     = lookup(each.value, "rss_enable_ipv4_hash", local.defaults.intersight.policies.ethernet_adpater.rss_enable_ipv4_hash)
-  rss_enable_ipv6_extensions_hash          = lookup(each.value, "rss_enable_ipv6_extensions_hash", local.defaults.intersight.policies.ethernet_adpater.rss_enable_ipv6_extensions_hash)
-  rss_enable_ipv6_hash                     = lookup(each.value, "rss_enable_ipv6_hash", local.defaults.intersight.policies.ethernet_adpater.rss_enable_ipv6_hash)
-  rss_enable_tcp_and_ipv4_hash             = lookup(each.value, "rss_enable_tcp_and_ipv4_hash", local.defaults.intersight.policies.ethernet_adpater.rss_enable_tcp_and_ipv4_hash)
-  rss_enable_tcp_and_ipv6_extensions_hash  = lookup(each.value, "rss_enable_tcp_and_ipv6_extensions_hash", local.defaults.intersight.policies.ethernet_adpater.rss_enable_tcp_and_ipv6_extensions_hash)
-  rss_enable_tcp_and_ipv6_hash             = lookup(each.value, "rss_enable_tcp_and_ipv6_hash", local.defaults.intersight.policies.ethernet_adpater.rss_enable_tcp_and_ipv6_hash)
-  rss_enable_udp_and_ipv4_hash             = lookup(each.value, "rss_enable_udp_and_ipv4_hash", local.defaults.intersight.policies.ethernet_adpater.rss_enable_udp_and_ipv4_hash)
-  rss_enable_udp_and_ipv6_hash             = lookup(each.value, "rss_enable_udp_and_ipv6_hash", local.defaults.intersight.policies.ethernet_adpater.rss_enable_udp_and_ipv6_hash)
-  receive_queue_count                      = lookup(each.value, "receive_queue_count", local.defaults.intersight.policies.ethernet_adpater.receive_queue_count)
-  receive_ring_size                        = lookup(each.value, "receive_ring_size", local.defaults.intersight.policies.ethernet_adpater.receive_ring_size)
+  receive_side_scaling_enable              = lookup(each.value, "receive_side_scaling_enable", local.defaults.intersight.policies.ethernet_adapter.receive_side_scaling_enable)
+  roce_cos                                 = lookup(each.value, "roce_cos", local.defaults.intersight.policies.ethernet_adapter.roce_cos)
+  roce_enable                              = lookup(each.value, "roce_enable", local.defaults.intersight.policies.ethernet_adapter.roce_enable)
+  roce_memory_regions                      = lookup(each.value, "roce_memory_regions", local.defaults.intersight.policies.ethernet_adapter.roce_memory_regions)
+  roce_queue_pairs                         = lookup(each.value, "roce_queue_pairs", local.defaults.intersight.policies.ethernet_adapter.roce_queue_pairs)
+  roce_resource_groups                     = lookup(each.value, "roce_resource_groups", local.defaults.intersight.policies.ethernet_adapter.roce_resource_groups)
+  roce_version                             = lookup(each.value, "roce_version", local.defaults.intersight.policies.ethernet_adapter.roce_version)
+  rss_enable_ipv4_hash                     = lookup(each.value, "rss_enable_ipv4_hash", local.defaults.intersight.policies.ethernet_adapter.rss_enable_ipv4_hash)
+  rss_enable_ipv6_extensions_hash          = lookup(each.value, "rss_enable_ipv6_extensions_hash", local.defaults.intersight.policies.ethernet_adapter.rss_enable_ipv6_extensions_hash)
+  rss_enable_ipv6_hash                     = lookup(each.value, "rss_enable_ipv6_hash", local.defaults.intersight.policies.ethernet_adapter.rss_enable_ipv6_hash)
+  rss_enable_tcp_and_ipv4_hash             = lookup(each.value, "rss_enable_tcp_and_ipv4_hash", local.defaults.intersight.policies.ethernet_adapter.rss_enable_tcp_and_ipv4_hash)
+  rss_enable_tcp_and_ipv6_extensions_hash  = lookup(each.value, "rss_enable_tcp_and_ipv6_extensions_hash", local.defaults.intersight.policies.ethernet_adapter.rss_enable_tcp_and_ipv6_extensions_hash)
+  rss_enable_tcp_and_ipv6_hash             = lookup(each.value, "rss_enable_tcp_and_ipv6_hash", local.defaults.intersight.policies.ethernet_adapter.rss_enable_tcp_and_ipv6_hash)
+  rss_enable_udp_and_ipv4_hash             = lookup(each.value, "rss_enable_udp_and_ipv4_hash", local.defaults.intersight.policies.ethernet_adapter.rss_enable_udp_and_ipv4_hash)
+  rss_enable_udp_and_ipv6_hash             = lookup(each.value, "rss_enable_udp_and_ipv6_hash", local.defaults.intersight.policies.ethernet_adapter.rss_enable_udp_and_ipv6_hash)
+  receive_queue_count                      = lookup(each.value, "receive_queue_count", local.defaults.intersight.policies.ethernet_adapter.receive_queue_count)
+  receive_ring_size                        = lookup(each.value, "receive_ring_size", local.defaults.intersight.policies.ethernet_adapter.receive_ring_size)
   tags                                     = lookup(each.value, "tags", local.defaults.intersight.tags)
-  tcp_offload_large_recieve                = lookup(each.value, "tcp_offload_large_recieve", local.defaults.intersight.policies.ethernet_adpater.tcp_offload_large_recieve)
-  tcp_offload_large_send                   = lookup(each.value, "tcp_offload_large_send", local.defaults.intersight.policies.ethernet_adpater.tcp_offload_large_send)
-  tcp_offload_rx_checksum                  = lookup(each.value, "tcp_offload_rx_checksum", local.defaults.intersight.policies.ethernet_adpater.tcp_offload_rx_checksum)
-  tcp_offload_tx_checksum                  = lookup(each.value, "tcp_offload_tx_checksum", local.defaults.intersight.policies.ethernet_adpater.tcp_offload_tx_checksum)
-  transmit_queue_count                     = lookup(each.value, "transmit_queue_count", local.defaults.intersight.policies.ethernet_adpater.transmit_queue_count)
-  transmit_ring_size                       = lookup(each.value, "transmit_ring_size", local.defaults.intersight.policies.ethernet_adpater.transmit_ring_size)
-  uplink_failback_timeout                  = lookup(each.value, "uplink_failback_timeout", local.defaults.intersight.policies.ethernet_adpater.uplink_failback_timeout)
+  tcp_offload_large_recieve                = lookup(each.value, "tcp_offload_large_recieve", local.defaults.intersight.policies.ethernet_adapter.tcp_offload_large_recieve)
+  tcp_offload_large_send                   = lookup(each.value, "tcp_offload_large_send", local.defaults.intersight.policies.ethernet_adapter.tcp_offload_large_send)
+  tcp_offload_rx_checksum                  = lookup(each.value, "tcp_offload_rx_checksum", local.defaults.intersight.policies.ethernet_adapter.tcp_offload_rx_checksum)
+  tcp_offload_tx_checksum                  = lookup(each.value, "tcp_offload_tx_checksum", local.defaults.intersight.policies.ethernet_adapter.tcp_offload_tx_checksum)
+  transmit_queue_count                     = lookup(each.value, "transmit_queue_count", local.defaults.intersight.policies.ethernet_adapter.transmit_queue_count)
+  transmit_ring_size                       = lookup(each.value, "transmit_ring_size", local.defaults.intersight.policies.ethernet_adapter.transmit_ring_size)
+  uplink_failback_timeout                  = lookup(each.value, "uplink_failback_timeout", local.defaults.intersight.policies.ethernet_adapter.uplink_failback_timeout)
 }
 
 
@@ -287,16 +288,16 @@ module "ethernet_qos" {
       local.modules.policies, "ethernet_qos", true
     )
   }
-  burst          = lookup(each.value, "burst", local.defaults.intersight.policies.ethernet_qos.burst)
-  cos            = lookup(each.value, "cos", local.defaults.intersight.policies.ethernet_qos.cos)
-  description    = lookup(each.value, "description", "")
-  mtu            = lookup(each.value, "mtu", local.defaults.intersight.policies.ethernet_qos.mtu)
-  name           = "${each.value.name}${local.defaults.intersight.policies.ethernet_qos.name_suffix}"
-  organization   = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
-  priority       = lookup(each.value, "priority", local.defaults.intersight.policies.ethernet_qos.priority)
-  rate_limit     = lookup(each.value, "rate_limit", local.defaults.intersight.policies.ethernet_qos.rate_limit)
-  tags           = lookup(each.value, "tags", local.defaults.intersight.tags)
-  trust_host_cos = lookup(each.value, "trust_host_cos", local.defaults.intersight.policies.ethernet_qos.trust_host_cos)
+  burst                 = lookup(each.value, "burst", local.defaults.intersight.policies.ethernet_qos.burst)
+  cos                   = lookup(each.value, "cos", local.defaults.intersight.policies.ethernet_qos.cos)
+  description           = lookup(each.value, "description", "")
+  enable_trust_host_cos = lookup(each.value, "enable_trust_host_cos", local.defaults.intersight.policies.ethernet_qos.enable_trust_host_cos)
+  mtu                   = lookup(each.value, "mtu", local.defaults.intersight.policies.ethernet_qos.mtu)
+  name                  = "${each.value.name}${local.defaults.intersight.policies.ethernet_qos.name_suffix}"
+  organization          = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
+  priority              = lookup(each.value, "priority", local.defaults.intersight.policies.ethernet_qos.priority)
+  rate_limit            = lookup(each.value, "rate_limit", local.defaults.intersight.policies.ethernet_qos.rate_limit)
+  tags                  = lookup(each.value, "tags", local.defaults.intersight.tags)
 }
 
 
@@ -355,6 +356,7 @@ module "fibre_channel_adapter" {
   io_throttle_count                 = lookup(each.value, "io_throttle_count", local.defaults.intersight.policies.fibre_channel_adapter.io_throttle_count)
   lun_queue_depth                   = lookup(each.value, "lun_queue_depth", local.defaults.intersight.policies.fibre_channel_adapter.lun_queue_depth)
   max_luns_per_target               = lookup(each.value, "max_luns_per_target", local.defaults.intersight.policies.fibre_channel_adapter.max_luns_per_target)
+  name                              = "${each.value.name}${local.defaults.intersight.policies.fibre_channel_adapter.name_suffix}"
   organization                      = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
   plogi_retries                     = lookup(each.value, "plogi_retries", local.defaults.intersight.policies.fibre_channel_adapter.plogi_retries)
   plogi_timeout                     = lookup(each.value, "plogi_timeout", local.defaults.intersight.policies.fibre_channel_adapter.plogi_timeout)
@@ -382,7 +384,7 @@ module "fibre_channel_network" {
       local.modules.policies, "fibre_channel_network", true
     )
   }
-  default_vlan = lookup(
+  default_vlan_id = lookup(
     each.value, "default_vlan_id", local.defaults.intersight.policies.fibre_channel_network.default_vlan_id
   )
   description  = lookup(each.value, "description", "")
@@ -412,11 +414,11 @@ module "fibre_channel_qos" {
   cos         = lookup(each.value, "cos", local.defaults.intersight.policies.fibre_channel_qos.cos)
   description = lookup(each.value, "description", "")
   max_data_field_size = lookup(
-    each.value, "max_data_field_size", local.defaults.intersight.policies.ethernet_qos.max_data_field_size
+    each.value, "max_data_field_size", local.defaults.intersight.policies.fibre_channel_qos.max_data_field_size
   )
-  name         = "${each.value.name}${local.defaults.intersight.policies.ethernet_qos.name_suffix}"
+  name         = "${each.value.name}${local.defaults.intersight.policies.fibre_channel_qos.name_suffix}"
   organization = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
-  rate_limit   = lookup(each.value, "rate_limit", local.defaults.intersight.policies.ethernet_qos.rate_limit)
+  rate_limit   = lookup(each.value, "rate_limit", local.defaults.intersight.policies.fibre_channel_qos.rate_limit)
   tags         = lookup(each.value, "tags", local.defaults.intersight.tags)
 }
 
@@ -427,7 +429,7 @@ module "fibre_channel_qos" {
 # GUI Location: Policies > Create Policy > Flow Control
 #__________________________________________________________________
 
-module "flow_control_control" {
+module "flow_control" {
   source  = "terraform-cisco-modules/policies-flow-control/intersight"
   version = ">= 1.0.1"
 
@@ -463,7 +465,7 @@ module "imc_access" {
   }
   description = lookup(each.value, "description", "")
   inband_ip_pool = length(
-    compact([each.value.inband_ip_pool])
+    compact([lookup(each.value, "inband_ip_pool", "")])
   ) > 0 ? local.pools.ip[each.value.inband_ip_pool].moid : ""
   inband_vlan_id = lookup(
   each.value, "inband_vlan_id", local.defaults.intersight.policies.imc_access.inband_vlan_id)
@@ -474,7 +476,7 @@ module "imc_access" {
   name         = "${each.value.name}${local.defaults.intersight.policies.imc_access.name_suffix}"
   organization = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
   out_of_band_ip_pool = length(
-    compact([each.value.out_of_band_ip_pool])
+    compact([lookup(each.value, "out_of_band_ip_pool", "")])
   ) > 0 ? local.pools.ip[each.value.out_of_band_ip_pool].moid : ""
   tags = lookup(each.value, "tags", local.defaults.intersight.tags)
 }
@@ -572,13 +574,12 @@ module "iscsi_boot" {
   description  = lookup(each.value, "description", "")
   name         = "${each.value.name}${local.defaults.intersight.policies.ethernet_qos.name_suffix}"
   organization = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
-  password     = lookup(each.value, "password", 0)
   primary_target_policy = length(
     compact([each.value.primary_target_policy])
-  ) > 0 ? module.iscsi_static_targets[each.value.primary_target_policy].moid : ""
+  ) > 0 ? module.iscsi_static_target[each.value.primary_target_policy].moid : ""
   secondary_target_policy = length(
     compact([each.value.secondary_target_policy])
-  ) > 0 ? module.iscsi_static_targets[each.value.secondary_target_policy].moid : ""
+  ) > 0 ? module.iscsi_static_target[each.value.secondary_target_policy].moid : ""
   tags = lookup(each.value, "tags", local.defaults.intersight.tags)
   target_source_type = lookup(
     each.value, "target_source_type", local.defaults.intersight.policies.iscsi_boot.target_source_type
@@ -607,6 +608,7 @@ module "iscsi_static_target" {
   lun          = lookup(each.value, "lun", [])
   name         = "${each.value.name}${local.defaults.intersight.policies.iscsi_static_target.name_suffix}"
   organization = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
+  port         = each.value.port
   tags         = lookup(each.value, "tags", local.defaults.intersight.tags)
   target_name  = each.value.target_name
 }
@@ -624,7 +626,7 @@ module "lan_connectivity" {
     module.ethernet_network,
     module.ethernet_network_control,
     module.ethernet_network_group,
-    module.ethernet_network_qos,
+    module.ethernet_qos,
     module.iscsi_boot
   ]
   source  = "terraform-cisco-modules/policies-lan-connectivity/intersight"
@@ -637,35 +639,35 @@ module "lan_connectivity" {
   }
   description = lookup(each.value, "description", "")
   enable_azure_stack_host_qos = lookup(
-    each.value, "enable_azure_stack_host_qos", local.defaults.policies.lan_connectivity.enable_azure_stack_host_qos
+    each.value, "enable_azure_stack_host_qos", local.defaults.intersight.policies.lan_connectivity.enable_azure_stack_host_qos
   )
   iqn_allocation_type = lookup(
-    each.value, "iqn_allocation_type", local.defaults.policies.lan_connectivity.iqn_allocation_type
+    each.value, "iqn_allocation_type", local.defaults.intersight.policies.lan_connectivity.iqn_allocation_type
   )
-  iqn_pool = length(compact([each.value.iqn_pool])) > 0 ? local.pools.iqn[each.value.iqn_pool].moid : ""
+  iqn_pool = length(compact([lookup(each.value, "iqn_pool", "")])) > 0 ? local.pools.iqn[each.value.iqn_pool].moid : ""
   iqn_static_identifier = lookup(
     each.value, "iqn_static_identifier", ""
   )
   name            = "${each.value.name}${local.defaults.intersight.policies.lan_connectivity.name_suffix}"
   organization    = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
   tags            = lookup(each.value, "tags", local.defaults.intersight.tags)
-  target_platform = lookup(each.value, "target_platform", local.defaults.policies.lan_connectivity.target_platform)
+  target_platform = lookup(each.value, "target_platform", local.defaults.intersight.policies.lan_connectivity.target_platform)
   vnic_placement_mode = lookup(
-    each.value, "vnic_placement_mode", local.defaults.policies.lan_connectivity.vnic_placement_mode
+    each.value, "vnic_placement_mode", local.defaults.intersight.policies.lan_connectivity.vnic_placement_mode
   )
   vnics = [
     for v in lookup(each.value, "vnics", []) : {
       cdn_value       = lookup(v, "cdn_value", local.defaults.intersight.policies.lan_connectivity.vnics.cdn_value)
       enable_failover = lookup(v, "enable_failover", local.defaults.intersight.policies.lan_connectivity.vnics.enable_failover)
-      ethernet_adapter_policy = module.ethernet_adapter_policy[
+      ethernet_adapter_policy = module.ethernet_adapter[
         lookup(v, "ethernet_adapter_policy", local.defaults.intersight.policies.lan_connectivity.vnics.ethernet_adapter_policy)
       ].moid
-      ethernet_network_control_policy = module.ethernet_network_control_policy[
+      ethernet_network_control_policy = module.ethernet_network_control[
         lookup(v, "ethernet_network_control_policy", local.defaults.intersight.policies.lan_connectivity.vnics.ethernet_network_control_policy)
       ].moid
       ethernet_network_group_policy = length(compact([
         lookup(v, "ethernet_network_group_policy", local.defaults.intersight.policies.lan_connectivity.vnics.ethernet_network_group_policy)])
-        ) > 0 ? module.ethernet_network[lookup(
+        ) > 0 ? module.ethernet_network_group[lookup(
         v, "ethernet_network_group_policy", local.defaults.intersight.policies.lan_connectivity.vnics.ethernet_network_group_policy)
       ].moid : ""
       ethernet_network_policy = length(compact([
@@ -673,7 +675,7 @@ module "lan_connectivity" {
         ) > 0 ? module.ethernet_network[lookup(
         v, "ethernet_network_policy", local.defaults.intersight.policies.lan_connectivity.vnics.ethernet_network_policy)
       ].moid : ""
-      ethernet_qos_policy = module.ethernet_qos_policy[
+      ethernet_qos_policy = module.ethernet_qos[
         lookup(v, "ethernet_qos_policy", local.defaults.intersight.policies.lan_connectivity.vnics.ethernet_qos_policy)
       ].moid
       iscsi_boot_policy = length(compact([lookup(
@@ -708,8 +710,8 @@ module "lan_connectivity" {
         v, "placement_uplink_port", local.defaults.intersight.policies.lan_connectivity.vnics.placement_uplink_port
       )
       usnic_adapter_policy = length(
-        compact([v, "usnic_adapter_policy"])
-      ) > 0 > module.ethernet_network_adpater[v.usnic_adapter_policy].moid
+        compact([lookup(v, "usnic_adapter_policy", "")])
+      ) > 0 ? module.ethernet_adapter[v.usnic_adapter_policy].moid : ""
       usnic_class_of_service = lookup(
         v, "usnic_class_of_service", local.defaults.intersight.policies.lan_connectivity.vnics.usnic_class_of_service
       )
@@ -732,8 +734,8 @@ module "lan_connectivity" {
         v, "vmq_number_of_virtual_machine_queues", local.defaults.intersight.policies.lan_connectivity.vnics.vmq_number_of_virtual_machine_queues
       )
       vmq_vmmq_adapter_policy = length(
-        compact([v, "vmq_vmmq_adapter_policy"])
-      ) > 0 > module.ethernet_network_adpater[v.vmq_vmmq_adapter_policy].moid
+        compact([lookup(v, "vmq_vmmq_adapter_policy", "")])
+      ) > 0 ? module.ethernet_adapter[v.vmq_vmmq_adapter_policy].moid : ""
     }
   ]
 }
@@ -888,7 +890,7 @@ module "local_user" {
     each.value, "enforce_strong_password", local.defaults.intersight.policies.local_user.enforce_strong_password
   )
   grace_period = lookup(each.value, "grace_period", local.defaults.intersight.policies.local_user.grace_period)
-  name         = "${each.value.name}${local.defaults.intersight.policies.ldap.name_suffix}"
+  name         = "${each.value.name}${local.defaults.intersight.policies.local_user.name_suffix}"
   notification_period = lookup(
     each.value, "notification_period", local.defaults.intersight.policies.local_user.notification_period
   )
@@ -920,7 +922,7 @@ module "multicast" {
     )
   }
   description  = lookup(each.value, "description", "")
-  name         = "${each.value.name}${local.defaults.intersight.policies.ldap.name_suffix}"
+  name         = "${each.value.name}${local.defaults.intersight.policies.multicast.name_suffix}"
   organization = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
   querier_ip_address = lookup(
     each.value, "querier_ip_address", local.defaults.intersight.policies.multicast.querier_ip_address
@@ -962,7 +964,7 @@ module "network_connectivity" {
   enable_ipv6 = lookup(
     each.value, "enable_ipv6", local.defaults.intersight.policies.network_connectivity.enable_ipv6
   )
-  name = "${each.value.name}${local.defaults.intersight.policies.ldap.name_suffix}"
+  name = "${each.value.name}${local.defaults.intersight.policies.network_connectivity.name_suffix}"
   obtain_ipv4_dns_from_dhcp = lookup(
     each.value, "obtain_ipv4_dns_from_dhcp", local.defaults.intersight.policies.network_connectivity.obtain_ipv4_dns_from_dhcp
   )
@@ -975,7 +977,7 @@ module "network_connectivity" {
       name        = v.moid
       object_type = "fabric.SwitchProfile"
       } if length(regexall(v.name, v.network_connectivity_policy)) > 0 || length(regexall(
-      v.network_connectivity_policy, "${each.value.name}${local.defaults.intersight.policies.ldap.name_suffix}")
+      v.network_connectivity_policy, "${each.value.name}${local.defaults.intersight.policies.network_connectivity.name_suffix}")
     ) > 0
   ]
   tags          = lookup(each.value, "tags", local.defaults.intersight.tags)
@@ -1000,15 +1002,15 @@ module "ntp" {
   }
   description  = lookup(each.value, "description", "")
   enabled      = lookup(each.value, "enabled", local.defaults.intersight.policies.ntp.enabled)
-  name         = "${each.value.name}${local.defaults.intersight.policies.ldap.name_suffix}"
+  name         = "${each.value.name}${local.defaults.intersight.policies.ntp.name_suffix}"
   ntp_servers  = lookup(each.value, "ntp_servers", local.defaults.intersight.policies.ntp.ntp_servers)
   organization = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
   profiles = [
     for v in local.domains : {
       name        = v.moid
       object_type = "fabric.SwitchProfile"
-      } if length(regexall(v.name, v.ntp_policy)) > 0 || length(regexall(
-      v.ntp_policy, "${each.value.name}${local.defaults.intersight.policies.ldap.name_suffix}")
+      } if length(regexall(each.value.name, v.ntp_policy)) > 0 || length(regexall(
+      v.ntp_policy, "${each.value.name}${local.defaults.intersight.policies.ntp.name_suffix}")
     ) > 0
   ]
   tags     = lookup(each.value, "tags", local.defaults.intersight.tags)
@@ -1197,8 +1199,8 @@ module "port" {
     }
   ]
   profiles = [
-    for v in local.domains : v.moid if length(regexall(v.name, v.ntp_policy)) > 0 || length(regexall(
-      v.ntp_policy, "${each.value.name}${local.defaults.intersight.policies.ldap.name_suffix}")
+    for v in local.domains : v.moid if length(regexall(v.name, v.port_policy)) > 0 || length(regexall(
+      v.port_policy, "${each.value.name}${local.defaults.intersight.policies.port.name_suffix}")
     ) > 0
   ]
   tags = lookup(each.value, "tags", local.defaults.intersight.tags)
@@ -1264,7 +1266,7 @@ module "san_connectivity" {
   target_platform     = lookup(each.value, "target_platform", local.defaults.intersight.policies.san_connectivity.target_platform)
   vhba_placement_mode = lookup(each.value, "vhba_placement_mode", local.defaults.intersight.policies.san_connectivity.vhba_placement_mode)
   vhbas = [
-    for v in lookup(each.value, "vhba", []) : {
+    for v in lookup(each.value, "vhbas", []) : {
       fc_zone_policies = length(lookup(
         v, "fc_zone_policies", local.defaults.intersight.policies.san_connectivity.vhbas.fc_zone_policies)
       ) > 0 ? [for s in v.fc_zone_policies : module.fc_zone[s].moid] : []
@@ -1286,12 +1288,12 @@ module "san_connectivity" {
       placement_uplink_port   = lookup(v, "placement_uplink_port", local.defaults.intersight.policies.san_connectivity.vhbas.placement_uplink_port)
       vhba_type               = lookup(v, "vhba_type", local.defaults.intersight.policies.san_connectivity.vhbas.vhba_type)
       wwpn_allocation_type    = lookup(v, "wwpn_allocation_type", local.defaults.intersight.policies.san_connectivity.vhbas.wwpn_allocation_type)
-      wwpn_pool               = length(compact([v.wwpn_pool])) > 0 ? local.pools.wwpn[each.value.wwpn_pool].moid : ""
+      wwpn_pool               = length(compact([lookup(v, "wwpn_pool", "")])) > 0 ? local.pools.wwpn[v.wwpn_pool].moid : ""
       wwpn_static_address     = lookup(v, "wwpn_static_address", "")
     }
   ]
   wwnn_allocation_type = lookup(each.value, "wwnn_allocation_type", local.defaults.intersight.policies.san_connectivity.wwnn_allocation_type)
-  wwnn_pool            = length(compact([each.value.wwnn_pool])) > 0 ? local.pools.wwnn[each.value.wwnn_pool].moid : ""
+  wwnn_pool            = length(compact([lookup(each.value, "wwnn_pool", "")])) > 0 ? local.pools.wwnn[each.value.wwnn_pool].moid : ""
   wwnn_static_address  = lookup(each.value, "wwnn_static_address", "")
 }
 
@@ -1407,8 +1409,8 @@ module "snmp" {
     for v in local.domains : {
       name        = v.moid
       object_type = "fabric.SwitchProfile"
-      } if length(regexall(v.name, v.ntp_policy)) > 0 || length(regexall(
-      v.ntp_policy, "${each.value.name}${local.defaults.intersight.policies.ldap.name_suffix}")
+      } if length(regexall(v.name, v.snmp_policy)) > 0 || length(regexall(
+      v.snmp_policy, "${each.value.name}${local.defaults.intersight.policies.snmp.name_suffix}")
     ) > 0
   ]
   snmp_community_access = lookup(each.value, "snmp_community_access", 0)
@@ -1466,7 +1468,7 @@ module "storage" {
     )
   }
   description       = lookup(each.value, "description", "")
-  drive_group       = lookup(each.value, "drive_group", [])
+  drive_groups      = lookup(each.value, "drive_groups", [])
   global_hot_spares = lookup(each.value, "global_hot_spares", local.defaults.intersight.policies.storage.global_hot_spares)
   m2_configuration  = lookup(each.value, "m2_configuration", [])
   name              = "${each.value.name}${local.defaults.intersight.policies.storage.name_suffix}"
@@ -1511,8 +1513,8 @@ module "switch_control" {
   name           = "${each.value.name}${local.defaults.intersight.policies.switch_control.name_suffix}"
   organization   = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
   profiles = [
-    for v in local.domains : v.moid if length(regexall(v.name, v.ntp_policy)) > 0 || length(regexall(
-      v.ntp_policy, "${each.value.name}${local.defaults.intersight.policies.ldap.name_suffix}")
+    for v in local.domains : v.moid if length(regexall(v.name, v.switch_control_policy)) > 0 || length(regexall(
+      v.switch_control_policy, "${each.value.name}${local.defaults.intersight.policies.switch_control.name_suffix}")
     ) > 0
   ]
   tags = lookup(each.value, "tags", local.defaults.intersight.tags)
@@ -1553,8 +1555,8 @@ module "syslog" {
     for v in local.domains : {
       name        = v.moid
       object_type = "fabric.SwitchProfile"
-      } if length(regexall(v.name, v.ntp_policy)) > 0 || length(regexall(
-      v.ntp_policy, "${each.value.name}${local.defaults.intersight.policies.ldap.name_suffix}")
+      } if length(regexall(v.name, v.syslog_policy)) > 0 || length(regexall(
+      v.syslog_policy, "${each.value.name}${local.defaults.intersight.policies.syslog.name_suffix}")
     ) > 0
   ]
   remote_clients = lookup(each.value, "remote_clients", [])
@@ -1582,8 +1584,8 @@ module "system_qos" {
   name         = "${each.value.name}${local.defaults.intersight.policies.system_qos.name_suffix}"
   organization = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
   profiles = [
-    for v in local.domains : v.moid if length(regexall(v.name, v.ntp_policy)) > 0 || length(regexall(
-      v.ntp_policy, "${each.value.name}${local.defaults.intersight.policies.ldap.name_suffix}")
+    for v in local.domains : v.moid if length(regexall(v.name, v.system_qos_policy)) > 0 || length(regexall(
+      v.system_qos_policy, "${each.value.name}${local.defaults.intersight.policies.system_qos.name_suffix}")
     ) > 0
   ]
   tags = lookup(each.value, "tags", local.defaults.intersight.tags)
@@ -1705,8 +1707,8 @@ module "vlan" {
   name         = "${each.value.name}${local.defaults.intersight.policies.vlan.name_suffix}"
   organization = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
   profiles = [
-    for v in local.domains : v.moid if length(regexall(v.name, v.ntp_policy)) > 0 || length(regexall(
-      v.ntp_policy, "${each.value.name}${local.defaults.intersight.policies.ldap.name_suffix}")
+    for v in local.domains : v.moid if length(regexall(v.name, v.vlan_policy)) > 0 || length(regexall(
+      v.vlan_policy, "${each.value.name}${local.defaults.intersight.policies.vlan.name_suffix}")
     ) > 0
   ]
   tags = lookup(each.value, "tags", local.defaults.intersight.tags)
@@ -1743,8 +1745,8 @@ module "vsan" {
   name         = "${each.value.name}${local.defaults.intersight.policies.vsan.name_suffix}"
   organization = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
   profiles = [
-    for v in local.domains : v.moid if length(regexall(v.name, v.ntp_policy)) > 0 || length(regexall(
-      v.ntp_policy, "${each.value.name}${local.defaults.intersight.policies.ldap.name_suffix}")
+    for v in local.domains : v.moid if length(regexall(v.name, v.vsan_policy)) > 0 || length(regexall(
+      v.vsan_policy, "${each.value.name}${local.defaults.intersight.policies.vsan.name_suffix}")
     ) > 0
   ]
   tags            = lookup(each.value, "tags", local.defaults.intersight.tags)
