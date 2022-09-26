@@ -1,6 +1,6 @@
 locals {
   defaults   = lookup(var.model, "defaults", {})
-  domains    = var.domains.domain
+  domains    = var.domains
   modules    = lookup(var.model, "modules", {})
   intersight = lookup(var.model, "intersight", {})
   orgs       = var.pools.orgs
@@ -969,7 +969,15 @@ module "network_connectivity" {
   obtain_ipv6_dns_from_dhcp = lookup(
     each.value, "obtain_ipv6_dns_from_dhcp", local.defaults.intersight.policies.network_connectivity.obtain_ipv6_dns_from_dhcp
   )
-  organization  = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
+  organization = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
+  profiles = [
+    for v in local.domains : {
+      name        = v.moid
+      object_type = "fabric.SwitchProfile"
+      } if length(regexall(v.name, v.network_connectivity_policy)) > 0 || length(regexall(
+      v.network_connectivity_policy, "${each.value.name}${local.defaults.intersight.policies.ldap.name_suffix}")
+    ) > 0
+  ]
   tags          = lookup(each.value, "tags", local.defaults.intersight.tags)
   update_domain = lookup(each.value, "update_domain", local.defaults.intersight.policies.network_connectivity.update_domain)
 }
@@ -995,8 +1003,16 @@ module "ntp" {
   name         = "${each.value.name}${local.defaults.intersight.policies.ldap.name_suffix}"
   ntp_servers  = lookup(each.value, "ntp_servers", local.defaults.intersight.policies.ntp.ntp_servers)
   organization = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
-  tags         = lookup(each.value, "tags", local.defaults.intersight.tags)
-  timezone     = lookup(each.value, "timezone", local.defaults.intersight.policies.ntp.timezone)
+  profiles = [
+    for v in local.domains : {
+      name        = v.moid
+      object_type = "fabric.SwitchProfile"
+      } if length(regexall(v.name, v.ntp_policy)) > 0 || length(regexall(
+      v.ntp_policy, "${each.value.name}${local.defaults.intersight.policies.ldap.name_suffix}")
+    ) > 0
+  ]
+  tags     = lookup(each.value, "tags", local.defaults.intersight.tags)
+  timezone = lookup(each.value, "timezone", local.defaults.intersight.policies.ntp.timezone)
 }
 
 
@@ -1091,6 +1107,13 @@ module "port" {
       pc_id = v.pc_id
     }
   ]
+  port_modes = [
+    for v in lookup(each.value, "port_modes", []) : {
+      custom_mode = lookup(v, "custom_mode", local.defaults.intersight.policies.port.port_modes.custom_mode)
+      port_list   = v.port_list
+      slot_id     = lookup(v, "slot_id", 0)
+    }
+  ]
   port_role_appliances = [
     for v in lookup(each.value, "port_role_appliances", []) : {
       admin_speed      = lookup(v, "admin_speed", local.defaults.intersight.policies.port.port_role_appliances.admin_speed)
@@ -1172,6 +1195,11 @@ module "port" {
       port_list        = v.port_list
       slot_id          = lookup(v, "slot_id", 0)
     }
+  ]
+  profiles = [
+    for v in local.domains : v.moid if length(regexall(v.name, v.ntp_policy)) > 0 || length(regexall(
+      v.ntp_policy, "${each.value.name}${local.defaults.intersight.policies.ldap.name_suffix}")
+    ) > 0
   ]
   tags = lookup(each.value, "tags", local.defaults.intersight.tags)
 }
@@ -1375,7 +1403,15 @@ module "snmp" {
   enable_snmp             = lookup(each.value, "enable_snmp", local.defaults.intersight.policies.snmp.enable_snmp)
   name                    = "${each.value.name}${local.defaults.intersight.policies.snmp.name_suffix}"
   organization            = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
-  snmp_community_access   = lookup(each.value, "snmp_community_access", 0)
+  profiles = [
+    for v in local.domains : {
+      name        = v.moid
+      object_type = "fabric.SwitchProfile"
+      } if length(regexall(v.name, v.ntp_policy)) > 0 || length(regexall(
+      v.ntp_policy, "${each.value.name}${local.defaults.intersight.policies.ldap.name_suffix}")
+    ) > 0
+  ]
+  snmp_community_access = lookup(each.value, "snmp_community_access", 0)
   snmp_engine_input_id = lookup(
     each.value, "snmp_engine_input_id", local.defaults.intersight.policies.snmp.snmp_engine_input_id
   )
@@ -1474,7 +1510,12 @@ module "switch_control" {
   mac_aging_time = lookup(each.value, "mac_aging_time", local.defaults.intersight.policies.switch_control.mac_aging_time)
   name           = "${each.value.name}${local.defaults.intersight.policies.switch_control.name_suffix}"
   organization   = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
-  tags           = lookup(each.value, "tags", local.defaults.intersight.tags)
+  profiles = [
+    for v in local.domains : v.moid if length(regexall(v.name, v.ntp_policy)) > 0 || length(regexall(
+      v.ntp_policy, "${each.value.name}${local.defaults.intersight.policies.ldap.name_suffix}")
+    ) > 0
+  ]
+  tags = lookup(each.value, "tags", local.defaults.intersight.tags)
   udld_message_interval = lookup(
     each.value, "udld_message_interval", local.defaults.intersight.policies.switch_control.udld_message_interval
   )
@@ -1506,8 +1547,16 @@ module "syslog" {
   local_min_severity = lookup(
     each.value, "local_min_severity", local.defaults.intersight.policies.syslog.local_min_severity
   )
-  name           = "${each.value.name}${local.defaults.intersight.policies.syslog.name_suffix}"
-  organization   = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
+  name         = "${each.value.name}${local.defaults.intersight.policies.syslog.name_suffix}"
+  organization = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
+  profiles = [
+    for v in local.domains : {
+      name        = v.moid
+      object_type = "fabric.SwitchProfile"
+      } if length(regexall(v.name, v.ntp_policy)) > 0 || length(regexall(
+      v.ntp_policy, "${each.value.name}${local.defaults.intersight.policies.ldap.name_suffix}")
+    ) > 0
+  ]
   remote_clients = lookup(each.value, "remote_clients", [])
   tags           = lookup(each.value, "tags", local.defaults.intersight.tags)
 }
@@ -1532,7 +1581,12 @@ module "system_qos" {
   classes      = lookup(each.value, "classes", [])
   name         = "${each.value.name}${local.defaults.intersight.policies.system_qos.name_suffix}"
   organization = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
-  tags         = lookup(each.value, "tags", local.defaults.intersight.tags)
+  profiles = [
+    for v in local.domains : v.moid if length(regexall(v.name, v.ntp_policy)) > 0 || length(regexall(
+      v.ntp_policy, "${each.value.name}${local.defaults.intersight.policies.ldap.name_suffix}")
+    ) > 0
+  ]
+  tags = lookup(each.value, "tags", local.defaults.intersight.tags)
 }
 
 
@@ -1650,7 +1704,12 @@ module "vlan" {
   description  = lookup(each.value, "description", "")
   name         = "${each.value.name}${local.defaults.intersight.policies.vlan.name_suffix}"
   organization = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
-  tags         = lookup(each.value, "tags", local.defaults.intersight.tags)
+  profiles = [
+    for v in local.domains : v.moid if length(regexall(v.name, v.ntp_policy)) > 0 || length(regexall(
+      v.ntp_policy, "${each.value.name}${local.defaults.intersight.policies.ldap.name_suffix}")
+    ) > 0
+  ]
+  tags = lookup(each.value, "tags", local.defaults.intersight.tags)
   vlans = [
     for v in lookup(each.value, "vlans", []) : {
       auto_allow_on_uplinks = lookup(
@@ -1680,9 +1739,14 @@ module "vsan" {
       local.modules.policies, "vsan", true
     )
   }
-  description     = lookup(each.value, "description", "")
-  name            = "${each.value.name}${local.defaults.intersight.policies.vsan.name_suffix}"
-  organization    = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
+  description  = lookup(each.value, "description", "")
+  name         = "${each.value.name}${local.defaults.intersight.policies.vsan.name_suffix}"
+  organization = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
+  profiles = [
+    for v in local.domains : v.moid if length(regexall(v.name, v.ntp_policy)) > 0 || length(regexall(
+      v.ntp_policy, "${each.value.name}${local.defaults.intersight.policies.ldap.name_suffix}")
+    ) > 0
+  ]
   tags            = lookup(each.value, "tags", local.defaults.intersight.tags)
   uplink_trunking = lookup(each.value, "uplink_trunking", local.defaults.intersight.policies.vsan.uplink_trunking)
   vsans           = lookup(each.value, "vsans", [])
