@@ -16,12 +16,12 @@ output "adapter_configuration" {
 # BIOS Policy Outputs
 #__________________________________________________________
 
-# output "bios" {
-#   description = "Moid's of the BIOS Policies."
-#   value = length(lookup(local.policies, "bios", [])) > 0 ? { for v in sort(
-#     keys(module.bios)
-#   ) : v => module.bios[v].moid } : {}
-# }
+output "bios" {
+  description = "Moid's of the BIOS Policies."
+  value = length(lookup(local.policies, "bios", [])) > 0 ? { for v in sort(
+    keys(module.bios)
+  ) : v => module.bios[v].moid } : {}
+}
 
 
 #__________________________________________________________

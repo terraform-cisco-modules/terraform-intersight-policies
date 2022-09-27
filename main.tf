@@ -50,13 +50,469 @@ module "adapter_configuration" {
 
 #__________________________________________________________________
 #
+# Intersight BIOS Policy
+# GUI Location: Policies > Create Policy > BIOS
+#__________________________________________________________________
+
+module "bios" {
+  source  = "terraform-cisco-modules/policies-bios/intersight"
+  version = ">= 1.0.1"
+
+  for_each = {
+    for v in lookup(local.policies, "bios", []) : v.name => v if lookup(
+      local.modules.policies, "bios", true
+    )
+  }
+  bios_template = lookup(each.value, "bios_template", "")
+  description   = lookup(each.value, "description", "")
+  name          = "${each.value.name}${local.defaults.intersight.policies.bios.name_suffix}"
+  organization  = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
+  tags          = lookup(each.value, "tags", local.defaults.intersight.tags)
+  #+++++++++++++++++++++++++++++++
+  # Boot Options Section
+  #+++++++++++++++++++++++++++++++
+  boot_option_num_retry        = lookup(each.value, "boot_option_num_retry", local.defaults.intersight.policies.bios.boot_option_num_retry)
+  boot_option_re_cool_down     = lookup(each.value, "boot_option_re_cool_down", local.defaults.intersight.policies.bios.boot_option_re_cool_down)
+  boot_option_retry            = lookup(each.value, "boot_option_retry", local.defaults.intersight.policies.bios.boot_option_retry)
+  ipv4http                     = lookup(each.value, "ipv4http", local.defaults.intersight.policies.bios.ipv4http)
+  ipv4pxe                      = lookup(each.value, "ipv4pxe", local.defaults.intersight.policies.bios.ipv4pxe)
+  ipv6http                     = lookup(each.value, "ipv6http", local.defaults.intersight.policies.bios.ipv6http)
+  ipv6pxe                      = lookup(each.value, "ipv6pxe", local.defaults.intersight.policies.bios.ipv6pxe)
+  network_stack                = lookup(each.value, "network_stack", local.defaults.intersight.policies.bios.network_stack)
+  onboard_scu_storage_support  = lookup(each.value, "onboard_scu_storage_support", local.defaults.intersight.policies.bios.onboard_scu_storage_support)
+  onboard_scu_storage_sw_stack = lookup(each.value, "onboard_scu_storage_sw_stack", local.defaults.intersight.policies.bios.onboard_scu_storage_sw_stack)
+  pop_support                  = lookup(each.value, "pop_support", local.defaults.intersight.policies.bios.pop_support)
+  psata                        = lookup(each.value, "psata", local.defaults.intersight.policies.bios.psata)
+  sata_mode_select             = lookup(each.value, "sata_mode_select", local.defaults.intersight.policies.bios.sata_mode_select)
+  vmd_enable                   = lookup(each.value, "vmd_enable", local.defaults.intersight.policies.bios.vmd_enable)
+  #+++++++++++++++++++++++++++++++
+  # Intel Directed IO Section
+  #+++++++++++++++++++++++++++++++
+  intel_vt_for_directed_io           = lookup(each.value, "intel_vt_for_directed_io", local.defaults.intersight.policies.bios.intel_vt_for_directed_io)
+  intel_vtd_coherency_support        = lookup(each.value, "intel_vtd_coherency_support", local.defaults.intersight.policies.bios.intel_vtd_coherency_support)
+  intel_vtd_interrupt_remapping      = lookup(each.value, "intel_vtd_interrupt_remapping", local.defaults.intersight.policies.bios.intel_vtd_interrupt_remapping)
+  intel_vtd_pass_through_dma_support = lookup(each.value, "intel_vtd_pass_through_dma_support", local.defaults.intersight.policies.bios.intel_vtd_pass_through_dma_support)
+  intel_vtdats_support               = lookup(each.value, "intel_vtdats_support", local.defaults.intersight.policies.bios.intel_vtdats_support)
+  #+++++++++++++++++++++++++++++++
+  # LOM and PCIe Slots Section
+  #+++++++++++++++++++++++++++++++
+  acs_control_gpu1state          = lookup(each.value, "acs_control_gpu1state", local.defaults.intersight.policies.bios.acs_control_gpu1state)
+  acs_control_gpu2state          = lookup(each.value, "acs_control_gpu2state", local.defaults.intersight.policies.bios.acs_control_gpu2state)
+  acs_control_gpu3state          = lookup(each.value, "acs_control_gpu3state", local.defaults.intersight.policies.bios.acs_control_gpu3state)
+  acs_control_gpu4state          = lookup(each.value, "acs_control_gpu4state", local.defaults.intersight.policies.bios.acs_control_gpu4state)
+  acs_control_gpu5state          = lookup(each.value, "acs_control_gpu5state", local.defaults.intersight.policies.bios.acs_control_gpu5state)
+  acs_control_gpu6state          = lookup(each.value, "acs_control_gpu6state", local.defaults.intersight.policies.bios.acs_control_gpu6state)
+  acs_control_gpu7state          = lookup(each.value, "acs_control_gpu7state", local.defaults.intersight.policies.bios.acs_control_gpu7state)
+  acs_control_gpu8state          = lookup(each.value, "acs_control_gpu8state", local.defaults.intersight.policies.bios.acs_control_gpu8state)
+  acs_control_slot11state        = lookup(each.value, "acs_control_slot11state", local.defaults.intersight.policies.bios.acs_control_slot11state)
+  acs_control_slot12state        = lookup(each.value, "acs_control_slot12state", local.defaults.intersight.policies.bios.acs_control_slot12state)
+  acs_control_slot13state        = lookup(each.value, "acs_control_slot13state", local.defaults.intersight.policies.bios.acs_control_slot13state)
+  acs_control_slot14state        = lookup(each.value, "acs_control_slot14state", local.defaults.intersight.policies.bios.acs_control_slot14state)
+  cdn_support                    = lookup(each.value, "cdn_support", local.defaults.intersight.policies.bios.cdn_support)
+  edpc_en                        = lookup(each.value, "edpc_en", local.defaults.intersight.policies.bios.edpc_en)
+  enable_clock_spread_spec       = lookup(each.value, "enable_clock_spread_spec", local.defaults.intersight.policies.bios.enable_clock_spread_spec)
+  lom_port0state                 = lookup(each.value, "lom_port0state", local.defaults.intersight.policies.bios.lom_port0state)
+  lom_port1state                 = lookup(each.value, "lom_port1state", local.defaults.intersight.policies.bios.lom_port1state)
+  lom_port2state                 = lookup(each.value, "lom_port2state", local.defaults.intersight.policies.bios.lom_port2state)
+  lom_port3state                 = lookup(each.value, "lom_port3state", local.defaults.intersight.policies.bios.lom_port3state)
+  lom_ports_all_state            = lookup(each.value, "lom_ports_all_state", local.defaults.intersight.policies.bios.lom_ports_all_state)
+  pci_option_ro_ms               = lookup(each.value, "pci_option_ro_ms", local.defaults.intersight.policies.bios.pci_option_ro_ms)
+  pci_rom_clp                    = lookup(each.value, "pci_rom_clp", local.defaults.intersight.policies.bios.pci_rom_clp)
+  pcie_ari_support               = lookup(each.value, "pcie_ari_support", local.defaults.intersight.policies.bios.pcie_ari_support)
+  pcie_pll_ssc                   = lookup(each.value, "pcie_pll_ssc", local.defaults.intersight.policies.bios.pcie_pll_ssc)
+  pcie_slot_mraid1link_speed     = lookup(each.value, "pcie_slot_mraid1link_speed", local.defaults.intersight.policies.bios.pcie_slot_mraid1link_speed)
+  pcie_slot_mraid1option_rom     = lookup(each.value, "pcie_slot_mraid1option_rom", local.defaults.intersight.policies.bios.pcie_slot_mraid1option_rom)
+  pcie_slot_mraid2link_speed     = lookup(each.value, "pcie_slot_mraid2link_speed", local.defaults.intersight.policies.bios.pcie_slot_mraid2link_speed)
+  pcie_slot_mraid2option_rom     = lookup(each.value, "pcie_slot_mraid2option_rom", local.defaults.intersight.policies.bios.pcie_slot_mraid2option_rom)
+  pcie_slot_mstorraid_link_speed = lookup(each.value, "pcie_slot_mstorraid_link_speed", local.defaults.intersight.policies.bios.pcie_slot_mstorraid_link_speed)
+  pcie_slot_mstorraid_option_rom = lookup(each.value, "pcie_slot_mstorraid_option_rom", local.defaults.intersight.policies.bios.pcie_slot_mstorraid_option_rom)
+  pcie_slot_nvme1link_speed      = lookup(each.value, "pcie_slot_nvme1link_speed", local.defaults.intersight.policies.bios.pcie_slot_nvme1link_speed)
+  pcie_slot_nvme1option_rom      = lookup(each.value, "pcie_slot_nvme1option_rom", local.defaults.intersight.policies.bios.pcie_slot_nvme1option_rom)
+  pcie_slot_nvme2link_speed      = lookup(each.value, "pcie_slot_nvme2link_speed", local.defaults.intersight.policies.bios.pcie_slot_nvme2link_speed)
+  pcie_slot_nvme2option_rom      = lookup(each.value, "pcie_slot_nvme2option_rom", local.defaults.intersight.policies.bios.pcie_slot_nvme2option_rom)
+  pcie_slot_nvme3link_speed      = lookup(each.value, "pcie_slot_nvme3link_speed", local.defaults.intersight.policies.bios.pcie_slot_nvme3link_speed)
+  pcie_slot_nvme3option_rom      = lookup(each.value, "pcie_slot_nvme3option_rom", local.defaults.intersight.policies.bios.pcie_slot_nvme3option_rom)
+  pcie_slot_nvme4link_speed      = lookup(each.value, "pcie_slot_nvme4link_speed", local.defaults.intersight.policies.bios.pcie_slot_nvme4link_speed)
+  pcie_slot_nvme4option_rom      = lookup(each.value, "pcie_slot_nvme4option_rom", local.defaults.intersight.policies.bios.pcie_slot_nvme4option_rom)
+  pcie_slot_nvme5link_speed      = lookup(each.value, "pcie_slot_nvme5link_speed", local.defaults.intersight.policies.bios.pcie_slot_nvme5link_speed)
+  pcie_slot_nvme5option_rom      = lookup(each.value, "pcie_slot_nvme5option_rom", local.defaults.intersight.policies.bios.pcie_slot_nvme5option_rom)
+  pcie_slot_nvme6link_speed      = lookup(each.value, "pcie_slot_nvme6link_speed", local.defaults.intersight.policies.bios.pcie_slot_nvme6link_speed)
+  pcie_slot_nvme6option_rom      = lookup(each.value, "pcie_slot_nvme6option_rom", local.defaults.intersight.policies.bios.pcie_slot_nvme6option_rom)
+  slot10link_speed               = lookup(each.value, "slot10link_speed", local.defaults.intersight.policies.bios.slot10link_speed)
+  slot10state                    = lookup(each.value, "slot10state", local.defaults.intersight.policies.bios.slot10state)
+  slot11link_speed               = lookup(each.value, "slot11link_speed", local.defaults.intersight.policies.bios.slot11link_speed)
+  slot11state                    = lookup(each.value, "slot11state", local.defaults.intersight.policies.bios.slot11state)
+  slot12link_speed               = lookup(each.value, "slot12link_speed", local.defaults.intersight.policies.bios.slot12link_speed)
+  slot12state                    = lookup(each.value, "slot12state", local.defaults.intersight.policies.bios.slot12state)
+  slot13state                    = lookup(each.value, "slot13state", local.defaults.intersight.policies.bios.slot13state)
+  slot14state                    = lookup(each.value, "slot14state", local.defaults.intersight.policies.bios.slot14state)
+  slot1link_speed                = lookup(each.value, "slot1link_speed", local.defaults.intersight.policies.bios.slot1link_speed)
+  slot1state                     = lookup(each.value, "slot1state", local.defaults.intersight.policies.bios.slot1state)
+  slot2link_speed                = lookup(each.value, "slot2link_speed", local.defaults.intersight.policies.bios.slot2link_speed)
+  slot2state                     = lookup(each.value, "slot2state", local.defaults.intersight.policies.bios.slot2state)
+  slot3link_speed                = lookup(each.value, "slot3link_speed", local.defaults.intersight.policies.bios.slot3link_speed)
+  slot3state                     = lookup(each.value, "slot3state", local.defaults.intersight.policies.bios.slot3state)
+  slot4link_speed                = lookup(each.value, "slot4link_speed", local.defaults.intersight.policies.bios.slot4link_speed)
+  slot4state                     = lookup(each.value, "slot4state", local.defaults.intersight.policies.bios.slot4state)
+  slot5link_speed                = lookup(each.value, "slot5link_speed", local.defaults.intersight.policies.bios.slot5link_speed)
+  slot5state                     = lookup(each.value, "slot5state", local.defaults.intersight.policies.bios.slot5state)
+  slot6link_speed                = lookup(each.value, "slot6link_speed", local.defaults.intersight.policies.bios.slot6link_speed)
+  slot6state                     = lookup(each.value, "slot6state", local.defaults.intersight.policies.bios.slot6state)
+  slot7link_speed                = lookup(each.value, "slot7link_speed", local.defaults.intersight.policies.bios.slot7link_speed)
+  slot7state                     = lookup(each.value, "slot7state", local.defaults.intersight.policies.bios.slot7state)
+  slot8link_speed                = lookup(each.value, "slot8link_speed", local.defaults.intersight.policies.bios.slot8link_speed)
+  slot8state                     = lookup(each.value, "slot8state", local.defaults.intersight.policies.bios.slot8state)
+  slot9link_speed                = lookup(each.value, "slot9link_speed", local.defaults.intersight.policies.bios.slot9link_speed)
+  slot9state                     = lookup(each.value, "slot9state", local.defaults.intersight.policies.bios.slot9state)
+  slot_flom_link_speed           = lookup(each.value, "slot_flom_link_speed", local.defaults.intersight.policies.bios.slot_flom_link_speed)
+  slot_front_nvme10link_speed    = lookup(each.value, "slot_front_nvme10link_speed", local.defaults.intersight.policies.bios.slot_front_nvme10link_speed)
+  slot_front_nvme10option_rom    = lookup(each.value, "slot_front_nvme10option_rom", local.defaults.intersight.policies.bios.slot_front_nvme10option_rom)
+  slot_front_nvme11link_speed    = lookup(each.value, "slot_front_nvme11link_speed", local.defaults.intersight.policies.bios.slot_front_nvme11link_speed)
+  slot_front_nvme11option_rom    = lookup(each.value, "slot_front_nvme11option_rom", local.defaults.intersight.policies.bios.slot_front_nvme11option_rom)
+  slot_front_nvme12link_speed    = lookup(each.value, "slot_front_nvme12link_speed", local.defaults.intersight.policies.bios.slot_front_nvme12link_speed)
+  slot_front_nvme12option_rom    = lookup(each.value, "slot_front_nvme12option_rom", local.defaults.intersight.policies.bios.slot_front_nvme12option_rom)
+  slot_front_nvme13option_rom    = lookup(each.value, "slot_front_nvme13option_rom", local.defaults.intersight.policies.bios.slot_front_nvme13option_rom)
+  slot_front_nvme14option_rom    = lookup(each.value, "slot_front_nvme14option_rom", local.defaults.intersight.policies.bios.slot_front_nvme14option_rom)
+  slot_front_nvme15option_rom    = lookup(each.value, "slot_front_nvme15option_rom", local.defaults.intersight.policies.bios.slot_front_nvme15option_rom)
+  slot_front_nvme16option_rom    = lookup(each.value, "slot_front_nvme16option_rom", local.defaults.intersight.policies.bios.slot_front_nvme16option_rom)
+  slot_front_nvme17option_rom    = lookup(each.value, "slot_front_nvme17option_rom", local.defaults.intersight.policies.bios.slot_front_nvme17option_rom)
+  slot_front_nvme18option_rom    = lookup(each.value, "slot_front_nvme18option_rom", local.defaults.intersight.policies.bios.slot_front_nvme18option_rom)
+  slot_front_nvme19option_rom    = lookup(each.value, "slot_front_nvme19option_rom", local.defaults.intersight.policies.bios.slot_front_nvme19option_rom)
+  slot_front_nvme1link_speed     = lookup(each.value, "slot_front_nvme1link_speed", local.defaults.intersight.policies.bios.slot_front_nvme1link_speed)
+  slot_front_nvme1option_rom     = lookup(each.value, "slot_front_nvme1option_rom", local.defaults.intersight.policies.bios.slot_front_nvme1option_rom)
+  slot_front_nvme20option_rom    = lookup(each.value, "slot_front_nvme20option_rom", local.defaults.intersight.policies.bios.slot_front_nvme20option_rom)
+  slot_front_nvme21option_rom    = lookup(each.value, "slot_front_nvme21option_rom", local.defaults.intersight.policies.bios.slot_front_nvme21option_rom)
+  slot_front_nvme22option_rom    = lookup(each.value, "slot_front_nvme22option_rom", local.defaults.intersight.policies.bios.slot_front_nvme22option_rom)
+  slot_front_nvme23option_rom    = lookup(each.value, "slot_front_nvme23option_rom", local.defaults.intersight.policies.bios.slot_front_nvme23option_rom)
+  slot_front_nvme24option_rom    = lookup(each.value, "slot_front_nvme24option_rom", local.defaults.intersight.policies.bios.slot_front_nvme24option_rom)
+  slot_front_nvme2link_speed     = lookup(each.value, "slot_front_nvme2link_speed", local.defaults.intersight.policies.bios.slot_front_nvme2link_speed)
+  slot_front_nvme2option_rom     = lookup(each.value, "slot_front_nvme2option_rom", local.defaults.intersight.policies.bios.slot_front_nvme2option_rom)
+  slot_front_nvme3link_speed     = lookup(each.value, "slot_front_nvme3link_speed", local.defaults.intersight.policies.bios.slot_front_nvme3link_speed)
+  slot_front_nvme3option_rom     = lookup(each.value, "slot_front_nvme3option_rom", local.defaults.intersight.policies.bios.slot_front_nvme3option_rom)
+  slot_front_nvme4link_speed     = lookup(each.value, "slot_front_nvme4link_speed", local.defaults.intersight.policies.bios.slot_front_nvme4link_speed)
+  slot_front_nvme4option_rom     = lookup(each.value, "slot_front_nvme4option_rom", local.defaults.intersight.policies.bios.slot_front_nvme4option_rom)
+  slot_front_nvme5link_speed     = lookup(each.value, "slot_front_nvme5link_speed", local.defaults.intersight.policies.bios.slot_front_nvme5link_speed)
+  slot_front_nvme5option_rom     = lookup(each.value, "slot_front_nvme5option_rom", local.defaults.intersight.policies.bios.slot_front_nvme5option_rom)
+  slot_front_nvme6link_speed     = lookup(each.value, "slot_front_nvme6link_speed", local.defaults.intersight.policies.bios.slot_front_nvme6link_speed)
+  slot_front_nvme6option_rom     = lookup(each.value, "slot_front_nvme6option_rom", local.defaults.intersight.policies.bios.slot_front_nvme6option_rom)
+  slot_front_nvme7link_speed     = lookup(each.value, "slot_front_nvme7link_speed", local.defaults.intersight.policies.bios.slot_front_nvme7link_speed)
+  slot_front_nvme7option_rom     = lookup(each.value, "slot_front_nvme7option_rom", local.defaults.intersight.policies.bios.slot_front_nvme7option_rom)
+  slot_front_nvme8link_speed     = lookup(each.value, "slot_front_nvme8link_speed", local.defaults.intersight.policies.bios.slot_front_nvme8link_speed)
+  slot_front_nvme8option_rom     = lookup(each.value, "slot_front_nvme8option_rom", local.defaults.intersight.policies.bios.slot_front_nvme8option_rom)
+  slot_front_nvme9link_speed     = lookup(each.value, "slot_front_nvme9link_speed", local.defaults.intersight.policies.bios.slot_front_nvme9link_speed)
+  slot_front_nvme9option_rom     = lookup(each.value, "slot_front_nvme9option_rom", local.defaults.intersight.policies.bios.slot_front_nvme9option_rom)
+  slot_front_slot5link_speed     = lookup(each.value, "slot_front_slot5link_speed", local.defaults.intersight.policies.bios.slot_front_slot5link_speed)
+  slot_front_slot6link_speed     = lookup(each.value, "slot_front_slot6link_speed", local.defaults.intersight.policies.bios.slot_front_slot6link_speed)
+  slot_gpu1state                 = lookup(each.value, "slot_gpu1state", local.defaults.intersight.policies.bios.slot_gpu1state)
+  slot_gpu2state                 = lookup(each.value, "slot_gpu2state", local.defaults.intersight.policies.bios.slot_gpu2state)
+  slot_gpu3state                 = lookup(each.value, "slot_gpu3state", local.defaults.intersight.policies.bios.slot_gpu3state)
+  slot_gpu4state                 = lookup(each.value, "slot_gpu4state", local.defaults.intersight.policies.bios.slot_gpu4state)
+  slot_gpu5state                 = lookup(each.value, "slot_gpu5state", local.defaults.intersight.policies.bios.slot_gpu5state)
+  slot_gpu6state                 = lookup(each.value, "slot_gpu6state", local.defaults.intersight.policies.bios.slot_gpu6state)
+  slot_gpu7state                 = lookup(each.value, "slot_gpu7state", local.defaults.intersight.policies.bios.slot_gpu7state)
+  slot_gpu8state                 = lookup(each.value, "slot_gpu8state", local.defaults.intersight.policies.bios.slot_gpu8state)
+  slot_hba_link_speed            = lookup(each.value, "slot_hba_link_speed", local.defaults.intersight.policies.bios.slot_hba_link_speed)
+  slot_hba_state                 = lookup(each.value, "slot_hba_state", local.defaults.intersight.policies.bios.slot_hba_state)
+  slot_lom1link                  = lookup(each.value, "slot_lom1link", local.defaults.intersight.policies.bios.slot_lom1link)
+  slot_lom2link                  = lookup(each.value, "slot_lom2link", local.defaults.intersight.policies.bios.slot_lom2link)
+  slot_mezz_state                = lookup(each.value, "slot_mezz_state", local.defaults.intersight.policies.bios.slot_mezz_state)
+  slot_mlom_link_speed           = lookup(each.value, "slot_mlom_link_speed", local.defaults.intersight.policies.bios.slot_mlom_link_speed)
+  slot_mlom_state                = lookup(each.value, "slot_mlom_state", local.defaults.intersight.policies.bios.slot_mlom_state)
+  slot_mraid_link_speed          = lookup(each.value, "slot_mraid_link_speed", local.defaults.intersight.policies.bios.slot_mraid_link_speed)
+  slot_mraid_state               = lookup(each.value, "slot_mraid_state", local.defaults.intersight.policies.bios.slot_mraid_state)
+  slot_n10state                  = lookup(each.value, "slot_n10state", local.defaults.intersight.policies.bios.slot_n10state)
+  slot_n11state                  = lookup(each.value, "slot_n11state", local.defaults.intersight.policies.bios.slot_n11state)
+  slot_n12state                  = lookup(each.value, "slot_n12state", local.defaults.intersight.policies.bios.slot_n12state)
+  slot_n13state                  = lookup(each.value, "slot_n13state", local.defaults.intersight.policies.bios.slot_n13state)
+  slot_n14state                  = lookup(each.value, "slot_n14state", local.defaults.intersight.policies.bios.slot_n14state)
+  slot_n15state                  = lookup(each.value, "slot_n15state", local.defaults.intersight.policies.bios.slot_n15state)
+  slot_n16state                  = lookup(each.value, "slot_n16state", local.defaults.intersight.policies.bios.slot_n16state)
+  slot_n17state                  = lookup(each.value, "slot_n17state", local.defaults.intersight.policies.bios.slot_n17state)
+  slot_n18state                  = lookup(each.value, "slot_n18state", local.defaults.intersight.policies.bios.slot_n18state)
+  slot_n19state                  = lookup(each.value, "slot_n19state", local.defaults.intersight.policies.bios.slot_n19state)
+  slot_n1state                   = lookup(each.value, "slot_n1state", local.defaults.intersight.policies.bios.slot_n1state)
+  slot_n20state                  = lookup(each.value, "slot_n20state", local.defaults.intersight.policies.bios.slot_n20state)
+  slot_n21state                  = lookup(each.value, "slot_n21state", local.defaults.intersight.policies.bios.slot_n21state)
+  slot_n22state                  = lookup(each.value, "slot_n22state", local.defaults.intersight.policies.bios.slot_n22state)
+  slot_n23state                  = lookup(each.value, "slot_n23state", local.defaults.intersight.policies.bios.slot_n23state)
+  slot_n24state                  = lookup(each.value, "slot_n24state", local.defaults.intersight.policies.bios.slot_n24state)
+  slot_n2state                   = lookup(each.value, "slot_n2state", local.defaults.intersight.policies.bios.slot_n2state)
+  slot_n3state                   = lookup(each.value, "slot_n3state", local.defaults.intersight.policies.bios.slot_n3state)
+  slot_n4state                   = lookup(each.value, "slot_n4state", local.defaults.intersight.policies.bios.slot_n4state)
+  slot_n5state                   = lookup(each.value, "slot_n5state", local.defaults.intersight.policies.bios.slot_n5state)
+  slot_n6state                   = lookup(each.value, "slot_n6state", local.defaults.intersight.policies.bios.slot_n6state)
+  slot_n7state                   = lookup(each.value, "slot_n7state", local.defaults.intersight.policies.bios.slot_n7state)
+  slot_n8state                   = lookup(each.value, "slot_n8state", local.defaults.intersight.policies.bios.slot_n8state)
+  slot_n9state                   = lookup(each.value, "slot_n9state", local.defaults.intersight.policies.bios.slot_n9state)
+  slot_raid_link_speed           = lookup(each.value, "slot_raid_link_speed", local.defaults.intersight.policies.bios.slot_raid_link_speed)
+  slot_raid_state                = lookup(each.value, "slot_raid_state", local.defaults.intersight.policies.bios.slot_raid_state)
+  slot_rear_nvme1link_speed      = lookup(each.value, "slot_rear_nvme1link_speed", local.defaults.intersight.policies.bios.slot_rear_nvme1link_speed)
+  slot_rear_nvme1state           = lookup(each.value, "slot_rear_nvme1state", local.defaults.intersight.policies.bios.slot_rear_nvme1state)
+  slot_rear_nvme2link_speed      = lookup(each.value, "slot_rear_nvme2link_speed", local.defaults.intersight.policies.bios.slot_rear_nvme2link_speed)
+  slot_rear_nvme2state           = lookup(each.value, "slot_rear_nvme2state", local.defaults.intersight.policies.bios.slot_rear_nvme2state)
+  slot_rear_nvme3link_speed      = lookup(each.value, "slot_rear_nvme3link_speed", local.defaults.intersight.policies.bios.slot_rear_nvme3link_speed)
+  slot_rear_nvme3state           = lookup(each.value, "slot_rear_nvme3state", local.defaults.intersight.policies.bios.slot_rear_nvme3state)
+  slot_rear_nvme4link_speed      = lookup(each.value, "slot_rear_nvme4link_speed", local.defaults.intersight.policies.bios.slot_rear_nvme4link_speed)
+  slot_rear_nvme4state           = lookup(each.value, "slot_rear_nvme4state", local.defaults.intersight.policies.bios.slot_rear_nvme4state)
+  slot_rear_nvme5state           = lookup(each.value, "slot_rear_nvme5state", local.defaults.intersight.policies.bios.slot_rear_nvme5state)
+  slot_rear_nvme6state           = lookup(each.value, "slot_rear_nvme6state", local.defaults.intersight.policies.bios.slot_rear_nvme6state)
+  slot_rear_nvme7state           = lookup(each.value, "slot_rear_nvme7state", local.defaults.intersight.policies.bios.slot_rear_nvme7state)
+  slot_rear_nvme8state           = lookup(each.value, "slot_rear_nvme8state", local.defaults.intersight.policies.bios.slot_rear_nvme8state)
+  slot_riser1link_speed          = lookup(each.value, "slot_riser1link_speed", local.defaults.intersight.policies.bios.slot_riser1link_speed)
+  slot_riser1slot1link_speed     = lookup(each.value, "slot_riser1slot1link_speed", local.defaults.intersight.policies.bios.slot_riser1slot1link_speed)
+  slot_riser1slot2link_speed     = lookup(each.value, "slot_riser1slot2link_speed", local.defaults.intersight.policies.bios.slot_riser1slot2link_speed)
+  slot_riser1slot3link_speed     = lookup(each.value, "slot_riser1slot3link_speed", local.defaults.intersight.policies.bios.slot_riser1slot3link_speed)
+  slot_riser2link_speed          = lookup(each.value, "slot_riser2link_speed", local.defaults.intersight.policies.bios.slot_riser2link_speed)
+  slot_riser2slot4link_speed     = lookup(each.value, "slot_riser2slot4link_speed", local.defaults.intersight.policies.bios.slot_riser2slot4link_speed)
+  slot_riser2slot5link_speed     = lookup(each.value, "slot_riser2slot5link_speed", local.defaults.intersight.policies.bios.slot_riser2slot5link_speed)
+  slot_riser2slot6link_speed     = lookup(each.value, "slot_riser2slot6link_speed", local.defaults.intersight.policies.bios.slot_riser2slot6link_speed)
+  slot_sas_state                 = lookup(each.value, "slot_sas_state", local.defaults.intersight.policies.bios.slot_sas_state)
+  slot_ssd_slot1link_speed       = lookup(each.value, "slot_ssd_slot1link_speed", local.defaults.intersight.policies.bios.slot_ssd_slot1link_speed)
+  slot_ssd_slot2link_speed       = lookup(each.value, "slot_ssd_slot2link_speed", local.defaults.intersight.policies.bios.slot_ssd_slot2link_speed)
+  #+++++++++++++++++++++++++++++++
+  # Main Section
+  #+++++++++++++++++++++++++++++++
+  pcie_slots_cdn_enable = lookup(each.value, "pcie_slots_cdn_enable", local.defaults.intersight.policies.bios.pcie_slots_cdn_enable)
+  post_error_pause      = lookup(each.value, "post_error_pause", local.defaults.intersight.policies.bios.post_error_pause)
+  tpm_support           = lookup(each.value, "tpm_support", local.defaults.intersight.policies.bios.tpm_support)
+  #+++++++++++++++++++++++++++++++
+  # Memory Section
+  #+++++++++++++++++++++++++++++++
+  advanced_mem_test                     = lookup(each.value, "advanced_mem_test", local.defaults.intersight.policies.bios.advanced_mem_test)
+  bme_dma_mitigation                    = lookup(each.value, "bme_dma_mitigation", local.defaults.intersight.policies.bios.bme_dma_mitigation)
+  burst_and_postponed_refresh           = lookup(each.value, "burst_and_postponed_refresh", local.defaults.intersight.policies.bios.burst_and_postponed_refresh)
+  cbs_cmn_cpu_smee                      = lookup(each.value, "cbs_cmn_cpu_smee", local.defaults.intersight.policies.bios.cbs_cmn_cpu_smee)
+  cbs_cmn_gnb_nb_iommu                  = lookup(each.value, "cbs_cmn_gnb_nb_iommu", local.defaults.intersight.policies.bios.cbs_cmn_gnb_nb_iommu)
+  cbs_cmn_mem_ctrl_bank_group_swap_ddr4 = lookup(each.value, "cbs_cmn_mem_ctrl_bank_group_swap_ddr4", local.defaults.intersight.policies.bios.cbs_cmn_mem_ctrl_bank_group_swap_ddr4)
+  cbs_cmn_mem_map_bank_interleave_ddr4  = lookup(each.value, "cbs_cmn_mem_map_bank_interleave_ddr4", local.defaults.intersight.policies.bios.cbs_cmn_mem_map_bank_interleave_ddr4)
+  cbs_dbg_cpu_snp_mem_cover             = lookup(each.value, "cbs_dbg_cpu_snp_mem_cover", local.defaults.intersight.policies.bios.cbs_dbg_cpu_snp_mem_cover)
+  cbs_dbg_cpu_snp_mem_size_cover        = lookup(each.value, "cbs_dbg_cpu_snp_mem_size_cover", local.defaults.intersight.policies.bios.cbs_dbg_cpu_snp_mem_size_cover)
+  cbs_df_cmn_dram_nps                   = lookup(each.value, "cbs_df_cmn_dram_nps", local.defaults.intersight.policies.bios.cbs_df_cmn_dram_nps)
+  cbs_df_cmn_mem_intlv                  = lookup(each.value, "cbs_df_cmn_mem_intlv", local.defaults.intersight.policies.bios.cbs_df_cmn_mem_intlv)
+  cbs_df_cmn_mem_intlv_size             = lookup(each.value, "cbs_df_cmn_mem_intlv_size", local.defaults.intersight.policies.bios.cbs_df_cmn_mem_intlv_size)
+  cbs_sev_snp_support                   = lookup(each.value, "cbs_sev_snp_support", local.defaults.intersight.policies.bios.cbs_sev_snp_support)
+  cke_low_policy                        = lookup(each.value, "cke_low_policy", local.defaults.intersight.policies.bios.cke_low_policy)
+  cr_qos                                = lookup(each.value, "cr_qos", local.defaults.intersight.policies.bios.cr_qos)
+  crfastgo_config                       = lookup(each.value, "crfastgo_config", local.defaults.intersight.policies.bios.crfastgo_config)
+  dcpmm_firmware_downgrade              = lookup(each.value, "dcpmm_firmware_downgrade", local.defaults.intersight.policies.bios.dcpmm_firmware_downgrade)
+  dram_refresh_rate                     = lookup(each.value, "dram_refresh_rate", local.defaults.intersight.policies.bios.dram_refresh_rate)
+  dram_sw_thermal_throttling            = lookup(each.value, "dram_sw_thermal_throttling", local.defaults.intersight.policies.bios.dram_sw_thermal_throttling)
+  eadr_support                          = lookup(each.value, "eadr_support", local.defaults.intersight.policies.bios.eadr_support)
+  lv_ddr_mode                           = lookup(each.value, "lv_ddr_mode", local.defaults.intersight.policies.bios.lv_ddr_mode)
+  memory_bandwidth_boost                = lookup(each.value, "memory_bandwidth_boost", local.defaults.intersight.policies.bios.memory_bandwidth_boost)
+  memory_refresh_rate                   = lookup(each.value, "memory_refresh_rate", local.defaults.intersight.policies.bios.memory_refresh_rate)
+  memory_size_limit                     = lookup(each.value, "memory_size_limit", local.defaults.intersight.policies.bios.memory_size_limit)
+  memory_thermal_throttling             = lookup(each.value, "memory_thermal_throttling", local.defaults.intersight.policies.bios.memory_thermal_throttling)
+  mirroring_mode                        = lookup(each.value, "mirroring_mode", local.defaults.intersight.policies.bios.mirroring_mode)
+  numa_optimized                        = lookup(each.value, "numa_optimized", local.defaults.intersight.policies.bios.numa_optimized)
+  nvmdimm_perform_config                = lookup(each.value, "nvmdimm_perform_config", local.defaults.intersight.policies.bios.nvmdimm_perform_config)
+  operation_mode                        = lookup(each.value, "operation_mode", local.defaults.intersight.policies.bios.operation_mode)
+  panic_high_watermark                  = lookup(each.value, "panic_high_watermark", local.defaults.intersight.policies.bios.panic_high_watermark)
+  partial_cache_line_sparing            = lookup(each.value, "partial_cache_line_sparing", local.defaults.intersight.policies.bios.partial_cache_line_sparing)
+  partial_mirror_mode_config            = lookup(each.value, "partial_mirror_mode_config", local.defaults.intersight.policies.bios.partial_mirror_mode_config)
+  partial_mirror_percent                = lookup(each.value, "partial_mirror_percent", local.defaults.intersight.policies.bios.partial_mirror_percent)
+  partial_mirror_value1                 = lookup(each.value, "partial_mirror_value1", local.defaults.intersight.policies.bios.partial_mirror_value1)
+  partial_mirror_value2                 = lookup(each.value, "partial_mirror_value2", local.defaults.intersight.policies.bios.partial_mirror_value2)
+  partial_mirror_value3                 = lookup(each.value, "partial_mirror_value3", local.defaults.intersight.policies.bios.partial_mirror_value3)
+  partial_mirror_value4                 = lookup(each.value, "partial_mirror_value4", local.defaults.intersight.policies.bios.partial_mirror_value4)
+  pc_ie_ras_support                     = lookup(each.value, "pc_ie_ras_support", local.defaults.intersight.policies.bios.pc_ie_ras_support)
+  post_package_repair                   = lookup(each.value, "post_package_repair", local.defaults.intersight.policies.bios.post_package_repair)
+  select_memory_ras_configuration       = lookup(each.value, "select_memory_ras_configuration", local.defaults.intersight.policies.bios.select_memory_ras_configuration)
+  select_ppr_type                       = lookup(each.value, "select_ppr_type", local.defaults.intersight.policies.bios.select_ppr_type)
+  sev                                   = lookup(each.value, "sev", local.defaults.intersight.policies.bios.sev)
+  smee                                  = lookup(each.value, "smee", local.defaults.intersight.policies.bios.smee)
+  snoopy_mode_for2lm                    = lookup(each.value, "snoopy_mode_for2lm", local.defaults.intersight.policies.bios.snoopy_mode_for2lm)
+  snoopy_mode_for_ad                    = lookup(each.value, "snoopy_mode_for_ad", local.defaults.intersight.policies.bios.snoopy_mode_for_ad)
+  sparing_mode                          = lookup(each.value, "sparing_mode", local.defaults.intersight.policies.bios.sparing_mode)
+  tsme                                  = lookup(each.value, "tsme", local.defaults.intersight.policies.bios.tsme)
+  uma_based_clustering                  = lookup(each.value, "uma_based_clustering", local.defaults.intersight.policies.bios.uma_based_clustering)
+  vol_memory_mode                       = lookup(each.value, "vol_memory_mode", local.defaults.intersight.policies.bios.vol_memory_mode)
+  #+++++++++++++++++++++++++++++++
+  # PCI Section
+  #+++++++++++++++++++++++++++++++
+  aspm_support               = lookup(each.value, "aspm_support", local.defaults.intersight.policies.bios.aspm_support)
+  ioh_resource               = lookup(each.value, "ioh_resource", local.defaults.intersight.policies.bios.ioh_resource)
+  memory_mapped_io_above4gb  = lookup(each.value, "memory_mapped_io_above4gb", local.defaults.intersight.policies.bios.memory_mapped_io_above4gb)
+  mmcfg_base                 = lookup(each.value, "mmcfg_base", local.defaults.intersight.policies.bios.mmcfg_base)
+  onboard10gbit_lom          = lookup(each.value, "onboard10gbit_lom", local.defaults.intersight.policies.bios.onboard10gbit_lom)
+  onboard_gbit_lom           = lookup(each.value, "onboard_gbit_lom", local.defaults.intersight.policies.bios.onboard_gbit_lom)
+  pc_ie_ssd_hot_plug_support = lookup(each.value, "pc_ie_ssd_hot_plug_support", local.defaults.intersight.policies.bios.pc_ie_ssd_hot_plug_support)
+  sr_iov                     = lookup(each.value, "sr_iov", local.defaults.intersight.policies.bios.sr_iov)
+  vga_priority               = lookup(each.value, "vga_priority", local.defaults.intersight.policies.bios.vga_priority)
+  #+++++++++++++++++++++++++++++++
+  # Power and Performance Section
+  #+++++++++++++++++++++++++++++++
+  c1auto_demotion                    = lookup(each.value, "c1auto_demotion", local.defaults.intersight.policies.bios.c1auto_demotion)
+  c1auto_un_demotion                 = lookup(each.value, "c1auto_un_demotion", local.defaults.intersight.policies.bios.c1auto_un_demotion)
+  cbs_cmn_cpu_cpb                    = lookup(each.value, "cbs_cmn_cpu_cpb", local.defaults.intersight.policies.bios.cbs_cmn_cpu_cpb)
+  cbs_cmn_cpu_global_cstate_ctrl     = lookup(each.value, "cbs_cmn_cpu_global_cstate_ctrl", local.defaults.intersight.policies.bios.cbs_cmn_cpu_global_cstate_ctrl)
+  cbs_cmn_cpu_l1stream_hw_prefetcher = lookup(each.value, "cbs_cmn_cpu_l1stream_hw_prefetcher", local.defaults.intersight.policies.bios.cbs_cmn_cpu_l1stream_hw_prefetcher)
+  cbs_cmn_cpu_l2stream_hw_prefetcher = lookup(each.value, "cbs_cmn_cpu_l2stream_hw_prefetcher", local.defaults.intersight.policies.bios.cbs_cmn_cpu_l2stream_hw_prefetcher)
+  cbs_cmn_determinism_slider         = lookup(each.value, "cbs_cmn_determinism_slider", local.defaults.intersight.policies.bios.cbs_cmn_determinism_slider)
+  cbs_cmn_efficiency_mode_en         = lookup(each.value, "cbs_cmn_efficiency_mode_en", local.defaults.intersight.policies.bios.cbs_cmn_efficiency_mode_en)
+  cbs_cmn_gnb_smucppc                = lookup(each.value, "cbs_cmn_gnb_smucppc", local.defaults.intersight.policies.bios.cbs_cmn_gnb_smucppc)
+  cbs_cmnc_tdp_ctl                   = lookup(each.value, "cbs_cmnc_tdp_ctl", local.defaults.intersight.policies.bios.cbs_cmnc_tdp_ctl)
+  cpu_perf_enhancement               = lookup(each.value, "cpu_perf_enhancement", local.defaults.intersight.policies.bios.cpu_perf_enhancement)
+  llc_alloc                          = lookup(each.value, "llc_alloc", local.defaults.intersight.policies.bios.llc_alloc)
+  upi_link_enablement                = lookup(each.value, "upi_link_enablement", local.defaults.intersight.policies.bios.upi_link_enablement)
+  upi_power_management               = lookup(each.value, "upi_power_management", local.defaults.intersight.policies.bios.upi_power_management)
+  virtual_numa                       = lookup(each.value, "virtual_numa", local.defaults.intersight.policies.bios.virtual_numa)
+  xpt_remote_prefetch                = lookup(each.value, "xpt_remote_prefetch", local.defaults.intersight.policies.bios.xpt_remote_prefetch)
+  #+++++++++++++++++++++++++++++++
+  # Processor Section
+  #+++++++++++++++++++++++++++++++
+  adjacent_cache_line_prefetch      = lookup(each.value, "adjacent_cache_line_prefetch", local.defaults.intersight.policies.bios.adjacent_cache_line_prefetch)
+  altitude                          = lookup(each.value, "altitude", local.defaults.intersight.policies.bios.altitude)
+  auto_cc_state                     = lookup(each.value, "auto_cc_state", local.defaults.intersight.policies.bios.auto_cc_state)
+  autonumous_cstate_enable          = lookup(each.value, "autonumous_cstate_enable", local.defaults.intersight.policies.bios.autonumous_cstate_enable)
+  boot_performance_mode             = lookup(each.value, "boot_performance_mode", local.defaults.intersight.policies.bios.boot_performance_mode)
+  cbs_cmn_apbdis                    = lookup(each.value, "cbs_cmn_apbdis", local.defaults.intersight.policies.bios.cbs_cmn_apbdis)
+  cbs_cmn_cpu_gen_downcore_ctrl     = lookup(each.value, "cbs_cmn_cpu_gen_downcore_ctrl", local.defaults.intersight.policies.bios.cbs_cmn_cpu_gen_downcore_ctrl)
+  cbs_cmn_cpu_streaming_stores_ctrl = lookup(each.value, "cbs_cmn_cpu_streaming_stores_ctrl", local.defaults.intersight.policies.bios.cbs_cmn_cpu_streaming_stores_ctrl)
+  cbs_cmn_fixed_soc_pstate          = lookup(each.value, "cbs_cmn_fixed_soc_pstate", local.defaults.intersight.policies.bios.cbs_cmn_fixed_soc_pstate)
+  cbs_cmn_gnb_smu_df_cstates        = lookup(each.value, "cbs_cmn_gnb_smu_df_cstates", local.defaults.intersight.policies.bios.cbs_cmn_gnb_smu_df_cstates)
+  cbs_cpu_ccd_ctrl_ssp              = lookup(each.value, "cbs_cpu_ccd_ctrl_ssp", local.defaults.intersight.policies.bios.cbs_cpu_ccd_ctrl_ssp)
+  cbs_cpu_core_ctrl                 = lookup(each.value, "cbs_cpu_core_ctrl", local.defaults.intersight.policies.bios.cbs_cpu_core_ctrl)
+  cbs_cpu_smt_ctrl                  = lookup(each.value, "cbs_cpu_smt_ctrl", local.defaults.intersight.policies.bios.cbs_cpu_smt_ctrl)
+  cbs_df_cmn_acpi_srat_l3numa       = lookup(each.value, "cbs_df_cmn_acpi_srat_l3numa", local.defaults.intersight.policies.bios.cbs_df_cmn_acpi_srat_l3numa)
+  channel_inter_leave               = lookup(each.value, "channel_inter_leave", local.defaults.intersight.policies.bios.channel_inter_leave)
+  cisco_xgmi_max_speed              = lookup(each.value, "cisco_xgmi_max_speed", local.defaults.intersight.policies.bios.cisco_xgmi_max_speed)
+  closed_loop_therm_throtl          = lookup(each.value, "closed_loop_therm_throtl", local.defaults.intersight.policies.bios.closed_loop_therm_throtl)
+  cmci_enable                       = lookup(each.value, "cmci_enable", local.defaults.intersight.policies.bios.cmci_enable)
+  config_tdp                        = lookup(each.value, "config_tdp", local.defaults.intersight.policies.bios.config_tdp)
+  config_tdp_level                  = lookup(each.value, "config_tdp_level", local.defaults.intersight.policies.bios.config_tdp_level)
+  core_multi_processing             = lookup(each.value, "core_multi_processing", local.defaults.intersight.policies.bios.core_multi_processing)
+  cpu_energy_performance            = lookup(each.value, "cpu_energy_performance", local.defaults.intersight.policies.bios.cpu_energy_performance)
+  cpu_frequency_floor               = lookup(each.value, "cpu_frequency_floor", local.defaults.intersight.policies.bios.cpu_frequency_floor)
+  cpu_performance                   = lookup(each.value, "cpu_performance", local.defaults.intersight.policies.bios.cpu_performance)
+  cpu_power_management              = lookup(each.value, "cpu_power_management", local.defaults.intersight.policies.bios.cpu_power_management)
+  demand_scrub                      = lookup(each.value, "demand_scrub", local.defaults.intersight.policies.bios.demand_scrub)
+  direct_cache_access               = lookup(each.value, "direct_cache_access", local.defaults.intersight.policies.bios.direct_cache_access)
+  dram_clock_throttling             = lookup(each.value, "dram_clock_throttling", local.defaults.intersight.policies.bios.dram_clock_throttling)
+  energy_efficient_turbo            = lookup(each.value, "energy_efficient_turbo", local.defaults.intersight.policies.bios.energy_efficient_turbo)
+  eng_perf_tuning                   = lookup(each.value, "eng_perf_tuning", local.defaults.intersight.policies.bios.eng_perf_tuning)
+  enhanced_intel_speed_step_tech    = lookup(each.value, "enhanced_intel_speed_step_tech", local.defaults.intersight.policies.bios.enhanced_intel_speed_step_tech)
+  epp_enable                        = lookup(each.value, "epp_enable", local.defaults.intersight.policies.bios.epp_enable)
+  epp_profile                       = lookup(each.value, "epp_profile", local.defaults.intersight.policies.bios.epp_profile)
+  execute_disable_bit               = lookup(each.value, "execute_disable_bit", local.defaults.intersight.policies.bios.execute_disable_bit)
+  extended_apic                     = lookup(each.value, "extended_apic", local.defaults.intersight.policies.bios.extended_apic)
+  hardware_prefetch                 = lookup(each.value, "hardware_prefetch", local.defaults.intersight.policies.bios.hardware_prefetch)
+  hwpm_enable                       = lookup(each.value, "hwpm_enable", local.defaults.intersight.policies.bios.hwpm_enable)
+  imc_interleave                    = lookup(each.value, "imc_interleave", local.defaults.intersight.policies.bios.imc_interleave)
+  intel_dynamic_speed_select        = lookup(each.value, "intel_dynamic_speed_select", local.defaults.intersight.policies.bios.intel_dynamic_speed_select)
+  intel_hyper_threading_tech        = lookup(each.value, "intel_hyper_threading_tech", local.defaults.intersight.policies.bios.intel_hyper_threading_tech)
+  intel_speed_select                = lookup(each.value, "intel_speed_select", local.defaults.intersight.policies.bios.intel_speed_select)
+  intel_turbo_boost_tech            = lookup(each.value, "intel_turbo_boost_tech", local.defaults.intersight.policies.bios.intel_turbo_boost_tech)
+  intel_virtualization_technology   = lookup(each.value, "intel_virtualization_technology", local.defaults.intersight.policies.bios.intel_virtualization_technology)
+  ioh_error_enable                  = lookup(each.value, "ioh_error_enable", local.defaults.intersight.policies.bios.ioh_error_enable)
+  ip_prefetch                       = lookup(each.value, "ip_prefetch", local.defaults.intersight.policies.bios.ip_prefetch)
+  kti_prefetch                      = lookup(each.value, "kti_prefetch", local.defaults.intersight.policies.bios.kti_prefetch)
+  llc_prefetch                      = lookup(each.value, "llc_prefetch", local.defaults.intersight.policies.bios.llc_prefetch)
+  memory_inter_leave                = lookup(each.value, "memory_inter_leave", local.defaults.intersight.policies.bios.memory_inter_leave)
+  package_cstate_limit              = lookup(each.value, "package_cstate_limit", local.defaults.intersight.policies.bios.package_cstate_limit)
+  patrol_scrub                      = lookup(each.value, "patrol_scrub", local.defaults.intersight.policies.bios.patrol_scrub)
+  patrol_scrub_duration             = lookup(each.value, "patrol_scrub_duration", local.defaults.intersight.policies.bios.patrol_scrub_duration)
+  processor_c1e                     = lookup(each.value, "processor_c1e", local.defaults.intersight.policies.bios.processor_c1e)
+  processor_c3report                = lookup(each.value, "processor_c3report", local.defaults.intersight.policies.bios.processor_c3report)
+  processor_c6report                = lookup(each.value, "processor_c6report", local.defaults.intersight.policies.bios.processor_c6report)
+  processor_cstate                  = lookup(each.value, "processor_cstate", local.defaults.intersight.policies.bios.processor_cstate)
+  pstate_coord_type                 = lookup(each.value, "pstate_coord_type", local.defaults.intersight.policies.bios.pstate_coord_type)
+  pwr_perf_tuning                   = lookup(each.value, "pwr_perf_tuning", local.defaults.intersight.policies.bios.pwr_perf_tuning)
+  qpi_link_speed                    = lookup(each.value, "qpi_link_speed", local.defaults.intersight.policies.bios.qpi_link_speed)
+  rank_inter_leave                  = lookup(each.value, "rank_inter_leave", local.defaults.intersight.policies.bios.rank_inter_leave)
+  single_pctl_enable                = lookup(each.value, "single_pctl_enable", local.defaults.intersight.policies.bios.single_pctl_enable)
+  smt_mode                          = lookup(each.value, "smt_mode", local.defaults.intersight.policies.bios.smt_mode)
+  snc                               = lookup(each.value, "snc", local.defaults.intersight.policies.bios.snc)
+  streamer_prefetch                 = lookup(each.value, "streamer_prefetch", local.defaults.intersight.policies.bios.streamer_prefetch)
+  svm_mode                          = lookup(each.value, "svm_mode", local.defaults.intersight.policies.bios.svm_mode)
+  ufs_disable                       = lookup(each.value, "ufs_disable", local.defaults.intersight.policies.bios.ufs_disable)
+  work_load_config                  = lookup(each.value, "work_load_config", local.defaults.intersight.policies.bios.work_load_config)
+  xpt_prefetch                      = lookup(each.value, "xpt_prefetch", local.defaults.intersight.policies.bios.xpt_prefetch)
+  #+++++++++++++++++++++++++++++++
+  # QPI Section
+  #+++++++++++++++++++++++++++++++
+  qpi_link_frequency = lookup(each.value, "qpi_link_frequency", local.defaults.intersight.policies.bios.qpi_link_frequency)
+  qpi_snoop_mode     = lookup(each.value, "qpi_snoop_mode", local.defaults.intersight.policies.bios.qpi_snoop_mode)
+  #+++++++++++++++++++++++++++++++
+  # Serial Port Section
+  #+++++++++++++++++++++++++++++++
+  serial_port_aenable = lookup(each.value, "serial_port_aenable", local.defaults.intersight.policies.bios.serial_port_aenable)
+  #+++++++++++++++++++++++++++++++
+  # Server Management Section
+  #+++++++++++++++++++++++++++++++
+  assert_nmi_on_perr              = lookup(each.value, "assert_nmi_on_perr", local.defaults.intersight.policies.bios.assert_nmi_on_perr)
+  assert_nmi_on_serr              = lookup(each.value, "assert_nmi_on_serr", local.defaults.intersight.policies.bios.assert_nmi_on_serr)
+  baud_rate                       = lookup(each.value, "baud_rate", local.defaults.intersight.policies.bios.baud_rate)
+  cdn_enable                      = lookup(each.value, "cdn_enable", local.defaults.intersight.policies.bios.cdn_enable)
+  cisco_adaptive_mem_training     = lookup(each.value, "cisco_adaptive_mem_training", local.defaults.intersight.policies.bios.cisco_adaptive_mem_training)
+  cisco_debug_level               = lookup(each.value, "cisco_debug_level", local.defaults.intersight.policies.bios.cisco_debug_level)
+  cisco_oprom_launch_optimization = lookup(each.value, "cisco_oprom_launch_optimization", local.defaults.intersight.policies.bios.cisco_oprom_launch_optimization)
+  console_redirection             = lookup(each.value, "console_redirection", local.defaults.intersight.policies.bios.console_redirection)
+  flow_control                    = lookup(each.value, "flow_control", local.defaults.intersight.policies.bios.flow_control)
+  frb2enable                      = lookup(each.value, "frb2enable", local.defaults.intersight.policies.bios.frb2enable)
+  legacy_os_redirection           = lookup(each.value, "legacy_os_redirection", local.defaults.intersight.policies.bios.legacy_os_redirection)
+  os_boot_watchdog_timer          = lookup(each.value, "os_boot_watchdog_timer", local.defaults.intersight.policies.bios.os_boot_watchdog_timer)
+  os_boot_watchdog_timer_policy   = lookup(each.value, "os_boot_watchdog_timer_policy", local.defaults.intersight.policies.bios.os_boot_watchdog_timer_policy)
+  os_boot_watchdog_timer_timeout  = lookup(each.value, "os_boot_watchdog_timer_timeout", local.defaults.intersight.policies.bios.os_boot_watchdog_timer_timeout)
+  out_of_band_mgmt_port           = lookup(each.value, "out_of_band_mgmt_port", local.defaults.intersight.policies.bios.out_of_band_mgmt_port)
+  putty_key_pad                   = lookup(each.value, "putty_key_pad", local.defaults.intersight.policies.bios.putty_key_pad)
+  redirection_after_post          = lookup(each.value, "redirection_after_post", local.defaults.intersight.policies.bios.redirection_after_post)
+  terminal_type                   = lookup(each.value, "terminal_type", local.defaults.intersight.policies.bios.terminal_type)
+  ucsm_boot_order_rule            = lookup(each.value, "ucsm_boot_order_rule", local.defaults.intersight.policies.bios.ucsm_boot_order_rule)
+  #+++++++++++++++++++++++++++++++
+  # Trusted Platform Section
+  #+++++++++++++++++++++++++++++++
+  cpu_pa_limit                    = lookup(each.value, "cpu_pa_limit", local.defaults.intersight.policies.bios.cpu_pa_limit)
+  enable_mktme                    = lookup(each.value, "enable_mktme", local.defaults.intersight.policies.bios.enable_mktme)
+  enable_sgx                      = lookup(each.value, "enable_sgx", local.defaults.intersight.policies.bios.enable_sgx)
+  enable_tme                      = lookup(each.value, "enable_tme", local.defaults.intersight.policies.bios.enable_tme)
+  epoch_update                    = lookup(each.value, "epoch_update", local.defaults.intersight.policies.bios.epoch_update)
+  sgx_auto_registration_agent     = lookup(each.value, "sgx_auto_registration_agent", local.defaults.intersight.policies.bios.sgx_auto_registration_agent)
+  sgx_epoch0                      = lookup(each.value, "sgx_epoch0", local.defaults.intersight.policies.bios.sgx_epoch0)
+  sgx_epoch1                      = lookup(each.value, "sgx_epoch1", local.defaults.intersight.policies.bios.sgx_epoch1)
+  sgx_factory_reset               = lookup(each.value, "sgx_factory_reset", local.defaults.intersight.policies.bios.sgx_factory_reset)
+  sgx_le_pub_key_hash0            = lookup(each.value, "sgx_le_pub_key_hash0", local.defaults.intersight.policies.bios.sgx_le_pub_key_hash0)
+  sgx_le_pub_key_hash1            = lookup(each.value, "sgx_le_pub_key_hash1", local.defaults.intersight.policies.bios.sgx_le_pub_key_hash1)
+  sgx_le_pub_key_hash2            = lookup(each.value, "sgx_le_pub_key_hash2", local.defaults.intersight.policies.bios.sgx_le_pub_key_hash2)
+  sgx_le_pub_key_hash3            = lookup(each.value, "sgx_le_pub_key_hash3", local.defaults.intersight.policies.bios.sgx_le_pub_key_hash3)
+  sgx_le_wr                       = lookup(each.value, "sgx_le_wr", local.defaults.intersight.policies.bios.sgx_le_wr)
+  sgx_package_info_in_band_access = lookup(each.value, "sgx_package_info_in_band_access", local.defaults.intersight.policies.bios.sgx_package_info_in_band_access)
+  sgx_qos                         = lookup(each.value, "sgx_qos", local.defaults.intersight.policies.bios.sgx_qos)
+  sha1pcr_bank                    = lookup(each.value, "sha1pcr_bank", local.defaults.intersight.policies.bios.sha1pcr_bank)
+  sha256pcr_bank                  = lookup(each.value, "sha256pcr_bank", local.defaults.intersight.policies.bios.sha256pcr_bank)
+  tpm_control                     = lookup(each.value, "tpm_control", local.defaults.intersight.policies.bios.tpm_control)
+  tpm_pending_operation           = lookup(each.value, "tpm_pending_operation", local.defaults.intersight.policies.bios.tpm_pending_operation)
+  tpm_ppi_required                = lookup(each.value, "tpm_ppi_required", local.defaults.intersight.policies.bios.tpm_ppi_required)
+  txt_support                     = lookup(each.value, "txt_support", local.defaults.intersight.policies.bios.txt_support)
+  #+++++++++++++++++++++++++++++++
+  # USB Section
+  #+++++++++++++++++++++++++++++++
+  all_usb_devices          = lookup(each.value, "all_usb_devices", local.defaults.intersight.policies.bios.all_usb_devices)
+  legacy_usb_support       = lookup(each.value, "legacy_usb_support", local.defaults.intersight.policies.bios.legacy_usb_support)
+  make_device_non_bootable = lookup(each.value, "make_device_non_bootable", local.defaults.intersight.policies.bios.make_device_non_bootable)
+  pch_usb30mode            = lookup(each.value, "pch_usb30mode", local.defaults.intersight.policies.bios.pch_usb30mode)
+  usb_emul6064             = lookup(each.value, "usb_emul6064", local.defaults.intersight.policies.bios.usb_emul6064)
+  usb_port_front           = lookup(each.value, "usb_port_front", local.defaults.intersight.policies.bios.usb_port_front)
+  usb_port_internal        = lookup(each.value, "usb_port_internal", local.defaults.intersight.policies.bios.usb_port_internal)
+  usb_port_kvm             = lookup(each.value, "usb_port_kvm", local.defaults.intersight.policies.bios.usb_port_kvm)
+  usb_port_rear            = lookup(each.value, "usb_port_rear", local.defaults.intersight.policies.bios.usb_port_rear)
+  usb_port_sd_card         = lookup(each.value, "usb_port_sd_card", local.defaults.intersight.policies.bios.usb_port_sd_card)
+  usb_port_vmedia          = lookup(each.value, "usb_port_vmedia", local.defaults.intersight.policies.bios.usb_port_vmedia)
+  usb_xhci_support         = lookup(each.value, "usb_xhci_support", local.defaults.intersight.policies.bios.usb_xhci_support)
+
+}
+
+
+
+#__________________________________________________________________
+#
 # Intersight Boot Order Policy
 # GUI Location: Policies > Create Policy > Boot Order
 #__________________________________________________________________
 
 module "boot_order" {
   source  = "terraform-cisco-modules/policies-boot-order/intersight"
-  version = ">= 1.0.1"
+  version = ">= 1.0.2"
 
   for_each = {
     for v in lookup(local.policies, "boot_order", []) : v.name => v if lookup(
@@ -200,7 +656,7 @@ module "ethernet_adapter" {
 
 module "ethernet_network" {
   source  = "terraform-cisco-modules/policies-ethernet-network/intersight"
-  version = ">= 1.0.1"
+  version = ">= 1.0.2"
 
   for_each = {
     for v in lookup(local.policies, "ethernet_network", []) : v.name => v if lookup(
@@ -438,7 +894,7 @@ module "fibre_channel_qos" {
 
 module "flow_control" {
   source  = "terraform-cisco-modules/policies-flow-control/intersight"
-  version = ">= 1.0.1"
+  version = ">= 1.0.2"
 
   for_each = {
     for v in lookup(local.policies, "flow_control", []) : v.name => v if lookup(
@@ -463,7 +919,7 @@ module "flow_control" {
 
 module "imc_access" {
   source  = "terraform-cisco-modules/policies-imc-access/intersight"
-  version = ">= 1.0.1"
+  version = ">= 1.0.2"
 
   for_each = {
     for v in lookup(local.policies, "imc_access", []) : v.name => v if lookup(
@@ -497,7 +953,7 @@ module "imc_access" {
 
 module "ipmi_over_lan" {
   source  = "terraform-cisco-modules/policies-ipmi-over-lan/intersight"
-  version = ">= 1.0.1"
+  version = ">= 1.0.2"
 
   for_each = {
     for v in lookup(local.policies, "ipmi_over_lan", []) : v.name => v if lookup(
@@ -555,7 +1011,7 @@ module "iscsi_boot" {
     module.iscsi_static_target
   ]
   source  = "terraform-cisco-modules/policies-iscsi-boot/intersight"
-  version = ">= 1.0.1"
+  version = ">= 1.0.2"
 
   for_each = {
     for v in lookup(local.policies, "iscsi_boot", []) : v.name => v if lookup(
@@ -639,7 +1095,7 @@ module "lan_connectivity" {
     module.iscsi_boot
   ]
   source  = "terraform-cisco-modules/policies-lan-connectivity/intersight"
-  version = ">= 1.0.1"
+  version = ">= 1.0.2"
 
   for_each = {
     for v in lookup(local.policies, "lan_connectivity", []) : v.name => v if lookup(
@@ -882,7 +1338,7 @@ module "link_control" {
 
 module "local_user" {
   source  = "terraform-cisco-modules/policies-local-user/intersight"
-  version = ">= 1.0.1"
+  version = ">= 1.0.2"
 
   for_each = {
     for v in lookup(local.policies, "local_user", []) : v.name => v if lookup(
@@ -959,7 +1415,7 @@ module "multicast" {
 
 module "network_connectivity" {
   source  = "terraform-cisco-modules/policies-network-connectivity/intersight"
-  version = ">= 1.0.1"
+  version = ">= 1.0.2"
 
   for_each = {
     for v in lookup(local.policies, "network_connectivity", []) : v.name => v if lookup(
@@ -1045,7 +1501,7 @@ module "port" {
     module.ethernet_network_group,
   ]
   source  = "terraform-cisco-modules/policies-port/intersight"
-  version = ">= 1.0.1"
+  version = ">= 1.0.2"
 
   for_each = {
     for v in lookup(local.policies, "port", []) : v.name => v if lookup(
@@ -1230,7 +1686,7 @@ module "port" {
 
 module "power" {
   source  = "terraform-cisco-modules/policies-power/intersight"
-  version = ">= 1.0.1"
+  version = ">= 1.0.2"
 
   for_each = {
     for v in lookup(local.policies, "power", []) : v.name => v if lookup(
@@ -1350,7 +1806,7 @@ module "sd_card" {
 
 module "serial_over_lan" {
   source  = "terraform-cisco-modules/policies-serial-over-lan/intersight"
-  version = ">= 1.0.1"
+  version = ">= 1.0.2"
 
   for_each = {
     for v in lookup(local.policies, "serial_over_lan", []) : v.name => v if lookup(
@@ -1408,7 +1864,7 @@ module "smtp" {
 
 module "snmp" {
   source  = "terraform-cisco-modules/policies-snmp/intersight"
-  version = ">= 1.0.1"
+  version = ">= 1.0.2"
 
   for_each = {
     for v in lookup(local.policies, "snmp", []) : v.name => v if lookup(
@@ -1527,7 +1983,7 @@ module "storage" {
 
 module "switch_control" {
   source  = "terraform-cisco-modules/policies-switch-control/intersight"
-  version = ">= 1.0.1"
+  version = ">= 1.0.2"
 
   for_each = {
     for v in lookup(local.policies, "switch_control", []) : v.name => v if lookup(
@@ -1607,7 +2063,7 @@ module "syslog" {
 
 module "system_qos" {
   source  = "terraform-cisco-modules/policies-system-qos/intersight"
-  version = ">= 1.0.1"
+  version = ">= 1.0.2"
 
   for_each = {
     for v in lookup(local.policies, "system_qos", []) : v.name => v if lookup(
@@ -1696,7 +2152,7 @@ module "virtual_kvm" {
 
 module "virtual_media" {
   source  = "terraform-cisco-modules/policies-virtual-media/intersight"
-  version = ">= 1.0.1"
+  version = ">= 1.0.2"
 
   for_each = {
     for v in lookup(local.policies, "virtual_media", []) : v.name => v if lookup(
@@ -1736,7 +2192,7 @@ module "vlan" {
     module.multicast
   ]
   source  = "terraform-cisco-modules/policies-vlan/intersight"
-  version = ">= 1.0.1"
+  version = ">= 1.0.2"
 
   for_each = {
     for v in lookup(local.policies, "vlan", []) : v.name => v if lookup(
@@ -1774,7 +2230,7 @@ module "vlan" {
 
 module "vsan" {
   source  = "terraform-cisco-modules/policies-vsan/intersight"
-  version = ">= 1.0.1"
+  version = ">= 1.0.2"
 
   for_each = {
     for v in lookup(local.policies, "vsan", []) : v.name => v if lookup(

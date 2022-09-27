@@ -1,7 +1,7 @@
 <!-- BEGIN_TF_DOCS -->
-# Terraform Intersight Pools Module
+# Terraform Intersight Policies Module
 
-A Terraform module to configure Intersight Pools.
+A Terraform module to configure Intersight Policies.
 
 This module is part of the Cisco [*Intersight as Code*](https://cisco.com/go/intersightascode) project. Its goal is to allow users to instantiate network fabrics in minutes using an easy to use, opinionated data model. It takes away the complexity of having to deal with references, dependencies or loops. By completely separating data (defining variables) from logic (infrastructure declaration), it allows the user to focus on describing the intended configuration while using a set of maintained and tested Terraform Modules without the need to understand the low-level Intersight object model.
 
@@ -77,6 +77,7 @@ No providers.
 | Name | Description |
 |------|-------------|
 | <a name="output_adapter_configuration"></a> [adapter\_configuration](#output\_adapter\_configuration) | Moid's of the Adapter Configuration Policies. |
+| <a name="output_bios"></a> [bios](#output\_bios) | Moid's of the BIOS Policies. |
 | <a name="output_boot_order"></a> [boot\_order](#output\_boot\_order) | Moid's of the Boot Order Policies. |
 | <a name="output_certificate_management"></a> [certificate\_management](#output\_certificate\_management) | Moid's of the Certificate Management Policies. |
 | <a name="output_device_connector"></a> [device\_connector](#output\_device\_connector) | Moid's of the Device Connector Policies. |
