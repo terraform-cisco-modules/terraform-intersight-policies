@@ -355,7 +355,7 @@ output "virtual_media" {
 #__________________________________________________________
 
 output "vlan" {
-  description = "moid of the VLAN Policies."
+  description = "Moid's of the VLAN Policies."
   value = length(lookup(local.policies, "vlan", [])) > 0 ? { for v in sort(
     keys(module.vlan)
   ) : v => module.vlan[v].moid } : {}

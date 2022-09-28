@@ -1270,7 +1270,7 @@ module "lan_connectivity" {
     module.iscsi_boot
   ]
   source  = "terraform-cisco-modules/policies-lan-connectivity/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.3"
 
   for_each = {
     for v in lookup(local.policies, "lan_connectivity", []) : v.name => v if lookup(
@@ -1744,7 +1744,7 @@ module "san_connectivity" {
     module.fibre_channel_qos
   ]
   source  = "terraform-cisco-modules/policies-san-connectivity/intersight"
-  version = ">= 1.0.1"
+  version = ">= 1.0.2"
 
   for_each = {
     for v in lookup(local.policies, "san_connectivity", []) : v.name => v if lookup(
