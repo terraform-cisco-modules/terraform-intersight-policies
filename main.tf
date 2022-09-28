@@ -6,6 +6,181 @@ locals {
   orgs       = var.pools.orgs
   pools      = var.pools
   policies   = lookup(local.intersight, "policies", {})
+  port = flatten([
+    for value in lookup(local.policies, "port", []) : [
+      for i in range(length(value.names)) : {
+        description  = lookup(value, "description", "")
+        device_model = lookup(value, "device_model", local.defaults.intersight.policies.port.device_model)
+        name         = "${element(value.names, i)}${local.defaults.intersight.policies.port.name_suffix}"
+        organization = local.orgs[lookup(value, "organization", local.defaults.intersight.organization)]
+        port_channel_appliances = [
+          for v in lookup(value, "port_channel_appliances", []) : {
+            admin_speed = lookup(v, "admin_speed", local.defaults.intersight.policies.port.port_channel_appliances.admin_speed)
+            ethernet_network_control_policy = module.ethernet_network_control[
+              lookup(v, "ethernet_network_control_policy", local.defaults.intersight.policies.port.port_channel_appliances.ethernet_network_control_policy)
+            ].moid
+            ethernet_network_group_policy = module.ethernet_network_group[
+              lookup(v, "ethernet_network_group_policy", local.defaults.intersight.policies.port.port_channel_appliances.ethernet_network_group_policy)
+            ].moid
+            interfaces = lookup(v, "interfaces", [])
+            mode       = lookup(v, "mode", local.defaults.intersight.policies.port.port_channel_appliances.mode)
+            pc_id      = length(v.pc_ids) == 1 ? element(v.pc_ids, 0) : element(v.pc_ids, i)
+            priority   = lookup(v, "priority", local.defaults.intersight.policies.port.port_channel_appliances.priority)
+          }
+        ]
+        port_channel_ethernet_uplinks = [
+          for v in lookup(value, "port_channel_ethernet_uplinks", []) : {
+            admin_speed = lookup(v, "admin_speed", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.admin_speed)
+            ethernet_network_group_policy = length(compact([
+              lookup(v, "ethernet_network_group_policy", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.ethernet_network_group_policy)
+              ])) > 0 ? module.ethernet_network_group[
+              lookup(v, "ethernet_network_group_policy", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.ethernet_network_group_policy)
+            ].moid : ""
+            flow_control_policy = length(compact([
+              lookup(v, "flow_control_policy", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.ethernet_network_group_policy)
+              ])) > 0 ? module.flow_control[
+              lookup(v, "flow_control_policy", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.flow_control_policy)
+            ].moid : ""
+            interfaces = lookup(v, "interfaces", [])
+            link_aggregation_policy = length(compact([
+              lookup(v, "link_aggregation_policy", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.ethernet_network_group_policy)
+              ])) > 0 ? module.link_aggregation[
+              lookup(v, "link_aggregation_policy", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.link_aggregation_policy)
+            ].moid : ""
+            link_control_policy = length(compact([
+              lookup(v, "link_control_policy", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.ethernet_network_group_policy)
+              ])) > 0 ? module.link_control[
+              lookup(v, "link_control_policy", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.link_control_policy)
+            ].moid : ""
+            pc_id = length(v.pc_ids) == 1 ? element(v.pc_ids, 0) : element(v.pc_ids, i)
+          }
+        ]
+        port_channel_fc_uplinks = [
+          for v in lookup(value, "port_channel_fc_uplinks", []) : {
+            admin_speed  = lookup(v, "admin_speed", local.defaults.intersight.policies.port.port_channel_fc_uplinks.admin_speed)
+            fill_pattern = lookup(v, "fill_pattern", local.defaults.intersight.policies.port.port_channel_fc_uplinks.fill_pattern)
+            interfaces   = lookup(v, "interfaces", [])
+            pc_id        = length(v.pc_ids) == 1 ? element(v.pc_ids, 0) : element(v.pc_ids, i)
+            vsan_id      = length(v.vsan_ids) == 1 ? element(v.vsan_ids, 0) : element(v.vsan_ids, i)
+          }
+        ]
+        port_channel_fcoe_uplinks = [
+          for v in lookup(value, "port_channel_fcoe_uplinks", []) : {
+            admin_speed = lookup(v, "admin_speed", local.defaults.intersight.policies.port.port_channel_fcoe_uplinks.admin_speed)
+            interfaces  = lookup(v, "interfaces", [])
+            link_aggregation_policy = length(compact([
+              lookup(v, "link_aggregation_policy", local.defaults.intersight.policies.port.port_channel_fcoe_uplinks.ethernet_network_group_policy)
+              ])) > 0 ? module.link_aggregation[
+              lookup(v, "link_aggregation_policy", local.defaults.intersight.policies.port.port_channel_fcoe_uplinks.link_aggregation_policy)
+            ].moid : ""
+            link_control_policy = length(compact([
+              lookup(v, "link_control_policy", local.defaults.intersight.policies.port.port_channel_fcoe_uplinks.ethernet_network_group_policy)
+              ])) > 0 ? module.link_control[
+              lookup(v, "link_control_policy", local.defaults.intersight.policies.port.port_channel_fcoe_uplinks.link_control_policy)
+            ].moid : ""
+            pc_id = length(v.pc_ids) == 1 ? element(v.pc_ids, 0) : element(v.pc_ids, i)
+          }
+        ]
+        port_modes = [
+          for v in lookup(value, "port_modes", []) : {
+            custom_mode = lookup(v, "custom_mode", local.defaults.intersight.policies.port.port_modes.custom_mode)
+            port_list   = v.port_list
+            slot_id     = lookup(v, "slot_id", 1)
+          }
+        ]
+        port_role_appliances = [
+          for v in lookup(value, "port_role_appliances", []) : {
+            admin_speed      = lookup(v, "admin_speed", local.defaults.intersight.policies.port.port_role_appliances.admin_speed)
+            breakout_port_id = lookup(v, "breakout_port_id", 0)
+            ethernet_network_control_policy = module.ethernet_network_control[
+              lookup(v, "ethernet_network_control_policy", local.defaults.intersight.policies.port.port_role_appliances.ethernet_network_control_policy)
+            ].moid
+            ethernet_network_group_policy = module.ethernet_network_group[
+              lookup(v, "ethernet_network_group_policy", local.defaults.intersight.policies.port.port_role_appliances.ethernet_network_group_policy)
+            ].moid
+            fec       = lookup(v, "fec", local.defaults.intersight.policies.port.port_role_appliances.fec)
+            mode      = lookup(v, "mode", local.defaults.intersight.policies.port.port_role_appliances.mode)
+            port_list = v.port_list
+            priority  = lookup(v, "priority", local.defaults.intersight.policies.port.port_role_appliances.priority)
+            slot_id   = lookup(v, "slot_id", 0)
+          }
+        ]
+        port_role_ethernet_uplinks = [
+          for v in lookup(value, "port_role_ethernet_uplinks", []) : {
+            admin_speed      = lookup(v, "admin_speed", local.defaults.intersight.policies.port.port_role_ethernet_uplinks.admin_speed)
+            breakout_port_id = lookup(v, "breakout_port_id", 0)
+            ethernet_network_group_policy = length(compact([
+              lookup(v, "ethernet_network_group_policy", local.defaults.intersight.policies.port.port_role_ethernet_uplinks.ethernet_network_group_policy)
+              ])) > 0 ? module.ethernet_network_group[
+              lookup(v, "ethernet_network_group_policy", local.defaults.intersight.policies.port.port_role_ethernet_uplinks.ethernet_network_group_policy)
+            ].moid : ""
+            fec = lookup(v, "fec", local.defaults.intersight.policies.port.port_role_ethernet_uplinks.fec)
+            flow_control_policy = length(compact([
+              lookup(v, "flow_control_policy", local.defaults.intersight.policies.port.port_role_ethernet_uplinks.ethernet_network_group_policy)
+              ])) > 0 ? module.flow_control[
+              lookup(v, "flow_control_policy", local.defaults.intersight.policies.port.port_role_ethernet_uplinks.flow_control_policy)
+            ].moid : ""
+            link_control_policy = length(compact([
+              lookup(v, "link_control_policy", local.defaults.intersight.policies.port.port_role_ethernet_uplinks.ethernet_network_group_policy)
+              ])) > 0 ? module.link_control[
+              lookup(v, "link_control_policy", local.defaults.intersight.policies.port.port_role_ethernet_uplinks.link_control_policy)
+            ].moid : ""
+            port_list = v.port_list
+            slot_id   = lookup(v, "slot_id", 0)
+          }
+        ]
+        port_role_fc_storage = [
+          for v in lookup(value, "port_role_fc_storage", []) : {
+            admin_speed      = lookup(v, "admin_speed", local.defaults.intersight.policies.port.port_role_fc_storage.admin_speed)
+            breakout_port_id = lookup(v, "breakout_port_id", 0)
+            port_list        = v.port_list
+            slot_id          = lookup(v, "slot_id", 0)
+            vsan_id          = v.vsan_id
+          }
+        ]
+        port_role_fc_uplinks = [
+          for v in lookup(value, "port_role_fc_uplinks", []) : {
+            admin_speed      = lookup(v, "admin_speed", local.defaults.intersight.policies.port.port_role_fc_uplinks.admin_speed)
+            breakout_port_id = lookup(v, "breakout_port_id", 0)
+            fill_pattern     = lookup(v, "fill_pattern", local.defaults.intersight.policies.port.port_role_fc_uplinks.fill_pattern)
+            port_list        = v.port_list
+            slot_id          = lookup(v, "slot_id", 0)
+            vsan_id          = v.vsan_id
+          }
+        ]
+        port_role_fcoe_uplinks = [
+          for v in lookup(value, "port_role_fcoe_uplinks", []) : {
+            admin_speed      = lookup(v, "admin_speed", local.defaults.intersight.policies.port.port_role_fcoe_uplinks.admin_speed)
+            breakout_port_id = lookup(v, "breakout_port_id", 0)
+            interfaces       = lookup(v, "interfaces", [])
+            fec              = lookup(v, "fec", local.defaults.intersight.policies.port.port_role_fcoe_uplinks.fec)
+            link_control_policy = length(compact([
+              lookup(v, "link_control_policy", local.defaults.intersight.policies.port.port_role_fcoe_uplinks.ethernet_network_group_policy)
+              ])) > 0 ? module.link_control[
+              lookup(v, "link_control_policy", local.defaults.intersight.policies.port.port_role_fcoe_uplinks.link_control_policy)
+            ].moid : ""
+            port_list = v.port_list
+            slot_id   = lookup(v, "slot_id", 0)
+          }
+        ]
+        port_role_servers = [
+          for v in lookup(value, "port_channel_fcoe_uplinks", []) : {
+            breakout_port_id = lookup(v, "breakout_port_id", 0)
+            port_list        = v.port_list
+            slot_id          = lookup(v, "slot_id", 0)
+          }
+        ]
+        profiles = [
+          for v in local.domains : v.moid if length(regexall(element(value.names, i), v.port_policy)) > 0 || length(regexall(
+            v.port_policy, "${element(value.names, i)}${local.defaults.intersight.policies.port.name_suffix}")
+          ) > 0
+        ]
+        tags = lookup(value, "tags", local.defaults.intersight.tags)
+
+      }
+      ] if lookup(
+    local.modules.policies, "port", true)
+  ])
 }
 
 #_________________________________________________________________
@@ -1122,8 +1297,8 @@ module "lan_connectivity" {
   )
   vnics = [
     for v in lookup(each.value, "vnics", []) : {
-      cdn_value       = lookup(v, "cdn_value", local.defaults.intersight.policies.lan_connectivity.vnics.cdn_value)
-      enable_failover = lookup(v, "enable_failover", local.defaults.intersight.policies.lan_connectivity.vnics.enable_failover)
+      cdn_source = lookup(v, "cdn_source", local.defaults.intersight.policies.lan_connectivity.vnics.cdn_source)
+      cdn_values = lookup(v, "cdn_values", local.defaults.intersight.policies.lan_connectivity.vnics.cdn_values)
       ethernet_adapter_policy = module.ethernet_adapter[
         lookup(v, "ethernet_adapter_policy", local.defaults.intersight.policies.lan_connectivity.vnics.ethernet_adapter_policy)
       ].moid
@@ -1152,13 +1327,13 @@ module "lan_connectivity" {
       mac_address_allocation_type = lookup(
         v, "mac_address_allocation_type", local.defaults.intersight.policies.lan_connectivity.vnics.mac_address_allocation_type
       )
-      mac_address_pool = length(compact([
-        lookup(v, "mac_address_pool", local.defaults.intersight.policies.lan_connectivity.vnics.mac_address_pool)])
-        ) > 0 ? local.pools.mac[lookup(
-        v, "mac_address_pool", local.defaults.intersight.policies.lan_connectivity.vnics.mac_address_pool)
-      ].moid : ""
-      mac_address_static = lookup(v, "mac_address_static", "")
-      name               = v.name
+      mac_address_pools = length(
+        lookup(v, "mac_address_pools", local.defaults.intersight.policies.lan_connectivity.vnics.mac_address_pools)
+        ) > 0 ? [for i in lookup(
+          v, "mac_address_pools", local.defaults.intersight.policies.lan_connectivity.vnics.mac_address_pools
+      ) : local.pools.mac[i].moid] : []
+      mac_address_static = lookup(v, "mac_address_static", [])
+      names              = v.names
       placement_pci_link = lookup(
         v, "placement_pci_link", local.defaults.intersight.policies.lan_connectivity.vnics.placement_pci_link
       )
@@ -1503,178 +1678,24 @@ module "port" {
   source  = "terraform-cisco-modules/policies-port/intersight"
   version = ">= 1.0.2"
 
-  for_each = {
-    for v in lookup(local.policies, "port", []) : v.name => v if lookup(
-      local.modules.policies, "port", true
-    )
-  }
-  description  = lookup(each.value, "description", "")
-  device_model = lookup(each.value, "device_model", local.defaults.intersight.policies.port.device_model)
-  name         = "${each.value.name}${local.defaults.intersight.policies.port.name_suffix}"
-  organization = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
-  port_channel_appliances = [
-    for v in lookup(each.value, "port_channel_appliances", []) : {
-      admin_speed = lookup(v, "admin_speed", local.defaults.intersight.policies.port.port_channel_appliances.admin_speed)
-      ethernet_network_control_policy = module.ethernet_network_control[
-        lookup(v, "ethernet_network_control_policy", local.defaults.intersight.policies.port.port_channel_appliances.ethernet_network_control_policy)
-      ].moid
-      ethernet_network_group_policy = module.ethernet_network_group[
-        lookup(v, "ethernet_network_group_policy", local.defaults.intersight.policies.port.port_channel_appliances.ethernet_network_group_policy)
-      ].moid
-      interfaces = lookup(v, "interfaces", [])
-      mode       = lookup(v, "mode", local.defaults.intersight.policies.port.port_channel_appliances.mode)
-      pc_id      = v.pc_id
-      priority   = lookup(v, "priority", local.defaults.intersight.policies.port.port_channel_appliances.priority)
-    }
-  ]
-  port_channel_ethernet_uplinks = [
-    for v in lookup(each.value, "port_channel_ethernet_uplinks", []) : {
-      admin_speed = lookup(v, "admin_speed", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.admin_speed)
-      ethernet_network_group_policy = length(compact([
-        lookup(v, "ethernet_network_group_policy", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.ethernet_network_group_policy)
-        ])) > 0 ? module.ethernet_network_group[
-        lookup(v, "ethernet_network_group_policy", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.ethernet_network_group_policy)
-      ].moid : ""
-      flow_control_policy = length(compact([
-        lookup(v, "flow_control_policy", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.ethernet_network_group_policy)
-        ])) > 0 ? module.flow_control[
-        lookup(v, "flow_control_policy", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.flow_control_policy)
-      ].moid : ""
-      interfaces = lookup(v, "interfaces", [])
-      link_aggregation_policy = length(compact([
-        lookup(v, "link_aggregation_policy", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.ethernet_network_group_policy)
-        ])) > 0 ? module.link_aggregation[
-        lookup(v, "link_aggregation_policy", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.link_aggregation_policy)
-      ].moid : ""
-      link_control_policy = length(compact([
-        lookup(v, "link_control_policy", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.ethernet_network_group_policy)
-        ])) > 0 ? module.link_control[
-        lookup(v, "link_control_policy", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.link_control_policy)
-      ].moid : ""
-      pc_id = v.pc_id
-    }
-  ]
-  port_channel_fc_uplinks = [
-    for v in lookup(each.value, "port_channel_fc_uplinks", []) : {
-      admin_speed  = lookup(v, "admin_speed", local.defaults.intersight.policies.port.port_channel_fc_uplinks.admin_speed)
-      fill_pattern = lookup(v, "fill_pattern", local.defaults.intersight.policies.port.port_channel_fc_uplinks.fill_pattern)
-      interfaces   = lookup(v, "interfaces", [])
-      pc_id        = v.pc_id
-      vsan_id      = v.vsan_id
-    }
-  ]
-  port_channel_fcoe_uplinks = [
-    for v in lookup(each.value, "port_channel_fcoe_uplinks", []) : {
-      admin_speed = lookup(v, "admin_speed", local.defaults.intersight.policies.port.port_channel_fcoe_uplinks.admin_speed)
-      interfaces  = lookup(v, "interfaces", [])
-      link_aggregation_policy = length(compact([
-        lookup(v, "link_aggregation_policy", local.defaults.intersight.policies.port.port_channel_fcoe_uplinks.ethernet_network_group_policy)
-        ])) > 0 ? module.link_aggregation[
-        lookup(v, "link_aggregation_policy", local.defaults.intersight.policies.port.port_channel_fcoe_uplinks.link_aggregation_policy)
-      ].moid : ""
-      link_control_policy = length(compact([
-        lookup(v, "link_control_policy", local.defaults.intersight.policies.port.port_channel_fcoe_uplinks.ethernet_network_group_policy)
-        ])) > 0 ? module.link_control[
-        lookup(v, "link_control_policy", local.defaults.intersight.policies.port.port_channel_fcoe_uplinks.link_control_policy)
-      ].moid : ""
-      pc_id = v.pc_id
-    }
-  ]
-  port_modes = [
-    for v in lookup(each.value, "port_modes", []) : {
-      custom_mode = lookup(v, "custom_mode", local.defaults.intersight.policies.port.port_modes.custom_mode)
-      port_list   = v.port_list
-      slot_id     = lookup(v, "slot_id", 1)
-    }
-  ]
-  port_role_appliances = [
-    for v in lookup(each.value, "port_role_appliances", []) : {
-      admin_speed      = lookup(v, "admin_speed", local.defaults.intersight.policies.port.port_role_appliances.admin_speed)
-      breakout_port_id = lookup(v, "breakout_port_id", 0)
-      ethernet_network_control_policy = module.ethernet_network_control[
-        lookup(v, "ethernet_network_control_policy", local.defaults.intersight.policies.port.port_role_appliances.ethernet_network_control_policy)
-      ].moid
-      ethernet_network_group_policy = module.ethernet_network_group[
-        lookup(v, "ethernet_network_group_policy", local.defaults.intersight.policies.port.port_role_appliances.ethernet_network_group_policy)
-      ].moid
-      fec       = lookup(v, "fec", local.defaults.intersight.policies.port.port_role_appliances.fec)
-      mode      = lookup(v, "mode", local.defaults.intersight.policies.port.port_role_appliances.mode)
-      port_list = v.port_list
-      priority  = lookup(v, "priority", local.defaults.intersight.policies.port.port_role_appliances.priority)
-      slot_id   = lookup(v, "slot_id", 0)
-    }
-  ]
-  port_role_ethernet_uplinks = [
-    for v in lookup(each.value, "port_role_ethernet_uplinks", []) : {
-      admin_speed      = lookup(v, "admin_speed", local.defaults.intersight.policies.port.port_role_ethernet_uplinks.admin_speed)
-      breakout_port_id = lookup(v, "breakout_port_id", 0)
-      ethernet_network_group_policy = length(compact([
-        lookup(v, "ethernet_network_group_policy", local.defaults.intersight.policies.port.port_role_ethernet_uplinks.ethernet_network_group_policy)
-        ])) > 0 ? module.ethernet_network_group[
-        lookup(v, "ethernet_network_group_policy", local.defaults.intersight.policies.port.port_role_ethernet_uplinks.ethernet_network_group_policy)
-      ].moid : ""
-      fec = lookup(v, "fec", local.defaults.intersight.policies.port.port_role_ethernet_uplinks.fec)
-      flow_control_policy = length(compact([
-        lookup(v, "flow_control_policy", local.defaults.intersight.policies.port.port_role_ethernet_uplinks.ethernet_network_group_policy)
-        ])) > 0 ? module.flow_control[
-        lookup(v, "flow_control_policy", local.defaults.intersight.policies.port.port_role_ethernet_uplinks.flow_control_policy)
-      ].moid : ""
-      link_control_policy = length(compact([
-        lookup(v, "link_control_policy", local.defaults.intersight.policies.port.port_role_ethernet_uplinks.ethernet_network_group_policy)
-        ])) > 0 ? module.link_control[
-        lookup(v, "link_control_policy", local.defaults.intersight.policies.port.port_role_ethernet_uplinks.link_control_policy)
-      ].moid : ""
-      port_list = v.port_list
-      slot_id   = lookup(v, "slot_id", 0)
-    }
-  ]
-  port_role_fc_storage = [
-    for v in lookup(each.value, "port_role_fc_storage", []) : {
-      admin_speed      = lookup(v, "admin_speed", local.defaults.intersight.policies.port.port_role_fc_storage.admin_speed)
-      breakout_port_id = lookup(v, "breakout_port_id", 0)
-      port_list        = v.port_list
-      slot_id          = lookup(v, "slot_id", 0)
-      vsan_id          = v.vsan_id
-    }
-  ]
-  port_role_fc_uplinks = [
-    for v in lookup(each.value, "port_role_fc_uplinks", []) : {
-      admin_speed      = lookup(v, "admin_speed", local.defaults.intersight.policies.port.port_role_fc_uplinks.admin_speed)
-      breakout_port_id = lookup(v, "breakout_port_id", 0)
-      fill_pattern     = lookup(v, "fill_pattern", local.defaults.intersight.policies.port.port_role_fc_uplinks.fill_pattern)
-      port_list        = v.port_list
-      slot_id          = lookup(v, "slot_id", 0)
-      vsan_id          = v.vsan_id
-    }
-  ]
-  port_role_fcoe_uplinks = [
-    for v in lookup(each.value, "port_role_fcoe_uplinks", []) : {
-      admin_speed      = lookup(v, "admin_speed", local.defaults.intersight.policies.port.port_role_fcoe_uplinks.admin_speed)
-      breakout_port_id = lookup(v, "breakout_port_id", 0)
-      interfaces       = lookup(v, "interfaces", [])
-      fec              = lookup(v, "fec", local.defaults.intersight.policies.port.port_role_fcoe_uplinks.fec)
-      link_control_policy = length(compact([
-        lookup(v, "link_control_policy", local.defaults.intersight.policies.port.port_role_fcoe_uplinks.ethernet_network_group_policy)
-        ])) > 0 ? module.link_control[
-        lookup(v, "link_control_policy", local.defaults.intersight.policies.port.port_role_fcoe_uplinks.link_control_policy)
-      ].moid : ""
-      port_list = v.port_list
-      slot_id   = lookup(v, "slot_id", 0)
-    }
-  ]
-  port_role_servers = [
-    for v in lookup(each.value, "port_channel_fcoe_uplinks", []) : {
-      breakout_port_id = lookup(v, "breakout_port_id", 0)
-      port_list        = v.port_list
-      slot_id          = lookup(v, "slot_id", 0)
-    }
-  ]
-  profiles = [
-    for v in local.domains : v.moid if length(regexall(v.name, v.port_policy)) > 0 || length(regexall(
-      v.port_policy, "${each.value.name}${local.defaults.intersight.policies.port.name_suffix}")
-    ) > 0
-  ]
-  tags = lookup(each.value, "tags", local.defaults.intersight.tags)
+  for_each                      = { for v in local.port : v.name => v }
+  description                   = each.value.description
+  device_model                  = each.value.device_model
+  name                          = each.value.name
+  organization                  = each.value.organization
+  port_channel_appliances       = each.value.port_channel_appliances
+  port_channel_ethernet_uplinks = each.value.port_channel_ethernet_uplinks
+  port_channel_fc_uplinks       = each.value.port_channel_fc_uplinks
+  port_channel_fcoe_uplinks     = each.value.port_channel_fcoe_uplinks
+  port_modes                    = each.value.port_modes
+  port_role_appliances          = each.value.port_role_appliances
+  port_role_ethernet_uplinks    = each.value.port_role_ethernet_uplinks
+  port_role_fc_storage          = each.value.port_role_fc_storage
+  port_role_fc_uplinks          = each.value.port_role_fc_uplinks
+  port_role_fcoe_uplinks        = each.value.port_role_fcoe_uplinks
+  port_role_servers             = each.value.port_role_servers
+  profiles                      = each.value.profiles
+  tags                          = each.value.tags
 }
 
 
@@ -1744,23 +1765,41 @@ module "san_connectivity" {
       fibre_channel_adapter_policy = module.fibre_channel_adapter[lookup(
         v, "fibre_channel_adapter_policy", local.defaults.intersight.policies.san_connectivity.vhbas.fibre_channel_adapter_policy
       )].moid
-      fibre_channel_network_policy = module.fibre_channel_network[lookup(
-        v, "fibre_channel_network_policy", local.defaults.intersight.policies.san_connectivity.vhbas.fibre_channel_network_policy
-      )].moid
+      fibre_channel_network_policies = [for i in lookup(
+        v, "fibre_channel_network_policies", local.defaults.intersight.policies.san_connectivity.vhbas.fibre_channel_network_policies
+      ) : module.fibre_channel_network[i].moid]
       fibre_channel_qos_policy = module.fibre_channel_qos[lookup(
         v, "fibre_channel_qos_policy", local.defaults.intersight.policies.san_connectivity.vhbas.fibre_channel_qos_policy
       )].moid
-      name                    = v.name
-      persistent_lun_bindings = lookup(v, "persistent_lun_bindings", local.defaults.intersight.policies.san_connectivity.vhbas.persistent_lun_bindings)
-      placement_pci_link      = lookup(v, "placement_pci_link", local.defaults.intersight.policies.san_connectivity.vhbas.placement_pci_link)
-      placement_pci_order     = lookup(v, "placement_pci_order", local.defaults.intersight.policies.san_connectivity.vhbas.placement_pci_order)
-      placement_slot_id       = lookup(v, "placement_slot_id", local.defaults.intersight.policies.san_connectivity.vhbas.placement_slot_id)
-      placement_switch_id     = v.placement_switch_id
-      placement_uplink_port   = lookup(v, "placement_uplink_port", local.defaults.intersight.policies.san_connectivity.vhbas.placement_uplink_port)
-      vhba_type               = lookup(v, "vhba_type", local.defaults.intersight.policies.san_connectivity.vhbas.vhba_type)
-      wwpn_allocation_type    = lookup(v, "wwpn_allocation_type", local.defaults.intersight.policies.san_connectivity.vhbas.wwpn_allocation_type)
-      wwpn_pool               = length(compact([lookup(v, "wwpn_pool", "")])) > 0 ? local.pools.wwpn[v.wwpn_pool].moid : ""
-      wwpn_static_address     = lookup(v, "wwpn_static_address", "")
+      names = v.names
+      persistent_lun_bindings = lookup(
+        v, "persistent_lun_bindings", local.defaults.intersight.policies.san_connectivity.vhbas.persistent_lun_bindings
+      )
+      placement_pci_link = lookup(
+        v, "placement_pci_link", local.defaults.intersight.policies.san_connectivity.vhbas.placement_pci_link
+      )
+      placement_pci_order = lookup(
+        v, "placement_pci_order", local.defaults.intersight.policies.san_connectivity.vhbas.placement_pci_order
+      )
+      placement_slot_id = lookup(
+        v, "placement_slot_id", local.defaults.intersight.policies.san_connectivity.vhbas.placement_slot_id
+      )
+      placement_switch_id = lookup(
+        v, "placement_switch_id", local.defaults.intersight.policies.san_connectivity.vhbas.placement_switch_id
+      )
+      placement_uplink_port = lookup(
+        v, "placement_uplink_port", local.defaults.intersight.policies.san_connectivity.vhbas.placement_uplink_port
+      )
+      vhba_type = lookup(
+        v, "vhba_type", local.defaults.intersight.policies.san_connectivity.vhbas.vhba_type
+      )
+      wwpn_allocation_type = lookup(
+        v, "wwpn_allocation_type", local.defaults.intersight.policies.san_connectivity.vhbas.wwpn_allocation_type
+      )
+      wwpn_pools = length(lookup(v, "wwpn_pools", local.defaults.intersight.policies.san_connectivity.vhbas.wwpn_pools)
+        ) > 0 ? [for i in lookup(v, "wwpn_pools", local.defaults.intersight.policies.san_connectivity.vhbas.wwpn_pools
+      ) : local.pools.wwpn[i].moid] : []
+      wwpn_static_address = lookup(v, "wwpn_static_address", [])
     }
   ]
   wwnn_allocation_type = lookup(each.value, "wwnn_allocation_type", local.defaults.intersight.policies.san_connectivity.wwnn_allocation_type)
