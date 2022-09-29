@@ -1651,7 +1651,7 @@ module "port" {
     module.link_control
   ]
   source  = "terraform-cisco-modules/policies-port/intersight"
-  version = ">= 1.0.3"
+  version = ">= 1.0.4"
 
   for_each        = { for v in local.port : v.name => v }
   description     = each.value.description

@@ -175,12 +175,12 @@ output "ntp" {
 # Port Policy Outputs
 #__________________________________________________________
 
-# output "port" {
-#   description = "Moid's of the Port Policies."
-#   value = length(lookup(local.policies, "port", [])) > 0 ? { for v in sort(
-#     keys(module.port)
-#   ) : v => module.port[v].moid } : {}
-# }
+output "port" {
+  description = "Moid's of the Port Policies."
+  value = length(lookup(local.policies, "port", [])) > 0 ? { for v in sort(
+    keys(module.port)
+  ) : v => module.port[v].moid } : {}
+}
 
 
 #__________________________________________________________
@@ -201,12 +201,12 @@ output "power" {
 # SAN Connectivity Policy Outputs
 #__________________________________________________________
 
-# output "san_connectivity" {
-#   description = "Moid's of the SAN Connectivity Policies."
-#   value = length(lookup(local.policies, "san_connectivity", [])) > 0 ? { for v in sort(
-#     keys(module.san_connectivity)
-#   ) : v => module.san_connectivity[v].moid } : {}
-# }
+output "san_connectivity" {
+  description = "Moid's of the SAN Connectivity Policies."
+  value = length(lookup(local.policies, "san_connectivity", [])) > 0 ? { for v in sort(
+    keys(module.san_connectivity)
+  ) : v => module.san_connectivity[v].moid } : {}
+}
 
 
 #__________________________________________________________
