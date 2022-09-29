@@ -18,7 +18,7 @@ locals {
             admin_speed = lookup(v, "admin_speed", local.defaults.intersight.policies.port.port_channel_appliances.admin_speed)
             ethernet_network_control_policy = lookup(
               v, "ethernet_network_control_policy", local.defaults.intersight.policies.port.port_channel_appliances.ethernet_network_control_policy
-              )
+            )
             ethernet_network_group_policy = lookup(
               v, "ethernet_network_group_policy", local.defaults.intersight.policies.port.port_channel_appliances.ethernet_network_group_policy
             )
@@ -33,7 +33,7 @@ locals {
             admin_speed = lookup(v, "admin_speed", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.admin_speed)
             ethernet_network_group_policy = lookup(
               v, "ethernet_network_group_policy", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.ethernet_network_group_policy
-              )
+            )
             flow_control_policy = lookup(v, "flow_control_policy", local.defaults.intersight.policies.port.port_channel_ethernet_uplinks.flow_control_policy
             )
             interfaces = lookup(v, "interfaces", [])
@@ -82,7 +82,7 @@ locals {
             )
             ethernet_network_group_policy = lookup(
               v, "ethernet_network_group_policy", local.defaults.intersight.policies.port.port_role_appliances.ethernet_network_group_policy
-              )
+            )
             fec       = lookup(v, "fec", local.defaults.intersight.policies.port.port_role_appliances.fec)
             mode      = lookup(v, "mode", local.defaults.intersight.policies.port.port_role_appliances.mode)
             port_list = v.port_list
@@ -103,7 +103,7 @@ locals {
             )
             link_control_policy = lookup(
               v, "link_control_policy", local.defaults.intersight.policies.port.port_role_ethernet_uplinks.link_control_policy
-              )
+            )
             port_list = v.port_list
             slot_id   = lookup(v, "slot_id", 1)
           }
@@ -135,7 +135,7 @@ locals {
             fec              = lookup(v, "fec", local.defaults.intersight.policies.port.port_role_fcoe_uplinks.fec)
             link_control_policy = lookup(
               v, "link_control_policy", local.defaults.intersight.policies.port.port_role_fcoe_uplinks.link_control_policy
-              )
+            )
             port_list = v.port_list
             slot_id   = lookup(v, "slot_id", 1)
           }
@@ -1071,7 +1071,7 @@ module "flow_control" {
 
 module "imc_access" {
   source  = "terraform-cisco-modules/policies-imc-access/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.3"
 
   for_each = {
     for v in lookup(local.policies, "imc_access", []) : v.name => v if lookup(
@@ -1246,7 +1246,7 @@ module "lan_connectivity" {
     module.iscsi_boot
   ]
   source  = "terraform-cisco-modules/policies-lan-connectivity/intersight"
-  version = ">= 1.0.3"
+  version = ">= 1.0.4"
 
   for_each = {
     for v in lookup(local.policies, "lan_connectivity", []) : v.name => v if lookup(
@@ -1269,12 +1269,12 @@ module "lan_connectivity" {
   organization = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
   pools        = local.pools
   policies = {
-    ethernet_adapter = module.ethernet_adapter,
-    ethernet_network = module.ethernet_network,
+    ethernet_adapter         = module.ethernet_adapter,
+    ethernet_network         = module.ethernet_network,
     ethernet_network_control = module.ethernet_network_control,
-    ethernet_network_group = module.ethernet_network_group,
-    ethernet_qos = module.ethernet_qos,
-    iscsi_boot = module.iscsi_boot,
+    ethernet_network_group   = module.ethernet_network_group,
+    ethernet_qos             = module.ethernet_qos,
+    iscsi_boot               = module.iscsi_boot,
   }
   tags            = lookup(each.value, "tags", local.defaults.intersight.tags)
   target_platform = lookup(each.value, "target_platform", local.defaults.intersight.policies.lan_connectivity.target_platform)
@@ -1558,14 +1558,14 @@ module "multicast" {
 
 module "network_connectivity" {
   source  = "terraform-cisco-modules/policies-network-connectivity/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.3"
 
   for_each = {
     for v in lookup(local.policies, "network_connectivity", []) : v.name => v if lookup(
       local.modules.policies, "network_connectivity", true
     )
   }
-  description = lookup(each.value, "description", "")
+  description     = lookup(each.value, "description", "")
   domain_profiles = local.domains
   dns_servers_v4 = lookup(
     each.value, "dns_servers_v4", local.defaults.intersight.policies.network_connectivity.dns_servers_v4
@@ -1580,7 +1580,7 @@ module "network_connectivity" {
     each.value, "enable_ipv6", local.defaults.intersight.policies.network_connectivity.enable_ipv6
   )
   moids = true
-  name = "${each.value.name}${local.defaults.intersight.policies.network_connectivity.name_suffix}"
+  name  = "${each.value.name}${local.defaults.intersight.policies.network_connectivity.name_suffix}"
   obtain_ipv4_dns_from_dhcp = lookup(
     each.value, "obtain_ipv4_dns_from_dhcp", local.defaults.intersight.policies.network_connectivity.obtain_ipv4_dns_from_dhcp
   )
@@ -1609,20 +1609,20 @@ module "network_connectivity" {
 
 module "ntp" {
   source  = "terraform-cisco-modules/policies-ntp/intersight"
-  version = ">= 1.0.1"
+  version = ">= 1.0.2"
 
   for_each = {
     for v in lookup(local.policies, "ntp", []) : v.name => v if lookup(
       local.modules.policies, "ntp", true
     )
   }
-  description  = lookup(each.value, "description", "")
+  description     = lookup(each.value, "description", "")
   domain_profiles = local.domains
-  enabled      = lookup(each.value, "enabled", local.defaults.intersight.policies.ntp.enabled)
-  moids = true
-  name         = "${each.value.name}${local.defaults.intersight.policies.ntp.name_suffix}"
-  ntp_servers  = lookup(each.value, "ntp_servers", local.defaults.intersight.policies.ntp.ntp_servers)
-  organization = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
+  enabled         = lookup(each.value, "enabled", local.defaults.intersight.policies.ntp.enabled)
+  moids           = true
+  name            = "${each.value.name}${local.defaults.intersight.policies.ntp.name_suffix}"
+  ntp_servers     = lookup(each.value, "ntp_servers", local.defaults.intersight.policies.ntp.ntp_servers)
+  organization    = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
   profiles = [
     for v in local.domains : {
       name        = v.name
@@ -1651,21 +1651,21 @@ module "port" {
     module.link_control
   ]
   source  = "terraform-cisco-modules/policies-port/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.3"
 
-  for_each                      = { for v in local.port : v.name => v }
-  description                   = each.value.description
-  device_model                  = each.value.device_model
+  for_each        = { for v in local.port : v.name => v }
+  description     = each.value.description
+  device_model    = each.value.device_model
   domain_profiles = local.domains
-  moids = true
-  name                          = each.value.name
-  organization                  = each.value.organization
+  moids           = true
+  name            = each.value.name
+  organization    = each.value.organization
   policies = {
     ethernet_network_control = module.ethernet_network_control,
-    ethernet_network_group = module.ethernet_network_group,
-    flow_control = module.flow_control,
-    link_aggregation = module.link_aggregation,
-    link_control = module.link_control,
+    ethernet_network_group   = module.ethernet_network_group,
+    flow_control             = module.flow_control,
+    link_aggregation         = module.link_aggregation,
+    link_control             = module.link_control,
   }
   port_channel_appliances       = each.value.port_channel_appliances
   port_channel_ethernet_uplinks = each.value.port_channel_ethernet_uplinks
@@ -1728,24 +1728,24 @@ module "san_connectivity" {
     module.fibre_channel_qos
   ]
   source  = "terraform-cisco-modules/policies-san-connectivity/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.3"
 
   for_each = {
     for v in lookup(local.policies, "san_connectivity", []) : v.name => v if lookup(
       local.modules.policies, "san_connectivity", true
     )
   }
-  description         = lookup(each.value, "description", "")
-  moids = true
-  name                = "${each.value.name}${local.defaults.intersight.policies.san_connectivity.name_suffix}"
-  organization        = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
+  description  = lookup(each.value, "description", "")
+  moids        = true
+  name         = "${each.value.name}${local.defaults.intersight.policies.san_connectivity.name_suffix}"
+  organization = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
   policies = {
-    fc_zone = module.fc_zone,
+    fc_zone               = module.fc_zone,
     fibre_channel_adapter = module.fibre_channel_adapter,
     fibre_channel_network = module.fibre_channel_network,
-    fibre_channel_qos = module.fibre_channel_qos,
+    fibre_channel_qos     = module.fibre_channel_qos,
   }
-  pools = local.pools
+  pools               = local.pools
   tags                = lookup(each.value, "tags", local.defaults.intersight.tags)
   target_platform     = lookup(each.value, "target_platform", local.defaults.intersight.policies.san_connectivity.target_platform)
   vhba_placement_mode = lookup(each.value, "vhba_placement_mode", local.defaults.intersight.policies.san_connectivity.vhba_placement_mode)
@@ -1753,7 +1753,7 @@ module "san_connectivity" {
     for v in lookup(each.value, "vhbas", []) : {
       fc_zone_policies = lookup(
         v, "fc_zone_policies", local.defaults.intersight.policies.san_connectivity.vhbas.fc_zone_policies
-        )
+      )
       fibre_channel_adapter_policy = lookup(
         v, "fibre_channel_adapter_policy", local.defaults.intersight.policies.san_connectivity.vhbas.fibre_channel_adapter_policy
       )
@@ -1788,7 +1788,7 @@ module "san_connectivity" {
       wwpn_allocation_type = lookup(
         v, "wwpn_allocation_type", local.defaults.intersight.policies.san_connectivity.vhbas.wwpn_allocation_type
       )
-      wwpn_pools = lookup(v, "wwpn_pools", local.defaults.intersight.policies.san_connectivity.vhbas.wwpn_pools)
+      wwpn_pools          = lookup(v, "wwpn_pools", local.defaults.intersight.policies.san_connectivity.vhbas.wwpn_pools)
       wwpn_static_address = lookup(v, "wwpn_static_address", [])
     }
   ]
@@ -1893,7 +1893,7 @@ module "smtp" {
 
 module "snmp" {
   source  = "terraform-cisco-modules/policies-snmp/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.3"
 
   for_each = {
     for v in lookup(local.policies, "snmp", []) : v.name => v if lookup(
@@ -1907,9 +1907,9 @@ module "snmp" {
   access_community_string_4 = var.access_community_string_4
   access_community_string_5 = var.access_community_string_5
   description               = lookup(each.value, "description", "")
-  domain_profiles = local.domains
+  domain_profiles           = local.domains
   enable_snmp               = lookup(each.value, "enable_snmp", local.defaults.intersight.policies.snmp.enable_snmp)
-  moids = true
+  moids                     = true
   name                      = "${each.value.name}${local.defaults.intersight.policies.snmp.name_suffix}"
   organization              = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
   profiles = [
@@ -2014,14 +2014,14 @@ module "storage" {
 
 module "switch_control" {
   source  = "terraform-cisco-modules/policies-switch-control/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.3"
 
   for_each = {
     for v in lookup(local.policies, "switch_control", []) : v.name => v if lookup(
       local.modules.policies, "switch_control", true
     )
   }
-  description = lookup(each.value, "description", "")
+  description     = lookup(each.value, "description", "")
   domain_profiles = local.domains
   ethernet_switching_mode = lookup(
     each.value, "ethernet_switching_mode", local.defaults.intersight.policies.switch_control.ethernet_switching_mode
@@ -2033,7 +2033,7 @@ module "switch_control" {
     each.value, "mac_address_table_aging", local.defaults.intersight.policies.switch_control.mac_address_table_aging
   )
   mac_aging_time = lookup(each.value, "mac_aging_time", local.defaults.intersight.policies.switch_control.mac_aging_time)
-  moids = true
+  moids          = true
   name           = "${each.value.name}${local.defaults.intersight.policies.switch_control.name_suffix}"
   organization   = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
   profiles = [
@@ -2069,12 +2069,12 @@ module "syslog" {
       local.modules.policies, "syslog", true
     )
   }
-  description = lookup(each.value, "description", "")
+  description     = lookup(each.value, "description", "")
   domain_profiles = local.domains
   local_min_severity = lookup(
     each.value, "local_min_severity", local.defaults.intersight.policies.syslog.local_min_severity
   )
-  moids = true
+  moids        = true
   name         = "${each.value.name}${local.defaults.intersight.policies.syslog.name_suffix}"
   organization = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
   profiles = [
@@ -2098,19 +2098,19 @@ module "syslog" {
 
 module "system_qos" {
   source  = "terraform-cisco-modules/policies-system-qos/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.3"
 
   for_each = {
     for v in lookup(local.policies, "system_qos", []) : v.name => v if lookup(
       local.modules.policies, "system_qos", true
     )
   }
-  classes      = lookup(each.value, "classes", [])
-  description  = lookup(each.value, "description", "")
+  classes         = lookup(each.value, "classes", [])
+  description     = lookup(each.value, "description", "")
   domain_profiles = local.domains
-  name         = "${each.value.name}${local.defaults.intersight.policies.system_qos.name_suffix}"
-  moids = true
-  organization = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
+  name            = "${each.value.name}${local.defaults.intersight.policies.system_qos.name_suffix}"
+  moids           = true
+  organization    = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
   profiles = [
     for v in local.domains : v.name if length(regexall(each.value.name, v.system_qos_policy)) > 0 || length(regexall(
       v.system_qos_policy, "${each.value.name}${local.defaults.intersight.policies.system_qos.name_suffix}")
@@ -2229,18 +2229,18 @@ module "vlan" {
     module.multicast
   ]
   source  = "terraform-cisco-modules/policies-vlan/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.3"
 
   for_each = {
     for v in lookup(local.policies, "vlan", []) : v.name => v if lookup(
       local.modules.policies, "vlan", true
     )
   }
-  description  = lookup(each.value, "description", "")
+  description     = lookup(each.value, "description", "")
   domain_profiles = local.domains
-  moids = true
-  name         = "${each.value.name}${local.defaults.intersight.policies.vlan.name_suffix}"
-  organization = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
+  moids           = true
+  name            = "${each.value.name}${local.defaults.intersight.policies.vlan.name_suffix}"
+  organization    = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
   policies = {
     multicast = module.multicast
   }
@@ -2272,18 +2272,18 @@ module "vlan" {
 
 module "vsan" {
   source  = "terraform-cisco-modules/policies-vsan/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.3"
 
   for_each = {
     for v in lookup(local.policies, "vsan", []) : v.name => v if lookup(
       local.modules.policies, "vsan", true
     )
   }
-  description  = lookup(each.value, "description", "")
+  description     = lookup(each.value, "description", "")
   domain_profiles = local.domains
-  moids = true
-  name         = "${each.value.name}${local.defaults.intersight.policies.vsan.name_suffix}"
-  organization = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
+  moids           = true
+  name            = "${each.value.name}${local.defaults.intersight.policies.vsan.name_suffix}"
+  organization    = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
   profiles = [
     for v in local.domains : v.name if length(regexall(each.value.name, v.vsan_policy)) > 0 || length(regexall(
       v.vsan_policy, "${each.value.name}${local.defaults.intersight.policies.vsan.name_suffix}")
