@@ -148,8 +148,9 @@ locals {
           }
         ]
         profiles = [
-          for v in local.domains : v.name if length(regexall(element(value.names, i), v.port_policy)) > 0 || length(regexall(
-            v.port_policy, "${element(value.names, i)}${local.defaults.intersight.policies.port.name_suffix}")
+          for v in local.domains : v.name if length(regexall(
+            "^${element(value.names, i)}$", v.port_policy)) > 0 || length(regexall(
+            "^${element(value.names, i)}${local.defaults.intersight.policies.port.name_suffix}$, v.port_policy")
           ) > 0
         ]
         tags = lookup(value, "tags", local.defaults.intersight.tags)
@@ -1592,8 +1593,8 @@ module "network_connectivity" {
     for v in local.domains : {
       name        = v.name
       object_type = "fabric.SwitchProfile"
-      } if length(regexall(each.value.name, v.network_connectivity_policy)) > 0 || length(regexall(
-      v.network_connectivity_policy, "${each.value.name}${local.defaults.intersight.policies.network_connectivity.name_suffix}")
+      } if length(regexall("^${each.value.name}$", v.network_connectivity_policy)) > 0 || length(regexall(
+      "^${each.value.name}${local.defaults.intersight.policies.network_connectivity.name_suffix}$", v.network_connectivity_policy)
     ) > 0
   ]
   tags          = lookup(each.value, "tags", local.defaults.intersight.tags)
@@ -1627,8 +1628,8 @@ module "ntp" {
     for v in local.domains : {
       name        = v.name
       object_type = "fabric.SwitchProfile"
-      } if length(regexall(each.value.name, v.ntp_policy)) > 0 || length(regexall(
-      v.ntp_policy, "${each.value.name}${local.defaults.intersight.policies.ntp.name_suffix}")
+      } if length(regexall("^${each.value.name}$", v.ntp_policy)) > 0 || length(regexall(
+      "^${each.value.name}${local.defaults.intersight.policies.ntp.name_suffix}$", v.ntp_policy)
     ) > 0
   ]
   tags     = lookup(each.value, "tags", local.defaults.intersight.tags)
@@ -1916,8 +1917,8 @@ module "snmp" {
     for v in local.domains : {
       name        = v.name
       object_type = "fabric.SwitchProfile"
-      } if length(regexall(each.value.name, v.snmp_policy)) > 0 || length(regexall(
-      v.snmp_policy, "${each.value.name}${local.defaults.intersight.policies.snmp.name_suffix}")
+      } if length(regexall("^${each.value.name}$", v.snmp_policy)) > 0 || length(regexall(
+      "^${each.value.name}${local.defaults.intersight.policies.snmp.name_suffix}$", v.snmp_policy)
     ) > 0
   ]
   snmp_auth_password_1  = var.snmp_auth_password_1
@@ -2037,8 +2038,9 @@ module "switch_control" {
   name           = "${each.value.name}${local.defaults.intersight.policies.switch_control.name_suffix}"
   organization   = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
   profiles = [
-    for v in local.domains : v.name if length(regexall(each.value.name, v.switch_control_policy)) > 0 || length(regexall(
-      v.switch_control_policy, "${each.value.name}${local.defaults.intersight.policies.switch_control.name_suffix}")
+    for v in local.domains : v.name if length(regexall(
+      "^${each.value.name}$", v.switch_control_policy)) > 0 || length(regexall(
+      "^${each.value.name}${local.defaults.intersight.policies.switch_control.name_suffix}$", v.switch_control_policy)
     ) > 0
   ]
   tags = lookup(each.value, "tags", local.defaults.intersight.tags)
@@ -2081,8 +2083,8 @@ module "syslog" {
     for v in local.domains : {
       name        = v.name
       object_type = "fabric.SwitchProfile"
-      } if length(regexall(each.value.name, v.syslog_policy)) > 0 || length(regexall(
-      v.syslog_policy, "${each.value.name}${local.defaults.intersight.policies.syslog.name_suffix}")
+      } if length(regexall("^${each.value.name}$", v.syslog_policy)) > 0 || length(regexall(
+      "^${each.value.name}${local.defaults.intersight.policies.syslog.name_suffix}$", v.syslog_policy)
     ) > 0
   ]
   remote_clients = lookup(each.value, "remote_clients", [])
@@ -2112,8 +2114,9 @@ module "system_qos" {
   moids           = true
   organization    = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
   profiles = [
-    for v in local.domains : v.name if length(regexall(each.value.name, v.system_qos_policy)) > 0 || length(regexall(
-      v.system_qos_policy, "${each.value.name}${local.defaults.intersight.policies.system_qos.name_suffix}")
+    for v in local.domains : v.name if length(regexall("^${each.value.name}$", v.system_qos_policy)
+    ) > 0 || length(regexall(
+      "${each.value.name}${local.defaults.intersight.policies.system_qos.name_suffix}", "^${v.system_qos_policy}$")
     ) > 0
   ]
   tags = lookup(each.value, "tags", local.defaults.intersight.tags)
@@ -2245,8 +2248,8 @@ module "vlan" {
     multicast = module.multicast
   }
   profiles = [
-    for v in local.domains : v.name if length(regexall(each.value.name, v.vlan_policy)) > 0 || length(regexall(
-      v.vlan_policy, "${each.value.name}${local.defaults.intersight.policies.vlan.name_suffix}")
+    for v in local.domains : v.name if length(regexall("^${each.value.name}$", v.vlan_policy)) > 0 || length(regexall(
+      "^${each.value.name}${local.defaults.intersight.policies.vlan.name_suffix}$", v.vlan_policy)
     ) > 0
   ]
   tags = lookup(each.value, "tags", local.defaults.intersight.tags)
@@ -2285,8 +2288,8 @@ module "vsan" {
   name            = "${each.value.name}${local.defaults.intersight.policies.vsan.name_suffix}"
   organization    = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
   profiles = [
-    for v in local.domains : v.name if length(regexall(each.value.name, v.vsan_policy)) > 0 || length(regexall(
-      v.vsan_policy, "${each.value.name}${local.defaults.intersight.policies.vsan.name_suffix}")
+    for v in local.domains : v.name if length(regexall("^${each.value.name}$", v.vsan_policy)) > 0 || length(regexall(
+      "^${each.value.name}${local.defaults.intersight.policies.vsan.name_suffix}$", v.vsan_policy)
     ) > 0
   ]
   tags            = lookup(each.value, "tags", local.defaults.intersight.tags)
