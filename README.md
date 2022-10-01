@@ -89,7 +89,9 @@ No providers.
 | <a name="output_local_user"></a> [local\_user](#output\_local\_user) | Moid's of the Local User Policies. |
 | <a name="output_network_connectivity"></a> [network\_connectivity](#output\_network\_connectivity) | Moid's of the Network Connectivity Policies. |
 | <a name="output_ntp"></a> [ntp](#output\_ntp) | Moid's of the NTP Policies. |
+| <a name="output_port"></a> [port](#output\_port) | Moid's of the Port Policies. |
 | <a name="output_power"></a> [power](#output\_power) | Moid's of the Power Policies. |
+| <a name="output_san_connectivity"></a> [san\_connectivity](#output\_san\_connectivity) | Moid's of the SAN Connectivity Policies. |
 | <a name="output_serial_over_lan"></a> [serial\_over\_lan](#output\_serial\_over\_lan) | Moid's of the Serial over LAN Policies. |
 | <a name="output_smtp"></a> [smtp](#output\_smtp) | Moid's of the SMTP Policies. |
 | <a name="output_snmp"></a> [snmp](#output\_snmp) | Moid's of the SNMP Policies. |
