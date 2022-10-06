@@ -1585,6 +1585,9 @@ module "power" {
   dynamic_power_rebalancing = lookup(
     each.value, "dynamic_power_rebalancing", local.defaults.intersight.policies.power.dynamic_power_rebalancing
   )
+  extended_power_capacity = lookup(
+    each.value, "extended_power_capacity", local.defaults.intersight.policies.power.extended_power_capacity
+  )
   name             = "${each.value.name}${local.defaults.intersight.policies.power.name_suffix}"
   organization     = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
   power_allocation = lookup(each.value, "power_allocation", local.defaults.intersight.policies.power.power_allocation)
