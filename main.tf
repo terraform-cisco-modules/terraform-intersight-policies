@@ -1098,27 +1098,26 @@ module "iscsi_boot" {
   dhcp_vendor_id_iqn = lookup(
     each.value, "dhcp_vendor_id_iqn", local.defaults.intersight.policies.iscsi_boot.dhcp_vendor_id_iqn
   )
-  initiator_ip_pool = length(
-    compact([each.value.initiator_ip_pool])
-  ) > 0 ? local.pools.ip[each.value.initiator_ip_pool].moid : ""
+  initiator_ip_pool = lookup(each.value, "initiator_ip_pool", "")
   initiator_ip_source = lookup(
     each.value, "initiator_ip_source", local.defaults.intersight.policies.iscsi_boot.initiator_ip_source
   )
   initiator_static_ip_v4_config = lookup(
     each.value, "initiator_static_ip_v4_config", []
   )
-  iscsi_adapter_policy = length(compact([each.value.iscsi_adapter_policy])
-  ) > 0 ? module.iscsi_adapter[each.value.iscsi_adapter_policy].moid : ""
-  iscsi_boot_password = var.iscsi_boot_password
-  name                = "${each.value.name}${local.defaults.intersight.policies.ethernet_qos.name_suffix}"
-  organization        = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
-  primary_target_policy = length(
-    compact([each.value.primary_target_policy])
-  ) > 0 ? module.iscsi_static_target[each.value.primary_target_policy].moid : ""
-  secondary_target_policy = length(
-    compact([each.value.secondary_target_policy])
-  ) > 0 ? module.iscsi_static_target[each.value.secondary_target_policy].moid : ""
-  tags = lookup(each.value, "tags", local.defaults.intersight.tags)
+  iscsi_adapter_policy = lookup(each.value, "iscsi_adapter_policy", "")
+  iscsi_boot_password  = var.iscsi_boot_password
+  moids                = true
+  name                 = "${each.value.name}${local.defaults.intersight.policies.ethernet_qos.name_suffix}"
+  organization         = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
+  policies = {
+    iscsi_adapter       = module.iscsi_adapter,
+    iscsi_static_target = module.iscsi_static_target,
+  }
+  pools                   = local.pools
+  primary_target_policy   = lookup(each.value, "primary_target_policy", "")
+  secondary_target_policy = lookup(each.value, "secondary_target_policy", "")
+  tags                    = lookup(each.value, "tags", local.defaults.intersight.tags)
   target_source_type = lookup(
     each.value, "target_source_type", local.defaults.intersight.policies.iscsi_boot.target_source_type
   )
