@@ -1593,7 +1593,7 @@ module "power" {
   power_allocation = lookup(each.value, "power_allocation", local.defaults.intersight.policies.power.power_allocation)
   power_priority   = lookup(each.value, "power_priority", local.defaults.intersight.policies.power.power_priority)
   power_profiling  = lookup(each.value, "power_profiling", local.defaults.intersight.policies.power.power_profiling)
-  power_redunancy  = lookup(each.value, "power_redunancy", local.defaults.intersight.policies.power.power_redunancy)
+  power_redundancy = lookup(each.value, "power_redundancy", local.defaults.intersight.policies.power.power_redundancy)
   power_restore    = lookup(each.value, "power_restore", local.defaults.intersight.policies.power.power_restore)
   power_save_mode  = lookup(each.value, "power_save_mode", local.defaults.intersight.policies.power.power_save_mode)
   tags             = lookup(each.value, "tags", local.defaults.intersight.tags)
