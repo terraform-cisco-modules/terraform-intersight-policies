@@ -167,7 +167,7 @@ locals {
 
 module "adapter_configuration" {
   source  = "terraform-cisco-modules/policies-adapter-configuration/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.7"
 
   for_each = { for v in lookup(local.policies, "adapter_configuration", []) : v.name => v }
   adapter_ports = lookup(
@@ -203,7 +203,7 @@ module "adapter_configuration" {
 
 module "bios" {
   source  = "terraform-cisco-modules/policies-bios/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.7"
 
   for_each      = { for v in lookup(local.policies, "bios", []) : v.name => v }
   bios_template = lookup(each.value, "bios_template", "")
@@ -655,7 +655,7 @@ module "bios" {
 
 module "boot_order" {
   source  = "terraform-cisco-modules/policies-boot-order/intersight"
-  version = ">= 1.0.3"
+  version = ">= 1.0.7"
 
   for_each     = { for v in lookup(local.policies, "boot_order", []) : v.name => v }
   boot_devices = lookup(each.value, "boot_devices", [])
@@ -678,7 +678,7 @@ module "boot_order" {
 
 module "certificate_management" {
   source  = "terraform-cisco-modules/policies-certificate-management/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.7"
 
   for_each             = { for v in lookup(local.policies, "certificate_management", []) : v.name => v }
   base64_certificate   = lookup(each.value, "base64_certificate", 1)
@@ -708,7 +708,7 @@ module "certificate_management" {
 
 module "device_connector" {
   source  = "terraform-cisco-modules/policies-device-connector/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.7"
 
   for_each = { for v in lookup(local.policies, "device_connector", []) : v.name => v }
   configuration_lockout = lookup(
@@ -729,7 +729,7 @@ module "device_connector" {
 
 module "ethernet_adapter" {
   source  = "terraform-cisco-modules/policies-ethernet-adapter/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.7"
 
   for_each                                 = { for v in lookup(local.policies, "ethernet_adapter", []) : v.name => v }
   completion_queue_count                   = lookup(each.value, "completion_queue_count", local.defaults.intersight.policies.ethernet_adapter.completion_queue_count)
@@ -783,7 +783,7 @@ module "ethernet_adapter" {
 
 module "ethernet_network" {
   source  = "terraform-cisco-modules/policies-ethernet-network/intersight"
-  version = ">= 1.0.3"
+  version = ">= 1.0.7"
 
   for_each     = { for v in lookup(local.policies, "ethernet_network", []) : v.name => v }
   default_vlan = lookup(each.value, "default_vlan", local.defaults.intersight.policies.ethernet_network.default_vlan)
@@ -803,7 +803,7 @@ module "ethernet_network" {
 
 module "ethernet_network_control" {
   source  = "terraform-cisco-modules/policies-ethernet-network-control/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.7"
 
   for_each = { for v in lookup(local.policies, "ethernet_network_control", []) : v.name => v }
   action_on_uplink_fail = lookup(
@@ -839,7 +839,7 @@ module "ethernet_network_control" {
 
 module "ethernet_network_group" {
   source  = "terraform-cisco-modules/policies-ethernet-network-group/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.7"
 
   for_each      = { for v in lookup(local.policies, "ethernet_network_group", []) : v.name => v }
   allowed_vlans = each.value.allowed_vlans
@@ -859,7 +859,7 @@ module "ethernet_network_group" {
 
 module "ethernet_qos" {
   source  = "terraform-cisco-modules/policies-ethernet-qos/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.7"
 
   for_each              = { for v in lookup(local.policies, "ethernet_qos", []) : v.name => v }
   burst                 = lookup(each.value, "burst", local.defaults.intersight.policies.ethernet_qos.burst)
@@ -883,7 +883,7 @@ module "ethernet_qos" {
 
 module "fc_zone" {
   source  = "terraform-cisco-modules/policies-fc-zone/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.7"
 
   for_each = { for v in lookup(local.policies, "fc_zone", []) : v.name => v }
   fc_target_zoning_type = lookup(
@@ -905,7 +905,7 @@ module "fc_zone" {
 
 module "fibre_channel_adapter" {
   source  = "terraform-cisco-modules/policies-fibre-channel-adapter/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.7"
 
   for_each                          = { for v in lookup(local.policies, "fibre_channel_adapter", []) : v.name => v }
   adapter_template                  = lookup(each.value, "adapter_template", "")
@@ -943,7 +943,7 @@ module "fibre_channel_adapter" {
 
 module "fibre_channel_network" {
   source  = "terraform-cisco-modules/policies-fibre-channel-network/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.7"
 
   for_each = { for v in lookup(local.policies, "fibre_channel_network", []) : v.name => v }
   default_vlan_id = lookup(
@@ -965,7 +965,7 @@ module "fibre_channel_network" {
 
 module "fibre_channel_qos" {
   source  = "terraform-cisco-modules/policies-fibre-channel-qos/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.7"
 
   for_each    = { for v in lookup(local.policies, "fibre_channel_qos", []) : v.name => v }
   burst       = lookup(each.value, "burst", local.defaults.intersight.policies.fibre_channel_qos.burst)
@@ -989,7 +989,7 @@ module "fibre_channel_qos" {
 
 module "flow_control" {
   source  = "terraform-cisco-modules/policies-flow-control/intersight"
-  version = ">= 1.0.3"
+  version = ">= 1.0.7"
 
   for_each     = { for v in lookup(local.policies, "flow_control", []) : v.name => v }
   description  = lookup(each.value, "description", "")
@@ -1010,7 +1010,7 @@ module "flow_control" {
 
 module "imc_access" {
   source  = "terraform-cisco-modules/policies-imc-access/intersight"
-  version = ">= 1.0.4"
+  version = ">= 1.0.7"
 
   for_each       = { for v in lookup(local.policies, "imc_access", []) : v.name => v }
   description    = lookup(each.value, "description", "")
@@ -1038,7 +1038,7 @@ module "imc_access" {
 
 module "ipmi_over_lan" {
   source  = "terraform-cisco-modules/policies-ipmi-over-lan/intersight"
-  version = ">= 1.0.3"
+  version = ">= 1.0.7"
 
   for_each     = { for v in lookup(local.policies, "ipmi_over_lan", []) : v.name => v }
   description  = lookup(each.value, "description", "")
@@ -1060,7 +1060,7 @@ module "ipmi_over_lan" {
 
 module "iscsi_adapter" {
   source  = "terraform-cisco-modules/policies-iscsi-adapter/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.7"
 
   for_each     = { for v in lookup(local.policies, "iscsi_adapter", []) : v.name => v }
   description  = lookup(each.value, "description", "")
@@ -1088,7 +1088,7 @@ module "iscsi_boot" {
     module.iscsi_static_target
   ]
   source  = "terraform-cisco-modules/policies-iscsi-boot/intersight"
-  version = ">= 1.0.3"
+  version = ">= 1.0.7"
 
   for_each = { for v in lookup(local.policies, "iscsi_boot", []) : v.name => v }
   authentication = lookup(
@@ -1133,7 +1133,7 @@ module "iscsi_boot" {
 
 module "iscsi_static_target" {
   source  = "terraform-cisco-modules/policies-iscsi-static-target/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.7"
 
   for_each     = { for v in lookup(local.policies, "iscsi_static_target", []) : v.name => v }
   description  = lookup(each.value, "description", "")
@@ -1164,7 +1164,7 @@ module "lan_connectivity" {
     module.iscsi_boot
   ]
   source  = "terraform-cisco-modules/policies-lan-connectivity/intersight"
-  version = ">= 1.0.5"
+  version = ">= 1.0.7"
 
   for_each    = { for v in lookup(local.policies, "lan_connectivity", []) : v.name => v }
   description = lookup(each.value, "description", "")
@@ -1271,7 +1271,7 @@ module "lan_connectivity" {
 
 module "ldap" {
   source  = "terraform-cisco-modules/policies-ldap/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.7"
 
   for_each = { for v in lookup(local.policies, "ldap", []) : v.name => v }
   base_settings = {
@@ -1341,7 +1341,7 @@ module "ldap" {
 
 module "link_aggregation" {
   source  = "terraform-cisco-modules/policies-link-aggregation/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.7"
 
   for_each     = { for v in lookup(local.policies, "link_aggregation", []) : v.name => v }
   description  = lookup(each.value, "description", "")
@@ -1363,7 +1363,7 @@ module "link_aggregation" {
 
 module "link_control" {
   source  = "terraform-cisco-modules/policies-link-control/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.7"
 
   for_each     = { for v in lookup(local.policies, "link_control", []) : v.name => v }
   admin_state  = lookup(each.value, "admin_state", local.defaults.intersight.policies.link_control.admin_state)
@@ -1383,7 +1383,7 @@ module "link_control" {
 
 module "local_user" {
   source  = "terraform-cisco-modules/policies-local-user/intersight"
-  version = ">= 1.0.3"
+  version = ">= 1.0.7"
 
   for_each = { for v in lookup(local.policies, "local_user", []) : v.name => v }
   always_send_user_password = lookup(
@@ -1426,7 +1426,7 @@ module "local_user" {
 
 module "multicast" {
   source  = "terraform-cisco-modules/policies-multicast/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.7"
 
   for_each     = { for v in lookup(local.policies, "multicast", []) : v.name => v }
   description  = lookup(each.value, "description", "")
@@ -1452,7 +1452,7 @@ module "multicast" {
 
 module "network_connectivity" {
   source  = "terraform-cisco-modules/policies-network-connectivity/intersight"
-  version = ">= 1.0.4"
+  version = ">= 1.0.7"
 
   for_each        = { for v in lookup(local.policies, "network_connectivity", []) : v.name => v }
   description     = lookup(each.value, "description", "")
@@ -1499,7 +1499,7 @@ module "network_connectivity" {
 
 module "ntp" {
   source  = "terraform-cisco-modules/policies-ntp/intersight"
-  version = ">= 1.0.3"
+  version = ">= 1.0.7"
 
   for_each        = { for v in lookup(local.policies, "ntp", []) : v.name => v }
   description     = lookup(each.value, "description", "")
@@ -1524,6 +1524,46 @@ module "ntp" {
 
 #__________________________________________________________________
 #
+# Intersight Persistent Memory Policy
+# GUI Location: Policies > Create Policy > Persistent Memory
+#__________________________________________________________________
+
+module "persistent_memory" {
+  source  = "terraform-cisco-modules/policies-link-aggregation/intersight"
+  version = ">= 1.0.7"
+
+  for_each    = { for v in lookup(local.policies, "persistent_memory", []) : v.name => v }
+  description = lookup(each.value, "description", "")
+  management_mode = lookup(
+    each.value, "management_mode", local.defaults.intersight.policies.persistent_memory.management_mode
+  )
+  memory_mode_percentage = lookup(
+    each.value, "memory_mode_percentage", local.defaults.intersight.policies.persistent_memory.memory_mode_percentage
+  )
+  name = "${each.value.name}${local.defaults.intersight.policies.persistent_memory.name_suffix}"
+  namespaces = [for v in lookup(each.value, "namespaces", []) :
+    {
+      capacity         = v.capacity
+      mode             = lookup(v, "mode", local.defaults.intersight.policies.persistent_memory.namespaces.mode)
+      name             = v.name
+      socket_id        = lookup(v, "socket_id", local.defaults.intersight.policies.persistent_memory.namespaces.socket_id)
+      socket_memory_id = lookup(v, "socket_memory_id", local.defaults.intersight.policies.persistent_memory.namespaces.socket_memory_id)
+    }
+  ]
+  organization = local.orgs[lookup(each.value, "organization", local.defaults.intersight.organization)]
+  persistent_memory_type = lookup(
+    each.value, "persistent_memory_type", local.defaults.intersight.policies.persistent_memory.persistent_memory_type
+  )
+  persistent_passphrase = var.persistent_passphrase
+  retain_namespaces = lookup(
+    each.value, "retain_namespaces", local.defaults.intersight.policies.persistent_memory.retain_namespaces
+  )
+  tags = lookup(each.value, "tags", local.defaults.intersight.tags)
+}
+
+
+#__________________________________________________________________
+#
 # Intersight Port Policy
 # GUI Location: Policies > Create Policy > Port
 #__________________________________________________________________
@@ -1537,7 +1577,7 @@ module "port" {
     module.link_control
   ]
   source  = "terraform-cisco-modules/policies-port/intersight"
-  version = ">= 1.0.6"
+  version = ">= 1.0.7"
 
   for_each        = { for v in local.port : v.name => v }
   description     = each.value.description
@@ -1577,7 +1617,7 @@ module "port" {
 
 module "power" {
   source  = "terraform-cisco-modules/policies-power/intersight"
-  version = ">= 1.0.3"
+  version = ">= 1.0.7"
 
   for_each    = { for v in lookup(local.policies, "power", []) : v.name => v }
   description = lookup(each.value, "description", "")
@@ -1613,7 +1653,7 @@ module "san_connectivity" {
     module.fibre_channel_qos
   ]
   source  = "terraform-cisco-modules/policies-san-connectivity/intersight"
-  version = ">= 1.0.4"
+  version = ">= 1.0.7"
 
   for_each     = { for v in lookup(local.policies, "san_connectivity", []) : v.name => v }
   description  = lookup(each.value, "description", "")
@@ -1687,7 +1727,7 @@ module "san_connectivity" {
 
 module "sd_card" {
   source  = "terraform-cisco-modules/policies-sd-card/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.7"
 
   for_each    = { for v in lookup(local.policies, "sd_card", []) : v.name => v }
   description = lookup(each.value, "description", "")
@@ -1712,7 +1752,7 @@ module "sd_card" {
 
 module "serial_over_lan" {
   source  = "terraform-cisco-modules/policies-serial-over-lan/intersight"
-  version = ">= 1.0.3"
+  version = ">= 1.0.7"
 
   for_each     = { for v in lookup(local.policies, "serial_over_lan", []) : v.name => v }
   baud_rate    = lookup(each.value, "baud_rate", local.defaults.intersight.policies.serial_over_lan.baud_rate)
@@ -1734,7 +1774,7 @@ module "serial_over_lan" {
 
 module "smtp" {
   source  = "terraform-cisco-modules/policies-smtp/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.7"
 
   for_each    = { for v in lookup(local.policies, "smtp", []) : v.name => v }
   description = lookup(each.value, "description", "")
@@ -1762,7 +1802,7 @@ module "smtp" {
 
 module "snmp" {
   source  = "terraform-cisco-modules/policies-snmp/intersight"
-  version = ">= 1.0.4"
+  version = ">= 1.0.7"
 
   for_each                  = { for v in lookup(local.policies, "snmp", []) : v.name => v }
   access_community_string   = lookup(each.value, "access_community_string", 0)
@@ -1822,7 +1862,7 @@ module "snmp" {
 
 module "ssh" {
   source  = "terraform-cisco-modules/policies-ssh/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.7"
 
   for_each     = { for v in lookup(local.policies, "ssh", []) : v.name => v }
   description  = lookup(each.value, "description", "")
@@ -1843,7 +1883,7 @@ module "ssh" {
 
 module "storage" {
   source  = "terraform-cisco-modules/policies-storage/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.7"
 
   for_each          = { for v in lookup(local.policies, "storage", []) : v.name => v }
   description       = lookup(each.value, "description", "")
@@ -1871,7 +1911,7 @@ module "storage" {
 
 module "switch_control" {
   source  = "terraform-cisco-modules/policies-switch-control/intersight"
-  version = ">= 1.0.4"
+  version = ">= 1.0.7"
 
   for_each        = { for v in lookup(local.policies, "switch_control", []) : v.name => v }
   description     = lookup(each.value, "description", "")
@@ -1916,7 +1956,7 @@ module "switch_control" {
 
 module "syslog" {
   source  = "terraform-cisco-modules/policies-syslog/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.7"
 
   for_each        = { for v in lookup(local.policies, "syslog", []) : v.name => v }
   description     = lookup(each.value, "description", "")
@@ -1948,7 +1988,7 @@ module "syslog" {
 
 module "system_qos" {
   source  = "terraform-cisco-modules/policies-system-qos/intersight"
-  version = ">= 1.0.4"
+  version = ">= 1.0.7"
 
   for_each        = { for v in lookup(local.policies, "system_qos", []) : v.name => v }
   classes         = lookup(each.value, "classes", [])
@@ -1975,7 +2015,7 @@ module "system_qos" {
 
 module "thermal" {
   source  = "terraform-cisco-modules/policies-thermal/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.7"
 
   for_each         = { for v in lookup(local.policies, "thermal", []) : v.name => v }
   description      = lookup(each.value, "description", "")
@@ -1994,7 +2034,7 @@ module "thermal" {
 
 module "virtual_kvm" {
   source  = "terraform-cisco-modules/policies-virtual-kvm/intersight"
-  version = ">= 1.0.2"
+  version = ">= 1.0.7"
 
   for_each = { for v in lookup(local.policies, "virtual_kvm", []) : v.name => v }
   allow_tunneled_vkvm = lookup(
@@ -2028,7 +2068,7 @@ module "virtual_kvm" {
 
 module "virtual_media" {
   source  = "terraform-cisco-modules/policies-virtual-media/intersight"
-  version = ">= 1.0.3"
+  version = ">= 1.0.7"
 
   for_each          = { for v in lookup(local.policies, "virtual_media", []) : v.name => v }
   add_virtual_media = lookup(each.value, "add_virtual_media", [])
@@ -2064,7 +2104,7 @@ module "vlan" {
     module.multicast
   ]
   source  = "terraform-cisco-modules/policies-vlan/intersight"
-  version = ">= 1.0.4"
+  version = ">= 1.0.7"
 
   for_each        = { for v in lookup(local.policies, "vlan", []) : v.name => v }
   description     = lookup(each.value, "description", "")
@@ -2103,7 +2143,7 @@ module "vlan" {
 
 module "vsan" {
   source  = "terraform-cisco-modules/policies-vsan/intersight"
-  version = ">= 1.0.4"
+  version = ">= 1.0.7"
 
   for_each        = { for v in lookup(local.policies, "vsan", []) : v.name => v }
   description     = lookup(each.value, "description", "")
