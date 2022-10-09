@@ -1308,9 +1308,9 @@ module "ldap" {
       each.value.ldap_from_dns, "source", local.defaults.intersight.policies.ldap.ldap_from_dns.source
     )
   }
-  ldap_groups  = lookup(each.value, "ldap_groups", [])
-  ldap_servers = lookup(each.value, "ldap_servers", [])
-  name         = "${each.value.name}${local.defaults.intersight.policies.ldap.name_suffix}"
+  ldap_groups    = lookup(each.value, "ldap_groups", [])
+  ldap_providers = lookup(each.value, "ldap_providers", [])
+  name           = "${each.value.name}${local.defaults.intersight.policies.ldap.name_suffix}"
   nested_group_search_depth = lookup(
     each.value, "nested_group_search_depth", local.defaults.intersight.policies.ldap.nested_group_search_depth
   )
@@ -1529,7 +1529,7 @@ module "ntp" {
 #__________________________________________________________________
 
 module "persistent_memory" {
-  source  = "terraform-cisco-modules/policies-link-aggregation/intersight"
+  source  = "terraform-cisco-modules/policies-persistent-memory/intersight"
   version = ">= 1.0.7"
 
   for_each    = { for v in lookup(local.policies, "persistent_memory", []) : v.name => v }
