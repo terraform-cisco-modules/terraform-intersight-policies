@@ -13,9 +13,21 @@ variable "domains" {
   type        = any
 }
 
+variable "organization" {
+  default     = "default"
+  description = "Name of the default intersight Organization."
+  type        = string
+}
+
 variable "pools" {
   description = "Pool Moids."
   type        = any
+}
+
+variable "tags" {
+  default     = []
+  description = "List of Key/Value Pairs to Assign as Attributes to the Policy."
+  type        = list(map(string))
 }
 
 #__________________________________________________________________
@@ -326,6 +338,13 @@ variable "snmp_trap_community_4" {
 variable "snmp_trap_community_5" {
   default     = ""
   description = "Community for a Trap Destination."
+  sensitive   = true
+  type        = string
+}
+
+variable "trap_community_string" {
+  default     = ""
+  description = "SNMP community group used for sending SNMP trap to other devices. Valid only for SNMPv2c."
   sensitive   = true
   type        = string
 }

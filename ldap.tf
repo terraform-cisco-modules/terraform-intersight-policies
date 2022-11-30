@@ -1,0 +1,98 @@
+#__________________________________________________________________
+#
+# Intersight LDAP Policy
+# GUI Location: Policies > Create Policy > LDAP
+#__________________________________________________________________
+
+resource "intersight_iam_ldap_policy" "ldap" {
+  for_each    = local.ldap
+  description = lookup(each.value, "description", "${each.value.name} LDAP Policy.")
+  name        = each.value.name
+  enabled     = each.value.enable_ldap
+  base_properties {
+    # Base Settings
+    base_dn = each.value.base_settings.base_dn
+    domain  = each.value.base_settings.domain
+    timeout = each.value.base_settings.timeout != null ? each.value.base_settings.timeout : 0
+    # Enable LDAP Encryption
+    enable_encryption = each.value.enable_encryption
+    # Binding Parameters
+    bind_method = each.value.binding_parameters.bind_method
+    bind_dn     = each.value.binding_parameters.bind_dn
+    password    = each.value.binding_parameters_password
+    # Search Parameters
+    attribute       = each.value.search_parameters.attribute
+    filter          = each.value.search_parameters.filter
+    group_attribute = each.value.search_parameters.group_attribute
+    # Group Authorization
+    enable_group_authorization = each.value.enable_group_authorization
+    nested_group_search_depth  = each.value.nested_group_search_depth
+  }
+  # Configure LDAP Servers
+  enable_dns = each.value.ldap_from_dns.enable
+  dns_parameters {
+    nr_source     = each.value.ldap_from_dns.source
+    search_domain = each.value.ldap_from_dns.search_domain
+    search_forest = each.value.ldap_from_dns.search_forest
+  }
+  user_search_precedence = each.value.user_search_precedence
+  organization {
+    moid        = local.orgs[each.value.organization]
+    object_type = "organization.Organization"
+  }
+  dynamic "tags" {
+    for_each = each.value.tags
+    content {
+      key   = tags.value.key
+      value = tags.value.value
+    }
+  }
+}
+
+#____________________________________________________________________
+#
+# Intersight LDAP Policy > Add New LDAP Group
+# GUI Location: Policies > Create Policy > LDAP > Add New LDAP Group
+#____________________________________________________________________
+
+data "intersight_iam_end_point_role" "roles" {
+  for_each = { for v in toset(local.roles) : v => v }
+  name     = each.value
+  type     = "IMC"
+}
+
+resource "intersight_iam_ldap_group" "ldap_group" {
+  depends_on = [
+    data.intersight_iam_end_point_role.roles,
+    intersight_iam_ldap_policy.ldap
+  ]
+  for_each = local.ldap_groups
+  domain   = length(compact([each.value.domain])) > 0 ? each.value.domain : each.value.base_settings.domain
+  name     = each.value.name
+  end_point_role {
+    moid        = data.intersight_iam_end_point_role.roles[each.value.role].results[0].moid
+    object_type = "iam.EndPointRole"
+  }
+  ldap_policy {
+    moid = intersight_iam_ldap_policy.ldap[each.value.ldap_policy].moid
+  }
+}
+
+#__________________________________________________________________
+#
+# Intersight LDAP Policy - Server
+# GUI Location: Policies > Create Policy > LDAP Policy > Server
+#__________________________________________________________________
+
+resource "intersight_iam_ldap_provider" "ldap_providers" {
+  for_each = local.ldap_providers
+  depends_on = [
+    intersight_iam_ldap_policy.ldap
+  ]
+  ldap_policy {
+    moid = intersight_iam_ldap_policy.ldap[each.value.ldap_policy].moid
+  }
+  port   = each.value.port
+  server = each.value.server
+}
+
