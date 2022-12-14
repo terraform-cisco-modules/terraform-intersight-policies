@@ -457,10 +457,14 @@ resource "intersight_fabric_server_role" "port_role_servers" {
   depends_on = [
     intersight_fabric_port_policy.port
   ]
-  for_each          = local.port_role_servers
-  aggregate_port_id = lookup(each.value, "breakout_port_id", 0)
-  port_id           = each.value.port_id
-  slot_id           = lookup(each.value, "slot_id", 1)
+  for_each                  = local.port_role_servers
+  aggregate_port_id         = lookup(each.value, "breakout_port_id", 0)
+  auto_negotiation_disabled = lookup(each.value, "auto_negotiation", false)
+  fec                       = lookup(each.value, "fec", "Auto") # Auto, Cl74, Cl91
+  port_id                   = each.value.port_id
+  preferred_device_id       = lookup(each.value, "device_number", null)
+  preferred_device_type     = lookup(each.value, "connected_device_type", "Auto") # Chassis, RackServer
+  slot_id                   = lookup(each.value, "slot_id", 1)
   port_policy {
     moid = intersight_fabric_port_policy.port[each.value.port_policy].moid
   }

@@ -1219,9 +1219,12 @@ locals {
         ]
         port_role_servers = [
           for v in lookup(value, "port_role_servers", []) : {
-            breakout_port_id = lookup(v, "breakout_port_id", 0)
-            port_list        = v.port_list
-            slot_id          = lookup(v, "slot_id", 1)
+            auto_negotiation      = lookup(v, "auto_negotiation", local.lport.port_role_servers.auto_negotiation)
+            breakout_port_id      = lookup(v, "breakout_port_id", local.lport.port_role_servers.breakout_port_id)
+            connected_device_type = lookup(v, "connected_device_type", local.lport.port_role_servers.connected_device_type)
+            device_number         = lookup(v, "device_number", local.lport.port_role_servers.device_number)
+            port_list             = v.port_list
+            slot_id               = lookup(v, "slot_id", 1)
           }
         ]
         profiles = [
@@ -1545,7 +1548,11 @@ locals {
   port_role_servers_loop = flatten([
     for value in local.port : [
       for v in value.port_role_servers : {
-        breakout_port_id = v.breakout_port_id
+        auto_negotiation      = v.auto_negotiation
+        breakout_port_id      = v.breakout_port_id
+        connected_device_type = v.connected_device_type
+        device_number         = v.device_number
+        fec                   = v.fec
         port_list = flatten(
           [for s in compact(length(regexall("-", v.port_list)) > 0 ? tolist(split(",", v.port_list)
             ) : length(regexall(",", v.port_list)) > 0 ? tolist(split(",", v.port_list)) : [v.port_list]
@@ -1562,11 +1569,15 @@ locals {
   port_role_servers = { for i in flatten([
     for v in local.port_role_servers_loop : [
       for s in v.port_list : {
-        breakout_port_id = v.breakout_port_id
-        port_id          = s
-        port_policy      = v.port_policy
-        slot_id          = v.slot_id
-        tags             = v.tags
+        auto_negotiation      = v.auto_negotiation
+        breakout_port_id      = v.breakout_port_id
+        connected_device_type = v.connected_device_type
+        device_number         = v.device_number
+        fec                   = v.fec
+        port_id               = s
+        port_policy           = v.port_policy
+        slot_id               = v.slot_id
+        tags                  = v.tags
       }
     ]
   ]) : "${i.port_policy}-${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
