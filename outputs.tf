@@ -158,12 +158,12 @@ output "ntp" {
 # Persistent Memory Policy Outputs
 #__________________________________________________________
 
-#output "persistent_memory" {
-#  description = "Moid's of the Persistent Memory Policies."
-#  value = length(local.persistent_memory) > 0 ? { for v in sort(
-#    keys(module.persistent_memory)
-#  ) : v => module.persistent_memory[v].moid } : {}
-#}
+output "persistent_memory" {
+  description = "Moid's of the Persistent Memory Policies."
+  value = length(local.persistent_memory) > 0 ? { for v in sort(
+    keys(intersight_memory_persistent_memory_policy.persistent_memory)
+  ) : v => intersight_memory_persistent_memory_policy.persistent_memory[v].moid } : {}
+}
 
 
 #__________________________________________________________

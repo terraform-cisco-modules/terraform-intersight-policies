@@ -42,7 +42,7 @@ resource "intersight_fabric_vsan" "vsans" {
   for_each             = local.vsans
   default_zoning       = each.value.default_zoning
   fcoe_vlan            = each.value.fcoe_vlan_id
-  fc_zone_sharing_mode = each.value.fc_zone_sharing_mode
+  #fc_zone_sharing_mode = each.value.fc_zone_sharing_mode
   name = length(compact([each.value.name])
     ) > 0 ? each.value.name : length(
     regexall("^[0-9]{4}$", each.value.vsan_id)

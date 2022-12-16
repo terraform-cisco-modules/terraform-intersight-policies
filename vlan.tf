@@ -12,6 +12,13 @@ resource "intersight_fabric_eth_network_policy" "vlan" {
     moid        = local.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
+  dynamic "profiles" {
+    for_each = { for v in each.value.profiles : v => v }
+    content {
+      moid        = var.domains[profiles.value].moid
+      object_type = "fabric.SwitchProfile"
+    }
+  }
   dynamic "tags" {
     for_each = each.value.tags
     content {

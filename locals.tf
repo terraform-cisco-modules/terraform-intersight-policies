@@ -1004,12 +1004,13 @@ locals {
         v, "obtain_ipv6_dns_from_dhcp", local.ldns.obtain_ipv6_dns_from_dhcp
       )
       organization = lookup(v, "organization", var.organization)
+      #profiles     = []
       profiles = [
-        for v in var.domains : {
-          name        = v.name
+        for i in var.domains : {
+          name        = i.name
           object_type = "fabric.SwitchProfile"
-          } if length(regexall("^${v.name}$", v.network_connectivity_policy)) > 0 || length(regexall(
-          "^${v.name}${local.ldns.name_suffix}$", v.network_connectivity_policy)
+          } if length(regexall("^${v.name}$", i.network_connectivity)) > 0 || length(regexall(
+          "^${v.name}${local.ldns.name_suffix}$", i.network_connectivity)
         ) > 0
       ]
       tags          = lookup(v, "tags", var.tags)
@@ -1029,12 +1030,13 @@ locals {
       name         = "${v.name}${local.defaults.intersight.policies.ntp.name_suffix}"
       ntp_servers  = lookup(v, "ntp_servers", local.defaults.intersight.policies.ntp.ntp_servers)
       organization = lookup(v, "organization", var.organization)
+      #profiles     = []
       profiles = [
-        for v in var.domains : {
-          name        = v.name
+        for i in var.domains : {
+          name        = i.name
           object_type = "fabric.SwitchProfile"
-          } if length(regexall("^${v.name}$", v.ntp_policy)) > 0 || length(regexall(
-          "^${v.name}${local.defaults.intersight.policies.ntp.name_suffix}$", v.ntp_policy)
+          } if length(regexall("^${v.name}$", i.ntp)) > 0 || length(regexall(
+          "^${v.name}${local.defaults.intersight.policies.ntp.name_suffix}$", i.ntp)
         ) > 0
       ]
       tags     = lookup(v, "tags", var.tags)
@@ -1223,14 +1225,16 @@ locals {
             breakout_port_id      = lookup(v, "breakout_port_id", local.lport.port_role_servers.breakout_port_id)
             connected_device_type = lookup(v, "connected_device_type", local.lport.port_role_servers.connected_device_type)
             device_number         = lookup(v, "device_number", local.lport.port_role_servers.device_number)
+            fec                   = lookup(v, "fec", local.lport.port_role_servers.fec)
             port_list             = v.port_list
             slot_id               = lookup(v, "slot_id", 1)
           }
         ]
+        #profiles = []
         profiles = [
           for v in var.domains : v.name if length(regexall(
-            "^${element(value.names, i)}$", v.port_policy)) > 0 || length(regexall(
-            "^${element(value.names, i)}${local.lport.name_suffix}$", v.port_policy)
+            "^${element(value.names, i)}$", v.port)) > 0 || length(regexall(
+            "^${element(value.names, i)}${local.lport.name_suffix}$", v.port)
           ) > 0
         ]
         tags = lookup(value, "tags", var.tags)
@@ -1668,12 +1672,13 @@ locals {
       enable_snmp             = lookup(v, "enable_snmp", local.defaults.intersight.policies.snmp.enable_snmp)
       name                    = "${v.name}${local.defaults.intersight.policies.snmp.name_suffix}"
       organization            = lookup(v, "organization", var.organization)
+      #profiles                = []
       profiles = [
-        for v in var.domains : {
-          name        = v.name
+        for i in var.domains : {
+          name        = i.name
           object_type = "fabric.SwitchProfile"
-          } if length(regexall("^${v.name}$", v.snmp_policy)) > 0 || length(regexall(
-          "^${v.name}${local.defaults.intersight.policies.snmp.name_suffix}$", v.snmp_policy)
+          } if length(regexall("^${v.name}$", i.snmp)) > 0 || length(regexall(
+          "^${v.name}${local.defaults.intersight.policies.snmp.name_suffix}$", i.snmp)
         ) > 0
       ]
       snmp_community_access = lookup(v, "snmp_community_access", local.defaults.intersight.policies.snmp.snmp_community_access)
@@ -1748,10 +1753,11 @@ locals {
       mac_aging_time = lookup(v, "mac_aging_time", local.defaults.intersight.policies.switch_control.mac_aging_time)
       name           = "${v.name}${local.defaults.intersight.policies.switch_control.name_suffix}"
       organization   = lookup(v, "organization", var.organization)
+      #profiles       = []
       profiles = [
-        for v in var.domains : v.name if length(regexall(
-          "^${v.name}$", v.switch_control_policy)) > 0 || length(regexall(
-          "^${v.name}${local.defaults.intersight.policies.switch_control.name_suffix}$", v.switch_control_policy)
+        for i in var.domains : i.name if length(regexall(
+          "^${v.name}$", i.switch_control)) > 0 || length(regexall(
+          "^${v.name}${local.defaults.intersight.policies.switch_control.name_suffix}$", i.switch_control)
         ) > 0
       ]
       tags = lookup(v, "tags", var.tags)
@@ -1780,12 +1786,13 @@ locals {
       )
       name         = "${v.name}${local.defaults.intersight.policies.syslog.name_suffix}"
       organization = lookup(v, "organization", var.organization)
+      #profiles     = []
       profiles = [
-        for v in var.domains : {
-          name        = v.name
+        for i in var.domains : {
+          name        = i.name
           object_type = "fabric.SwitchProfile"
-          } if length(regexall("^${v.name}$", v.syslog_policy)) > 0 || length(regexall(
-          "^${v.name}${local.defaults.intersight.policies.syslog.name_suffix}$", v.syslog_policy)
+          } if length(regexall("^${v.name}$", i.syslog)) > 0 || length(regexall(
+          "^${v.name}${local.defaults.intersight.policies.syslog.name_suffix}$", i.syslog)
         ) > 0
       ]
       remote_clients = lookup(v, "remote_clients", [])
@@ -1804,10 +1811,11 @@ locals {
       description  = lookup(v, "description", "")
       name         = "${v.name}${local.defaults.intersight.policies.system_qos.name_suffix}"
       organization = lookup(v, "organization", var.organization)
+      #profiles     = []
       profiles = [
-        for v in var.domains : v.name if length(regexall("^${v.name}$", v.system_qos_policy)
+        for i in var.domains : i.name if length(regexall("^${v.name}$", i.system_qos)
           ) > 0 || length(regexall(
-          "${v.name}${local.defaults.intersight.policies.system_qos.name_suffix}", "^${v.system_qos_policy}$")
+          "${v.name}${local.defaults.intersight.policies.system_qos.name_suffix}", "^${i.system_qos}$")
         ) > 0
       ]
       tags = lookup(v, "tags", var.tags)
@@ -1848,9 +1856,10 @@ locals {
       description  = lookup(v, "description", "")
       name         = "${v.name}${local.defaults.intersight.policies.vlan.name_suffix}"
       organization = lookup(v, "organization", var.organization)
+      #profiles     = []
       profiles = [
-        for v in var.domains : v.name if length(regexall("^${v.name}$", v.vlan_policy)) > 0 || length(regexall(
-          "^${v.name}${local.defaults.intersight.policies.vlan.name_suffix}$", v.vlan_policy)
+        for i in var.domains : i.name if length(regexall("^${v.name}$", i.vlan)) > 0 || length(regexall(
+          "^${v.name}${local.defaults.intersight.policies.vlan.name_suffix}$", i.vlan)
         ) > 0
       ]
       tags = lookup(v, "tags", var.tags)
@@ -1908,9 +1917,10 @@ locals {
       description  = lookup(v, "description", "")
       name         = "${v.name}${local.defaults.intersight.policies.vsan.name_suffix}"
       organization = lookup(v, "organization", var.organization)
+      #profiles     = []
       profiles = [
-        for v in var.domains : v.name if length(regexall("^${v.name}$", v.vsan_policy)) > 0 || length(regexall(
-          "^${v.name}${local.defaults.intersight.policies.vsan.name_suffix}$", v.vsan_policy)
+        for i in var.domains : i.name if length(regexall("^${v.name}$", i.vsan)) > 0 || length(regexall(
+          "^${v.name}${local.defaults.intersight.policies.vsan.name_suffix}$", i.vsan)
         ) > 0
       ]
       tags            = lookup(v, "tags", var.tags)
