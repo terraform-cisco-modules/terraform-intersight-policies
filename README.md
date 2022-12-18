@@ -15,12 +15,12 @@ A comprehensive example using this module is available here: https://github.com/
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >=1.3.0 |
-| <a name="requirement_intersight"></a> [intersight](#requirement\_intersight) | >=1.0.32 |
+| <a name="requirement_intersight"></a> [intersight](#requirement\_intersight) | >=1.0.34 |
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_intersight"></a> [intersight](#provider\_intersight) | >=1.0.32 |
+| <a name="provider_intersight"></a> [intersight](#provider\_intersight) | >=1.0.34 |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
@@ -96,6 +96,7 @@ A comprehensive example using this module is available here: https://github.com/
 | <a name="output_local_user"></a> [local\_user](#output\_local\_user) | Moid's of the Local User Policies. |
 | <a name="output_network_connectivity"></a> [network\_connectivity](#output\_network\_connectivity) | Moid's of the Network Connectivity Policies. |
 | <a name="output_ntp"></a> [ntp](#output\_ntp) | Moid's of the NTP Policies. |
+| <a name="output_persistent_memory"></a> [persistent\_memory](#output\_persistent\_memory) | Moid's of the Persistent Memory Policies. |
 | <a name="output_port"></a> [port](#output\_port) | Moid's of the Port Policies. |
 | <a name="output_power"></a> [power](#output\_power) | Moid's of the Power Policies. |
 | <a name="output_san_connectivity"></a> [san\_connectivity](#output\_san\_connectivity) | Moid's of the SAN Connectivity Policies. |
