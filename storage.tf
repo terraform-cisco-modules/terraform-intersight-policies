@@ -72,24 +72,38 @@ resource "intersight_storage_drive_group" "drive_groups" {
     # object_type = "organization.Organization"
   }
   dynamic "automatic_drive_group" {
-    for_each = toset(each.value.automatic_drive_group)
+    for_each = toset(each.value.automatic_drive_groups)
     content {
-      class_id                 = "storage.ManualDriveGroup"
-      drives_per_span          = automatic_drive_group.value.drives_per_span
-      drive_type               = automatic_drive_group.value.drive_type
-      minimum_drive_size       = automatic_drive_group.value.minimum_drive_size
-      num_dedicated_hot_spares = automatic_drive_group.value.num_dedicated_hot_spares
-      number_of_spans          = automatic_drive_group.value.number_of_spans
-      object_type              = "storage.ManualDriveGroup"
-      use_remaining_drives     = automatic_drive_group.value.use_remaining_drives
+      class_id = "storage.ManualDriveGroup"
+      drives_per_span = lookup(
+        automatic_drive_group.value, "drives_per_span", length(regexall("^Raid0$", each.value.raid_level)
+          ) > 0 ? 1 : length(regexall("^Raid1[0]?$", each.value.raid_level)
+          ) > 0 ? 2 : length(regexall("^Raid5[0]?$", each.value.raid_level)
+          ) > 0 ? 3 : length(regexall("^Raid6[0]$", each.value.raid_level)
+        ) > 0 ? 4 : 2
+      )
+      drive_type         = lookup(automatic_drive_group.value, "drive_type", local.ldga.drive_type)
+      minimum_drive_size = lookup(automatic_drive_group.value, "minimum_drive_size", local.ldga.minimum_drive_size)
+      num_dedicated_hot_spares = lookup(
+        automatic_drive_group.value, "num_dedicated_hot_spares", local.ldga.num_dedicated_hot_spares
+      )
+      number_of_spans = lookup(
+        automatic_drive_group.value, "number_of_spans", length(regexall("^Raid(0|1|5|6)$", each.value.raid_level)
+          ) > 0 ? 1 : length(regexall("^Raid(1|5|6)0?$", each.value.raid_level)
+        ) > 0 ? 2 : 1
+      )
+      object_type          = "storage.ManualDriveGroup"
+      use_remaining_drives = lookup(automatic_drive_group.value, "use_remaining_drives", local.ldga.use_remaining_drives)
     }
   }
   dynamic "manual_drive_group" {
-    for_each = toset(each.value.manual_drive_group)
+    for_each = toset(each.value.manual_drive_groups)
     content {
-      class_id             = "storage.ManualDriveGroup"
-      dedicated_hot_spares = manual_drive_group.value.dedicated_hot_spares
-      object_type          = "storage.ManualDriveGroup"
+      class_id = "storage.ManualDriveGroup"
+      dedicated_hot_spares = lookup(
+        manual_drive_group.value, "dedicated_hot_spares", local.ldgm.dedicated_hot_spares
+      )
+      object_type = "storage.ManualDriveGroup"
       span_groups = [
         for sg in manual_drive_group.value.drive_array_spans : {
           additional_properties = ""
@@ -111,22 +125,22 @@ resource "intersight_storage_drive_group" "drive_groups" {
     for_each = { for v in each.value.virtual_drives : v.name => v }
     content {
       additional_properties = ""
-      boot_drive            = lookup(virtual_drives.value, "boot_drive", false)
+      boot_drive            = lookup(virtual_drives.value, "boot_drive", local.ldgv.boot_drive)
       class_id              = "storage.VirtualDriveConfiguration"
-      expand_to_available   = lookup(virtual_drives.value, "expand_to_available", true)
+      expand_to_available   = lookup(virtual_drives.value, "expand_to_available", local.ldgv.expand_to_available)
       name                  = virtual_drives.key
       object_type           = "storage.VirtualDriveConfiguration"
-      size                  = lookup(virtual_drives.value, "size", 50)
+      size                  = lookup(virtual_drives.value, "size", local.ldgv.size)
       virtual_drive_policy = [
         {
           additional_properties = ""
-          access_policy         = lookup(virtual_drives.value, "access_policy", "Default")
+          access_policy         = lookup(virtual_drives.value, "access_policy", local.ldgv.virtual_drive_policy.access_policy)
           class_id              = "storage.VirtualDrivePolicy"
-          drive_cache           = lookup(virtual_drives.value, "disk_cache", "Default")
+          drive_cache           = lookup(virtual_drives.value, "disk_cache", local.ldgv.virtual_drive_policy.drive_cache)
           object_type           = "storage.VirtualDrivePolicy"
-          read_policy           = lookup(virtual_drives.value, "read_policy", "Default")
-          strip_size            = lookup(virtual_drives.value, "strip_size", 64)
-          write_policy          = lookup(virtual_drives.value, "write_policy", "Default")
+          read_policy           = lookup(virtual_drives.value, "read_policy", local.ldgv.virtual_drive_policy.read_policy)
+          strip_size            = lookup(virtual_drives.value, "strip_size", local.ldgv.virtual_drive_policy.strip_size)
+          write_policy          = lookup(virtual_drives.value, "write_policy", local.ldgv.virtual_drive_policy.write_policy)
         }
       ]
     }

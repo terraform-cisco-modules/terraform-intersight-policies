@@ -52,12 +52,12 @@ resource "intersight_vnic_eth_if" "vnics" {
   for_each         = local.vnics
   failover_enabled = each.value.enable_failover
   mac_address_type = each.value.mac_address_allocation_type
-  name             = each.key
+  name             = each.value.name
   order            = each.value.placement_pci_order
   static_mac_address = length(regexall("STATIC", each.value.mac_address_allocation_type)
   ) > 0 ? each.value.mac_address_static : null
   cdn {
-    value     = each.value.cdn_source == "user" ? each.value.cdn_value : each.key
+    value     = each.value.cdn_source == "user" ? each.value.cdn_value : each.value.name
     nr_source = each.value.cdn_source
   }
   eth_adapter_policy {

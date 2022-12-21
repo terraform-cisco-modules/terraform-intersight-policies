@@ -5,6 +5,9 @@ locals {
   lancon      = local.defaults.intersight.policies.lan_connectivity
   lbios       = local.defaults.intersight.policies.bios
   lboot       = local.defaults.intersight.policies.boot_order
+  ldga        = local.defaults.intersight.policies.storage.drive_groups.automatic_drive_groups
+  ldgm        = local.defaults.intersight.policies.storage.drive_groups.manual_drive_groups
+  ldgv        = local.defaults.intersight.policies.storage.drive_groups.virtual_drives
   ldns        = local.defaults.intersight.policies.network_connectivity
   leadapter   = local.defaults.intersight.policies.ethernet_adapter
   lfadapter   = local.defaults.intersight.policies.fibre_channel_adapter
@@ -896,7 +899,7 @@ locals {
         }
       ]
     ]
-  ]) : "${i.lan_connectivity}-${i.name}" => i }
+  ]) : "${i.lan_connectivity}:${i.name}" => i }
 
   #__________________________________________________________________
   #
@@ -961,7 +964,7 @@ locals {
         role          = v.role
       }
     ]
-  ]) : "${i.ldap_policy}-${i.name}" => i }
+  ]) : "${i.ldap_policy}:${i.name}" => i }
   ldap_providers = { for i in flatten([
     for value in local.ldap : [
       for v in value.ldap_providers : {
@@ -970,7 +973,7 @@ locals {
         server      = v.server
       }
     ]
-  ]) : "${i.ldap_policy}-${i.server}" => i }
+  ]) : "${i.ldap_policy}:${i.server}" => i }
   roles = distinct(concat(
     [for v in local.ldap_groups : v.role],
     [for v in local.users : v.role],
@@ -1019,7 +1022,7 @@ locals {
         tags         = value.name
       }
     ]
-  ]) : "${i.local_user}-${i.user}" => i }
+  ]) : "${i.local_user}:${i.user}" => i }
 
   #__________________________________________________________________
   #
@@ -1293,7 +1296,7 @@ locals {
         tags                            = value.tags
       }
     ]
-  ]) : "${i.port_policy}-${i.pc_id}" => i }
+  ]) : "${i.port_policy}:${i.pc_id}" => i }
   port_channel_ethernet_uplinks = { for i in flatten([
     for value in local.port : [
       for v in value.port_channel_ethernet_uplinks : {
@@ -1308,7 +1311,7 @@ locals {
         tags                          = value.tags
       }
     ]
-  ]) : "${i.port_policy}-${i.pc_id}" => i }
+  ]) : "${i.port_policy}:${i.pc_id}" => i }
   port_channel_fc_uplinks = { for i in flatten([
     for value in local.port : [
       for v in value.port_channel_fc_uplinks : {
@@ -1321,7 +1324,7 @@ locals {
         vsan_id      = v.vsan_id
       }
     ]
-  ]) : "${i.port_policy}-${i.pc_id}" => i }
+  ]) : "${i.port_policy}:${i.pc_id}" => i }
   port_channel_fcoe_uplinks = { for i in flatten([
     for value in local.port : [
       for v in value.port_channel_fcoe_uplinks : {
@@ -1334,7 +1337,7 @@ locals {
         tags                    = value.tags
       }
     ]
-  ]) : "${i.port_policy}-${i.pc_id}" => i }
+  ]) : "${i.port_policy}:${i.pc_id}" => i }
   port_modes = { for i in flatten([
     for value in local.port : [
       for v in value.port_modes : {
@@ -1345,7 +1348,7 @@ locals {
         tags        = value.tags
       }
     ]
-  ]) : "${i.port_policy}-${i.slot_id}-${element(i.port_list, 0)}" => i }
+  ]) : "${i.port_policy}:${i.slot_id}-${element(i.port_list, 0)}" => i }
   /*
   Loop 1 is to determine if the port_list is:
   * A Single number. i.e. 1
@@ -1392,7 +1395,7 @@ locals {
         tags                            = v.tags
       }
     ]
-  ]) : "${i.port_policy}-${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
+  ]) : "${i.port_policy}:${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
   #_________________________________________________________________
   #
   # Port Policy > Port Roles > Ethernet Uplinks Section - Locals
@@ -1441,7 +1444,7 @@ locals {
         tags                          = v.tags
       }
     ]
-  ]) : "${i.port_policy}-${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
+  ]) : "${i.port_policy}:${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
   #______________________________________________________________________
   #
   # Port Policy > Port Roles > Fibre-Channel Storage Section - Locals
@@ -1484,7 +1487,7 @@ locals {
         vsan_id          = v.vsan_id
       }
     ]
-  ]) : "${i.port_policy}-${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
+  ]) : "${i.port_policy}:${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
   #______________________________________________________________________
   #
   # Port Policy > Port Roles > Fibre-Channel Uplinks Section - Locals
@@ -1527,7 +1530,7 @@ locals {
         vsan_id          = v.vsan_id
       }
     ]
-    ]) : "${i.port_policy}-${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i
+    ]) : "${i.port_policy}:${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i
   }
   #_________________________________________________________________
   #
@@ -1573,7 +1576,7 @@ locals {
         tags                = v.tags
       }
     ]
-  ]) : "${i.port_policy}-${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
+  ]) : "${i.port_policy}:${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
   #_________________________________________________________________
   #
   # Port Policy > Port Roles > FCoE Uplinks Section - Locals
@@ -1621,7 +1624,7 @@ locals {
         tags                  = v.tags
       }
     ]
-  ]) : "${i.port_policy}-${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
+  ]) : "${i.port_policy}:${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
 
   #_________________________________________________________________________
   #
@@ -1695,7 +1698,7 @@ locals {
         }
       ]
     ]
-  ]) : "${i.san_connectivity}-${i.name}" => i }
+  ]) : "${i.san_connectivity}:${i.name}" => i }
 
   #_________________________________________________________________________
   #
@@ -1756,16 +1759,16 @@ locals {
   drive_groups = { for i in flatten([
     for value in local.storage : [
       for v in value.drive_groups : {
-        automatic_drive_group = lookup(v, "automatic_drive_group", [])
-        manual_drive_group    = lookup(v, "manual_drive_group", [])
-        name                  = v.name
-        raid_level            = lookup(v, "raid_level", "Raid1")
-        storage_policy        = value.name
-        tags                  = value.tags
-        virtual_drives        = lookup(v, "virtual_drives", [])
+        automatic_drive_groups = lookup(v, "automatic_drive_groups", [])
+        manual_drive_groups    = lookup(v, "manual_drive_groups", [])
+        name                   = v.name
+        raid_level             = lookup(v, "raid_level", "Raid1")
+        storage_policy         = value.name
+        tags                   = value.tags
+        virtual_drives         = lookup(v, "virtual_drives", [])
       }
     ]
-    ]) : "${i.storage_policy}-${i.name}" => i
+    ]) : "${i.storage_policy}:${i.name}" => i
   }
 
   #_________________________________________________________________________
@@ -1922,7 +1925,7 @@ locals {
         vlan_policy           = v.vlan_policy
       }
     ]
-  ]) : "${i.vlan_policy}-${i.vlan_id}" => i }
+  ]) : "${i.vlan_policy}:${i.vlan_id}" => i }
 
   #_________________________________________________________________________
   #
@@ -1956,5 +1959,5 @@ locals {
         vsan_scope     = lookup(v, "vsan_scope", local.lvsan.vsans.vsan_scope)
       }
     ]
-  ]) : "${i.vsan_policy}-${i.vsan_id}" => i }
+  ]) : "${i.vsan_policy}:${i.vsan_id}" => i }
 }
