@@ -29,14 +29,14 @@ resource "intersight_access_policy" "imc_access" {
     object_type = "organization.Organization"
   }
   dynamic "inband_ip_pool" {
-    for_each = { for v in compact([each.value.inband_ip_pool]) : v => v }
+    for_each = { for v in compact([lookup(each.value, "inband_ip_pool", "")]) : v => v }
     content {
       moid        = var.pools.ip[inband_ip_pool.value]
       object_type = "ippool.Pool"
     }
   }
   dynamic "out_of_band_ip_pool" {
-    for_each = { for v in compact([each.value.out_of_band_ip_pool]) : v => v }
+    for_each = { for v in compact([lookup(each.value, "out_of_band_ip_pool", "")]) : v => v }
     content {
       moid        = var.pools.ip[out_of_band_ip_pool.value]
       object_type = "ippool.Pool"

@@ -794,8 +794,9 @@ locals {
       )
       vnics = [
         for v in lookup(v, "vnics", []) : {
-          cdn_source = lookup(v, "cdn_source", local.lancon.vnics.cdn_source)
-          cdn_values = lookup(v, "cdn_values", local.lancon.vnics.cdn_values)
+          cdn_source      = lookup(v, "cdn_source", local.lancon.vnics.cdn_source)
+          cdn_values      = lookup(v, "cdn_values", local.lancon.vnics.cdn_values)
+          enable_failover = lookup(v, "enable_failover", null)
           ethernet_adapter_policy = lookup(
             v, "ethernet_adapter_policy", local.lancon.vnics.ethernet_adapter_policy
           )
@@ -857,9 +858,10 @@ locals {
     for value in local.lan_connectivity : [
       for v in value.vnics : [
         for s in range(length(v.names)) : {
-          cdn_source                      = v.cdn_source
-          cdn_value                       = length(v.cdn_values) > 0 ? element(v.cdn_values, s) : ""
-          enable_failover                 = lookup(v, "enable_failover", length(v.names) == 1 ? true : false)
+          cdn_source = v.cdn_source
+          cdn_value  = length(v.cdn_values) > 0 ? element(v.cdn_values, s) : ""
+          enable_failover = length(compact([v.enable_failover])
+          ) > 0 ? v.enable_failover : length(v.names) == 1 ? true : local.lancon.vnics.enable_failover
           ethernet_adapter_policy         = v.ethernet_adapter_policy
           ethernet_network_control_policy = v.ethernet_network_control_policy
           ethernet_network_group_policy   = v.ethernet_network_group_policy
@@ -1015,14 +1017,16 @@ locals {
   users = { for i in flatten([
     for value in local.local_user : [
       for v in value.users : {
+        enabled      = lookup(v, "enabled", true)
         local_user   = value.name
-        name         = v.name
+        name         = v.username
         organization = value.organization
+        password     = lookup(v, "password", 1)
         role         = lookup(v, "role", "readonly")
-        tags         = value.name
+        tags         = value.tags
       }
     ]
-  ]) : "${i.local_user}:${i.user}" => i }
+  ]) : "${i.local_user}:${i.name}" => i }
 
   #__________________________________________________________________
   #
@@ -1374,7 +1378,7 @@ locals {
         port_policy = value.name
         priority    = v.priority
         slot_id     = v.slot_id
-        tags        = v.tags != null ? v.tags : var.tags
+        tags        = value.tags
       }
     ]
   ])
@@ -1424,7 +1428,7 @@ locals {
         )
         port_policy = value.name
         slot_id     = v.slot_id
-        tags        = v.tags != null ? v.tags : var.tags
+        tags        = value.tags
       }
     ]
   ])
@@ -1439,7 +1443,7 @@ locals {
         flow_control_policy           = v.flow_control_policy
         link_control_policy           = v.link_control_policy
         port_id                       = s
-        port_policy                   = v.name
+        port_policy                   = v.port_policy
         slot_id                       = v.slot_id
         tags                          = v.tags
       }
@@ -1469,7 +1473,7 @@ locals {
         )
         port_policy = value.name
         slot_id     = v.slot_id
-        tags        = v.tags != null ? v.tags : var.tags
+        tags        = value.tags
         vsan_id     = v.vsan_id
       }
     ]
@@ -1481,7 +1485,7 @@ locals {
         admin_speed      = v.admin_speed
         breakout_port_id = v.breakout_port_id
         port_id          = s
-        port_policy      = v.name
+        port_policy      = v.port_policy
         slot_id          = v.slot_id
         tags             = v.tags
         vsan_id          = v.vsan_id
@@ -1512,7 +1516,7 @@ locals {
         )
         port_policy = value.name
         slot_id     = v.slot_id
-        tags        = v.tags != null ? v.tags : var.tags
+        tags        = value.tags
         vsan_id     = v.vsan_id
       }
     ]
@@ -1524,7 +1528,7 @@ locals {
         admin_speed      = v.admin_speed
         breakout_port_id = v.breakout_port_id
         port_id          = s
-        port_policy      = v.name
+        port_policy      = v.port_policy
         slot_id          = v.slot_id
         tags             = v.tags
         vsan_id          = v.vsan_id
@@ -1558,7 +1562,7 @@ locals {
         )
         port_policy = value.name
         slot_id     = v.slot_id
-        tags        = v.tags != null ? v.tags : var.tags
+        tags        = value.tags
       }
     ]
   ])
@@ -1571,7 +1575,7 @@ locals {
         fec                 = v.fec
         link_control_policy = v.link_control_policy
         port_id             = s
-        port_policy         = v.name
+        port_policy         = v.port_policy
         slot_id             = v.slot_id
         tags                = v.tags
       }
@@ -1952,7 +1956,7 @@ locals {
     for value in local.vsan : [
       for v in value.vsans : {
         default_zoning = lookup(v, "default_zoning", local.lvsan.vsans.default_zoning)
-        fcoe_vlan_id   = coalesce(v.fcoe_vlan_id, v.vsan_id)
+        fcoe_vlan_id   = lookup(v, "fcoe_vlan_id", v.vsan_id)
         name           = v.name
         vsan_id        = v.vsan_id
         vsan_policy    = value.name

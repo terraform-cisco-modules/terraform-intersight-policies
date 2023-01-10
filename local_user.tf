@@ -56,19 +56,19 @@ resource "intersight_iam_end_point_user_role" "user_role" {
   enabled  = each.value.enabled
   password = length(
     regexall("^1$", each.value.password)
-    ) > 0 ? each.value.local_user_password_1 : length(
+    ) > 0 ? var.local_user_password_1 : length(
     regexall("^2$", each.value.password)
-    ) > 0 ? each.value.local_user_password_2 : length(
+    ) > 0 ? var.local_user_password_2 : length(
     regexall("^3$", each.value.password)
-    ) > 0 ? each.value.local_user_password_3 : length(
+    ) > 0 ? var.local_user_password_3 : length(
     regexall("^4$", each.value.password)
-  ) > 0 ? each.value.local_user_password_4 : each.value.local_user_password_5
+  ) > 0 ? var.local_user_password_4 : var.local_user_password_5
   end_point_role {
     moid        = data.intersight_iam_end_point_role.roles[each.value.role].results[0].moid
     object_type = "iam.EndPointRole"
   }
   end_point_user {
-    moid        = intersight_iam_end_point_user.users[each.value.name].moid
+    moid        = intersight_iam_end_point_user.users[each.key].moid
     object_type = "iam.EndPointUser"
   }
   end_point_user_policy {
