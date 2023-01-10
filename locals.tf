@@ -859,7 +859,7 @@ locals {
         for s in range(length(v.names)) : {
           cdn_source                      = v.cdn_source
           cdn_value                       = length(v.cdn_values) > 0 ? element(v.cdn_values, s) : ""
-          enable_failover                 = length(v.names) == 1 ? true : false
+          enable_failover                 = lookup(v, "enable_failover", length(v.names) == 1 ? true : false)
           ethernet_adapter_policy         = v.ethernet_adapter_policy
           ethernet_network_control_policy = v.ethernet_network_control_policy
           ethernet_network_group_policy   = v.ethernet_network_group_policy
