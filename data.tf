@@ -142,26 +142,26 @@ data "intersight_vnic_iscsi_static_target_policy" "iscsi_static_target" {
 # Port Policy Data Objects
 #________________________________________
 
-#data "intersight_fabric_flow_control_policy" "flow_control" {
-#  depends_on = [
-#    intersight_fabric_flow_control_policy.flow_control
-#  ]
-#  for_each = { for v in [0] : v => v if length(local.flow_ctrl) > 0 }
-#}
-#
-#data "intersight_fabric_link_aggregation_policy" "link_aggregation" {
-#  depends_on = [
-#    intersight_fabric_link_aggregation_policy.link_aggregation
-#  ]
-#  for_each = { for v in [0] : v => v if length(local.link_agg) > 0 }
-#}
-#
-#data "intersight_fabric_link_control_policy" "link_control" {
-#  depends_on = [
-#    intersight_fabric_link_control_policy.link_control
-#  ]
-#  for_each = { for v in [0] : v => v if length(local.link_ctrl) > 0 }
-#}
+data "intersight_fabric_flow_control_policy" "flow_control" {
+  depends_on = [
+    intersight_fabric_flow_control_policy.flow_control
+  ]
+  for_each = { for v in [0] : v => v if length(local.flow_ctrl) > 0 }
+}
+
+data "intersight_fabric_link_aggregation_policy" "link_aggregation" {
+  depends_on = [
+    intersight_fabric_link_aggregation_policy.link_aggregation
+  ]
+  for_each = { for v in [0] : v => v if length(local.link_agg) > 0 }
+}
+
+data "intersight_fabric_link_control_policy" "link_control" {
+  depends_on = [
+    intersight_fabric_link_control_policy.link_control
+  ]
+  for_each = { for v in [0] : v => v if length(local.link_ctrl) > 0 }
+}
 
 #________________________________________
 #

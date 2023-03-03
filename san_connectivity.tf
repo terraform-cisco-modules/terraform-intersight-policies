@@ -27,7 +27,7 @@ resource "intersight_vnic_san_connectivity_policy" "san_connectivity" {
     for_each = { for v in [each.value.wwnn_pool.name] : v => v if each.value.wwnn_pool.name != "UNUSED" }
     content {
       moid = [for i in data.intersight_fcpool_pool.wwnn[0].results : i.moid if i.organization[0
-      ].moid == local.orgs[each.value.wwnn_pool.organization] && i.name == each.value.wwnn_pool.name][0]
+      ].moid == local.orgs[each.value.wwnn_pool.org] && i.name == each.value.wwnn_pool.name][0]
       object_type = "fcpool.Pool"
     }
   }
@@ -58,19 +58,19 @@ resource "intersight_vnic_fc_if" "vhbas" {
   fc_adapter_policy {
     moid = [for i in data.intersight_vnic_fc_adapter_policy.fibre_channel_adapter[0
       ].results : i.moid if i.organization[0].moid == local.orgs[
-      each.value.fibre_channel_adapter_policy.organization
+      each.value.fibre_channel_adapter_policy.org
     ] && i.name == each.value.fibre_channel_adapter_policy.name][0]
   }
   fc_network_policy {
     moid = [for i in data.intersight_vnic_fc_network_policy.fibre_channel_network[0
       ].results : i.moid if i.organization[0].moid == local.orgs[
-      each.value.fibre_channel_network_policy.organization
+      each.value.fibre_channel_network_policy.org
     ] && i.name == each.value.fibre_channel_network_policy.name][0]
   }
   fc_qos_policy {
     moid = [for i in data.intersight_vnic_fc_qos_policy.fibre_channel_qos[0
       ].results : i.moid if i.organization[0].moid == local.orgs[
-      each.value.fibre_channel_qos_policy.organization
+      each.value.fibre_channel_qos_policy.org
     ] && i.name == each.value.fibre_channel_qos_policy.name][0]
   }
   san_connectivity_policy {
@@ -93,7 +93,7 @@ resource "intersight_vnic_fc_if" "vhbas" {
     for_each = { for v in [each.value.wwpn_pool.name] : v => v if each.value.wwpn_pool.name != "UNUSED" }
     content {
       moid = [for i in data.intersight_fcpool_pool.wwpn[0].results : i.moid if i.organization[0
-      ].moid == local.orgs[each.value.wwpn_pool.organization] && i.name == each.value.wwpn_pool.name][0]
+      ].moid == local.orgs[each.value.wwpn_pool.org] && i.name == each.value.wwpn_pool.name][0]
       object_type = "fcpool.Pool"
     }
   }

@@ -59,8 +59,7 @@ resource "intersight_fabric_vlan" "vlans" {
   }
   multicast_policy {
     moid = [for i in data.intersight_fabric_multicast_policy.multicast[0
-      ].results : i.moid if i.organization[0].moid == local.orgs[
-      each.value.multicast_policy.organization
+      ].results : i.moid if i.organization[0].moid == local.orgs[each.value.multicast_policy.org
     ] && i.name == each.value.multicast_policy.name][0]
   }
 }

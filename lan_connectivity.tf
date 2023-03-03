@@ -24,7 +24,7 @@ resource "intersight_vnic_lan_connectivity_policy" "lan_connectivity" {
     for_each = { for v in [each.value.iqn_pool.name] : v => v if each.value.iqn_pool.name != "UNUSED" }
     content {
       moid = [for i in data.intersight_iqnpool_pool.iqn[0].results : i.moid if i.organization[0
-      ].moid == local.orgs[each.value.iqn_pool.organization] && i.name == each.value.iqn_pool.name][0]
+      ].moid == local.orgs[each.value.iqn_pool.org] && i.name == each.value.iqn_pool.name][0]
       object_type = "iqnpool.Pool"
     }
   }
@@ -68,19 +68,19 @@ resource "intersight_vnic_eth_if" "vnics" {
   eth_adapter_policy {
     moid = [for i in data.intersight_vnic_eth_adapter_policy.ethernet_adapter[0
       ].results : i.moid if i.organization[0].moid == local.orgs[
-      each.value.ethernet_adapter_policy.organization
+      each.value.ethernet_adapter_policy.org
     ] && i.name == each.value.ethernet_adapter_policy.name][0]
   }
   eth_qos_policy {
     moid = [for i in data.intersight_vnic_eth_qos_policy.ethernet_qos[0
       ].results : i.moid if i.organization[0].moid == local.orgs[
-      each.value.ethernet_qos_policy.organization
+      each.value.ethernet_qos_policy.org
     ] && i.name == each.value.ethernet_qos_policy.name][0]
   }
   fabric_eth_network_control_policy {
     moid = [for i in data.intersight_fabric_eth_network_control_policy.ethernet_network_control[0
       ].results : i.moid if i.organization[0].moid == local.orgs[
-      each.value.ethernet_network_control_policy.organization
+      each.value.ethernet_network_control_policy.org
     ] && i.name == each.value.ethernet_network_control_policy.name][0]
   }
   lan_connectivity_policy {
@@ -98,7 +98,7 @@ resource "intersight_vnic_eth_if" "vnics" {
     usnic_adapter_policy = length(regexall("UNUSED", each.value.usnic_adapter_policy.name)
       ) == 0 ? [for i in data.intersight_vnic_eth_adapter_policy.ethernet_adapter[0
         ].results : i.moid if i.organization[0].moid == local.orgs[
-        each.value.usnic_adapter_policy.organization
+        each.value.usnic_adapter_policy.org
     ] && i.name == each.value.usnic_adapter_policy.name][0] : ""
   }
   vmq_settings {
@@ -110,7 +110,7 @@ resource "intersight_vnic_eth_if" "vnics" {
     vmmq_adapter_policy = length(regexall("UNUSED", each.value.vmq_vmmq_adapter_policy.name)
       ) == 0 ? [for i in data.intersight_vnic_eth_adapter_policy.ethernet_adapter[0
         ].results : i.moid if i.organization[0].moid == local.orgs[
-        each.value.vmq_vmmq_adapter_policy.organization
+        each.value.vmq_vmmq_adapter_policy.org
     ] && i.name == each.value.vmq_vmmq_adapter_policy.name][0] : ""
   }
   dynamic "eth_network_policy" {
@@ -121,7 +121,7 @@ resource "intersight_vnic_eth_if" "vnics" {
     content {
       moid = [for i in data.intersight_vnic_eth_network_policy.ethernet_network[0
         ].results : i.moid if i.organization[0].moid == local.orgs[
-        each.value.ethernet_network_policy.organization
+        each.value.ethernet_network_policy.org
       ] && i.name == each.value.ethernet_network_policy.name][0]
     }
   }
@@ -133,7 +133,7 @@ resource "intersight_vnic_eth_if" "vnics" {
     content {
       moid = [for i in data.intersight_fabric_eth_network_group_policy.ethernet_network_group[0
         ].results : i.moid if i.organization[0].moid == local.orgs[
-        each.value.ethernet_network_group_policy.organization
+        each.value.ethernet_network_group_policy.org
       ] && i.name == each.value.ethernet_network_group_policy.name][0]
     }
   }
@@ -145,7 +145,7 @@ resource "intersight_vnic_eth_if" "vnics" {
     content {
       moid = [for i in data.intersight_vnic_iscsi_boot_policy.iscsi_boot[0
         ].results : i.moid if i.organization[0].moid == local.orgs[
-        each.value.iscsi_boot_policy.organization
+        each.value.iscsi_boot_policy.org
       ] && i.name == each.value.iscsi_boot_policy.name][0]
     }
   }
@@ -155,7 +155,7 @@ resource "intersight_vnic_eth_if" "vnics" {
     }
     content {
       moid = [for i in data.intersight_macpool_pool.mac[0].results : i.moid if i.organization[0
-      ].moid == local.orgs[each.value.mac_address_pool.organization] && i.name == each.value.mac_address_pool.name][0]
+      ].moid == local.orgs[each.value.mac_address_pool.org] && i.name == each.value.mac_address_pool.name][0]
     }
   }
   dynamic "tags" {

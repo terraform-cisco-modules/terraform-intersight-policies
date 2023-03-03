@@ -89,7 +89,7 @@ resource "intersight_vnic_iscsi_boot_policy" "iscsi_boot" {
     content {
       moid = [for i in data.intersight_vnic_iscsi_adapter_policy.iscsi_adapter[0
         ].results : i.moid if i.organization[0
-        ].moid == local.orgs[each.value.iscsi_adapter_policy.organization
+        ].moid == local.orgs[each.value.iscsi_adapter_policy.org
       ] && i.name == each.value.iscsi_adapter_policy.name][0]
     }
   }
@@ -101,7 +101,7 @@ resource "intersight_vnic_iscsi_boot_policy" "iscsi_boot" {
     content {
       moid = [for i in data.intersight_vnic_iscsi_static_target_policy.iscsi_static_target[0
         ].results : i.moid if i.organization[0
-        ].moid == local.orgs[each.value.primary_target_policy.organization
+        ].moid == local.orgs[each.value.primary_target_policy.org
       ] && i.name == each.value.primary_target_policy.name][0]
     }
   }
@@ -113,7 +113,7 @@ resource "intersight_vnic_iscsi_boot_policy" "iscsi_boot" {
     content {
       moid = [for i in data.intersight_vnic_iscsi_static_target_policy.iscsi_static_target[0
         ].results : i.moid if i.organization[0
-        ].moid == local.orgs[each.value.secondary_target_policy.organization
+        ].moid == local.orgs[each.value.secondary_target_policy.org
       ] && i.name == each.value.secondary_target_policy.name][0]
     }
   }

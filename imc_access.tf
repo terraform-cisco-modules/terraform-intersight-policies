@@ -29,7 +29,7 @@ resource "intersight_access_policy" "imc_access" {
     for_each = { for v in [each.value.inband_ip_pool.name] : v => v if each.value.inband_ip_pool.name != "UNUSED" }
     content {
       moid = [for i in data.intersight_ippool_pool.ip[0].results : i.moid if i.organization[0
-      ].moid == local.orgs[each.value.inband_ip_pool.organization] && i.name == each.value.inband_ip_pool.name][0]
+      ].moid == local.orgs[each.value.inband_ip_pool.org] && i.name == each.value.inband_ip_pool.name][0]
       object_type = "ippool.Pool"
     }
   }

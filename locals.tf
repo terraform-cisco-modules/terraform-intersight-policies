@@ -2,14 +2,22 @@ locals {
   defaults  = var.defaults
   eth_adapt = local.defaults.ethernet_adapter
   eth_ntwk_ctrl = distinct(compact(concat([
-    for v in local.vnics : v.ethernet_network_control_policy.name if v.ethernet_network_control_policy.name != "UNUSED"], [
+    for v in local.port_channel_appliances : v.ethernet_network_control_policy.name if v.ethernet_network_control_policy.name != "UNUSED"], [
+    for v in local.port_role_appliances : v.ethernet_network_control_policy.name if v.ethernet_network_control_policy.name != "UNUSED"], [
     for v in local.vnics : v.ethernet_network_control_policy.name if v.ethernet_network_control_policy.name != "UNUSED"]
   )))
   eth_ntwk_grp = distinct(compact(concat([
-    for v in local.vnics : v.ethernet_network_group_policy.name if v.ethernet_network_group_policy.name != "UNUSED"], [
+    for v in local.port_channel_appliances : v.ethernet_network_group_policy.name if v.ethernet_network_group_policy.name != "UNUSED"], [
+    for v in local.port_channel_ethernet_uplinks : v.ethernet_network_group_policy.name if v.ethernet_network_group_policy.name != "UNUSED"], [
+    for v in local.port_role_appliances : v.ethernet_network_group_policy.name if v.ethernet_network_group_policy.name != "UNUSED"], [
+    for v in local.port_role_ethernet_uplinks : v.ethernet_network_group_policy.name if v.ethernet_network_group_policy.name != "UNUSED"], [
     for v in local.vnics : v.ethernet_network_group_policy.name if v.ethernet_network_group_policy.name != "UNUSED"]
   )))
   fc_adapt = local.defaults.fibre_channel_adapter
+  flow_ctrl = distinct(compact(concat([
+    for v in local.port_channel_ethernet_uplinks : v.flow_control_policy.name if v.flow_control_policy.name != "UNUSED"], [
+    for v in local.port_role_ethernet_uplinks : v.flow_control_policy.name if v.flow_control_policy.name != "UNUSED"]
+  )))
   iboot    = local.defaults.iscsi_boot
   ip_pools = distinct(compact(concat([
     for v in local.imc_access : v.inband_ip_pool.name if v.inband_ip_pool.name != "UNUSED"], [
@@ -27,6 +35,8 @@ locals {
     for v in local.iscsi_boot : v.secondary_target_policy.name if v.secondary_target_policy.name != "UNUSED"]
   )))
   ladapter = local.defaults.adapter_configuration
+  lbios       = local.defaults.bios
+  lboot       = local.defaults.boot_order
   lcp      = local.defaults.lan_connectivity
   lcp_eth_adtr = distinct(compact(concat([
     for v in local.vnics : v.ethernet_adapter_policy.name if v.ethernet_adapter_policy.name != "UNUSED"], [
@@ -42,12 +52,21 @@ locals {
   lcp_iboot = distinct(compact([
     for v in local.vnics : v.iscsi_boot_policy.name if v.iscsi_boot_policy.name != "UNUSED"]
   ))
-  lbios       = local.defaults.bios
-  lboot       = local.defaults.boot_order
   ldga        = local.defaults.storage.drive_groups.automatic_drive_groups
   ldgm        = local.defaults.storage.drive_groups.manual_drive_groups
   ldgv        = local.defaults.storage.drive_groups.virtual_drives
   ldns        = local.defaults.network_connectivity
+  link_agg = distinct(compact(concat([
+    for v in local.port_channel_appliances : v.link_aggregation_policy.name if v.link_aggregation_policy.name != "UNUSED"], [
+    for v in local.port_channel_ethernet_uplinks : v.link_aggregation_policy.name if v.link_aggregation_policy.name != "UNUSED"], [
+    for v in local.port_channel_fcoe_uplinks : v.link_aggregation_policy.name if v.link_aggregation_policy.name != "UNUSED"]
+  )))
+  link_ctrl = distinct(compact(concat([
+    for v in local.port_channel_ethernet_uplinks : v.link_control_policy.name if v.link_control_policy.name != "UNUSED"], [
+    for v in local.port_channel_fcoe_uplinks : v.link_control_policy.name if v.link_control_policy.name != "UNUSED"], [
+    for v in local.port_role_ethernet_uplinks : v.link_control_policy.name if v.link_control_policy.name != "UNUSED"], [
+    for v in local.port_role_fcoe_uplinks : v.link_control_policy.name if v.link_control_policy.name != "UNUSED"]
+  )))
   lldap       = local.defaults.ldap
   lntp        = local.defaults.ntp
   lport       = local.defaults.port
@@ -849,24 +868,24 @@ locals {
       )
       inband_ip_pool = lookup(v, "inband_ip_pool", null) != null ? try(
         {
-          name         = tostring(v.inband_ip_pool)
-          organization = var.organization
+          name = tostring(v.inband_ip_pool)
+          org  = var.organization
         },
         v.inband_ip_pool
         ) : {
-        name         = "UNUSED"
-        organization = "UNUSED"
+        name = "UNUSED"
+        org  = "UNUSED"
       }
       organization = var.organization
       out_of_band_ip_pool = lookup(v, "out_of_band_ip_pool", null) != null ? try(
         {
-          name         = tostring(v.out_of_band_ip_pool)
-          organization = var.organization
+          name = tostring(v.out_of_band_ip_pool)
+          org  = var.organization
         },
         v.out_of_band_ip_pool
         ) : {
-        name         = "UNUSED"
-        organization = "UNUSED"
+        name = "UNUSED"
+        org  = "UNUSED"
       }
       tags = lookup(v, "tags", var.tags)
     }
@@ -885,25 +904,25 @@ locals {
       gateway            = lookup(lookup(v, "initiator_static_ipv4_config", {}), "default_gateway", "")
       initiator_ip_pool = lookup(v, "initiator_ip_pool", null) != null ? try(
         {
-          name         = tostring(v.initiator_ip_pool)
-          organization = var.organization
+          name = tostring(v.initiator_ip_pool)
+          org  = var.organization
         },
         v.initiator_ip_pool
         ) : {
-        name         = "UNUSED"
-        organization = "UNUSED"
+        name = "UNUSED"
+        org  = "UNUSED"
       }
       initiator_ip_source = lookup(v, "initiator_ip_source", local.iboot.initiator_ip_source)
       ip_address          = lookup(lookup(v, "initiator_static_ipv4_config", {}), "ip_address", "")
       iscsi_adapter_policy = lookup(v, "iscsi_adapter_policy", null) != null ? try(
         {
-          name         = tostring(v.iscsi_adapter_policy)
-          organization = var.organization
+          name = tostring(v.iscsi_adapter_policy)
+          org  = var.organization
         },
         v.iscsi_adapter_policy
         ) : {
-        name         = "UNUSED"
-        organization = "UNUSED"
+        name = "UNUSED"
+        org  = "UNUSED"
       }
       name         = "${local.name_prefix}${v.name}${local.iboot.name_suffix}"
       netmask      = lookup(lookup(v, "initiator_static_ipv4_config", {}), "subnet_mask", "")
@@ -911,24 +930,24 @@ locals {
       primary_dns  = lookup(lookup(v, "initiator_static_ipv4_config", {}), "primary_dns", "")
       primary_target_policy = lookup(v, "primary_target_policy", null) != null ? try(
         {
-          name         = tostring(v.primary_target_policy)
-          organization = var.organization
+          name = tostring(v.primary_target_policy)
+          org  = var.organization
         },
         v.primary_target_policy
         ) : {
-        name         = "UNUSED"
-        organization = "UNUSED"
+        name = "UNUSED"
+        org  = "UNUSED"
       }
       secondary_dns = lookup(lookup(v, "initiator_static_ipv4_config", {}), "secondary_dns", "")
       secondary_target_policy = lookup(v, "secondary_target_policy", null) != null ? try(
         {
-          name         = tostring(v.secondary_target_policy)
-          organization = var.organization
+          name = tostring(v.secondary_target_policy)
+          org  = var.organization
         },
         v.secondary_target_policy
         ) : {
-        name         = "UNUSED"
-        organization = "UNUSED"
+        name = "UNUSED"
+        org  = "UNUSED"
       }
       tags               = lookup(v, "tags", var.tags)
       target_source_type = lookup(v, "target_source_type", local.iboot.target_source_type)
@@ -1040,77 +1059,71 @@ locals {
           cdn_value  = length(v.cdn_values) > 0 ? element(v.cdn_values, s) : ""
           enable_failover = length(compact([v.enable_failover])
           ) > 0 ? v.enable_failover : length(v.names) == 1 ? true : local.lcp.vnics.enable_failover
-          ethernet_adapter_policy = v.ethernet_adapter_policy != "" ? try(
+          ethernet_adapter_policy = try(
             {
-              name         = tostring(v.ethernet_adapter_policy)
-              organization = var.organization
+              name = tostring(v.ethernet_adapter_policy)
+              org  = var.organization
             },
             v.ethernet_adapter_policy
-            ) : {
-            name         = "UNUSED"
-            organization = "UNUSED"
-          }
+          )
           ethernet_network_control_policy = v.ethernet_network_control_policy != "" ? try(
             {
-              name         = tostring(v.ethernet_network_control_policy)
-              organization = var.organization
+              name = tostring(v.ethernet_network_control_policy)
+              org  = var.organization
             },
             v.ethernet_network_control_policy
             ) : {
-            name         = "UNUSED"
-            organization = "UNUSED"
+            name = "UNUSED"
+            org  = "UNUSED"
           }
           ethernet_network_group_policy = v.ethernet_network_group_policy != "" ? try(
             {
-              name         = tostring(v.ethernet_network_group_policy)
-              organization = var.organization
+              name = tostring(v.ethernet_network_group_policy)
+              org  = var.organization
             },
             v.ethernet_network_group_policy
             ) : {
-            name         = "UNUSED"
-            organization = "UNUSED"
+            name = "UNUSED"
+            org  = "UNUSED"
           }
           ethernet_network_policy = v.ethernet_network_policy != "" ? try(
             {
-              name         = tostring(v.ethernet_network_policy)
-              organization = var.organization
+              name = tostring(v.ethernet_network_policy)
+              org  = var.organization
             },
             v.ethernet_network_policy
             ) : {
-            name         = "UNUSED"
-            organization = "UNUSED"
+            name = "UNUSED"
+            org  = "UNUSED"
           }
-          ethernet_qos_policy = v.ethernet_qos_policy != "" ? try(
+          ethernet_qos_policy = try(
             {
-              name         = tostring(v.ethernet_qos_policy)
-              organization = var.organization
+              name = tostring(v.ethernet_qos_policy)
+              org  = var.organization
             },
             v.ethernet_qos_policy
-            ) : {
-            name         = "UNUSED"
-            organization = "UNUSED"
-          }
+          )
           iscsi_boot_policy = v.iscsi_boot_policy != "" ? try(
             {
-              name         = tostring(v.iscsi_boot_policy)
-              organization = var.organization
+              name = tostring(v.iscsi_boot_policy)
+              org  = var.organization
             },
             v.iscsi_boot_policy
             ) : {
-            name         = "UNUSED"
-            organization = "UNUSED"
+            name = "UNUSED"
+            org  = "UNUSED"
           }
           lan_connectivity            = value.name
           mac_address_allocation_type = v.mac_address_allocation_type
           mac_address_pool = length(v.mac_address_pools) > 0 ? try(
             {
-              name         = tostring(element(v.mac_address_pools, s))
-              organization = var.organization
+              name = tostring(element(v.mac_address_pools, s))
+              org  = var.organization
             },
             element(v.mac_address_pools, s)
             ) : {
-            name         = "UNUSED"
-            organization = "UNUSED"
+            name = "UNUSED"
+            org  = "UNUSED"
           }
           mac_address_static = length(lookup(v, "mac_addresses_static", [])
           ) > 0 ? element(v.mac_addresses_static, s) : ""
@@ -1131,13 +1144,13 @@ locals {
           tags = value.tags
           usnic_adapter_policy = v.usnic_adapter_policy != "" ? try(
             {
-              name         = tostring(v.usnic_adapter_policy)
-              organization = var.organization
+              name = tostring(v.usnic_adapter_policy)
+              org  = var.organization
             },
             v.usnic_adapter_policy
             ) : {
-            name         = "UNUSED"
-            organization = "UNUSED"
+            name = "UNUSED"
+            org  = "UNUSED"
           }
           usnic_class_of_service                 = lookup(v, "usnic_class_of_service", 5)
           usnic_number_of_usnics                 = lookup(v, "usnic_number_of_usnics", 0)
@@ -1148,13 +1161,13 @@ locals {
           vmq_number_of_virtual_machine_queues   = lookup(v, "vmq_number_of_virtual_machine_queues", 4)
           vmq_vmmq_adapter_policy = v.vmq_vmmq_adapter_policy != "" ? try(
             {
-              name         = tostring(v.vmq_vmmq_adapter_policy)
-              organization = var.organization
+              name = tostring(v.vmq_vmmq_adapter_policy)
+              org  = var.organization
             },
             v.vmq_vmmq_adapter_policy
             ) : {
-            name         = "UNUSED"
-            organization = "UNUSED"
+            name = "UNUSED"
+            org  = "UNUSED"
           }
         }
       ]
@@ -1402,6 +1415,9 @@ locals {
               v, "ethernet_network_group_policy", local.lport.port_channel_appliances.ethernet_network_group_policy
             )
             interfaces = lookup(v, "interfaces", [])
+            link_aggregation_policy = lookup(
+              v, "link_aggregation_policy", local.lport.port_channel_ethernet_uplinks.link_aggregation_policy
+            )
             mode       = lookup(v, "mode", local.lport.port_channel_appliances.mode)
             pc_id      = length(v.pc_ids) == 1 ? element(v.pc_ids, 0) : element(v.pc_ids, i)
             priority   = lookup(v, "priority", local.lport.port_channel_appliances.priority)
@@ -1547,30 +1563,88 @@ locals {
   port_channel_appliances = { for i in flatten([
     for value in local.port : [
       for v in value.port_channel_appliances : {
-        admin_speed                     = v.admin_speed
-        ethernet_network_control_policy = v.ethernet_network_control_policy
-        ethernet_network_group_policy   = v.ethernet_network_group_policy
-        interfaces                      = v.interfaces
-        mode                            = v.mode
-        pc_id                           = v.pc_id
-        port_policy                     = value.name
-        priority                        = v.priority
-        tags                            = value.tags
+        admin_speed = v.admin_speed
+        ethernet_network_control_policy = try(
+          {
+            name = tostring(v.ethernet_network_control_policy)
+            org  = var.organization
+          },
+          v.ethernet_network_control_policy
+        )
+        ethernet_network_group_policy = try(
+          {
+            name = tostring(v.ethernet_network_group_policy)
+            org  = var.organization
+          },
+          v.ethernet_network_group_policy
+        )
+        interfaces = v.interfaces
+        link_aggregation_policy = v.link_aggregation_policy != "" ? try(
+          {
+            name = tostring(v.link_aggregation_policy)
+            org  = var.organization
+          },
+          v.link_aggregation_policy
+          ) : {
+          name = "UNUSED"
+          org  = "UNUSED"
+        }
+        mode        = v.mode
+        pc_id       = v.pc_id
+        port_policy = value.name
+        priority    = v.priority
+        tags        = value.tags
       }
     ]
   ]) : "${i.port_policy}:${i.pc_id}" => i }
   port_channel_ethernet_uplinks = { for i in flatten([
     for value in local.port : [
       for v in value.port_channel_ethernet_uplinks : {
-        admin_speed                   = v.admin_speed
-        ethernet_network_group_policy = v.ethernet_network_group_policy
-        flow_control_policy           = v.flow_control_policy
-        interfaces                    = v.interfaces
-        link_aggregation_policy       = v.link_aggregation_policy
-        link_control_policy           = v.link_control_policy
-        pc_id                         = v.pc_id
-        port_policy                   = value.name
-        tags                          = value.tags
+        admin_speed = v.admin_speed
+        ethernet_network_group_policy = v.ethernet_network_group_policy != "" ? try(
+          {
+            name = tostring(v.ethernet_network_group_policy)
+            org  = var.organization
+          },
+          v.ethernet_network_group_policy
+          ) : {
+          name = "UNUSED"
+          org  = "UNUSED"
+        }
+        flow_control_policy = v.flow_control_policy != "" ? try(
+          {
+            name = tostring(v.flow_control_policy)
+            org  = var.organization
+          },
+          v.flow_control_policy
+          ) : {
+          name = "UNUSED"
+          org  = "UNUSED"
+        }
+        interfaces = v.interfaces
+        link_aggregation_policy = v.link_aggregation_policy != "" ? try(
+          {
+            name = tostring(v.link_aggregation_policy)
+            org  = var.organization
+          },
+          v.link_aggregation_policy
+          ) : {
+          name = "UNUSED"
+          org  = "UNUSED"
+        }
+        link_control_policy = v.link_control_policy != "" ? try(
+          {
+            name = tostring(v.link_control_policy)
+            org  = var.organization
+          },
+          v.link_control_policy
+          ) : {
+          name = "UNUSED"
+          org  = "UNUSED"
+        }
+        pc_id       = v.pc_id
+        port_policy = value.name
+        tags        = value.tags
       }
     ]
   ]) : "${i.port_policy}:${i.pc_id}" => i }
@@ -1590,13 +1664,31 @@ locals {
   port_channel_fcoe_uplinks = { for i in flatten([
     for value in local.port : [
       for v in value.port_channel_fcoe_uplinks : {
-        admin_speed             = v.admin_speed
-        interfaces              = v.interfaces
-        link_aggregation_policy = v.link_aggregation_policy
-        link_control_policy     = v.link_control_policy
-        pc_id                   = v.pc_id
-        port_policy             = value.name
-        tags                    = value.tags
+        admin_speed = v.admin_speed
+        interfaces  = v.interfaces
+        link_aggregation_policy = v.link_aggregation_policy != "" ? try(
+          {
+            name = tostring(v.link_aggregation_policy)
+            org  = var.organization
+          },
+          v.link_aggregation_policy
+          ) : {
+          name = "UNUSED"
+          org  = "UNUSED"
+        }
+        link_control_policy = v.link_control_policy != "" ? try(
+          {
+            name = tostring(v.link_control_policy)
+            org  = var.organization
+          },
+          v.link_control_policy
+          ) : {
+          name = "UNUSED"
+          org  = "UNUSED"
+        }
+        pc_id       = v.pc_id
+        port_policy = value.name
+        tags        = value.tags
       }
     ]
   ]) : "${i.port_policy}:${i.pc_id}" => i }
@@ -1644,17 +1736,29 @@ locals {
   port_role_appliances = { for i in flatten([
     for v in local.port_role_appliances_loop : [
       for s in v.port_list : {
-        admin_speed                     = v.admin_speed
-        breakout_port_id                = v.breakout_port_id
-        ethernet_network_control_policy = v.ethernet_network_control_policy
-        ethernet_network_group_policy   = v.ethernet_network_group_policy
-        fec                             = v.fec
-        mode                            = v.mode
-        port_id                         = s
-        port_policy                     = v.port_policy
-        priority                        = v.priority
-        slot_id                         = v.slot_id
-        tags                            = v.tags
+        admin_speed      = v.admin_speed
+        breakout_port_id = v.breakout_port_id
+        ethernet_network_control_policy = try(
+          {
+            name = tostring(v.ethernet_network_control_policy)
+            org  = var.organization
+          },
+          v.ethernet_network_control_policy
+        )
+        ethernet_network_group_policy = try(
+          {
+            name = tostring(v.ethernet_network_group_policy)
+            org  = var.organization
+          },
+          v.ethernet_network_group_policy
+        )
+        fec         = v.fec
+        mode        = v.mode
+        port_id     = s
+        port_policy = v.port_policy
+        priority    = v.priority
+        slot_id     = v.slot_id
+        tags        = v.tags
       }
     ]
   ]) : "${i.port_policy}:${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
@@ -1694,16 +1798,43 @@ locals {
   port_role_ethernet_uplinks = { for i in flatten([
     for v in local.port_role_ethernet_uplinks_loop : [
       for s in v.port_list : {
-        admin_speed                   = v.admin_speed
-        breakout_port_id              = v.breakout_port_id
-        ethernet_network_group_policy = v.ethernet_network_group_policy
-        fec                           = v.fec
-        flow_control_policy           = v.flow_control_policy
-        link_control_policy           = v.link_control_policy
-        port_id                       = s
-        port_policy                   = v.port_policy
-        slot_id                       = v.slot_id
-        tags                          = v.tags
+        admin_speed      = v.admin_speed
+        breakout_port_id = v.breakout_port_id
+        ethernet_network_group_policy = v.ethernet_network_group_policy != "" ? try(
+          {
+            name = tostring(v.ethernet_network_group_policy)
+            org  = var.organization
+          },
+          v.ethernet_network_group_policy
+          ) : {
+          name = "UNUSED"
+          org  = "UNUSED"
+        }
+        fec = v.fec
+        flow_control_policy = v.flow_control_policy != "" ? try(
+          {
+            name = tostring(v.flow_control_policy)
+            org  = var.organization
+          },
+          v.flow_control_policy
+          ) : {
+          name = "UNUSED"
+          org  = "UNUSED"
+        }
+        link_control_policy = v.link_control_policy != "" ? try(
+          {
+            name = tostring(v.link_control_policy)
+            org  = var.organization
+          },
+          v.link_control_policy
+          ) : {
+          name = "UNUSED"
+          org  = "UNUSED"
+        }
+        port_id     = s
+        port_policy = v.port_policy
+        slot_id     = v.slot_id
+        tags        = v.tags
       }
     ]
   ]) : "${i.port_policy}:${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
@@ -1828,14 +1959,20 @@ locals {
   port_role_fcoe_uplinks = { for i in flatten([
     for v in local.port_role_fcoe_uplinks_loop : [
       for s in v.port_list : {
-        admin_speed         = v.admin_speed
-        breakout_port_id    = v.breakout_port_id
-        fec                 = v.fec
-        link_control_policy = v.link_control_policy
-        port_id             = s
-        port_policy         = v.port_policy
-        slot_id             = v.slot_id
-        tags                = v.tags
+        admin_speed      = v.admin_speed
+        breakout_port_id = v.breakout_port_id
+        fec              = v.fec
+        link_control_policy = try(
+          {
+            name = tostring(v.link_control_policy)
+            org  = var.organization
+          },
+          v.link_control_policy
+        )
+        port_id     = s
+        port_policy = v.port_policy
+        slot_id     = v.slot_id
+        tags        = v.tags
       }
     ]
   ]) : "${i.port_policy}:${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
@@ -1924,17 +2061,17 @@ locals {
       }
     ]
     wwnn_allocation_type = lookup(v, "wwnn_allocation_type", local.lscp.wwnn_allocation_type)
-    wwnn_pool            = lookup(v, "wwnn_pool", local.lscp.wwnn_pool) != "" ? try(
-            {
-              name         = tostring(lookup(v, "wwnn_pool", local.lscp.wwnn_pool))
-              organization = var.organization
-            },
-            lookup(v, "wwnn_pool", local.lscp.wwnn_pool)
-            ) : {
-            name         = "UNUSED"
-            organization = "UNUSED"
-          }
-    wwnn_static_address  = lookup(v, "wwnn_static_address", "")
+    wwnn_pool = lookup(v, "wwnn_pool", local.lscp.wwnn_pool) != "" ? try(
+      {
+        name = tostring(lookup(v, "wwnn_pool", local.lscp.wwnn_pool))
+        org  = var.organization
+      },
+      lookup(v, "wwnn_pool", local.lscp.wwnn_pool)
+      ) : {
+      name = "UNUSED"
+      org  = "UNUSED"
+    }
+    wwnn_static_address = lookup(v, "wwnn_static_address", "")
     }
   }
   vhbas = { for i in flatten([
@@ -1946,36 +2083,36 @@ locals {
           ) : []
           fibre_channel_adapter_policy = v.fibre_channel_adapter_policy != "" ? try(
             {
-              name         = tostring(v.fibre_channel_adapter_policy)
-              organization = var.organization
+              name = tostring(v.fibre_channel_adapter_policy)
+              org  = var.organization
             },
             v.fibre_channel_adapter_policy
             ) : {
-            name         = "UNUSED"
-            organization = "UNUSED"
+            name = "UNUSED"
+            org  = "UNUSED"
           }
           fibre_channel_network_policy = element(v.fibre_channel_network_policies, s) != "" ? try(
             {
-              name         = tostring(element(v.fibre_channel_network_policies, s))
-              organization = var.organization
+              name = tostring(element(v.fibre_channel_network_policies, s))
+              org  = var.organization
             },
             element(v.fibre_channel_network_policies, s)
             ) : {
-            name         = "UNUSED"
-            organization = "UNUSED"
+            name = "UNUSED"
+            org  = "UNUSED"
           }
           fibre_channel_qos_policy = v.fibre_channel_qos_policy != "" ? try(
             {
-              name         = tostring(v.fibre_channel_qos_policy)
-              organization = var.organization
+              name = tostring(v.fibre_channel_qos_policy)
+              org  = var.organization
             },
             v.fibre_channel_qos_policy
             ) : {
-            name         = "UNUSED"
-            organization = "UNUSED"
+            name = "UNUSED"
+            org  = "UNUSED"
           }
-          name                         = element(v.names, s)
-          persistent_lun_bindings      = v.persistent_lun_bindings
+          name                    = element(v.names, s)
+          persistent_lun_bindings = v.persistent_lun_bindings
           placement_pci_link = length(v.placement_pci_link) == 1 ? element(
             v.placement_pci_link, 0) : element(v.placement_pci_link, s
           )
@@ -1994,15 +2131,15 @@ locals {
           wwpn_allocation_type = v.wwpn_allocation_type
           wwpn_pool = length(v.wwpn_pools) > 0 ? try(
             {
-              name         = tostring(element(v.wwpn_pools, s))
-              organization = var.organization
+              name = tostring(element(v.wwpn_pools, s))
+              org  = var.organization
             },
             element(v.wwpn_pools, s)
             ) : {
-            name         = "UNUSED"
-            organization = "UNUSED"
+            name = "UNUSED"
+            org  = "UNUSED"
           }
-          wwpn_static_address  = length(v.wwpn_static_addresses) > 0 ? element(v.wwpn_static_addresses, s) : ""
+          wwpn_static_address = length(v.wwpn_static_addresses) > 0 ? element(v.wwpn_static_addresses, s) : ""
         }
       ]
     ]
@@ -2229,19 +2366,19 @@ locals {
         auto_allow_on_uplinks = v.auto_allow_on_uplinks
         multicast_policy = v.multicast_policy != "" ? try(
           {
-            name         = tostring(v.multicast_policy)
-            organization = var.organization
+            name = tostring(v.multicast_policy)
+            org  = var.organization
           },
           v.multicast_policy
           ) : {
-          name         = "UNUSED"
-          organization = "UNUSED"
+          name = "UNUSED"
+          org  = "UNUSED"
         }
-        name                  = v.name
-        name_prefix           = v.name_prefix
-        native_vlan           = v.native_vlan
-        vlan_id               = s
-        vlan_policy           = v.vlan_policy
+        name        = v.name
+        name_prefix = v.name_prefix
+        native_vlan = v.native_vlan
+        vlan_id     = s
+        vlan_policy = v.vlan_policy
       }
     ]
   ]) : "${i.vlan_policy}:${i.vlan_id}" => i }
