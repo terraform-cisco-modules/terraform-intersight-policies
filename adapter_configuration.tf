@@ -12,18 +12,21 @@ resource "intersight_adapter_config_policy" "adapter_configuration" {
     moid        = local.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
-  settings {
-    object_type            = "adapter.AdapterConfig"
-    slot_id                = each.value.pci_slot
-    dce_interface_settings = each.value.dce_interface_settings
-    eth_settings {
-      lldp_enabled = each.value.enable_lldp
-    }
-    fc_settings {
-      fip_enabled = each.value.enable_fip
-    }
-    port_channel_settings {
-      enabled = each.value.enable_port_channel
+  dynamic "settings" {
+    for_each = each.value.add_vic_adapter_configuration
+    content {
+      dce_interface_settings = settings.value.dce_interface_settings
+      object_type            = "adapter.AdapterConfig"
+      slot_id                = settings.value.pci_slot
+      eth_settings {
+        lldp_enabled = settings.value.enable_lldp
+      }
+      fc_settings {
+        fip_enabled = settings.value.enable_fip
+      }
+      port_channel_settings {
+        enabled = settings.value.enable_port_channel
+      }
     }
   }
   dynamic "tags" {

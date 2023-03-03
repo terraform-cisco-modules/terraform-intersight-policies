@@ -112,35 +112,39 @@ locals {
   # GUI Location: Policies > Create Policy > Adapter Configuration
   #_________________________________________________________________
   adapter_configuration = {
-    for v in lookup(local.policies, "adapter_configuration", []) : v.name => {
-      dce_interface_settings = [for i in range(4) :
-        {
-          additional_properties = ""
-          class_id              = "adapter.DceInterfaceSettings"
-          fec_mode = length(
-            lookup(lookup(
-              v, "dce_interface_settings", {}
-            ), "dce_interface_fec_modes", local.ladapter.dce_interface_settings.dce_interface_fec_modes)
-            ) == 4 ? element(lookup(lookup(
-              v, "dce_interface_settings", {}
-            ), "dce_interface_fec_modes", local.ladapter.dce_interface_settings.dce_interface_fec_modes), i
-            ) : element(lookup(lookup(
-              v, "dce_interface_settings", {}
-            ), "dce_interface_fec_modes", local.ladapter.dce_interface_settings.dce_interface_fec_modes), 0
-          )
-          interface_id = i
-          object_type  = "adapter.DceInterfaceSettings"
+    for value in lookup(local.policies, "adapter_configuration", []) : value.name => {
+      add_vic_adapter_configuration = [
+        for v in v.add_vic_configuration : {
+          dce_interface_settings = [for i in range(4) :
+            {
+              additional_properties = ""
+              class_id              = "adapter.DceInterfaceSettings"
+              fec_mode = length(
+                lookup(lookup(
+                  v, "dce_interface_settings", {}
+                ), "dce_interface_fec_modes", local.ladapter.dce_interface_settings.dce_interface_fec_modes)
+                ) == 4 ? element(lookup(lookup(
+                  v, "dce_interface_settings", {}
+                ), "dce_interface_fec_modes", local.ladapter.dce_interface_settings.dce_interface_fec_modes), i
+                ) : element(lookup(lookup(
+                  v, "dce_interface_settings", {}
+                ), "dce_interface_fec_modes", local.ladapter.dce_interface_settings.dce_interface_fec_modes), 0
+              )
+              interface_id = i
+              object_type  = "adapter.DceInterfaceSettings"
+            }
+          ]
+          enable_fip          = lookup(v, "enable_fip", local.ladapter.enable_fip)
+          enable_lldp         = lookup(v, "enable_lldp", local.ladapter.enable_lldp)
+          enable_port_channel = lookup(v, "enable_port_channel", local.ladapter.enable_port_channel)
+          fec_modes           = lookup(v, "fec_modes", local.ladapter.fec_modes)
+          pci_slot            = lookup(v, "pci_slot", local.ladapter.pci_slot)
         }
       ]
-      description         = lookup(v, "description", "")
-      enable_fip          = lookup(v, "enable_fip", local.ladapter.enable_fip)
-      enable_lldp         = lookup(v, "enable_lldp", local.ladapter.enable_lldp)
-      enable_port_channel = lookup(v, "enable_port_channel", local.ladapter.enable_port_channel)
-      fec_modes           = lookup(v, "fec_modes", local.ladapter.fec_modes)
-      name                = "${local.name_prefix}${v.name}${local.ladapter.name_suffix}"
-      pci_slot            = lookup(v, "pci_slot", local.ladapter.pci_slot)
+      description         = lookup(value, "description", "")
+      name                = "${local.name_prefix}${value.name}${local.ladapter.name_suffix}"
       organization        = var.organization
-      tags                = lookup(v, "tags", var.tags)
+      tags                = lookup(value, "tags", var.tags)
     }
   }
 
