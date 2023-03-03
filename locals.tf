@@ -1,35 +1,92 @@
 locals {
-  defaults    = lookup(var.model, "defaults", {})
-  intersight  = lookup(var.model, "intersight", {})
-  ladapter    = local.defaults.intersight.policies.adapter_configuration
-  lancon      = local.defaults.intersight.policies.lan_connectivity
-  lbios       = local.defaults.intersight.policies.bios
-  lboot       = local.defaults.intersight.policies.boot_order
-  ldga        = local.defaults.intersight.policies.storage.drive_groups.automatic_drive_groups
-  ldgm        = local.defaults.intersight.policies.storage.drive_groups.manual_drive_groups
-  ldgv        = local.defaults.intersight.policies.storage.drive_groups.virtual_drives
-  ldns        = local.defaults.intersight.policies.network_connectivity
-  leadapter   = local.defaults.intersight.policies.ethernet_adapter
-  lfadapter   = local.defaults.intersight.policies.fibre_channel_adapter
-  liboot      = local.defaults.intersight.policies.iscsi_boot
-  lldap       = local.defaults.intersight.policies.ldap
-  lntp        = local.defaults.intersight.policies.ntp
-  lport       = local.defaults.intersight.policies.port
-  lpmem       = local.defaults.intersight.policies.persistent_memory
-  lscp        = local.defaults.intersight.policies.san_connectivity
-  lsdcard     = local.defaults.intersight.policies.sd_card
-  lsnmp       = local.defaults.intersight.policies.snmp
-  lstorage    = local.defaults.intersight.policies.storage
-  lsyslog     = local.defaults.intersight.policies.syslog
-  lsystem_qos = local.defaults.intersight.policies.system_qos
-  luser       = local.defaults.intersight.policies.local_user
-  lvlan       = local.defaults.intersight.policies.vlan
-  lvsan       = local.defaults.intersight.policies.vsan
-  name_prefix = local.defaults.intersight.policies.name_prefix
-  orgs        = var.pools.orgs
-  policies    = lookup(local.intersight, "policies", {})
-  swctrl      = local.defaults.intersight.policies.switch_control
-  vmedia      = local.defaults.intersight.policies.virtual_media
+  defaults  = var.defaults
+  eth_adapt = local.defaults.ethernet_adapter
+  eth_ntwk_ctrl = distinct(compact(concat([
+    for v in local.vnics : v.ethernet_network_control_policy.name if v.ethernet_network_control_policy.name != "UNUSED"], [
+    for v in local.vnics : v.ethernet_network_control_policy.name if v.ethernet_network_control_policy.name != "UNUSED"]
+  )))
+  eth_ntwk_grp = distinct(compact(concat([
+    for v in local.vnics : v.ethernet_network_group_policy.name if v.ethernet_network_group_policy.name != "UNUSED"], [
+    for v in local.vnics : v.ethernet_network_group_policy.name if v.ethernet_network_group_policy.name != "UNUSED"]
+  )))
+  fc_adapt = local.defaults.fibre_channel_adapter
+  iboot    = local.defaults.iscsi_boot
+  ip_pools = distinct(compact(concat([
+    for v in local.imc_access : v.inband_ip_pool.name if v.inband_ip_pool.name != "UNUSED"], [
+    for v in local.imc_access : v.out_of_band_ip_pool.name if v.out_of_band_ip_pool.name != "UNUSED"], [
+    for v in local.iscsi_boot : v.initiator_ip_pool.name if v.initiator_ip_pool.name != "UNUSED"]
+  )))
+  iadapter = distinct(compact([
+    for v in local.iscsi_boot : v.iscsi_adapter_policy.name if v.iscsi_adapter_policy.name != "UNUSED"]
+  ))
+  iqn_pools = distinct(compact([
+    for v in local.lan_connectivity : v.iqn_pool.name if v.iqn_pool.name != "UNUSED"]
+  ))
+  itarget = distinct(compact(concat([
+    for v in local.iscsi_boot : v.primary_target_policy.name if v.primary_target_policy.name != "UNUSED"], [
+    for v in local.iscsi_boot : v.secondary_target_policy.name if v.secondary_target_policy.name != "UNUSED"]
+  )))
+  ladapter = local.defaults.adapter_configuration
+  lcp      = local.defaults.lan_connectivity
+  lcp_eth_adtr = distinct(compact(concat([
+    for v in local.vnics : v.ethernet_adapter_policy.name if v.ethernet_adapter_policy.name != "UNUSED"], [
+    for v in local.vnics : v.usnic_adapter_policy.name if v.usnic_adapter_policy.name != "UNUSED"], [
+    for v in local.vnics : v.vmq_vmmq_adapter_policy.name if v.vmq_vmmq_adapter_policy.name != "UNUSED"]
+  )))
+  lcp_eth_ntwk = distinct(compact([
+    for v in local.vnics : v.ethernet_network_policy.name if v.ethernet_network_policy.name != "UNUSED"]
+  ))
+  lcp_eth_qos = distinct(compact([
+    for v in local.vnics : v.ethernet_qos_policy.name if v.ethernet_qos_policy.name != "UNUSED"]
+  ))
+  lcp_iboot = distinct(compact([
+    for v in local.vnics : v.iscsi_boot_policy.name if v.iscsi_boot_policy.name != "UNUSED"]
+  ))
+  lbios       = local.defaults.bios
+  lboot       = local.defaults.boot_order
+  ldga        = local.defaults.storage.drive_groups.automatic_drive_groups
+  ldgm        = local.defaults.storage.drive_groups.manual_drive_groups
+  ldgv        = local.defaults.storage.drive_groups.virtual_drives
+  ldns        = local.defaults.network_connectivity
+  lldap       = local.defaults.ldap
+  lntp        = local.defaults.ntp
+  lport       = local.defaults.port
+  lpmem       = local.defaults.persistent_memory
+  lscp        = local.defaults.san_connectivity
+  lsnmp       = local.defaults.snmp
+  lstorage    = local.defaults.storage
+  lsyslog     = local.defaults.syslog
+  lsystem_qos = local.defaults.system_qos
+  luser       = local.defaults.local_user
+  lvlan       = local.defaults.vlan
+  lvsan       = local.defaults.vsan
+  mac_pools = distinct(compact([
+    for v in local.vnics : v.mac_address_pool.name if v.mac_address_pool.name != "UNUSED"]
+  ))
+  mcast = distinct(compact([
+    for v in local.vlans : v.multicast_policy.name if v.multicast_policy.name != "UNUSED"]
+  ))
+  name_prefix = local.defaults.name_prefix
+  orgs        = { for k, v in data.intersight_organization_organization.orgs.results : v.name => v.moid }
+  policies    = var.policies
+  scp_fc_adtr = distinct(compact(concat([
+    for v in local.vhbas : v.fibre_channel_adapter_policy.name if v.fibre_channel_adapter_policy.name != "UNUSED"]
+  )))
+  scp_fc_ntwk = distinct(compact([
+    for v in local.vhbas : v.fibre_channel_network_policy.name if v.fibre_channel_network_policy.name != "UNUSED"]
+  ))
+  scp_fc_qos = distinct(compact([
+    for v in local.vhbas : v.fibre_channel_qos_policy.name if v.fibre_channel_qos_policy.name != "UNUSED"]
+  ))
+  scp_fc_zone = distinct(compact(flatten([for v in local.vhbas : v.fc_zone_policies])))
+  swctrl      = local.defaults.switch_control
+  vmedia      = local.defaults.virtual_media
+  wwnn_pools = distinct(compact([
+    for v in local.san_connectivity : v.wwnn_pool.name if v.wwnn_pool.name != "UNUSED"]
+  ))
+  wwpn_pools = distinct(compact([
+    for v in local.vhbas : v.wwpn_pool.name if v.wwpn_pool.name != "UNUSED"]
+  ))
   #_________________________________________________________________
   #
   # Intersight Adapter Configuration Policy
@@ -37,13 +94,20 @@ locals {
   #_________________________________________________________________
   adapter_configuration = {
     for v in lookup(local.policies, "adapter_configuration", []) : v.name => {
-      dce_interface_settings = [for i in range(lookup(v, "adapter_ports", local.ladapter.adapter_ports)) :
+      dce_interface_settings = [for i in range(4) :
         {
           additional_properties = ""
           class_id              = "adapter.DceInterfaceSettings"
           fec_mode = length(
-            lookup(v, "fec_modes", ["cl91"])) == 1 ? element(lookup(v, "fec_modes", ["cl91"]), 0
-            ) : element(lookup(v, "fec_modes", ["cl91"]), i
+            lookup(lookup(
+              v, "dce_interface_settings", {}
+            ), "dce_interface_fec_modes", local.ladapter.dce_interface_settings.dce_interface_fec_modes)
+            ) == 4 ? element(lookup(lookup(
+              v, "dce_interface_settings", {}
+            ), "dce_interface_fec_modes", local.ladapter.dce_interface_settings.dce_interface_fec_modes), i
+            ) : element(lookup(lookup(
+              v, "dce_interface_settings", {}
+            ), "dce_interface_fec_modes", local.ladapter.dce_interface_settings.dce_interface_fec_modes), 0
           )
           interface_id = i
           object_type  = "adapter.DceInterfaceSettings"
@@ -56,7 +120,7 @@ locals {
       fec_modes           = lookup(v, "fec_modes", local.ladapter.fec_modes)
       name                = "${local.name_prefix}${v.name}${local.ladapter.name_suffix}"
       pci_slot            = lookup(v, "pci_slot", local.ladapter.pci_slot)
-      organization        = lookup(v, "organization", var.organization)
+      organization        = var.organization
       tags                = lookup(v, "tags", var.tags)
     }
   }
@@ -71,7 +135,7 @@ locals {
       bios_template = lookup(v, "bios_template", "")
       description   = lookup(v, "description", "")
       name          = "${local.name_prefix}${v.name}${local.lbios.name_suffix}"
-      organization  = lookup(v, "organization", var.organization)
+      organization  = var.organization
       tags          = lookup(v, "tags", var.tags)
       #+++++++++++++++++++++++++++++++
       # Boot Options Section
@@ -662,64 +726,64 @@ locals {
   ethernet_adapter = {
     for v in lookup(local.policies, "ethernet_adapter", []) : v.name => {
       adapter_template       = lookup(v, "adapter_template", "")
-      completion_queue_count = lookup(v, "completion_queue_count", local.leadapter.completion_queue_count)
-      completion_ring_size   = lookup(v, "completion_ring_size", local.leadapter.completion_ring_size)
+      completion_queue_count = lookup(v, "completion_queue_count", local.eth_adapt.completion_queue_count)
+      completion_ring_size   = lookup(v, "completion_ring_size", local.eth_adapt.completion_ring_size)
       description            = lookup(v, "description", "")
       enable_accelerated_receive_flow_steering = lookup(
-        v, "enable_accelerated_receive_flow_steering", local.leadapter.enable_accelerated_receive_flow_steering
+        v, "enable_accelerated_receive_flow_steering", local.eth_adapt.enable_accelerated_receive_flow_steering
       )
-      enable_advanced_filter   = lookup(v, "enable_advanced_filter", local.leadapter.enable_advanced_filter)
-      enable_geneve_offload    = lookup(v, "enable_geneve_offload", local.leadapter.enable_geneve_offload)
-      enable_interrupt_scaling = lookup(v, "enable_interrupt_scaling", local.leadapter.enable_interrupt_scaling)
-      enable_nvgre_offload     = lookup(v, "enable_nvgre_offload", local.leadapter.enable_nvgre_offload)
-      enable_vxlan_offload     = lookup(v, "enable_vxlan_offload", local.leadapter.enable_vxlan_offload)
+      enable_advanced_filter   = lookup(v, "enable_advanced_filter", local.eth_adapt.enable_advanced_filter)
+      enable_geneve_offload    = lookup(v, "enable_geneve_offload", local.eth_adapt.enable_geneve_offload)
+      enable_interrupt_scaling = lookup(v, "enable_interrupt_scaling", local.eth_adapt.enable_interrupt_scaling)
+      enable_nvgre_offload     = lookup(v, "enable_nvgre_offload", local.eth_adapt.enable_nvgre_offload)
+      enable_vxlan_offload     = lookup(v, "enable_vxlan_offload", local.eth_adapt.enable_vxlan_offload)
       interrupt_coalescing_type = lookup(
-        v, "interrupt_coalescing_type", local.leadapter.interrupt_coalescing_type
+        v, "interrupt_coalescing_type", local.eth_adapt.interrupt_coalescing_type
       )
-      interrupt_mode  = lookup(v, "interrupt_mode", local.leadapter.interrupt_mode)
-      interrupt_timer = lookup(v, "interrupt_timer", local.leadapter.interrupt_timer)
-      interrupts      = lookup(v, "interrupts", local.leadapter.interrupts)
-      name            = "${local.name_prefix}${v.name}${local.leadapter.name_suffix}"
-      organization    = lookup(v, "organization", var.organization)
+      interrupt_mode  = lookup(v, "interrupt_mode", local.eth_adapt.interrupt_mode)
+      interrupt_timer = lookup(v, "interrupt_timer", local.eth_adapt.interrupt_timer)
+      interrupts      = lookup(v, "interrupts", local.eth_adapt.interrupts)
+      name            = "${local.name_prefix}${v.name}${local.eth_adapt.name_suffix}"
+      organization    = var.organization
       receive_side_scaling_enable = lookup(
-        v, "receive_side_scaling_enable", local.leadapter.receive_side_scaling_enable
+        v, "receive_side_scaling_enable", local.eth_adapt.receive_side_scaling_enable
       )
-      roce_cos             = lookup(v, "roce_cos", local.leadapter.roce_cos)
-      roce_enable          = lookup(v, "roce_enable", local.leadapter.roce_enable)
-      roce_memory_regions  = lookup(v, "roce_memory_regions", local.leadapter.roce_memory_regions)
-      roce_queue_pairs     = lookup(v, "roce_queue_pairs", local.leadapter.roce_queue_pairs)
-      roce_resource_groups = lookup(v, "roce_resource_groups", local.leadapter.roce_resource_groups)
-      roce_version         = lookup(v, "roce_version", local.leadapter.roce_version)
-      rss_enable_ipv4_hash = lookup(v, "rss_enable_ipv4_hash", local.leadapter.rss_enable_ipv4_hash)
+      roce_cos             = lookup(v, "roce_cos", local.eth_adapt.roce_cos)
+      roce_enable          = lookup(v, "roce_enable", local.eth_adapt.roce_enable)
+      roce_memory_regions  = lookup(v, "roce_memory_regions", local.eth_adapt.roce_memory_regions)
+      roce_queue_pairs     = lookup(v, "roce_queue_pairs", local.eth_adapt.roce_queue_pairs)
+      roce_resource_groups = lookup(v, "roce_resource_groups", local.eth_adapt.roce_resource_groups)
+      roce_version         = lookup(v, "roce_version", local.eth_adapt.roce_version)
+      rss_enable_ipv4_hash = lookup(v, "rss_enable_ipv4_hash", local.eth_adapt.rss_enable_ipv4_hash)
       rss_enable_ipv6_extensions_hash = lookup(
-        v, "rss_enable_ipv6_extensions_hash", local.leadapter.rss_enable_ipv6_extensions_hash
+        v, "rss_enable_ipv6_extensions_hash", local.eth_adapt.rss_enable_ipv6_extensions_hash
       )
-      rss_enable_ipv6_hash = lookup(v, "rss_enable_ipv6_hash", local.leadapter.rss_enable_ipv6_hash)
+      rss_enable_ipv6_hash = lookup(v, "rss_enable_ipv6_hash", local.eth_adapt.rss_enable_ipv6_hash)
       rss_enable_tcp_and_ipv4_hash = lookup(
-        v, "rss_enable_tcp_and_ipv4_hash", local.leadapter.rss_enable_tcp_and_ipv4_hash
+        v, "rss_enable_tcp_and_ipv4_hash", local.eth_adapt.rss_enable_tcp_and_ipv4_hash
       )
       rss_enable_tcp_and_ipv6_extensions_hash = lookup(
-        v, "rss_enable_tcp_and_ipv6_extensions_hash", local.leadapter.rss_enable_tcp_and_ipv6_extensions_hash
+        v, "rss_enable_tcp_and_ipv6_extensions_hash", local.eth_adapt.rss_enable_tcp_and_ipv6_extensions_hash
       )
       rss_enable_tcp_and_ipv6_hash = lookup(
-        v, "rss_enable_tcp_and_ipv6_hash", local.leadapter.rss_enable_tcp_and_ipv6_hash
+        v, "rss_enable_tcp_and_ipv6_hash", local.eth_adapt.rss_enable_tcp_and_ipv6_hash
       )
       rss_enable_udp_and_ipv4_hash = lookup(
-        v, "rss_enable_udp_and_ipv4_hash", local.leadapter.rss_enable_udp_and_ipv4_hash
+        v, "rss_enable_udp_and_ipv4_hash", local.eth_adapt.rss_enable_udp_and_ipv4_hash
       )
       rss_enable_udp_and_ipv6_hash = lookup(
-        v, "rss_enable_udp_and_ipv6_hash", local.leadapter.rss_enable_udp_and_ipv6_hash
+        v, "rss_enable_udp_and_ipv6_hash", local.eth_adapt.rss_enable_udp_and_ipv6_hash
       )
-      receive_queue_count       = lookup(v, "receive_queue_count", local.leadapter.receive_queue_count)
-      receive_ring_size         = lookup(v, "receive_ring_size", local.leadapter.receive_ring_size)
+      receive_queue_count       = lookup(v, "receive_queue_count", local.eth_adapt.receive_queue_count)
+      receive_ring_size         = lookup(v, "receive_ring_size", local.eth_adapt.receive_ring_size)
       tags                      = lookup(v, "tags", var.tags)
-      tcp_offload_large_recieve = lookup(v, "tcp_offload_large_recieve", local.leadapter.tcp_offload_large_recieve)
-      tcp_offload_large_send    = lookup(v, "tcp_offload_large_send", local.leadapter.tcp_offload_large_send)
-      tcp_offload_rx_checksum   = lookup(v, "tcp_offload_rx_checksum", local.leadapter.tcp_offload_rx_checksum)
-      tcp_offload_tx_checksum   = lookup(v, "tcp_offload_tx_checksum", local.leadapter.tcp_offload_tx_checksum)
-      transmit_queue_count      = lookup(v, "transmit_queue_count", local.leadapter.transmit_queue_count)
-      transmit_ring_size        = lookup(v, "transmit_ring_size", local.leadapter.transmit_ring_size)
-      uplink_failback_timeout   = lookup(v, "uplink_failback_timeout", local.leadapter.uplink_failback_timeout)
+      tcp_offload_large_recieve = lookup(v, "tcp_offload_large_recieve", local.eth_adapt.tcp_offload_large_recieve)
+      tcp_offload_large_send    = lookup(v, "tcp_offload_large_send", local.eth_adapt.tcp_offload_large_send)
+      tcp_offload_rx_checksum   = lookup(v, "tcp_offload_rx_checksum", local.eth_adapt.tcp_offload_rx_checksum)
+      tcp_offload_tx_checksum   = lookup(v, "tcp_offload_tx_checksum", local.eth_adapt.tcp_offload_tx_checksum)
+      transmit_queue_count      = lookup(v, "transmit_queue_count", local.eth_adapt.transmit_queue_count)
+      transmit_ring_size        = lookup(v, "transmit_ring_size", local.eth_adapt.transmit_ring_size)
+      uplink_failback_timeout   = lookup(v, "uplink_failback_timeout", local.eth_adapt.uplink_failback_timeout)
     }
   }
 
@@ -732,38 +796,143 @@ locals {
     for v in lookup(local.policies, "fibre_channel_adapter", []) : v.name => {
       adapter_template          = lookup(v, "adapter_template", "")
       description               = lookup(v, "description", "")
-      error_detection_timeout   = lookup(v, "error_detection_timeout", local.lfadapter.error_detection_timeout)
-      enable_fcp_error_recovery = lookup(v, "enable_fcp_error_recovery", local.lfadapter.enable_fcp_error_recovery)
+      error_detection_timeout   = lookup(v, "error_detection_timeout", local.fc_adapt.error_detection_timeout)
+      enable_fcp_error_recovery = lookup(v, "enable_fcp_error_recovery", local.fc_adapt.enable_fcp_error_recovery)
       error_recovery_io_retry_timeout = lookup(
-        v, "error_recovery_io_retry_timeout", local.lfadapter.error_recovery_io_retry_timeout
+        v, "error_recovery_io_retry_timeout", local.fc_adapt.error_recovery_io_retry_timeout
       )
       error_recovery_link_down_timeout = lookup(
-        v, "error_recovery_link_down_timeout", local.lfadapter.error_recovery_link_down_timeout
+        v, "error_recovery_link_down_timeout", local.fc_adapt.error_recovery_link_down_timeout
       )
       error_recovery_port_down_io_retry = lookup(
-        v, "error_recovery_port_down_io_retry", local.lfadapter.error_recovery_port_down_io_retry
+        v, "error_recovery_port_down_io_retry", local.fc_adapt.error_recovery_port_down_io_retry
       )
       error_recovery_port_down_timeout = lookup(
-        v, "error_recovery_port_down_timeout", local.lfadapter.error_recovery_port_down_timeout
+        v, "error_recovery_port_down_timeout", local.fc_adapt.error_recovery_port_down_timeout
       )
-      flogi_retries       = lookup(v, "flogi_retries", local.lfadapter.flogi_retries)
-      flogi_timeout       = lookup(v, "flogi_timeout", local.lfadapter.flogi_timeout)
-      interrupt_mode      = lookup(v, "interrupt_mode", local.lfadapter.interrupt_mode)
-      io_throttle_count   = lookup(v, "io_throttle_count", local.lfadapter.io_throttle_count)
-      lun_queue_depth     = lookup(v, "lun_queue_depth", local.lfadapter.lun_queue_depth)
-      max_luns_per_target = lookup(v, "max_luns_per_target", local.lfadapter.max_luns_per_target)
-      name                = "${local.name_prefix}${v.name}${local.lfadapter.name_suffix}"
-      organization        = lookup(v, "organization", var.organization)
-      plogi_retries       = lookup(v, "plogi_retries", local.lfadapter.plogi_retries)
-      plogi_timeout       = lookup(v, "plogi_timeout", local.lfadapter.plogi_timeout)
-      receive_ring_size   = lookup(v, "receive_ring_size", local.lfadapter.receive_ring_size)
+      flogi_retries       = lookup(v, "flogi_retries", local.fc_adapt.flogi_retries)
+      flogi_timeout       = lookup(v, "flogi_timeout", local.fc_adapt.flogi_timeout)
+      interrupt_mode      = lookup(v, "interrupt_mode", local.fc_adapt.interrupt_mode)
+      io_throttle_count   = lookup(v, "io_throttle_count", local.fc_adapt.io_throttle_count)
+      lun_queue_depth     = lookup(v, "lun_queue_depth", local.fc_adapt.lun_queue_depth)
+      max_luns_per_target = lookup(v, "max_luns_per_target", local.fc_adapt.max_luns_per_target)
+      name                = "${local.name_prefix}${v.name}${local.fc_adapt.name_suffix}"
+      organization        = var.organization
+      plogi_retries       = lookup(v, "plogi_retries", local.fc_adapt.plogi_retries)
+      plogi_timeout       = lookup(v, "plogi_timeout", local.fc_adapt.plogi_timeout)
+      receive_ring_size   = lookup(v, "receive_ring_size", local.fc_adapt.receive_ring_size)
       resource_allocation_timeout = lookup(
-        v, "resource_allocation_timeout", local.lfadapter.resource_allocation_timeout
+        v, "resource_allocation_timeout", local.fc_adapt.resource_allocation_timeout
       )
-      scsi_io_queue_count = lookup(v, "scsi_io_queue_count", local.lfadapter.scsi_io_queue_count)
-      scsi_io_ring_size   = lookup(v, "scsi_io_ring_size", local.lfadapter.scsi_io_ring_size)
+      scsi_io_queue_count = lookup(v, "scsi_io_queue_count", local.fc_adapt.scsi_io_queue_count)
+      scsi_io_ring_size   = lookup(v, "scsi_io_ring_size", local.fc_adapt.scsi_io_ring_size)
       tags                = lookup(v, "tags", var.tags)
-      transmit_ring_size  = lookup(v, "transmit_ring_size", local.lfadapter.transmit_ring_size)
+      transmit_ring_size  = lookup(v, "transmit_ring_size", local.fc_adapt.transmit_ring_size)
+    }
+  }
+
+  #__________________________________________________________________
+  #
+  # Intersight IMC Access Policy
+  # GUI Location: Policies > Create Policy > IMC Access
+  #__________________________________________________________________
+  imc_access = {
+    for v in lookup(local.policies, "imc_access", {}) : v.name => {
+      description    = lookup(v, "description", "")
+      inband_vlan_id = lookup(v, "inband_vlan_id", local.defaults.imc_access.inband_vlan_id)
+      name           = "${local.name_prefix}${v.name}${local.defaults.imc_access.name_suffix}"
+      ipv4_address_configuration = lookup(
+        v, "ipv4_address_configuration", local.defaults.imc_access.ipv4_address_configuration
+      )
+      ipv6_address_configuration = lookup(
+        v, "ipv6_address_configuration", local.defaults.imc_access.ipv6_address_configuration
+      )
+      inband_ip_pool = lookup(v, "inband_ip_pool", null) != null ? try(
+        {
+          name         = tostring(v.inband_ip_pool)
+          organization = var.organization
+        },
+        v.inband_ip_pool
+        ) : {
+        name         = "UNUSED"
+        organization = "UNUSED"
+      }
+      organization = var.organization
+      out_of_band_ip_pool = lookup(v, "out_of_band_ip_pool", null) != null ? try(
+        {
+          name         = tostring(v.out_of_band_ip_pool)
+          organization = var.organization
+        },
+        v.out_of_band_ip_pool
+        ) : {
+        name         = "UNUSED"
+        organization = "UNUSED"
+      }
+      tags = lookup(v, "tags", var.tags)
+    }
+  }
+
+  #__________________________________________________________________
+  #
+  # Intersight IMC Access Policy
+  # GUI Location: Policies > Create Policy > IMC Access
+  #__________________________________________________________________
+  iscsi_boot = {
+    for v in lookup(local.policies, "iscsi_boot", {}) : v.name => {
+      authentication     = lookup(v, "authentication", local.defaults.iscsi_boot.authentication)
+      dhcp_vendor_id_iqn = lookup(v, "dhcp_vendor_id_iqn", local.iboot.dhcp_vendor_id_iqn)
+      description        = lookup(v, "description", "")
+      gateway            = lookup(lookup(v, "initiator_static_ipv4_config", {}), "default_gateway", "")
+      initiator_ip_pool = lookup(v, "initiator_ip_pool", null) != null ? try(
+        {
+          name         = tostring(v.initiator_ip_pool)
+          organization = var.organization
+        },
+        v.initiator_ip_pool
+        ) : {
+        name         = "UNUSED"
+        organization = "UNUSED"
+      }
+      initiator_ip_source = lookup(v, "initiator_ip_source", local.iboot.initiator_ip_source)
+      ip_address          = lookup(lookup(v, "initiator_static_ipv4_config", {}), "ip_address", "")
+      iscsi_adapter_policy = lookup(v, "iscsi_adapter_policy", null) != null ? try(
+        {
+          name         = tostring(v.iscsi_adapter_policy)
+          organization = var.organization
+        },
+        v.iscsi_adapter_policy
+        ) : {
+        name         = "UNUSED"
+        organization = "UNUSED"
+      }
+      name         = "${local.name_prefix}${v.name}${local.iboot.name_suffix}"
+      netmask      = lookup(lookup(v, "initiator_static_ipv4_config", {}), "subnet_mask", "")
+      organization = var.organization
+      primary_dns  = lookup(lookup(v, "initiator_static_ipv4_config", {}), "primary_dns", "")
+      primary_target_policy = lookup(v, "primary_target_policy", null) != null ? try(
+        {
+          name         = tostring(v.primary_target_policy)
+          organization = var.organization
+        },
+        v.primary_target_policy
+        ) : {
+        name         = "UNUSED"
+        organization = "UNUSED"
+      }
+      secondary_dns = lookup(lookup(v, "initiator_static_ipv4_config", {}), "secondary_dns", "")
+      secondary_target_policy = lookup(v, "secondary_target_policy", null) != null ? try(
+        {
+          name         = tostring(v.secondary_target_policy)
+          organization = var.organization
+        },
+        v.secondary_target_policy
+        ) : {
+        name         = "UNUSED"
+        organization = "UNUSED"
+      }
+      tags               = lookup(v, "tags", var.tags)
+      target_source_type = lookup(v, "target_source_type", local.iboot.target_source_type)
+      username           = lookup(v, "username", "")
     }
   }
 
@@ -773,83 +942,92 @@ locals {
   # GUI Location: Configure > Policies > Create Policy > LAN Connectivity
   #_________________________________________________________________________
   lan_connectivity = {
-    for v in lookup(local.policies, "lan_connectivity", []) : v.name => {
+    for v in lookup(local.policies, "lan_connectivity", {}) : v.name => {
       description = lookup(v, "description", "")
       enable_azure_stack_host_qos = lookup(
-        v, "enable_azure_stack_host_qos", local.lancon.enable_azure_stack_host_qos
+        v, "enable_azure_stack_host_qos", local.lcp.enable_azure_stack_host_qos
       )
       iqn_allocation_type = lookup(
-        v, "iqn_allocation_type", local.lancon.iqn_allocation_type
+        v, "iqn_allocation_type", local.lcp.iqn_allocation_type
       )
-      iqn_pool = length(compact([lookup(v, "iqn_pool", "")])) > 0 ? var.pools.iqn[v.iqn_pool].moid : ""
+      iqn_pool = lookup(v, "iqn_pool", null) != null ? try(
+        {
+          name         = tostring(v.iqn_pool)
+          organization = var.organization
+        },
+        v.iqn_pool
+        ) : {
+        name         = "UNUSED"
+        organization = "UNUSED"
+      }
       iqn_static_identifier = lookup(
         v, "iqn_static_identifier", ""
       )
-      name            = "${local.name_prefix}${v.name}${local.lancon.name_suffix}"
-      organization    = lookup(v, "organization", var.organization)
+      name            = "${local.name_prefix}${v.name}${local.lcp.name_suffix}"
+      organization    = var.organization
       tags            = lookup(v, "tags", var.tags)
-      target_platform = lookup(v, "target_platform", local.lancon.target_platform)
+      target_platform = lookup(v, "target_platform", local.lcp.target_platform)
       vnic_placement_mode = lookup(
-        v, "vnic_placement_mode", local.lancon.vnic_placement_mode
+        v, "vnic_placement_mode", local.lcp.vnic_placement_mode
       )
       vnics = [
         for v in lookup(v, "vnics", []) : {
-          cdn_source      = lookup(v, "cdn_source", local.lancon.vnics.cdn_source)
-          cdn_values      = lookup(v, "cdn_values", local.lancon.vnics.cdn_values)
+          cdn_source      = lookup(v, "cdn_source", local.lcp.vnics.cdn_source)
+          cdn_values      = lookup(v, "cdn_values", local.lcp.vnics.cdn_values)
           enable_failover = lookup(v, "enable_failover", null)
           ethernet_adapter_policy = lookup(
-            v, "ethernet_adapter_policy", local.lancon.vnics.ethernet_adapter_policy
+            v, "ethernet_adapter_policy", local.lcp.vnics.ethernet_adapter_policy
           )
           ethernet_network_control_policy = lookup(
-            v, "ethernet_network_control_policy", local.lancon.vnics.ethernet_network_control_policy
+            v, "ethernet_network_control_policy", local.lcp.vnics.ethernet_network_control_policy
           )
           ethernet_network_group_policy = lookup(
-            v, "ethernet_network_group_policy", local.lancon.vnics.ethernet_network_group_policy
+            v, "ethernet_network_group_policy", local.lcp.vnics.ethernet_network_group_policy
           )
           ethernet_network_policy = lookup(
-            v, "ethernet_network_policy", local.lancon.vnics.ethernet_network_policy
+            v, "ethernet_network_policy", local.lcp.vnics.ethernet_network_policy
           )
           ethernet_qos_policy = lookup(
-            v, "ethernet_qos_policy", local.lancon.vnics.ethernet_qos_policy
+            v, "ethernet_qos_policy", local.lcp.vnics.ethernet_qos_policy
           )
           iscsi_boot_policy = lookup(
-            v, "iscsi_boot_policy", local.lancon.vnics.iscsi_boot_policy
+            v, "iscsi_boot_policy", local.lcp.vnics.iscsi_boot_policy
           )
           mac_address_allocation_type = lookup(
-            v, "mac_address_allocation_type", local.lancon.vnics.mac_address_allocation_type
+            v, "mac_address_allocation_type", local.lcp.vnics.mac_address_allocation_type
           )
-          mac_address_pools    = lookup(v, "mac_address_pools", local.lancon.vnics.mac_address_pools)
+          mac_address_pools    = lookup(v, "mac_address_pools", local.lcp.vnics.mac_address_pools)
           mac_addresses_static = lookup(v, "mac_addresses_static", [])
           names                = v.names
           placement_pci_links = lookup(
-            v, "placement_pci_links", local.lancon.vnics.placement_pci_links
+            v, "placement_pci_links", local.lcp.vnics.placement_pci_links
           )
           placement_pci_order = lookup(
-            v, "placement_pci_order", local.lancon.vnics.placement_pci_order
+            v, "placement_pci_order", local.lcp.vnics.placement_pci_order
           )
           placement_slot_ids = lookup(
-            v, "placement_slot_ids", local.lancon.vnics.placement_slot_ids
+            v, "placement_slot_ids", local.lcp.vnics.placement_slot_ids
           )
           placement_switch_id = lookup(
-            v, "placement_switch_id", local.lancon.vnics.placement_switch_id
+            v, "placement_switch_id", local.lcp.vnics.placement_switch_id
           )
           placement_uplink_ports = lookup(
-            v, "placement_uplink_ports", local.lancon.vnics.placement_uplink_ports
+            v, "placement_uplink_ports", local.lcp.vnics.placement_uplink_ports
           )
-          usnic_adapter_policy = lookup(v, "usnic_adapter_policy", local.lancon.vnics.usnic_adapter_policy)
+          usnic_adapter_policy = lookup(v, "usnic_adapter_policy", local.lcp.vnics.usnic_adapter_policy)
           usnic_number_of_usnics = lookup(
-            v, "usnic_number_of_usnics", local.lancon.vnics.usnic_number_of_usnics
+            v, "usnic_number_of_usnics", local.lcp.vnics.usnic_number_of_usnics
           )
           vmq_enable_virtual_machine_multi_queue = lookup(
-            v, "vmq_enable_virtual_machine_multi_queue", local.lancon.vnics.vmq_enable_virtual_machine_multi_queue
+            v, "vmq_enable_virtual_machine_multi_queue", local.lcp.vnics.vmq_enable_virtual_machine_multi_queue
           )
-          vmq_enabled              = lookup(v, "vmq_enabled", local.lancon.vnics.vmq_enabled)
-          vmq_number_of_interrupts = lookup(v, "vmq_number_of_interrupts", local.lancon.vnics.vmq_number_of_interrupts)
-          vmq_number_of_sub_vnics  = lookup(v, "vmq_number_of_sub_vnics", local.lancon.vnics.vmq_number_of_sub_vnics)
+          vmq_enabled              = lookup(v, "vmq_enabled", local.lcp.vnics.vmq_enabled)
+          vmq_number_of_interrupts = lookup(v, "vmq_number_of_interrupts", local.lcp.vnics.vmq_number_of_interrupts)
+          vmq_number_of_sub_vnics  = lookup(v, "vmq_number_of_sub_vnics", local.lcp.vnics.vmq_number_of_sub_vnics)
           vmq_number_of_virtual_machine_queues = lookup(
-            v, "vmq_number_of_virtual_machine_queues", local.lancon.vnics.vmq_number_of_virtual_machine_queues
+            v, "vmq_number_of_virtual_machine_queues", local.lcp.vnics.vmq_number_of_virtual_machine_queues
           )
-          vmq_vmmq_adapter_policy = lookup(v, "vmq_vmmq_adapter_policy", local.lancon.vnics.vmq_vmmq_adapter_policy)
+          vmq_vmmq_adapter_policy = lookup(v, "vmq_vmmq_adapter_policy", local.lcp.vnics.vmq_vmmq_adapter_policy)
         }
       ]
     }
@@ -861,17 +1039,79 @@ locals {
           cdn_source = v.cdn_source
           cdn_value  = length(v.cdn_values) > 0 ? element(v.cdn_values, s) : ""
           enable_failover = length(compact([v.enable_failover])
-          ) > 0 ? v.enable_failover : length(v.names) == 1 ? true : local.lancon.vnics.enable_failover
-          ethernet_adapter_policy         = v.ethernet_adapter_policy
-          ethernet_network_control_policy = v.ethernet_network_control_policy
-          ethernet_network_group_policy   = v.ethernet_network_group_policy
-          ethernet_network_policy         = v.ethernet_network_policy
-          ethernet_qos_policy             = v.ethernet_qos_policy
-          iscsi_boot_policy               = v.iscsi_boot_policy
-          lan_connectivity                = value.name
-          mac_address_allocation_type     = v.mac_address_allocation_type
-          mac_address_pool = length(v.mac_address_pools
-          ) > 0 ? element(v.mac_address_pools, s) : ""
+          ) > 0 ? v.enable_failover : length(v.names) == 1 ? true : local.lcp.vnics.enable_failover
+          ethernet_adapter_policy = v.ethernet_adapter_policy != "" ? try(
+            {
+              name         = tostring(v.ethernet_adapter_policy)
+              organization = var.organization
+            },
+            v.ethernet_adapter_policy
+            ) : {
+            name         = "UNUSED"
+            organization = "UNUSED"
+          }
+          ethernet_network_control_policy = v.ethernet_network_control_policy != "" ? try(
+            {
+              name         = tostring(v.ethernet_network_control_policy)
+              organization = var.organization
+            },
+            v.ethernet_network_control_policy
+            ) : {
+            name         = "UNUSED"
+            organization = "UNUSED"
+          }
+          ethernet_network_group_policy = v.ethernet_network_group_policy != "" ? try(
+            {
+              name         = tostring(v.ethernet_network_group_policy)
+              organization = var.organization
+            },
+            v.ethernet_network_group_policy
+            ) : {
+            name         = "UNUSED"
+            organization = "UNUSED"
+          }
+          ethernet_network_policy = v.ethernet_network_policy != "" ? try(
+            {
+              name         = tostring(v.ethernet_network_policy)
+              organization = var.organization
+            },
+            v.ethernet_network_policy
+            ) : {
+            name         = "UNUSED"
+            organization = "UNUSED"
+          }
+          ethernet_qos_policy = v.ethernet_qos_policy != "" ? try(
+            {
+              name         = tostring(v.ethernet_qos_policy)
+              organization = var.organization
+            },
+            v.ethernet_qos_policy
+            ) : {
+            name         = "UNUSED"
+            organization = "UNUSED"
+          }
+          iscsi_boot_policy = v.iscsi_boot_policy != "" ? try(
+            {
+              name         = tostring(v.iscsi_boot_policy)
+              organization = var.organization
+            },
+            v.iscsi_boot_policy
+            ) : {
+            name         = "UNUSED"
+            organization = "UNUSED"
+          }
+          lan_connectivity            = value.name
+          mac_address_allocation_type = v.mac_address_allocation_type
+          mac_address_pool = length(v.mac_address_pools) > 0 ? try(
+            {
+              name         = tostring(element(v.mac_address_pools, s))
+              organization = var.organization
+            },
+            element(v.mac_address_pools, s)
+            ) : {
+            name         = "UNUSED"
+            organization = "UNUSED"
+          }
           mac_address_static = length(lookup(v, "mac_addresses_static", [])
           ) > 0 ? element(v.mac_addresses_static, s) : ""
           name = element(v.names, s)
@@ -888,8 +1128,17 @@ locals {
           placement_uplink_port = length(v.placement_uplink_ports) == 1 ? element(
             v.placement_uplink_ports, 0) : element(v.placement_uplink_ports, s
           )
-          tags                                   = value.tags
-          usnic_adapter_policy                   = v.usnic_adapter_policy
+          tags = value.tags
+          usnic_adapter_policy = v.usnic_adapter_policy != "" ? try(
+            {
+              name         = tostring(v.usnic_adapter_policy)
+              organization = var.organization
+            },
+            v.usnic_adapter_policy
+            ) : {
+            name         = "UNUSED"
+            organization = "UNUSED"
+          }
           usnic_class_of_service                 = lookup(v, "usnic_class_of_service", 5)
           usnic_number_of_usnics                 = lookup(v, "usnic_number_of_usnics", 0)
           vmq_enable_virtual_machine_multi_queue = v.vmq_enable_virtual_machine_multi_queue
@@ -897,7 +1146,16 @@ locals {
           vmq_number_of_interrupts               = lookup(v, "vmq_number_of_interrupts", 16)
           vmq_number_of_sub_vnics                = lookup(v, "vmq_number_of_sub_vnics", 64)
           vmq_number_of_virtual_machine_queues   = lookup(v, "vmq_number_of_virtual_machine_queues", 4)
-          vmq_vmmq_adapter_policy                = v.vmq_vmmq_adapter_policy
+          vmq_vmmq_adapter_policy = v.vmq_vmmq_adapter_policy != "" ? try(
+            {
+              name         = tostring(v.vmq_vmmq_adapter_policy)
+              organization = var.organization
+            },
+            v.vmq_vmmq_adapter_policy
+            ) : {
+            name         = "UNUSED"
+            organization = "UNUSED"
+          }
         }
       ]
     ]
@@ -941,7 +1199,7 @@ locals {
       name           = "${local.name_prefix}${v.name}${local.lldap.name_suffix}"
       nested_group_search_depth = lookup(
       v, "nested_group_search_depth", local.lldap.nested_group_search_depth)
-      organization = lookup(v, "organization", var.organization)
+      organization = var.organization
       search_parameters = {
         attribute = lookup(
         v.search_parameters, "attribute", local.lldap.search_parameters.attribute)
@@ -1003,7 +1261,7 @@ locals {
       notification_period = lookup(
         v, "notification_period", local.luser.notification_period
       )
-      organization = lookup(v, "organization", var.organization)
+      organization = var.organization
       password_expiry_duration = lookup(
         v, "password_expiry_duration", local.luser.password_expiry_duration
       )
@@ -1047,10 +1305,10 @@ locals {
       obtain_ipv6_dns_from_dhcp = lookup(
         v, "obtain_ipv6_dns_from_dhcp", local.ldns.obtain_ipv6_dns_from_dhcp
       )
-      organization = lookup(v, "organization", var.organization)
+      organization = var.organization
       #profiles     = []
       profiles = [
-        for i in var.domains : {
+        for i in var.domains[var.organization].switch_profiles : {
           name        = i.name
           object_type = "fabric.SwitchProfile"
           } if length(regexall(
@@ -1073,10 +1331,10 @@ locals {
       enabled      = lookup(v, "enabled", local.lntp.enabled)
       name         = "${local.name_prefix}${v.name}${local.lntp.name_suffix}"
       ntp_servers  = lookup(v, "ntp_servers", local.lntp.ntp_servers)
-      organization = lookup(v, "organization", var.organization)
+      organization = var.organization
       #profiles     = []
       profiles = [
-        for i in var.domains : {
+        for i in var.domains[var.organization].switch_profiles : {
           name        = i.name
           object_type = "fabric.SwitchProfile"
           } if length(regexall(
@@ -1110,7 +1368,7 @@ locals {
           socket_memory_id = lookup(v, "socket_memory_id", local.lpmem.namespaces.socket_memory_id)
         }
       ]
-      organization = lookup(v, "organization", var.organization)
+      organization = var.organization
       persistent_memory_type = lookup(
         v, "persistent_memory_type", local.lpmem.persistent_memory_type
       )
@@ -1277,7 +1535,7 @@ locals {
         ]
         #profiles = []
         profiles = [
-          for v in var.domains : v.name if length(regexall(
+          for v in var.domains[var.organization].switch_profiles : v.name if length(regexall(
             "^${local.name_prefix}${element(value.names, i)}${local.lport.name_suffix}$", v.port)
           ) > 0
         ]
@@ -1638,7 +1896,7 @@ locals {
   san_connectivity = { for v in lookup(local.policies, "san_connectivity", []) : v.name => {
     description         = lookup(v, "description", "")
     name                = "${local.name_prefix}${v.name}${local.lscp.name_suffix}"
-    organization        = lookup(v, "organization", var.organization)
+    organization        = var.organization
     tags                = lookup(v, "tags", var.tags)
     target_platform     = lookup(v, "target_platform", local.lscp.target_platform)
     vhba_placement_mode = lookup(v, "vhba_placement_mode", local.lscp.vhba_placement_mode)
@@ -1662,11 +1920,20 @@ locals {
         vhba_type             = lookup(v, "vhba_type", local.lscp.vhbas.vhba_type)
         wwpn_allocation_type  = lookup(v, "wwpn_allocation_type", local.lscp.vhbas.wwpn_allocation_type)
         wwpn_pools            = lookup(v, "wwpn_pools", local.lscp.vhbas.wwpn_pools)
-        wwpn_static_address   = lookup(v, "wwpn_static_address", [])
+        wwpn_static_addresses = lookup(v, "wwpn_static_addresses", [])
       }
     ]
     wwnn_allocation_type = lookup(v, "wwnn_allocation_type", local.lscp.wwnn_allocation_type)
-    wwnn_pool            = lookup(v, "wwnn_pool", local.lscp.wwnn_pool)
+    wwnn_pool            = lookup(v, "wwnn_pool", local.lscp.wwnn_pool) != "" ? try(
+            {
+              name         = tostring(lookup(v, "wwnn_pool", local.lscp.wwnn_pool))
+              organization = var.organization
+            },
+            lookup(v, "wwnn_pool", local.lscp.wwnn_pool)
+            ) : {
+            name         = "UNUSED"
+            organization = "UNUSED"
+          }
     wwnn_static_address  = lookup(v, "wwnn_static_address", "")
     }
   }
@@ -1674,11 +1941,39 @@ locals {
     for value in local.san_connectivity : [
       for v in value.vhbas : [
         for s in range(length(v.names)) : {
-          fc_zone_policies = length(
-          v.fc_zone_policies) > 0 ? element(chunklist(v.fc_zone_policies, 2), s) : []
-          fibre_channel_adapter_policy = v.fibre_channel_adapter_policy
-          fibre_channel_network_policy = element(v.fibre_channel_network_policies, s)
-          fibre_channel_qos_policy     = v.fibre_channel_qos_policy
+          fc_zone_policies = length(v.fc_zone_policies) > 0 ? element(
+            chunklist(v.fc_zone_policies, 2), s
+          ) : []
+          fibre_channel_adapter_policy = v.fibre_channel_adapter_policy != "" ? try(
+            {
+              name         = tostring(v.fibre_channel_adapter_policy)
+              organization = var.organization
+            },
+            v.fibre_channel_adapter_policy
+            ) : {
+            name         = "UNUSED"
+            organization = "UNUSED"
+          }
+          fibre_channel_network_policy = element(v.fibre_channel_network_policies, s) != "" ? try(
+            {
+              name         = tostring(element(v.fibre_channel_network_policies, s))
+              organization = var.organization
+            },
+            element(v.fibre_channel_network_policies, s)
+            ) : {
+            name         = "UNUSED"
+            organization = "UNUSED"
+          }
+          fibre_channel_qos_policy = v.fibre_channel_qos_policy != "" ? try(
+            {
+              name         = tostring(v.fibre_channel_qos_policy)
+              organization = var.organization
+            },
+            v.fibre_channel_qos_policy
+            ) : {
+            name         = "UNUSED"
+            organization = "UNUSED"
+          }
           name                         = element(v.names, s)
           persistent_lun_bindings      = v.persistent_lun_bindings
           placement_pci_link = length(v.placement_pci_link) == 1 ? element(
@@ -1697,8 +1992,17 @@ locals {
           san_connectivity     = value.name
           vhba_type            = v.vhba_type
           wwpn_allocation_type = v.wwpn_allocation_type
-          wwpn_pool            = length(v.wwpn_pools) > 0 ? element(v.wwpn_pools, s) : ""
-          wwpn_static_address  = length(v.wwpn_static_address) > 0 ? element(v.wwpn_static_address, s) : ""
+          wwpn_pool = length(v.wwpn_pools) > 0 ? try(
+            {
+              name         = tostring(element(v.wwpn_pools, s))
+              organization = var.organization
+            },
+            element(v.wwpn_pools, s)
+            ) : {
+            name         = "UNUSED"
+            organization = "UNUSED"
+          }
+          wwpn_static_address  = length(v.wwpn_static_addresses) > 0 ? element(v.wwpn_static_addresses, s) : ""
         }
       ]
     ]
@@ -1715,10 +2019,10 @@ locals {
       description             = lookup(v, "description", "")
       enable_snmp             = lookup(v, "enable_snmp", local.lsnmp.enable_snmp)
       name                    = "${local.name_prefix}${v.name}${local.lsnmp.name_suffix}"
-      organization            = lookup(v, "organization", var.organization)
+      organization            = var.organization
       #profiles                = []
       profiles = [
-        for i in var.domains : {
+        for i in var.domains[var.organization].switch_profiles : {
           name        = i.name
           object_type = "fabric.SwitchProfile"
           } if length(regexall("^${v.name}$", i.snmp)) > 0 || length(regexall(
@@ -1744,12 +2048,12 @@ locals {
   #_________________________________________________________________________
   storage = {
     for v in lookup(local.policies, "storage", []) : v.name => {
-      description       = lookup(v, "description", "")
-      drive_groups      = lookup(v, "drive_groups", [])
-      global_hot_spares = lookup(v, "global_hot_spares", local.lstorage.global_hot_spares)
-      m2_configuration  = lookup(v, "m2_configuration", [])
-      name              = "${local.name_prefix}${v.name}${local.lstorage.name_suffix}"
-      organization      = lookup(v, "organization", var.organization)
+      description           = lookup(v, "description", "")
+      drive_groups          = lookup(v, "drive_groups", [])
+      global_hot_spares     = lookup(v, "global_hot_spares", local.lstorage.global_hot_spares)
+      m2_raid_configuration = lookup(v, "m2_raid_configuration", {})
+      name                  = "${local.name_prefix}${v.name}${local.lstorage.name_suffix}"
+      organization          = var.organization
       single_drive_raid_configuration = lookup(
         v, "single_drive_raid_configuration", []
       )
@@ -1792,10 +2096,10 @@ locals {
       )
       mac_aging_time = lookup(v, "mac_aging_time", local.swctrl.mac_aging_time)
       name           = "${local.name_prefix}${v.name}${local.swctrl.name_suffix}"
-      organization   = lookup(v, "organization", var.organization)
+      organization   = var.organization
       #profiles       = []
       profiles = [
-        for i in var.domains : i.name if length(regexall(
+        for i in var.domains[var.organization].switch_profiles : i.name if length(regexall(
           "^${local.name_prefix}${v.name}${local.swctrl.name_suffix}$", i.switch_control)
         ) > 0
       ]
@@ -1815,18 +2119,20 @@ locals {
   #_________________________________________________________________________
   syslog = {
     for v in lookup(local.policies, "syslog", []) : v.name => {
-      description        = lookup(v, "description", "")
-      local_min_severity = lookup(v, "local_min_severity", local.lsyslog.local_min_severity)
-      name               = "${local.name_prefix}${v.name}${local.lsyslog.name_suffix}"
-      organization       = lookup(v, "organization", var.organization)
+      description = lookup(v, "description", "")
+      local_min_severity = lookup(lookup(
+        v, "local_logging", {}), "minimum_severity", local.lsyslog.local_logging.minimum_severity
+      )
+      name         = "${local.name_prefix}${v.name}${local.lsyslog.name_suffix}"
+      organization = var.organization
       #profiles     = []
       profiles = [
-        for i in var.domains : {
+        for i in var.domains[var.organization].switch_profiles : {
           name        = i.name
           object_type = "fabric.SwitchProfile"
         } if length(regexall("^${local.name_prefix}${v.name}${local.lsyslog.name_suffix}$", i.syslog)) > 0
       ]
-      remote_clients = lookup(v, "remote_clients", [])
+      remote_logging = lookup(v, "remote_logging", [])
       tags           = lookup(v, "tags", var.tags)
     }
   }
@@ -1841,10 +2147,10 @@ locals {
       classes      = lookup(v, "classes", [])
       description  = lookup(v, "description", "")
       name         = "${local.name_prefix}${v.name}${local.lsystem_qos.name_suffix}"
-      organization = lookup(v, "organization", var.organization)
+      organization = var.organization
       #profiles     = []
       profiles = [
-        for i in var.domains : i.name if length(regexall(
+        for i in var.domains[var.organization].switch_profiles : i.name if length(regexall(
           "${local.name_prefix}${v.name}${local.lsystem_qos.name_suffix}", i.system_qos)
         ) > 0
       ]
@@ -1867,7 +2173,7 @@ locals {
         v, "enable_virtual_media_encryption", local.vmedia.enable_virtual_media_encryption
       )
       name         = "${local.name_prefix}${v.name}${local.vmedia.name_suffix}"
-      organization = lookup(v, "organization", var.organization)
+      organization = var.organization
       tags         = lookup(v, "tags", var.tags)
     }
   }
@@ -1881,10 +2187,10 @@ locals {
     for v in lookup(local.policies, "vlan", []) : v.name => {
       description  = lookup(v, "description", "")
       name         = "${local.name_prefix}${v.name}${local.lvlan.name_suffix}"
-      organization = lookup(v, "organization", var.organization)
+      organization = var.organization
       #profiles     = []
       profiles = [
-        for i in var.domains : i.name if length(regexall(
+        for i in var.domains[var.organization].switch_profiles : i.name if length(regexall(
           "^${local.name_prefix}${v.name}${local.lvlan.name_suffix}$", i.vlan)
         ) > 0
       ]
@@ -1921,7 +2227,16 @@ locals {
     for v in local.vlans_loop : [
       for s in v.vlan_list : {
         auto_allow_on_uplinks = v.auto_allow_on_uplinks
-        multicast_policy      = v.multicast_policy
+        multicast_policy = v.multicast_policy != "" ? try(
+          {
+            name         = tostring(v.multicast_policy)
+            organization = var.organization
+          },
+          v.multicast_policy
+          ) : {
+          name         = "UNUSED"
+          organization = "UNUSED"
+        }
         name                  = v.name
         name_prefix           = v.name_prefix
         native_vlan           = v.native_vlan
@@ -1940,10 +2255,10 @@ locals {
     for v in lookup(local.policies, "vsan", []) : v.name => {
       description  = lookup(v, "description", "")
       name         = "${local.name_prefix}${v.name}${local.lvsan.name_suffix}"
-      organization = lookup(v, "organization", var.organization)
+      organization = var.organization
       #profiles     = []
       profiles = [
-        for i in var.domains : i.name if length(regexall(
+        for i in var.domains[var.organization].switch_profiles : i.name if length(regexall(
           "^${local.name_prefix}${v.name}${local.lvsan.name_suffix}$", i.vsan)
         ) > 0
       ]

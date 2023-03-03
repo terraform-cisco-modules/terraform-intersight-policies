@@ -8,11 +8,11 @@ resource "intersight_vnic_iscsi_static_target_policy" "iscsi_static_target" {
   for_each    = { for v in lookup(local.policies, "iscsi_static_target", []) : v.name => v }
   description = lookup(each.value, "description", "${each.value.name} iSCSI Static Target Policy.")
   ip_address  = each.value.ip_address
-  name        = "${each.key}${local.defaults.intersight.policies.iscsi_static_target.name_suffix}"
+  name        = "${each.key}${local.defaults.iscsi_static_target.name_suffix}"
   port        = each.value.port
   target_name = each.value.target_name
   organization {
-    moid        = local.orgs[lookup(each.value, "organization", var.organization)]
+    moid        = local.orgs[var.organization]
     object_type = "organization.Organization"
   }
   dynamic "lun" {
@@ -20,7 +20,7 @@ resource "intersight_vnic_iscsi_static_target_policy" "iscsi_static_target" {
     content {
       additional_properties = ""
       bootable = lookup(
-        lun.value, "bootable", local.defaults.intersight.policies.iscsi_static_target.luns.bootable
+        lun.value, "bootable", local.defaults.iscsi_static_target.luns.bootable
       )
       lun_id      = lun.value.lun_id
       object_type = "vnic.Lun"

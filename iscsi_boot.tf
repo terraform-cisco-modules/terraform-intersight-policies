@@ -6,22 +6,21 @@
 
 resource "intersight_vnic_iscsi_boot_policy" "iscsi_boot" {
   depends_on = [
-    intersight_vnic_iscsi_adapter_policy.iscsi_adapter,
-    intersight_vnic_iscsi_static_target_policy.iscsi_static_target
+    data.intersight_vnic_iscsi_adapter_policy.iscsi_adapter,
+    data.intersight_vnic_iscsi_static_target_policy.iscsi_static_target
   ]
-  for_each               = { for v in lookup(local.policies, "iscsi_boot", []) : v.name => v }
-  auto_targetvendor_name = lookup(each.value, "dhcp_vendor_id_iqn", local.liboot.dhcp_vendor_id_iqn)
-  chap = lookup(each.value, "authentication", local.liboot.authentication
-    ) == "chap" && lookup(each.value, "target_source_type", local.liboot.target_source_type) == "Static" ? [
+  for_each               = { for k, v in local.iscsi_boot : k => v }
+  auto_targetvendor_name = each.value.dhcp_vendor_id_iqn
+  chap = each.value.authentication == "chap" && each.value.target_source_type == "Static" ? [
     {
       additional_properties = ""
       class_id              = "vnic.IscsiAuthProfile"
       is_password_set       = null
       object_type           = "vnic.IscsiAuthProfile"
       password              = var.iscsi_boot_password
-      user_id               = lookup(each.value, "username", "")
+      user_id               = each.value.username
     }
-    ] : lookup(each.value, "target_source_type", local.liboot.target_source_type) == "Static" ? [
+    ] : each.value.target_source_type == "Static" ? [
     {
       additional_properties = ""
       class_id              = "vnic.IscsiAuthProfile"
@@ -31,38 +30,31 @@ resource "intersight_vnic_iscsi_boot_policy" "iscsi_boot" {
       user_id               = ""
     }
   ] : null
-  description = lookup(each.value, "description", "${each.value.name} iSCSI Boot Policy.")
-  initiator_ip_source = lookup(each.value, "target_source_type", local.liboot.target_source_type
-  ) == "Auto" ? "DHCP" : lookup(each.value, "initiator_ip_source", local.liboot.initiator_ip_source)
-  initiator_static_ip_v4_address = length(regexall("Static", lookup(
-    each.value, "initiator_ip_source", local.liboot.initiator_ip_source))
-  ) > 0 ? each.value.initiator_static_ipv4_config.ip_address : ""
-  initiator_static_ip_v4_config = lookup(each.value, "target_source_type", local.liboot.target_source_type) == "Static" ? [
+  description         = lookup(each.value, "description", "${each.value.name} iSCSI Boot Policy.")
+  initiator_ip_source = each.value.target_source_type == "Auto" ? "DHCP" : each.value.initiator_ip_source
+  initiator_static_ip_v4_address = length(regexall("Static", each.value.initiator_ip_source)
+  ) > 0 ? each.value.ip_address : ""
+  initiator_static_ip_v4_config = each.value.initiator_ip_source == "Static" ? [
     {
       additional_properties = ""
       class_id              = "ippool.IpV4Config"
-      gateway = length(regexall("Static", lookup(each.value, "initiator_ip_source", local.liboot.initiator_ip_source))
-      ) > 0 ? each.value.initiator_static_ipv4_config.default_gateway : ""
-      netmask = length(regexall("Static", lookup(each.value, "initiator_ip_source", local.liboot.initiator_ip_source))
-      ) > 0 ? each.value.initiator_static_ipv4_config.subnet_mask : ""
-      object_type = "ippool.IpV4Config"
-      primary_dns = length(regexall("Static", lookup(each.value, "initiator_ip_source", local.liboot.initiator_ip_source))
-      ) > 0 ? lookup(lookup(each.value, "initiator_static_ipv4_config", {}), "primary_dns", "") : ""
-      secondary_dns = length(regexall("Static", lookup(each.value, "initiator_ip_source", local.liboot.initiator_ip_source))
-      ) > 0 ? lookup(lookup(each.value, "initiator_static_ipv4_config", {}), "secondary_dns", "") : ""
+      gateway               = each.value.gateway
+      netmask               = each.value.netmask
+      object_type           = "ippool.IpV4Config"
+      primary_dns           = each.value.primary_dns
+      secondary_dns         = each.value.secondary_dns
     }
   ] : null
-  mutual_chap = lookup(each.value, "authentication", local.liboot.authentication
-    ) == "mutual_chap" && lookup(each.value, "target_source_type", local.liboot.target_source_type) == "Static" ? [
+  mutual_chap = each.value.authentication == "mutual_chap" && each.value.target_source_type == "Static" ? [
     {
       additional_properties = ""
       class_id              = "vnic.IscsiAuthProfile"
       is_password_set       = null
       object_type           = "vnic.IscsiAuthProfile"
-      password              = each.value.iscsi_boot_password
-      user_id               = lookup(each.value, "username", "")
+      password              = var.iscsi_boot_password
+      user_id               = each.value.username
     }
-    ] : lookup(each.value, "target_source_type", local.liboot.target_source_type) == "Static" ? [
+    ] : each.value.target_source_type == "Static" ? [
     {
       additional_properties = ""
       class_id              = "vnic.IscsiAuthProfile"
@@ -72,41 +64,61 @@ resource "intersight_vnic_iscsi_boot_policy" "iscsi_boot" {
       user_id               = ""
     }
   ] : null
-  name               = "${each.key}${local.defaults.intersight.policies.ethernet_qos.name_suffix}"
-  target_source_type = lookup(each.value, "target_source_type", local.liboot.target_source_type)
+  name               = each.value.name
+  target_source_type = each.value.target_source_type == "Static"
   organization {
-    moid        = local.orgs[lookup(each.value, "organization", var.organization)]
+    moid        = local.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "initiator_ip_pool" {
-    for_each = { for v in compact([lookup(each.value, "initiator_ip_pool", "")]
-    ) : v => v if lookup(each.value, "target_source_type", local.liboot.target_source_type) != "Auto" }
+    for_each = {
+      for v in [each.value.initiator_ip_pool.name] : v => v if each.value.initiator_ip_pool.name != "UNUSED"
+    }
     content {
-      moid = var.pools.ip[each.value.initiator_ip_pool].moid
+      moid = [for i in data.intersight_ippool_pool.ip[0].results : i.moid if i.organization[0
+        ].moid == local.orgs[each.value.initiator_ip_pool.organization
+      ] && i.name == each.value.initiator_ip_pool.name][0]
+      object_type = "ippool.Pool"
     }
   }
   dynamic "iscsi_adapter_policy" {
-    for_each = { for v in compact([lookup(each.value, "iscsi_adapter_policy", "")]) : v => v }
+    for_each = {
+      for v in [each.value.iscsi_adapter_policy.name
+      ] : v => v if each.value.iscsi_adapter_policy.name != "UNUSED"
+    }
     content {
-      moid = intersight_vnic_iscsi_adapter_policy.iscsi_adapter[iscsi_adapter_policy.value].moid
+      moid = [for i in data.intersight_vnic_iscsi_adapter_policy.iscsi_adapter[0
+        ].results : i.moid if i.organization[0
+        ].moid == local.orgs[each.value.iscsi_adapter_policy.organization
+      ] && i.name == each.value.iscsi_adapter_policy.name][0]
     }
   }
   dynamic "primary_target_policy" {
-    for_each = { for v in compact([lookup(each.value, "primary_target_policy", "")]
-    ) : v => v if each.value.target_source_type != "Auto" }
+    for_each = {
+      for v in [each.value.primary_target_policy.name
+      ] : v => v if each.value.primary_target_policy.name != "UNUSED"
+    }
     content {
-      moid = intersight_vnic_iscsi_static_target_policy.iscsi_static_target[primary_target_policy.value].moid
+      moid = [for i in data.intersight_vnic_iscsi_static_target_policy.iscsi_static_target[0
+        ].results : i.moid if i.organization[0
+        ].moid == local.orgs[each.value.primary_target_policy.organization
+      ] && i.name == each.value.primary_target_policy.name][0]
     }
   }
   dynamic "secondary_target_policy" {
-    for_each = { for v in compact([lookup(each.value, "secondary_target_policy", "")]
-    ) : v => v if each.value.target_source_type != "Auto" }
+    for_each = {
+      for v in [each.value.secondary_target_policy.name
+      ] : v => v if each.value.secondary_target_policy.name != "UNUSED"
+    }
     content {
-      moid = intersight_vnic_iscsi_static_target_policy.iscsi_static_target[secondary_target_policy.value].moid
+      moid = [for i in data.intersight_vnic_iscsi_static_target_policy.iscsi_static_target[0
+        ].results : i.moid if i.organization[0
+        ].moid == local.orgs[each.value.secondary_target_policy.organization
+      ] && i.name == each.value.secondary_target_policy.name][0]
     }
   }
   dynamic "tags" {
-    for_each = lookup(each.value, "tags", var.tags)
+    for_each = each.value.tags
     content {
       key   = tags.value.key
       value = tags.value.value

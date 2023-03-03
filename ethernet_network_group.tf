@@ -7,9 +7,9 @@
 resource "intersight_fabric_eth_network_group_policy" "ethernet_network_group" {
   for_each    = { for v in lookup(local.policies, "ethernet_network_group", []) : v.name => v }
   description = lookup(each.value, "description", "${each.value.name} Ethernet Network Group Policy.")
-  name        = "${each.key}${local.defaults.intersight.policies.ethernet_network_group.name_suffix}"
+  name        = "${each.key}${local.defaults.ethernet_network_group.name_suffix}"
   organization {
-    moid        = local.orgs[lookup(each.value, "organization", var.organization)]
+    moid        = local.orgs[var.organization]
     object_type = "organization.Organization"
   }
   vlan_settings {

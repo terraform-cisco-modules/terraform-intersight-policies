@@ -7,14 +7,14 @@
 resource "intersight_vnic_fc_network_policy" "fibre_channel_network" {
   for_each    = { for v in lookup(local.policies, "fibre_channel_network", []) : v.name => v }
   description = lookup(each.value, "description", "${each.value.name} Fibre-Channel Network Policy.")
-  name        = "${each.key}${local.defaults.intersight.policies.fibre_channel_network.name_suffix}"
+  name        = "${each.key}${local.defaults.fibre_channel_network.name_suffix}"
   organization {
-    moid        = local.orgs[lookup(each.value, "organization", var.organization)]
+    moid        = local.orgs[var.organization]
     object_type = "organization.Organization"
   }
   vsan_settings {
     default_vlan_id = lookup(
-      each.value, "default_vlan_id", local.defaults.intersight.policies.fibre_channel_network.default_vlan_id
+      each.value, "default_vlan_id", local.defaults.fibre_channel_network.default_vlan_id
     )
     id = each.value.vsan_id
   }

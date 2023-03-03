@@ -19,18 +19,18 @@ resource "intersight_syslog_policy" "syslog" {
   dynamic "profiles" {
     for_each = { for v in each.value.profiles : v.name => v }
     content {
-      moid        = var.domains[profiles.value.name].moid
+      moid        = var.domains[var.organization].switch_profiles[profiles.value.name].moid
       object_type = profiles.value.object_type
     }
   }
   dynamic "remote_clients" {
-    for_each = { for k, v in each.value.remote_clients : k => v }
+    for_each = { for k, v in each.value.remote_logging : k => v }
     content {
-      enabled      = lookup(remote_clients.value, "enabled", true)
+      enabled      = lookup(remote_clients.value, "enable", local.lsyslog.remote_logging.enable)
       hostname     = remote_clients.value.hostname
       port         = lookup(remote_clients.value, "port", 514)
       protocol     = lookup(remote_clients.value, "protocol", "udp")
-      min_severity = lookup(remote_clients.value, "min_severity", "warning")
+      min_severity = lookup(remote_clients.value, "minimum_severity", "warning")
       object_type  = "syslog.RemoteLoggingClient"
     }
   }

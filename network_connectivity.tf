@@ -24,7 +24,7 @@ resource "intersight_networkconfig_policy" "network_connectivity" {
   dynamic "profiles" {
     for_each = { for v in each.value.profiles : v.name => v }
     content {
-      moid        = var.domains[profiles.value.name].moid
+      moid        = var.domains[var.organization].switch_profiles[profiles.value.name].moid
       object_type = profiles.value.object_type
     }
   }

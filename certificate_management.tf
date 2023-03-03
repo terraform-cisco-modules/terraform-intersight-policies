@@ -7,9 +7,9 @@
 resource "intersight_certificatemanagement_policy" "certificate_management" {
   for_each    = { for v in lookup(local.policies, "certificate_management", []) : v.name => v }
   description = lookup(each.value, "description", "${each.value.name} Certificate Management Policy.")
-  name        = "${each.key}${local.defaults.intersight.policies.certificate_management.name_suffix}"
+  name        = "${each.key}${local.defaults.certificate_management.name_suffix}"
   organization {
-    moid        = local.orgs[lookup(each.value, "organization", var.organization)]
+    moid        = local.orgs[var.organization]
     object_type = "organization.Organization"
   }
   certificates {
@@ -26,7 +26,7 @@ resource "intersight_certificatemanagement_policy" "certificate_management" {
         regexall("5", lookup(each.value, "base64_certificate", 1))
       ) > 0 ? var.base64_certificate_5 : null
     }
-    enabled = lookup(each.value, "enabled", local.defaults.intersight.policies.certificate_management.enabled)
+    enabled = lookup(each.value, "enabled", local.defaults.certificate_management.enabled)
     privatekey = length(
       regexall("1", lookup(each.value, "base64_private_key", 1))
       ) > 0 ? var.base64_private_key_1 : length(

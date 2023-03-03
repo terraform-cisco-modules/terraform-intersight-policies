@@ -7,12 +7,12 @@
 resource "intersight_ipmioverlan_policy" "ipmi_over_lan" {
   for_each       = { for v in lookup(local.policies, "ipmi_over_lan", []) : v.name => v }
   description    = lookup(each.value, "description", "${each.value.name} IPMI over LAN Policy.")
-  enabled        = lookup(each.value, "enabled", local.defaults.intersight.policies.ipmi_over_lan.enabled)
+  enabled        = lookup(each.value, "enabled", local.defaults.ipmi_over_lan.enabled)
   encryption_key = lookup(each.value, "ipmi_key", "") == 1 ? var.ipmi_key_1 : null
-  name           = "${each.key}${local.defaults.intersight.policies.ipmi_over_lan.name_suffix}"
-  privilege      = lookup(each.value, "privilege", local.defaults.intersight.policies.ipmi_over_lan.privilege)
+  name           = "${each.key}${local.defaults.ipmi_over_lan.name_suffix}"
+  privilege      = lookup(each.value, "privilege", local.defaults.ipmi_over_lan.privilege)
   organization {
-    moid        = local.orgs[lookup(each.value, "organization", var.organization)]
+    moid        = local.orgs[var.organization]
     object_type = "organization.Organization"
   }
   dynamic "tags" {

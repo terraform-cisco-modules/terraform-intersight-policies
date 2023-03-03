@@ -210,9 +210,6 @@ resource "intersight_bios_policy" "bios" {
   #+++++++++++++++++++++++++++++++
   pcie_slots_cdn_enable = each.value.pcie_slots_cdn_enable # PCIe Slots CDN Control
   post_error_pause      = each.value.post_error_pause      # POST Error Pause
-  tpm_support = length(                                    # TPM Support
-    regexall("_tpm", each.value.bios_template)
-  ) > 0 ? "enabled" : each.value.tpm_support
   #+++++++++++++++++++++++++++++++
   # Memory Section
   #+++++++++++++++++++++++++++++++
@@ -297,7 +294,7 @@ resource "intersight_bios_policy" "bios" {
   ) > 0 ? "Auto" : each.value.cpu_perf_enhancement
   llc_alloc = length(
     regexall("M6_(HPC|relational_DB)(_tpm)?", each.value.bios_template)
-  ) > 0 ? "enabled" : each.value.llc_alloc             # LLC Dead Line
+  ) > 0 ? "disabled" : each.value.llc_alloc            # LLC Dead Line
   upi_link_enablement = each.value.upi_link_enablement # UPI Link Enablement
   upi_power_management = length(
     regexall("M6_(HPC|relational_DB)(_tpm)?", each.value.bios_template)
@@ -356,29 +353,33 @@ resource "intersight_bios_policy" "bios" {
   intel_speed_select     = each.value.intel_speed_select     # Intel Speed Select
   intel_turbo_boost_tech = each.value.intel_turbo_boost_tech # Intel Turbo Boost Tech
   intel_virtualization_technology = length(                  # Intel(R) VT
-    regexall("^(HPC|Java)(_tpm)?$", each.value.bios_template)
+    regexall("^(M6_)?(analytical_DB|HPC|Java)(_tpm)?$", each.value.bios_template)
   ) > 0 ? "disabled" : each.value.intel_virtualization_technology
   ioh_error_enable = each.value.ioh_error_enable # IIO Error Enable
   ip_prefetch      = each.value.ip_prefetch      # DCU IP Prefetcher
   kti_prefetch     = each.value.kti_prefetch     # KTI Prefetch
   llc_prefetch     = each.value.llc_prefetch     # LLC Prefetch
   memory_inter_leave = length(
-    regexall("(relational_DB|M6_HPC)?$", each.value.bios_template)
+    regexall("(relational_DB|M6_HPC)(_tpm)?$", each.value.bios_template)
   ) > 0 ? "1 Way Node Interleave" : each.value.memory_inter_leave # Intel Memory Interleaving
   package_cstate_limit = each.value.package_cstate_limit          # Package C State Limit
   patrol_scrub = length(
     regexall("(DB|M6_HPC)(_tpm)?$", each.value.bios_template)
-  ) > 0 ? "custom" : each.value.patrol_scrub               # Patrol Scrub
+  ) > 0 ? "disabled" : each.value.patrol_scrub             # Patrol Scrub
   patrol_scrub_duration = each.value.patrol_scrub_duration # Patrol Scrub Interval
   processor_c1e = length(                                  # Processor C1E
-    regexall("(DSS|M6_HPC|Java|OLTP|DB|Virtualization)(_tpm)?", each.value.bios_template)
-  ) > 0 ? "disabled" : each.value.processor_c1e
+    regexall("^(DSS|Java|OLTP|Virtualization)(_tpm)?", each.value.bios_template)
+    ) > 0 ? "disabled" : length(
+    regexall("^M6_(Data|Virtualization)(_tpm)?", each.value.bios_template)
+  ) > 0 ? "enabled" : each.value.processor_c1e
   processor_c3report = length(
     regexall("^(DSS|Java|OLTP|Virtualization)(_tpm)?$", each.value.bios_template)
   ) > 0 ? "disabled" : each.value.processor_c3report # Processor C3 Report
   processor_c6report = length(
-    regexall("^(DSS|M6_HPC|Java|OLTP|Virtualization)(_tpm)?$", each.value.bios_template)
-  ) > 0 ? "disabled" : each.value.processor_c6report # Processor C6 Report
+    regexall("^(DSS|Java|OLTP|Virtualization)(_tpm)?$", each.value.bios_template)
+    ) > 0 ? "disabled" : length(
+    regexall("^M6_((relational|analytical)_DB|Data|Virtualization)(_tpm)?", each.value.bios_template)
+  ) > 0 ? "enabled" : each.value.processor_c6report # Processor C6 Report
   processor_cstate = length(
     regexall("^(DSS|Java|OLTP|Virtualization)(_tpm)?$", each.value.bios_template)
   ) > 0 ? "disabled" : each.value.processor_cstate   # CPU C State
@@ -457,7 +458,10 @@ resource "intersight_bios_policy" "bios" {
   ) > 0 ? "enabled" : each.value.tpm_control
   tpm_pending_operation = each.value.tpm_pending_operation # TPM Pending Operation
   tpm_ppi_required      = each.value.tpm_ppi_required      # TPM Minimal Physical Presence
-  txt_support           = each.value.txt_support           # Intel Trusted Execution Technology Support
+  tpm_support = length(                                    # TPM Support/Security Device Support
+    regexall("_tpm", each.value.bios_template)
+  ) > 0 ? "enabled" : each.value.tpm_support
+  txt_support = each.value.txt_support # Intel Trusted Execution Technology Support
   #+++++++++++++++++++++++++++++++
   # USB Section
   #+++++++++++++++++++++++++++++++

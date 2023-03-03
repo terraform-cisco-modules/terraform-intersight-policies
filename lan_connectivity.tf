@@ -5,6 +5,9 @@
 #__________________________________________________________________
 
 resource "intersight_vnic_lan_connectivity_policy" "lan_connectivity" {
+  depends_on = [
+    data.intersight_iqnpool_pool.iqn
+  ]
   for_each            = local.lan_connectivity
   description         = lookup(each.value, "description", "${each.value.name} LAN Connectivity Policy.")
   azure_qos_enabled   = each.value.enable_azure_stack_host_qos
@@ -18,9 +21,11 @@ resource "intersight_vnic_lan_connectivity_policy" "lan_connectivity" {
     object_type = "organization.Organization"
   }
   dynamic "iqn_pool" {
-    for_each = { for v in compact([each.value.iqn_pool]) : v.name => v }
+    for_each = { for v in [each.value.iqn_pool.name] : v => v if each.value.iqn_pool.name != "UNUSED" }
     content {
-      moid = var.pools.iqn[iqn_pool.value].moid
+      moid = [for i in data.intersight_iqnpool_pool.iqn[0].results : i.moid if i.organization[0
+      ].moid == local.orgs[each.value.iqn_pool.organization] && i.name == each.value.iqn_pool.name][0]
+      object_type = "iqnpool.Pool"
     }
   }
   dynamic "tags" {
@@ -41,12 +46,12 @@ resource "intersight_vnic_lan_connectivity_policy" "lan_connectivity" {
 
 resource "intersight_vnic_eth_if" "vnics" {
   depends_on = [
-    intersight_fabric_eth_network_control_policy.ethernet_network_control,
-    intersight_fabric_eth_network_group_policy.ethernet_network_group,
-    intersight_vnic_eth_adapter_policy.ethernet_adapter,
-    intersight_vnic_eth_network_policy.ethernet_network,
-    intersight_vnic_eth_qos_policy.ethernet_qos,
-    intersight_vnic_iscsi_boot_policy.iscsi_boot,
+    data.intersight_fabric_eth_network_control_policy.ethernet_network_control,
+    data.intersight_fabric_eth_network_group_policy.ethernet_network_group,
+    data.intersight_vnic_eth_adapter_policy.ethernet_adapter,
+    data.intersight_vnic_eth_network_policy.ethernet_network,
+    data.intersight_vnic_eth_qos_policy.ethernet_qos,
+    data.intersight_vnic_iscsi_boot_policy.iscsi_boot,
     intersight_vnic_lan_connectivity_policy.lan_connectivity
   ]
   for_each         = local.vnics
@@ -61,17 +66,22 @@ resource "intersight_vnic_eth_if" "vnics" {
     nr_source = each.value.cdn_source
   }
   eth_adapter_policy {
-    moid = intersight_vnic_eth_adapter_policy.ethernet_adapter[
-      each.value.ethernet_adapter_policy
-    ].moid
+    moid = [for i in data.intersight_vnic_eth_adapter_policy.ethernet_adapter[0
+      ].results : i.moid if i.organization[0].moid == local.orgs[
+      each.value.ethernet_adapter_policy.organization
+    ] && i.name == each.value.ethernet_adapter_policy.name][0]
   }
   eth_qos_policy {
-    moid = intersight_vnic_eth_qos_policy.ethernet_qos[each.value.ethernet_qos_policy].moid
+    moid = [for i in data.intersight_vnic_eth_qos_policy.ethernet_qos[0
+      ].results : i.moid if i.organization[0].moid == local.orgs[
+      each.value.ethernet_qos_policy.organization
+    ] && i.name == each.value.ethernet_qos_policy.name][0]
   }
   fabric_eth_network_control_policy {
-    moid = intersight_fabric_eth_network_control_policy.ethernet_network_control[
-      each.value.ethernet_network_control_policy
-    ].moid
+    moid = [for i in data.intersight_fabric_eth_network_control_policy.ethernet_network_control[0
+      ].results : i.moid if i.organization[0].moid == local.orgs[
+      each.value.ethernet_network_control_policy.organization
+    ] && i.name == each.value.ethernet_network_control_policy.name][0]
   }
   lan_connectivity_policy {
     moid = intersight_vnic_lan_connectivity_policy.lan_connectivity[each.value.lan_connectivity].moid
@@ -85,10 +95,11 @@ resource "intersight_vnic_eth_if" "vnics" {
   usnic_settings {
     cos      = each.value.usnic_class_of_service
     nr_count = each.value.usnic_number_of_usnics
-    usnic_adapter_policy = length(compact([each.value.usnic_adapter_policy])
-      ) > 0 ? intersight_vnic_eth_adapter_policy.ethernet_adapter[
-      each.value.usnic_adapter_policy
-    ].moid : ""
+    usnic_adapter_policy = length(regexall("UNUSED", each.value.usnic_adapter_policy.name)
+      ) == 0 ? [for i in data.intersight_vnic_eth_adapter_policy.ethernet_adapter[0
+        ].results : i.moid if i.organization[0].moid == local.orgs[
+        each.value.usnic_adapter_policy.organization
+    ] && i.name == each.value.usnic_adapter_policy.name][0] : ""
   }
   vmq_settings {
     enabled             = each.value.vmq_enabled
@@ -96,42 +107,55 @@ resource "intersight_vnic_eth_if" "vnics" {
     num_interrupts      = each.value.vmq_number_of_interrupts
     num_vmqs            = each.value.vmq_number_of_virtual_machine_queues
     num_sub_vnics       = each.value.vmq_number_of_sub_vnics
-    vmmq_adapter_policy = length(compact([each.value.vmq_vmmq_adapter_policy])
-      ) > 0 ? intersight_vnic_eth_adapter_policy.ethernet_adapter[
-      each.value.vmq_vmmq_adapter_policy
-    ].moid : ""
+    vmmq_adapter_policy = length(regexall("UNUSED", each.value.vmq_vmmq_adapter_policy.name)
+      ) == 0 ? [for i in data.intersight_vnic_eth_adapter_policy.ethernet_adapter[0
+        ].results : i.moid if i.organization[0].moid == local.orgs[
+        each.value.vmq_vmmq_adapter_policy.organization
+    ] && i.name == each.value.vmq_vmmq_adapter_policy.name][0] : ""
   }
   dynamic "eth_network_policy" {
-    for_each = { for v in compact([each.value.ethernet_network_policy]) : v => v }
+    for_each = {
+      for v in [each.value.ethernet_network_policy.name
+      ] : v => v if each.value.ethernet_network_policy.name != "UNUSED"
+    }
     content {
-      moid = intersight_vnic_eth_network_policy.ethernet_network[
-        eth_network_policy.value
-      ].moid
+      moid = [for i in data.intersight_vnic_eth_network_policy.ethernet_network[0
+        ].results : i.moid if i.organization[0].moid == local.orgs[
+        each.value.ethernet_network_policy.organization
+      ] && i.name == each.value.ethernet_network_policy.name][0]
     }
   }
   dynamic "fabric_eth_network_group_policy" {
-    for_each = { for v in compact([each.value.ethernet_network_group_policy]) : v => v }
+    for_each = {
+      for v in [each.value.ethernet_network_group_policy.name
+      ] : v => v if each.value.ethernet_network_group_policy.name != "UNUSED"
+    }
     content {
-      moid = intersight_fabric_eth_network_group_policy.ethernet_network_group[
-        fabric_eth_network_group_policy.value
-      ].moid
+      moid = [for i in data.intersight_fabric_eth_network_group_policy.ethernet_network_group[0
+        ].results : i.moid if i.organization[0].moid == local.orgs[
+        each.value.ethernet_network_group_policy.organization
+      ] && i.name == each.value.ethernet_network_group_policy.name][0]
     }
   }
   dynamic "iscsi_boot_policy" {
-    for_each = { for v in compact([each.value.iscsi_boot_policy]) : v => v }
+    for_each = {
+      for v in [each.value.iscsi_boot_policy.name
+      ] : v => v if each.value.iscsi_boot_policy.name != "UNUSED"
+    }
     content {
-      moid = intersight_vnic_iscsi_boot_policy.iscsi_boot[iscsi_boot_policy.value].moid
-
+      moid = [for i in data.intersight_vnic_iscsi_boot_policy.iscsi_boot[0
+        ].results : i.moid if i.organization[0].moid == local.orgs[
+        each.value.iscsi_boot_policy.organization
+      ] && i.name == each.value.iscsi_boot_policy.name][0]
     }
   }
   dynamic "mac_pool" {
     for_each = {
-      for v in compact(
-        [each.value.mac_address_pool]
-      ) : v => v if each.value.mac_address_allocation_type == "POOL"
+      for v in [each.value.mac_address_pool.name] : v => v if each.value.mac_address_pool.name != "UNUSED"
     }
     content {
-      moid = var.pools.mac[mac_pool.value]
+      moid = [for i in data.intersight_macpool_pool.mac[0].results : i.moid if i.organization[0
+      ].moid == local.orgs[each.value.mac_address_pool.organization] && i.name == each.value.mac_address_pool.name][0]
     }
   }
   dynamic "tags" {

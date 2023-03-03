@@ -26,7 +26,7 @@ resource "intersight_fabric_switch_control_policy" "switch_control" {
   dynamic "profiles" {
     for_each = { for v in each.value.profiles : v => v }
     content {
-      moid        = var.domains[profiles.value].moid
+      moid        = var.domains[var.organization].switch_profiles[profiles.value].moid
       object_type = "fabric.SwitchProfile"
     }
   }

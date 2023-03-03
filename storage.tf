@@ -17,10 +17,10 @@ resource "intersight_storage_storage_policy" "storage" {
     object_type = "organization.Organization"
   }
   dynamic "m2_virtual_drive" {
-    for_each = each.value.m2_configuration
+    for_each = each.value.m2_raid_configuration
     content {
-      controller_slot = m2_virtual_drive.value.controller_slot
-      enable          = m2_virtual_drive.value.enable
+      controller_slot = m2_virtual_drive.value.slot
+      enable          = true
       # additional_properties = ""
       # object_type           = "storage.DiskGroupPolicy"
     }

@@ -8,11 +8,11 @@ resource "intersight_deviceconnector_policy" "device_connector" {
   for_each    = { for v in lookup(local.policies, "device_connector", []) : v.name => v }
   description = lookup(each.value, "description", "${each.value.name} Device Connector Policy.")
   lockout_enabled = lookup(
-    each.value, "configuration_lockout", local.defaults.intersight.policies.device_connector.configuration_lockout
+    each.value, "configuration_lockout", local.defaults.device_connector.configuration_lockout
   )
-  name = "${each.key}${local.defaults.intersight.policies.device_connector.name_suffix}"
+  name = "${each.key}${local.defaults.device_connector.name_suffix}"
   organization {
-    moid        = local.orgs[lookup(each.value, "organization", var.organization)]
+    moid        = local.orgs[var.organization]
     object_type = "organization.Organization"
   }
   dynamic "tags" {

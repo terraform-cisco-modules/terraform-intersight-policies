@@ -5,45 +5,47 @@
 #__________________________________________________________________
 
 resource "intersight_access_policy" "imc_access" {
-  for_each    = { for v in lookup(local.policies, "imc_access", []) : v.name => v }
+  depends_on = [
+    data.intersight_ippool_pool.ip
+  ]
+  for_each    = { for k, v in local.imc_access : k => v }
   description = lookup(each.value, "description", "${each.value.name} IMC Access Policy.")
-  inband_vlan = lookup(
-    each.value, "inband_vlan_id", local.defaults.intersight.policies.imc_access.inband_vlan_id
-  )
-  name = "${each.key}${local.defaults.intersight.policies.imc_access.name_suffix}"
+  inband_vlan = each.value.inband_vlan_id
+  name        = each.value.name
   address_type {
-    enable_ip_v4 = lookup(
-      each.value, "ipv4_address_configuration", local.defaults.intersight.policies.imc_access.ipv4_address_configuration
-    )
-    enable_ip_v6 = lookup(
-      each.value, "ipv6_address_configuration", local.defaults.intersight.policies.imc_access.ipv6_address_configuration
-    )
-    object_type = "access.AddressType"
+    enable_ip_v4 = each.value.ipv4_address_configuration
+    enable_ip_v6 = each.value.ipv6_address_configuration
+    object_type  = "access.AddressType"
   }
   configuration_type {
-    configure_inband      = length(compact([lookup(each.value, "inband_ip_pool", "")])) > 0 ? true : false
-    configure_out_of_band = length(compact([lookup(each.value, "out_of_band_ip_pool", "")])) > 0 ? true : false
+    configure_inband      = length(regexall("UNUSED", each.value.inband_ip_pool.name)) > 0 ? false : true
+    configure_out_of_band = length(regexall("UNUSED", each.value.out_of_band_ip_pool.name)) > 0 ? false : true
   }
   organization {
-    moid        = local.orgs[lookup(each.value, "organization", var.organization)]
+    moid        = local.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "inband_ip_pool" {
-    for_each = { for v in compact([lookup(each.value, "inband_ip_pool", "")]) : v => v }
+    for_each = { for v in [each.value.inband_ip_pool.name] : v => v if each.value.inband_ip_pool.name != "UNUSED" }
     content {
-      moid        = var.pools.ip[inband_ip_pool.value]
+      moid = [for i in data.intersight_ippool_pool.ip[0].results : i.moid if i.organization[0
+      ].moid == local.orgs[each.value.inband_ip_pool.organization] && i.name == each.value.inband_ip_pool.name][0]
       object_type = "ippool.Pool"
     }
   }
   dynamic "out_of_band_ip_pool" {
-    for_each = { for v in compact([lookup(each.value, "out_of_band_ip_pool", "")]) : v => v }
+    for_each = {
+      for v in [each.value.out_of_band_ip_pool.name] : v => v if each.value.out_of_band_ip_pool.name != "UNUSED"
+    }
     content {
-      moid        = var.pools.ip[out_of_band_ip_pool.value]
+      moid = [for i in data.intersight_ippool_pool.ip[0].results : i.moid if i.organization[0
+        ].moid == local.orgs[each.value.out_of_band_ip_pool.organization
+      ] && i.name == each.value.out_of_band_ip_pool.name][0]
       object_type = "ippool.Pool"
     }
   }
   dynamic "tags" {
-    for_each = lookup(each.value, "tags", var.tags)
+    for_each = each.value.tags
     content {
       key   = tags.value.key
       value = tags.value.value

@@ -41,14 +41,14 @@ resource "intersight_snmp_policy" "snmp" {
   dynamic "profiles" {
     for_each = { for v in each.value.profiles : v.name => v }
     content {
-      moid        = var.domains[profiles.value.name].moid
+      moid        = var.domains[var.organization].switch_profiles[profiles.value.name].moid
       object_type = profiles.value.object_type
     }
   }
   dynamic "snmp_traps" {
-    for_each = { for v in each.value.snmp_trap_destinations : v.hostname => v }
+    for_each = { for v in each.value.snmp_trap_destinations : v.destination_address => v }
     content {
-      community = length(
+      community = length(compact([lookup(snmp_traps.value, "user", "")])) == 0 ? length(
         regexall("1", coalesce(snmp_traps.value.community_string, 10))
         ) > 0 ? var.snmp_trap_community_1 : length(
         regexall("2", coalesce(snmp_traps.value.community_string, 10))
@@ -58,11 +58,11 @@ resource "intersight_snmp_policy" "snmp" {
         regexall("4", coalesce(snmp_traps.value.community_string, 10))
         ) > 0 ? var.snmp_trap_community_4 : length(
         regexall("5", coalesce(snmp_traps.value.community_string, 10))
-      ) > 0 ? var.snmp_trap_community_5 : ""
-      destination = snmp_traps.value.hostname
-      enabled     = snmp_traps.value.enable
-      port        = snmp_traps.value.port
-      type        = snmp_traps.value.trap_type
+      ) > 0 ? var.snmp_trap_community_5 : "" : ""
+      destination = snmp_traps.key
+      enabled     = lookup(snmp_traps.value, "enable", local.lsnmp.snmp_trap_destinations.enable)
+      port        = lookup(snmp_traps.value, "port", local.lsnmp.snmp_trap_destinations.port)
+      type        = lookup(snmp_traps.value, "trap_type", local.lsnmp.snmp_trap_destinations.trap_type)
       nr_version  = length(compact([snmp_traps.value.user])) > 0 ? "V3" : "V2"
       user        = snmp_traps.value.user
     }
@@ -70,7 +70,8 @@ resource "intersight_snmp_policy" "snmp" {
   dynamic "snmp_users" {
     for_each = { for v in each.value.snmp_users : v.name => v }
     content {
-      auth_password = length(
+      auth_password = lookup(
+        snmp_users.value, "auth_type", local.lsnmp.snmp_users.auth_type) != "NoAuthPriv" ? length(
         regexall("1", coalesce(snmp_users.value.auth_password, 10))
         ) > 0 ? var.snmp_auth_password_1 : length(
         regexall("2", coalesce(snmp_users.value.auth_password, 10))
@@ -80,10 +81,11 @@ resource "intersight_snmp_policy" "snmp" {
         regexall("4", coalesce(snmp_users.value.auth_password, 10))
         ) > 0 ? var.snmp_auth_password_3 : length(
         regexall("5", coalesce(snmp_users.value.auth_password, 10))
-      ) > 0 ? var.snmp_auth_password_5 : ""
-      auth_type = snmp_users.value.auth_type
+      ) > 0 ? var.snmp_auth_password_5 : "" : ""
+      auth_type = lookup(snmp_users.value, "auth_type", local.lsnmp.snmp_users.auth_type)
       name      = snmp_users.value.name
-      privacy_password = length(
+      privacy_password = lookup(
+        snmp_users.value, "auth_type", local.lsnmp.snmp_users.auth_type) == "AuthPriv" ? length(
         regexall("1", coalesce(snmp_users.value.privacy_password, 10))
         ) > 0 ? var.snmp_privacy_password_1 : length(
         regexall("2", coalesce(snmp_users.value.privacy_password, 10))
@@ -93,9 +95,9 @@ resource "intersight_snmp_policy" "snmp" {
         regexall("4", coalesce(snmp_users.value.privacy_password, 10))
         ) > 0 ? var.snmp_privacy_password_3 : length(
         regexall("5", coalesce(snmp_users.value.privacy_password, 10))
-      ) > 0 ? var.snmp_privacy_password_5 : ""
-      privacy_type   = snmp_users.value.privacy_type
-      security_level = snmp_users.value.security_level
+      ) > 0 ? var.snmp_privacy_password_5 : "" : ""
+      privacy_type   = lookup(snmp_users.value, "privacy_type", local.lsnmp.snmp_users.privacy_type)
+      security_level = lookup(snmp_users.value, "security_level", local.lsnmp.snmp_users.security_level)
     }
   }
   dynamic "tags" {

@@ -15,7 +15,7 @@ resource "intersight_fabric_eth_network_policy" "vlan" {
   dynamic "profiles" {
     for_each = { for v in each.value.profiles : v => v }
     content {
-      moid        = var.domains[profiles.value].moid
+      moid        = var.domains[var.organization].switch_profiles[profiles.value].moid
       object_type = "fabric.SwitchProfile"
     }
   }
@@ -36,7 +36,7 @@ resource "intersight_fabric_eth_network_policy" "vlan" {
 
 resource "intersight_fabric_vlan" "vlans" {
   depends_on = [
-    intersight_fabric_multicast_policy.multicast,
+    data.intersight_fabric_multicast_policy.multicast,
     intersight_fabric_eth_network_policy.vlan
   ]
   for_each              = local.vlans
@@ -58,6 +58,9 @@ resource "intersight_fabric_vlan" "vlans" {
     moid = intersight_fabric_eth_network_policy.vlan[each.value.vlan_policy].moid
   }
   multicast_policy {
-    moid = intersight_fabric_multicast_policy.multicast[each.value.multicast_policy].moid
+    moid = [for i in data.intersight_fabric_multicast_policy.multicast[0
+      ].results : i.moid if i.organization[0].moid == local.orgs[
+      each.value.multicast_policy.organization
+    ] && i.name == each.value.multicast_policy.name][0]
   }
 }

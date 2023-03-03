@@ -3,8 +3,8 @@
 # Model Data and policy from domains and pools
 #__________________________________________________________________
 
-variable "model" {
-  description = "Model data."
+variable "defaults" {
+  description = "Map of Defaults for Intersight Profiles."
   type        = any
 }
 
@@ -17,6 +17,11 @@ variable "organization" {
   default     = "default"
   description = "Name of the default intersight Organization."
   type        = string
+}
+
+variable "policies" {
+  description = "Policies - YAML to HCL data."
+  type        = any
 }
 
 variable "pools" {
