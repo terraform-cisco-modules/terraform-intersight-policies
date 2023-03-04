@@ -114,7 +114,7 @@ locals {
   adapter_configuration = {
     for value in lookup(local.policies, "adapter_configuration", []) : value.name => {
       add_vic_adapter_configuration = [
-        for v in v.add_vic_configuration : {
+        for v in value.add_vic_configuration : {
           dce_interface_settings = [for i in range(4) :
             {
               additional_properties = ""
