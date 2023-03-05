@@ -18,7 +18,7 @@ locals {
     for v in local.port_channel_ethernet_uplinks : v.flow_control_policy.name if v.flow_control_policy.name != "UNUSED"], [
     for v in local.port_role_ethernet_uplinks : v.flow_control_policy.name if v.flow_control_policy.name != "UNUSED"]
   )))
-  iboot    = local.defaults.iscsi_boot
+  iboot = local.defaults.iscsi_boot
   ip_pools = distinct(compact(concat([
     for v in local.imc_access : v.inband_ip_pool.name if v.inband_ip_pool.name != "UNUSED"], [
     for v in local.imc_access : v.out_of_band_ip_pool.name if v.out_of_band_ip_pool.name != "UNUSED"], [
@@ -35,8 +35,8 @@ locals {
     for v in local.iscsi_boot : v.secondary_target_policy.name if v.secondary_target_policy.name != "UNUSED"]
   )))
   ladapter = local.defaults.adapter_configuration
-  lbios       = local.defaults.bios
-  lboot       = local.defaults.boot_order
+  lbios    = local.defaults.bios
+  lboot    = local.defaults.boot_order
   lcp      = local.defaults.lan_connectivity
   lcp_eth_adtr = distinct(compact(concat([
     for v in local.vnics : v.ethernet_adapter_policy.name if v.ethernet_adapter_policy.name != "UNUSED"], [
@@ -52,10 +52,10 @@ locals {
   lcp_iboot = distinct(compact([
     for v in local.vnics : v.iscsi_boot_policy.name if v.iscsi_boot_policy.name != "UNUSED"]
   ))
-  ldga        = local.defaults.storage.drive_groups.automatic_drive_groups
-  ldgm        = local.defaults.storage.drive_groups.manual_drive_groups
-  ldgv        = local.defaults.storage.drive_groups.virtual_drives
-  ldns        = local.defaults.network_connectivity
+  ldga = local.defaults.storage.drive_groups.automatic_drive_groups
+  ldgm = local.defaults.storage.drive_groups.manual_drive_groups
+  ldgv = local.defaults.storage.drive_groups.virtual_drives
+  ldns = local.defaults.network_connectivity
   link_agg = distinct(compact(concat([
     for v in local.port_channel_appliances : v.link_aggregation_policy.name if v.link_aggregation_policy.name != "UNUSED"], [
     for v in local.port_channel_ethernet_uplinks : v.link_aggregation_policy.name if v.link_aggregation_policy.name != "UNUSED"], [
@@ -86,7 +86,7 @@ locals {
     for v in local.vlans : v.multicast_policy.name if v.multicast_policy.name != "UNUSED"]
   ))
   name_prefix = local.defaults.name_prefix
-  orgs        = { for k, v in data.intersight_organization_organization.orgs.results : v.name => v.moid }
+  orgs        = var.orgs
   policies    = var.policies
   scp_fc_adtr = distinct(compact(concat([
     for v in local.vhbas : v.fibre_channel_adapter_policy.name if v.fibre_channel_adapter_policy.name != "UNUSED"]
@@ -141,10 +141,10 @@ locals {
           pci_slot            = lookup(v, "pci_slot", local.ladapter.pci_slot)
         }
       ]
-      description         = lookup(value, "description", "")
-      name                = "${local.name_prefix}${value.name}${local.ladapter.name_suffix}"
-      organization        = var.organization
-      tags                = lookup(value, "tags", var.tags)
+      description  = lookup(value, "description", "")
+      name         = "${local.name_prefix}${value.name}${local.ladapter.name_suffix}"
+      organization = var.organization
+      tags         = lookup(value, "tags", var.tags)
     }
   }
 
@@ -870,7 +870,7 @@ locals {
       ipv6_address_configuration = lookup(
         v, "ipv6_address_configuration", local.defaults.imc_access.ipv6_address_configuration
       )
-      inband_ip_pool = lookup(v, "inband_ip_pool", null) != null ? try(
+      inband_ip_pool = lookup(v, "inband_ip_pool", "") != "" ? try(
         {
           name = tostring(v.inband_ip_pool)
           org  = var.organization
@@ -881,7 +881,7 @@ locals {
         org  = "UNUSED"
       }
       organization = var.organization
-      out_of_band_ip_pool = lookup(v, "out_of_band_ip_pool", null) != null ? try(
+      out_of_band_ip_pool = lookup(v, "out_of_band_ip_pool", "") != "" ? try(
         {
           name = tostring(v.out_of_band_ip_pool)
           org  = var.organization
@@ -906,7 +906,7 @@ locals {
       dhcp_vendor_id_iqn = lookup(v, "dhcp_vendor_id_iqn", local.iboot.dhcp_vendor_id_iqn)
       description        = lookup(v, "description", "")
       gateway            = lookup(lookup(v, "initiator_static_ipv4_config", {}), "default_gateway", "")
-      initiator_ip_pool = lookup(v, "initiator_ip_pool", null) != null ? try(
+      initiator_ip_pool = lookup(v, "initiator_ip_pool", "") != "" ? try(
         {
           name = tostring(v.initiator_ip_pool)
           org  = var.organization
@@ -918,7 +918,7 @@ locals {
       }
       initiator_ip_source = lookup(v, "initiator_ip_source", local.iboot.initiator_ip_source)
       ip_address          = lookup(lookup(v, "initiator_static_ipv4_config", {}), "ip_address", "")
-      iscsi_adapter_policy = lookup(v, "iscsi_adapter_policy", null) != null ? try(
+      iscsi_adapter_policy = lookup(v, "iscsi_adapter_policy", "") != "" ? try(
         {
           name = tostring(v.iscsi_adapter_policy)
           org  = var.organization
@@ -932,7 +932,7 @@ locals {
       netmask      = lookup(lookup(v, "initiator_static_ipv4_config", {}), "subnet_mask", "")
       organization = var.organization
       primary_dns  = lookup(lookup(v, "initiator_static_ipv4_config", {}), "primary_dns", "")
-      primary_target_policy = lookup(v, "primary_target_policy", null) != null ? try(
+      primary_target_policy = lookup(v, "primary_target_policy", "") != "" ? try(
         {
           name = tostring(v.primary_target_policy)
           org  = var.organization
@@ -943,7 +943,7 @@ locals {
         org  = "UNUSED"
       }
       secondary_dns = lookup(lookup(v, "initiator_static_ipv4_config", {}), "secondary_dns", "")
-      secondary_target_policy = lookup(v, "secondary_target_policy", null) != null ? try(
+      secondary_target_policy = lookup(v, "secondary_target_policy", "") != "" ? try(
         {
           name = tostring(v.secondary_target_policy)
           org  = var.organization
@@ -973,7 +973,7 @@ locals {
       iqn_allocation_type = lookup(
         v, "iqn_allocation_type", local.lcp.iqn_allocation_type
       )
-      iqn_pool = lookup(v, "iqn_pool", null) != null ? try(
+      iqn_pool = lookup(v, "iqn_pool", "") != "" ? try(
         {
           name         = tostring(v.iqn_pool)
           organization = var.organization
@@ -1066,14 +1066,14 @@ locals {
           ethernet_adapter_policy = try(
             {
               name = tostring(v.ethernet_adapter_policy)
-              org  = var.organization
+              org  = value.organization
             },
             v.ethernet_adapter_policy
           )
           ethernet_network_control_policy = v.ethernet_network_control_policy != "" ? try(
             {
               name = tostring(v.ethernet_network_control_policy)
-              org  = var.organization
+              org  = value.organization
             },
             v.ethernet_network_control_policy
             ) : {
@@ -1083,7 +1083,7 @@ locals {
           ethernet_network_group_policy = v.ethernet_network_group_policy != "" ? try(
             {
               name = tostring(v.ethernet_network_group_policy)
-              org  = var.organization
+              org  = value.organization
             },
             v.ethernet_network_group_policy
             ) : {
@@ -1093,7 +1093,7 @@ locals {
           ethernet_network_policy = v.ethernet_network_policy != "" ? try(
             {
               name = tostring(v.ethernet_network_policy)
-              org  = var.organization
+              org  = value.organization
             },
             v.ethernet_network_policy
             ) : {
@@ -1103,14 +1103,14 @@ locals {
           ethernet_qos_policy = try(
             {
               name = tostring(v.ethernet_qos_policy)
-              org  = var.organization
+              org  = value.organization
             },
             v.ethernet_qos_policy
           )
           iscsi_boot_policy = v.iscsi_boot_policy != "" ? try(
             {
               name = tostring(v.iscsi_boot_policy)
-              org  = var.organization
+              org  = value.organization
             },
             v.iscsi_boot_policy
             ) : {
@@ -1122,7 +1122,7 @@ locals {
           mac_address_pool = length(v.mac_address_pools) > 0 ? try(
             {
               name = tostring(element(v.mac_address_pools, s))
-              org  = var.organization
+              org  = value.organization
             },
             element(v.mac_address_pools, s)
             ) : {
@@ -1131,7 +1131,8 @@ locals {
           }
           mac_address_static = length(lookup(v, "mac_addresses_static", [])
           ) > 0 ? element(v.mac_addresses_static, s) : ""
-          name = element(v.names, s)
+          name         = element(v.names, s)
+          organization = value.organization
           placement_pci_link = length(v.placement_pci_links) == 1 ? element(
             v.placement_pci_links, 0) : element(v.placement_pci_links, s
           )
@@ -1149,7 +1150,7 @@ locals {
           usnic_adapter_policy = v.usnic_adapter_policy != "" ? try(
             {
               name = tostring(v.usnic_adapter_policy)
-              org  = var.organization
+              org  = value.organization
             },
             v.usnic_adapter_policy
             ) : {
@@ -1166,7 +1167,7 @@ locals {
           vmq_vmmq_adapter_policy = v.vmq_vmmq_adapter_policy != "" ? try(
             {
               name = tostring(v.vmq_vmmq_adapter_policy)
-              org  = var.organization
+              org  = value.organization
             },
             v.vmq_vmmq_adapter_policy
             ) : {
@@ -1422,9 +1423,9 @@ locals {
             link_aggregation_policy = lookup(
               v, "link_aggregation_policy", local.lport.port_channel_ethernet_uplinks.link_aggregation_policy
             )
-            mode       = lookup(v, "mode", local.lport.port_channel_appliances.mode)
-            pc_id      = length(v.pc_ids) == 1 ? element(v.pc_ids, 0) : element(v.pc_ids, i)
-            priority   = lookup(v, "priority", local.lport.port_channel_appliances.priority)
+            mode     = lookup(v, "mode", local.lport.port_channel_appliances.mode)
+            pc_id    = length(v.pc_ids) == 1 ? element(v.pc_ids, 0) : element(v.pc_ids, i)
+            priority = lookup(v, "priority", local.lport.port_channel_appliances.priority)
           }
         ]
         port_channel_ethernet_uplinks = [
@@ -1593,11 +1594,12 @@ locals {
           name = "UNUSED"
           org  = "UNUSED"
         }
-        mode        = v.mode
-        pc_id       = v.pc_id
-        port_policy = value.name
-        priority    = v.priority
-        tags        = value.tags
+        mode         = v.mode
+        organization = value.organization
+        pc_id        = v.pc_id
+        port_policy  = value.name
+        priority     = v.priority
+        tags         = value.tags
       }
     ]
   ]) : "${i.port_policy}:${i.pc_id}" => i }
@@ -1629,7 +1631,7 @@ locals {
         link_aggregation_policy = v.link_aggregation_policy != "" ? try(
           {
             name = tostring(v.link_aggregation_policy)
-            org  = var.organization
+            org  = value.organization
           },
           v.link_aggregation_policy
           ) : {
@@ -1639,16 +1641,17 @@ locals {
         link_control_policy = v.link_control_policy != "" ? try(
           {
             name = tostring(v.link_control_policy)
-            org  = var.organization
+            org  = value.organization
           },
           v.link_control_policy
           ) : {
           name = "UNUSED"
           org  = "UNUSED"
         }
-        pc_id       = v.pc_id
-        port_policy = value.name
-        tags        = value.tags
+        organization = value.organization
+        pc_id        = v.pc_id
+        port_policy  = value.name
+        tags         = value.tags
       }
     ]
   ]) : "${i.port_policy}:${i.pc_id}" => i }
@@ -1673,7 +1676,7 @@ locals {
         link_aggregation_policy = v.link_aggregation_policy != "" ? try(
           {
             name = tostring(v.link_aggregation_policy)
-            org  = var.organization
+            org  = value.organization
           },
           v.link_aggregation_policy
           ) : {
@@ -1683,16 +1686,17 @@ locals {
         link_control_policy = v.link_control_policy != "" ? try(
           {
             name = tostring(v.link_control_policy)
-            org  = var.organization
+            org  = value.organization
           },
           v.link_control_policy
           ) : {
           name = "UNUSED"
           org  = "UNUSED"
         }
-        pc_id       = v.pc_id
-        port_policy = value.name
-        tags        = value.tags
+        organization = value.organization
+        pc_id        = v.pc_id
+        port_policy  = value.name
+        tags         = value.tags
       }
     ]
   ]) : "${i.port_policy}:${i.pc_id}" => i }
@@ -1723,6 +1727,7 @@ locals {
         ethernet_network_group_policy   = v.ethernet_network_group_policy
         fec                             = v.fec
         mode                            = v.mode
+        organization                    = value.organization
         port_list = flatten(
           [for s in compact(length(regexall("-", v.port_list)) > 0 ? tolist(split(",", v.port_list)
             ) : length(regexall(",", v.port_list)) > 0 ? tolist(split(",", v.port_list)) : [v.port_list]
@@ -1756,13 +1761,14 @@ locals {
           },
           v.ethernet_network_group_policy
         )
-        fec         = v.fec
-        mode        = v.mode
-        port_id     = s
-        port_policy = v.port_policy
-        priority    = v.priority
-        slot_id     = v.slot_id
-        tags        = v.tags
+        fec          = v.fec
+        mode         = v.mode
+        organization = v.organization
+        port_id      = s
+        port_policy  = v.port_policy
+        priority     = v.priority
+        slot_id      = v.slot_id
+        tags         = v.tags
       }
     ]
   ]) : "${i.port_policy}:${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
@@ -1786,6 +1792,7 @@ locals {
         fec                           = v.fec
         flow_control_policy           = v.flow_control_policy
         link_control_policy           = v.link_control_policy
+        organization                  = value.organization
         port_list = flatten(
           [for s in compact(length(regexall("-", v.port_list)) > 0 ? tolist(split(",", v.port_list)
             ) : length(regexall(",", v.port_list)) > 0 ? tolist(split(",", v.port_list)) : [v.port_list]
@@ -1835,10 +1842,11 @@ locals {
           name = "UNUSED"
           org  = "UNUSED"
         }
-        port_id     = s
-        port_policy = v.port_policy
-        slot_id     = v.slot_id
-        tags        = v.tags
+        organization = v.organization
+        port_id      = s
+        port_policy  = v.port_policy
+        slot_id      = v.slot_id
+        tags         = v.tags
       }
     ]
   ]) : "${i.port_policy}:${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
@@ -1947,6 +1955,7 @@ locals {
         breakout_port_id    = v.breakout_port_id
         fec                 = v.fec
         link_control_policy = v.link_control_policy
+        organization        = value.organization
         port_list = flatten(
           [for s in compact(length(regexall("-", v.port_list)) > 0 ? tolist(split(",", v.port_list)
             ) : length(regexall(",", v.port_list)) > 0 ? tolist(split(",", v.port_list)) : [v.port_list]
@@ -1973,10 +1982,11 @@ locals {
           },
           v.link_control_policy
         )
-        port_id     = s
-        port_policy = v.port_policy
-        slot_id     = v.slot_id
-        tags        = v.tags
+        organization = v.organization
+        port_id      = s
+        port_policy  = v.port_policy
+        slot_id      = v.slot_id
+        tags         = v.tags
       }
     ]
   ]) : "${i.port_policy}:${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
@@ -2108,7 +2118,7 @@ locals {
           fibre_channel_qos_policy = v.fibre_channel_qos_policy != "" ? try(
             {
               name = tostring(v.fibre_channel_qos_policy)
-              org  = var.organization
+              org  = value.organization
             },
             v.fibre_channel_qos_policy
             ) : {
@@ -2116,6 +2126,7 @@ locals {
             org  = "UNUSED"
           }
           name                    = element(v.names, s)
+          organization            = value.organization
           persistent_lun_bindings = v.persistent_lun_bindings
           placement_pci_link = length(v.placement_pci_link) == 1 ? element(
             v.placement_pci_link, 0) : element(v.placement_pci_link, s
@@ -2355,6 +2366,7 @@ locals {
         name                  = v.name
         name_prefix           = length(regexall("(,|-)", jsonencode(v.vlan_list))) > 0 ? true : false
         native_vlan           = v.native_vlan
+        organization          = value.organization
         vlan_list = flatten(
           [for s in compact(length(regexall("-", v.vlan_list)) > 0 ? tolist(split(",", v.vlan_list)
             ) : length(regexall(",", v.vlan_list)) > 0 ? tolist(split(",", v.vlan_list)) : [v.vlan_list]
@@ -2378,11 +2390,12 @@ locals {
           name = "UNUSED"
           org  = "UNUSED"
         }
-        name        = v.name
-        name_prefix = v.name_prefix
-        native_vlan = v.native_vlan
-        vlan_id     = s
-        vlan_policy = v.vlan_policy
+        name         = v.name
+        name_prefix  = v.name_prefix
+        native_vlan  = v.native_vlan
+        organization = v.organization
+        vlan_id      = s
+        vlan_policy  = v.vlan_policy
       }
     ]
   ]) : "${i.vlan_policy}:${i.vlan_id}" => i }
@@ -2414,6 +2427,7 @@ locals {
         default_zoning = lookup(v, "default_zoning", local.lvsan.vsans.default_zoning)
         fcoe_vlan_id   = lookup(v, "fcoe_vlan_id", v.vsan_id)
         name           = v.name
+        organization   = value.organization
         vsan_id        = v.vsan_id
         vsan_policy    = value.name
         vsan_scope     = lookup(v, "vsan_scope", local.lvsan.vsans.vsan_scope)

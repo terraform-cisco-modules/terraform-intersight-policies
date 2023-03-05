@@ -1,36 +1,31 @@
 #__________________________________________________________________
 #
-# Organization Data Objects
-#__________________________________________________________________
-
-data "intersight_organization_organization" "orgs" {
-}
-
-#__________________________________________________________________
-#
 # Pool Data Objects
 #__________________________________________________________________
 
-data "intersight_ippool_pool" "ip" {
-  for_each = { for v in [0] : v => v if length(local.ip_pools) > 0 }
+data "intersight_search_search_item" "ip" {
+  for_each              = { for v in [0] : v => v if length(local.ip_pools) > 0 }
+  additional_properties = jsonencode({ "ObjectType" = "ippool.Pool" })
 }
 
-data "intersight_iqnpool_pool" "iqn" {
-  for_each = { for v in [0] : v => v if length(local.iqn_pools) > 0 }
+data "intersight_search_search_item" "iqn" {
+  for_each              = { for v in [0] : v => v if length(local.iqn_pools) > 0 }
+  additional_properties = jsonencode({ "ObjectType" = "iqnpool.Pool" })
 }
 
-data "intersight_macpool_pool" "mac" {
-  for_each = { for v in [0] : v => v if length(local.mac_pools) > 0 }
+data "intersight_search_search_item" "mac" {
+  for_each              = { for v in [0] : v => v if length(local.mac_pools) > 0 }
+  additional_properties = jsonencode({ "ObjectType" = "macpool.Pool" })
 }
 
-data "intersight_fcpool_pool" "wwnn" {
-  for_each     = { for v in [0] : v => v if length(local.wwnn_pools) > 0 }
-  pool_purpose = "WWNN"
+data "intersight_search_search_item" "wwnn" {
+  for_each              = { for v in [0] : v => v if length(local.wwnn_pools) > 0 }
+  additional_properties = jsonencode({ "ObjectType" = "fcpool.Pool" })
 }
 
-data "intersight_fcpool_pool" "wwpn" {
-  for_each     = { for v in [0] : v => v if length(local.wwpn_pools) > 0 }
-  pool_purpose = "WWPN"
+data "intersight_search_search_item" "wwpn" {
+  for_each              = { for v in [0] : v => v if length(local.wwpn_pools) > 0 }
+  additional_properties = jsonencode({ "ObjectType" = "fcpool.Pool" })
 }
 
 #__________________________________________________________________
@@ -43,39 +38,29 @@ data "intersight_fcpool_pool" "wwpn" {
 # Ethernet Data Objects
 #________________________________________
 
-data "intersight_vnic_eth_adapter_policy" "ethernet_adapter" {
-  depends_on = [
-    intersight_vnic_eth_adapter_policy.ethernet_adapter
-  ]
-  for_each = { for v in [0] : v => v if length(local.lcp_eth_adtr) > 0 }
+data "intersight_search_search_item" "ethernet_adapter" {
+  for_each              = { for v in [0] : v => v if length(local.lcp_eth_adtr) > 0 }
+  additional_properties = jsonencode({ "ObjectType" = "vnic.EthAdapterPolicy" })
 }
 
-data "intersight_fabric_eth_network_control_policy" "ethernet_network_control" {
-  depends_on = [
-    intersight_fabric_eth_network_control_policy.ethernet_network_control
-  ]
-  for_each = { for v in [0] : v => v if length(local.eth_ntwk_ctrl) > 0 }
+data "intersight_search_search_item" "ethernet_network_control" {
+  for_each              = { for v in [0] : v => v if length(local.eth_ntwk_ctrl) > 0 }
+  additional_properties = jsonencode({ "ObjectType" = "fabric.EthNetworkControlPolicy" })
 }
 
-data "intersight_fabric_eth_network_group_policy" "ethernet_network_group" {
-  depends_on = [
-    intersight_fabric_eth_network_group_policy.ethernet_network_group
-  ]
-  for_each = { for v in [0] : v => v if length(local.eth_ntwk_grp) > 0 }
+data "intersight_search_search_item" "ethernet_network_group" {
+  for_each              = { for v in [0] : v => v if length(local.eth_ntwk_grp) > 0 }
+  additional_properties = jsonencode({ "ObjectType" = "fabric.EthNetworkGroupPolicy" })
 }
 
-data "intersight_vnic_eth_network_policy" "ethernet_network" {
-  depends_on = [
-    intersight_vnic_eth_network_policy.ethernet_network
-  ]
-  for_each = { for v in [0] : v => v if length(local.lcp_eth_ntwk) > 0 }
+data "intersight_search_search_item" "ethernet_network" {
+  for_each              = { for v in [0] : v => v if length(local.lcp_eth_ntwk) > 0 }
+  additional_properties = jsonencode({ "ObjectType" = "vnic.EthNetworkPolicy" })
 }
 
-data "intersight_vnic_eth_qos_policy" "ethernet_qos" {
-  depends_on = [
-    intersight_vnic_eth_qos_policy.ethernet_qos
-  ]
-  for_each = { for v in [0] : v => v if length(local.lcp_eth_qos) > 0 }
+data "intersight_search_search_item" "ethernet_qos" {
+  for_each              = { for v in [0] : v => v if length(local.lcp_eth_qos) > 0 }
+  additional_properties = jsonencode({ "ObjectType" = "vnic.EthQosPolicy" })
 }
 
 #________________________________________
@@ -83,32 +68,24 @@ data "intersight_vnic_eth_qos_policy" "ethernet_qos" {
 # Fibre-Channel Data Objects
 #________________________________________
 
-data "intersight_vnic_fc_adapter_policy" "fibre_channel_adapter" {
-  depends_on = [
-    intersight_vnic_fc_adapter_policy.fibre_channel_adapter
-  ]
-  for_each = { for v in [0] : v => v if length(local.scp_fc_adtr) > 0 }
+data "intersight_search_search_item" "fibre_channel_adapter" {
+  for_each              = { for v in [0] : v => v if length(local.scp_fc_adtr) > 0 }
+  additional_properties = jsonencode({ "ObjectType" = "vnic.FcAdapterPolicy" })
 }
 
-data "intersight_vnic_fc_network_policy" "fibre_channel_network" {
-  depends_on = [
-    intersight_vnic_fc_network_policy.fibre_channel_network
-  ]
-  for_each = { for v in [0] : v => v if length(local.scp_fc_ntwk) > 0 }
+data "intersight_search_search_item" "fibre_channel_network" {
+  for_each              = { for v in [0] : v => v if length(local.scp_fc_ntwk) > 0 }
+  additional_properties = jsonencode({ "ObjectType" = "vnic.FcNetworkPolicy" })
 }
 
-data "intersight_vnic_fc_qos_policy" "fibre_channel_qos" {
-  depends_on = [
-    intersight_vnic_fc_qos_policy.fibre_channel_qos
-  ]
-  for_each = { for v in [0] : v => v if length(local.scp_fc_qos) > 0 }
+data "intersight_search_search_item" "fibre_channel_qos" {
+  for_each              = { for v in [0] : v => v if length(local.scp_fc_qos) > 0 }
+  additional_properties = jsonencode({ "ObjectType" = "vnic.FcQosPolicy" })
 }
 
-data "intersight_fabric_fc_zone_policy" "fc_zone" {
-  depends_on = [
-    intersight_fabric_fc_zone_policy.fc_zone
-  ]
-  for_each = { for v in [0] : v => v if length(local.scp_fc_zone) > 0 }
+data "intersight_search_search_item" "fc_zone" {
+  for_each              = { for v in [0] : v => v if length(local.scp_fc_zone) > 0 }
+  additional_properties = jsonencode({ "ObjectType" = "fabric.FcZonePolicy" })
 }
 
 #________________________________________
@@ -116,25 +93,19 @@ data "intersight_fabric_fc_zone_policy" "fc_zone" {
 # iSCSI Policy Data Objects
 #________________________________________
 
-data "intersight_vnic_iscsi_adapter_policy" "iscsi_adapter" {
-  depends_on = [
-    intersight_vnic_iscsi_adapter_policy.iscsi_adapter
-  ]
-  for_each = { for v in [0] : v => v if length(local.iadapter) > 0 }
+data "intersight_search_search_item" "iscsi_adapter" {
+  for_each              = { for v in [0] : v => v if length(local.iadapter) > 0 }
+  additional_properties = jsonencode({ "ObjectType" = "vnic.IscsiAdapterPolicy" })
 }
 
-data "intersight_vnic_iscsi_boot_policy" "iscsi_boot" {
-  depends_on = [
-    intersight_vnic_iscsi_boot_policy.iscsi_boot
-  ]
-  for_each = { for v in [0] : v => v if length(local.lcp_iboot) > 0 }
+data "intersight_search_search_item" "iscsi_boot" {
+  for_each              = { for v in [0] : v => v if length(local.lcp_iboot) > 0 }
+  additional_properties = jsonencode({ "ObjectType" = "vnic.IscsiBootPolicy" })
 }
 
-data "intersight_vnic_iscsi_static_target_policy" "iscsi_static_target" {
-  depends_on = [
-    intersight_vnic_iscsi_static_target_policy.iscsi_static_target
-  ]
-  for_each = { for v in [0] : v => v if length(local.itarget) > 0 }
+data "intersight_search_search_item" "iscsi_static_target" {
+  for_each              = { for v in [0] : v => v if length(local.itarget) > 0 }
+  additional_properties = jsonencode({ "ObjectType" = "vnic.IscsiStaticTargetPolicy" })
 }
 
 #________________________________________
@@ -142,25 +113,19 @@ data "intersight_vnic_iscsi_static_target_policy" "iscsi_static_target" {
 # Port Policy Data Objects
 #________________________________________
 
-data "intersight_fabric_flow_control_policy" "flow_control" {
-  depends_on = [
-    intersight_fabric_flow_control_policy.flow_control
-  ]
-  for_each = { for v in [0] : v => v if length(local.flow_ctrl) > 0 }
+data "intersight_search_search_item" "flow_control" {
+  for_each              = { for v in [0] : v => v if length(local.flow_ctrl) > 0 }
+  additional_properties = jsonencode({ "ObjectType" = "fabric.FlowControlPolicy" })
 }
 
-data "intersight_fabric_link_aggregation_policy" "link_aggregation" {
-  depends_on = [
-    intersight_fabric_link_aggregation_policy.link_aggregation
-  ]
-  for_each = { for v in [0] : v => v if length(local.link_agg) > 0 }
+data "intersight_search_search_item" "link_aggregation" {
+  for_each              = { for v in [0] : v => v if length(local.link_agg) > 0 }
+  additional_properties = jsonencode({ "ObjectType" = "fabric.LinkAggregationPolicy" })
 }
 
-data "intersight_fabric_link_control_policy" "link_control" {
-  depends_on = [
-    intersight_fabric_link_control_policy.link_control
-  ]
-  for_each = { for v in [0] : v => v if length(local.link_ctrl) > 0 }
+data "intersight_search_search_item" "link_control" {
+  for_each              = { for v in [0] : v => v if length(local.link_ctrl) > 0 }
+  additional_properties = jsonencode({ "ObjectType" = "fabric.LinkControlPolicy" })
 }
 
 #________________________________________
@@ -168,9 +133,7 @@ data "intersight_fabric_link_control_policy" "link_control" {
 # Multicast Policy Data Objects
 #________________________________________
 
-data "intersight_fabric_multicast_policy" "multicast" {
-  depends_on = [
-    intersight_fabric_multicast_policy.multicast
-  ]
-  for_each = { for v in [0] : v => v if length(local.mcast) > 0 }
+data "intersight_search_search_item" "multicast" {
+  for_each              = { for v in [0] : v => v if length(local.mcast) > 0 }
+  additional_properties = jsonencode({ "ObjectType" = "fabric.MulticastPolicy" })
 }

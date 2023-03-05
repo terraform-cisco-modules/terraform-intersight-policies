@@ -96,7 +96,8 @@ resource "intersight_snmp_policy" "snmp" {
         ) > 0 ? var.snmp_privacy_password_3 : length(
         regexall("5", coalesce(snmp_users.value.privacy_password, 10))
       ) > 0 ? var.snmp_privacy_password_5 : "" : ""
-      privacy_type   = lookup(snmp_users.value, "privacy_type", local.lsnmp.snmp_users.privacy_type)
+      privacy_type = lookup(snmp_users.value, "auth_type", local.lsnmp.snmp_users.auth_type
+      ) == "AuthPriv" ? lookup(snmp_users.value, "privacy_type", local.lsnmp.snmp_users.privacy_type) : "NA"
       security_level = lookup(snmp_users.value, "security_level", local.lsnmp.snmp_users.security_level)
     }
   }

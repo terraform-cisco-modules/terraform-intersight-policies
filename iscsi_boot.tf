@@ -6,8 +6,11 @@
 
 resource "intersight_vnic_iscsi_boot_policy" "iscsi_boot" {
   depends_on = [
-    data.intersight_vnic_iscsi_adapter_policy.iscsi_adapter,
-    data.intersight_vnic_iscsi_static_target_policy.iscsi_static_target
+    data.intersight_search_search_item.ip,
+    data.intersight_search_search_item.iscsi_adapter,
+    data.intersight_search_search_item.iscsi_static_target,
+    intersight_vnic_iscsi_adapter_policy.iscsi_adapter,
+    intersight_vnic_iscsi_static_target_policy.iscsi_static_target
   ]
   for_each               = { for k, v in local.iscsi_boot : k => v }
   auto_targetvendor_name = each.value.dhcp_vendor_id_iqn
@@ -75,9 +78,11 @@ resource "intersight_vnic_iscsi_boot_policy" "iscsi_boot" {
       for v in [each.value.initiator_ip_pool.name] : v => v if each.value.initiator_ip_pool.name != "UNUSED"
     }
     content {
-      moid = [for i in data.intersight_ippool_pool.ip[0].results : i.moid if i.organization[0
-        ].moid == local.orgs[each.value.initiator_ip_pool.organization
-      ] && i.name == each.value.initiator_ip_pool.name][0]
+      moid = length(regexall(false, var.moids_pools)) > 0 ? var.pools[each.value.initiator_ip_pool.org].ip[
+        each.value.initiator_ip_pool.name
+        ] : [for i in data.intersight_search_search_item.ip[0].results : i.moid if jsondecode(
+          i.additional_properties).Organization.Moid == local.orgs[each.value.initiator_ip_pool.org
+      ] && jsondecode(i.additional_properties).Name == each.value.initiator_ip_pool.name][0]
       object_type = "ippool.Pool"
     }
   }
@@ -87,10 +92,11 @@ resource "intersight_vnic_iscsi_boot_policy" "iscsi_boot" {
       ] : v => v if each.value.iscsi_adapter_policy.name != "UNUSED"
     }
     content {
-      moid = [for i in data.intersight_vnic_iscsi_adapter_policy.iscsi_adapter[0
-        ].results : i.moid if i.organization[0
-        ].moid == local.orgs[each.value.iscsi_adapter_policy.org
-      ] && i.name == each.value.iscsi_adapter_policy.name][0]
+      moid = length(regexall(each.value.iscsi_adapter_policy.org, each.value.organization)
+        ) > 0 ? intersight_vnic_iscsi_adapter_policy.iscsi_adapter[each.value.iscsi_adapter_policy.name
+        ].moid : [for i in data.intersight_search_search_item.iscsi_adapter[0].results : i.moid if jsondecode(
+          i.additional_properties).Organization.Moid == local.orgs[each.value.iscsi_adapter_policy.org
+      ] && jsondecode(i.additional_properties).Name == each.value.iscsi_adapter_policy.name][0]
     }
   }
   dynamic "primary_target_policy" {
@@ -99,10 +105,11 @@ resource "intersight_vnic_iscsi_boot_policy" "iscsi_boot" {
       ] : v => v if each.value.primary_target_policy.name != "UNUSED"
     }
     content {
-      moid = [for i in data.intersight_vnic_iscsi_static_target_policy.iscsi_static_target[0
-        ].results : i.moid if i.organization[0
-        ].moid == local.orgs[each.value.primary_target_policy.org
-      ] && i.name == each.value.primary_target_policy.name][0]
+      moid = length(regexall(each.value.primary_target_policy.org, each.value.organization)
+        ) > 0 ? intersight_vnic_iscsi_static_target_policy.iscsi_static_target[each.value.primary_target_policy.name
+        ].moid : [for i in data.intersight_search_search_item.iscsi_static_target[0].results : i.moid if jsondecode(
+          i.additional_properties).Organization.Moid == local.orgs[each.value.primary_target_policy.org
+      ] && jsondecode(i.additional_properties).Name == each.value.primary_target_policy.name][0]
     }
   }
   dynamic "secondary_target_policy" {
@@ -111,10 +118,11 @@ resource "intersight_vnic_iscsi_boot_policy" "iscsi_boot" {
       ] : v => v if each.value.secondary_target_policy.name != "UNUSED"
     }
     content {
-      moid = [for i in data.intersight_vnic_iscsi_static_target_policy.iscsi_static_target[0
-        ].results : i.moid if i.organization[0
-        ].moid == local.orgs[each.value.secondary_target_policy.org
-      ] && i.name == each.value.secondary_target_policy.name][0]
+      moid = length(regexall(each.value.secondary_target_policy.org, each.value.organization)
+        ) > 0 ? intersight_vnic_iscsi_static_target_policy.iscsi_static_target[each.value.secondary_target_policy.name
+        ].moid : [for i in data.intersight_search_search_item.iscsi_static_target[0].results : i.moid if jsondecode(
+          i.additional_properties).Organization.Moid == local.orgs[each.value.secondary_target_policy.org
+      ] && jsondecode(i.additional_properties).Name == each.value.secondary_target_policy.name][0]
     }
   }
   dynamic "tags" {

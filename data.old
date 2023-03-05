@@ -1,0 +1,189 @@
+#__________________________________________________________________
+#
+# Organization Data Objects
+#__________________________________________________________________
+
+data "intersight_organization_organization" "orgs" {
+}
+
+#__________________________________________________________________
+#
+# Pool Data Objects
+#__________________________________________________________________
+
+data "intersight_search_search_item" "ip" {
+  for_each = { for v in [0] : v => v if length(local.ip_pools) > 0 }
+  additional_properties = jsonencode({ "ClassId" = "ippool.Pool' and Name in ('${
+    trim(join("', '", local.ip_pools), ", '")}') and ObjectType eq 'ippool.Pool"
+  })
+}
+
+data "intersight_search_search_item" "iqn" {
+  for_each = { for v in [0] : v => v if length(local.iqn_pools) > 0 }
+  additional_properties = jsonencode({ "ClassId" = "iqnpool.Pool' and Name in ('${
+    trim(join("', '", local.iqn_pools), ", '")}') and ObjectType eq 'iqnpool.Pool"
+  })
+}
+
+data "intersight_search_search_item" "mac" {
+  for_each = { for v in [0] : v => v if length(local.mac_pools) > 0 }
+  additional_properties = jsonencode({ "ClassId" = "macpool.Pool' and Name in ('${
+    trim(join("', '", local.mac_pools), ", '")}') and ObjectType eq 'macpool.Pool"
+  })
+}
+
+data "intersight_search_search_item" "wwnn" {
+  for_each = { for v in [0] : v => v if length(local.wwnn_pools) > 0 }
+  additional_properties = jsonencode({ "ClassId" = "fcpool.Pool' and Name in ('${
+    trim(join("', '", local.wwnn_pools), ", '")}') and PoolPurpose eq 'WWNN"
+  })
+}
+
+data "intersight_search_search_item" "wwpn" {
+  for_each = { for v in [0] : v => v if length(local.wwpn_pools) > 0 }
+  additional_properties = jsonencode({ "ClassId" = "fcpool.Pool' and Name in ('${
+    trim(join("', '", local.wwpn_pools), ", '")}') and PoolPurpose eq 'WWPN"
+  })
+}
+
+#__________________________________________________________________
+#
+# Policies Data Objects
+#__________________________________________________________________
+
+#________________________________________
+#
+# Ethernet Data Objects
+#________________________________________
+
+data "intersight_search_search_item" "ethernet_adapter" {
+  for_each = { for v in [0] : v => v if length(local.lcp_eth_adtr) > 0 }
+  additional_properties = jsonencode({ "ClassId" = "vnic.EthAdapterPolicy' and Name in ('${
+    trim(join("', '", local.lcp_eth_adtr), ", '")}') and ObjectType eq 'vnic.EthAdapterPolicy"
+  })
+}
+
+data "intersight_search_search_item" "ethernet_network_control" {
+  for_each = { for v in [0] : v => v if length(local.eth_ntwk_ctrl) > 0 }
+  additional_properties = jsonencode({ "ClassId" = "fabric.EthNetworkControlPolicy' and Name in ('${
+    trim(join("', '", local.eth_ntwk_ctrl), ", '")}') and ObjectType eq 'fabric.EthNetworkControlPolicy"
+  })
+}
+
+data "intersight_search_search_item" "ethernet_network_group" {
+  for_each = { for v in [0] : v => v if length(local.eth_ntwk_grp) > 0 }
+  additional_properties = jsonencode({ "ClassId" = "fabric.EthNetworkGroupPolicy' and Name in ('${
+    trim(join("', '", local.eth_ntwk_grp), ", '")}') and ObjectType eq 'fabric.EthNetworkGroupPolicy"
+  })
+}
+
+data "intersight_search_search_item" "ethernet_network" {
+  for_each = { for v in [0] : v => v if length(local.lcp_eth_ntwk) > 0 }
+  additional_properties = jsonencode({ "ClassId" = "vnic.EthNetworkPolicy' and Name in ('${
+    trim(join("', '", local.lcp_eth_ntwk), ", '")}') and ObjectType eq 'vnic.EthNetworkPolicy"
+  })
+}
+
+data "intersight_search_search_item" "ethernet_qos" {
+  for_each = { for v in [0] : v => v if length(local.lcp_eth_qos) > 0 }
+  additional_properties = jsonencode({ "ClassId" = "vnic.EthQosPolicy' and Name in ('${
+    trim(join("', '", local.lcp_eth_qos), ", '")}') and ObjectType eq 'vnic.EthQosPolicy"
+  })
+}
+
+#________________________________________
+#
+# Fibre-Channel Data Objects
+#________________________________________
+
+data "intersight_search_search_item" "fibre_channel_adapter" {
+  for_each = { for v in [0] : v => v if length(local.scp_fc_adtr) > 0 }
+  additional_properties = jsonencode({ "ClassId" = "vnic.FcAdapterPolicy' and Name in ('${
+    trim(join("', '", local.scp_fc_adtr), ", '")}') and ObjectType eq 'vnic.FcAdapterPolicy"
+  })
+}
+
+data "intersight_search_search_item" "fibre_channel_network" {
+  for_each = { for v in [0] : v => v if length(local.scp_fc_ntwk) > 0 }
+  additional_properties = jsonencode({ "ClassId" = "vnic.FcNetworkPolicy' and Name in ('${
+    trim(join("', '", local.scp_fc_ntwk), ", '")}') and ObjectType eq 'vnic.FcNetworkPolicy"
+  })
+}
+
+data "intersight_search_search_item" "fibre_channel_qos" {
+  for_each = { for v in [0] : v => v if length(local.scp_fc_qos) > 0 }
+  additional_properties = jsonencode({ "ClassId" = "vnic.FcQosPolicy' and Name in ('${
+    trim(join("', '", local.scp_fc_qos), ", '")}') and ObjectType eq 'vnic.FcQosPolicy"
+  })
+}
+
+data "intersight_search_search_item" "fc_zone" {
+  for_each = { for v in [0] : v => v if length(local.scp_fc_zone) > 0 }
+  additional_properties = jsonencode({ "ClassId" = "fabric.FcZonePolicy' and Name in ('${
+    trim(join("', '", local.scp_fc_zone), ", '")}') and ObjectType eq 'fabric.FcZonePolicy"
+  })
+}
+
+#________________________________________
+#
+# iSCSI Policy Data Objects
+#________________________________________
+
+data "intersight_search_search_item" "iscsi_adapter" {
+  for_each = { for v in [0] : v => v if length(local.iadapter) > 0 }
+  additional_properties = jsonencode({ "ClassId" = "vnic.IscsiAdapterPolicy' and Name in ('${
+    trim(join("', '", local.iadapter), ", '")}') and ObjectType eq 'vnic.IscsiAdapterPolicy"
+  })
+}
+
+data "intersight_search_search_item" "iscsi_boot" {
+  for_each = { for v in [0] : v => v if length(local.lcp_iboot) > 0 }
+  additional_properties = jsonencode({ "ClassId" = "vnic.IscsiBootPolicy' and Name in ('${
+    trim(join("', '", local.lcp_iboot), ", '")}') and ObjectType eq 'vnic.IscsiBootPolicy"
+  })
+}
+
+data "intersight_search_search_item" "iscsi_static_target" {
+  for_each = { for v in [0] : v => v if length(local.itarget) > 0 }
+  additional_properties = jsonencode({ "ClassId" = "vnic.IscsiStaticTargetPolicy' and Name in ('${
+    trim(join("', '", local.itarget), ", '")}') and ObjectType eq 'vnic.IscsiStaticTargetPolicy"
+  })
+}
+
+#________________________________________
+#
+# Port Policy Data Objects
+#________________________________________
+
+data "intersight_search_search_item" "flow_control" {
+  for_each = { for v in [0] : v => v if length(local.flow_ctrl) > 0 }
+  additional_properties = jsonencode({ "ClassId" = "fabric.FlowControlPolicy' and Name in ('${
+    trim(join("', '", local.flow_ctrl), ", '")}') and ObjectType eq 'fabric.FlowControlPolicy"
+  })
+}
+
+data "intersight_search_search_item" "link_aggregation" {
+  for_each = { for v in [0] : v => v if length(local.link_agg) > 0 }
+  additional_properties = jsonencode({ "ClassId" = "fabric.LinkAggregationPolicy' and Name in ('${
+    trim(join("', '", local.link_agg), ", '")}') and ObjectType eq 'fabric.LinkAggregationPolicy"
+  })
+}
+
+data "intersight_search_search_item" "link_control" {
+  for_each = { for v in [0] : v => v if length(local.link_ctrl) > 0 }
+  additional_properties = jsonencode({ "ClassId" = "fabric.LinkControlPolicy' and Name in ('${
+    trim(join("', '", local.link_ctrl), ", '")}') and ObjectType eq 'fabric.LinkControlPolicy"
+  })
+}
+
+#________________________________________
+#
+# Multicast Policy Data Objects
+#________________________________________
+
+data "intersight_search_search_item" "multicast" {
+  for_each = { for v in [0] : v => v if length(local.mcast) > 0 }
+  additional_properties = jsonencode({ "ClassId" = "fabric.MulticastPolicy' and Name in ('${
+    trim(join("', '", local.mcast), ", '")}') and ObjectType eq 'fabric.MulticastPolicy"
+  })
+}

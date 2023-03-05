@@ -70,10 +70,9 @@ output "device_connector" {
 
 output "imc_access" {
   description = "Moid's of the IMC Access Policies."
-  value       = local.imc_access
-  #value = length(lookup(local.policies, "imc_access", [])) > 0 ? { for v in sort(
-  #  keys(intersight_access_policy.imc_access)
-  #) : v => intersight_access_policy.imc_access[v].moid } : {}
+  value = length(lookup(local.policies, "imc_access", [])) > 0 ? { for v in sort(
+    keys(intersight_access_policy.imc_access)
+  ) : v => intersight_access_policy.imc_access[v].moid } : {}
 }
 
 
