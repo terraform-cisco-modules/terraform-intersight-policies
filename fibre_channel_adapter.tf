@@ -17,18 +17,22 @@ resource "intersight_vnic_fc_adapter_policy" "fibre_channel_adapter" {
     regexall("(Windows)", coalesce(each.value.adapter_template, "EMPTY"))
   ) > 0 ? "Recommended adapter settings for Windows." : each.value.description != "" ? each.value.description : "${each.value.name} Fibre-Channel Adapter Policy."
   error_detection_timeout     = each.value.error_detection_timeout
-  io_throttle_count           = each.value.io_throttle_count
+  io_throttle_count           = length(
+      regexall("(FCNVMeInitiator|Initiator|Solaris|VMware|Windows)", coalesce(each.value.adapter_template, "EMPTY"))
+    ) > 0 ? 256 : each.value.io_throttle_count
   lun_count                   = each.value.max_luns_per_target
   lun_queue_depth             = each.value.lun_queue_depth
   name                        = each.value.name
   resource_allocation_timeout = each.value.resource_allocation_timeout
   error_recovery_settings {
     enabled           = each.value.enable_fcp_error_recovery
-    io_retry_count    = each.value.error_recovery_port_down_io_retry
+    io_retry_count    = length(
+      regexall("(FCNVMeInitiator|Initiator|Solaris|VMware|Windows)", coalesce(each.value.adapter_template, "EMPTY"))
+    ) > 0 ? 30 : each.value.error_recovery_port_down_io_retry
     io_retry_timeout  = each.value.error_recovery_io_retry_timeout
     link_down_timeout = each.value.error_recovery_link_down_timeout
-    port_down_timeout = each.value.adapter_template == "WindowsBoot" ? 5000 : length(
-      regexall("(FCNVMeInitiator|Initiator|Solaris|VMware|Windows)", coalesce(each.value.adapter_template, "EMPTY"))
+    port_down_timeout = length(
+      regexall("(FCNVMeInitiator|Initiator|Windows)", coalesce(each.value.adapter_template, "EMPTY"))
     ) > 0 ? 30000 : each.value.error_recovery_port_down_timeout
   }
   flogi_settings {
@@ -44,7 +48,7 @@ resource "intersight_vnic_fc_adapter_policy" "fibre_channel_adapter" {
   }
   plogi_settings {
     retries = each.value.plogi_retries
-    timeout = each.value.adapter_template == "WindowsBoot" ? 4000 : each.value.plogi_timeout
+    timeout = each.value.plogi_timeout
   }
   rx_queue_settings {
     ring_size = length(

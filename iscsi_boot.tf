@@ -68,7 +68,7 @@ resource "intersight_vnic_iscsi_boot_policy" "iscsi_boot" {
     }
   ] : null
   name               = each.value.name
-  target_source_type = each.value.target_source_type == "Static"
+  target_source_type = each.value.target_source_type
   organization {
     moid        = local.orgs[each.value.organization]
     object_type = "organization.Organization"

@@ -6,6 +6,7 @@
 
 resource "intersight_storage_storage_policy" "storage" {
   for_each                 = local.storage
+  default_drive_mode       = each.value.default_drive_state
   description              = lookup(each.value, "description", "${each.value.name} Storage Policy.")
   global_hot_spares        = each.value.global_hot_spares
   name                     = each.value.name
@@ -20,7 +21,7 @@ resource "intersight_storage_storage_policy" "storage" {
     for_each = each.value.m2_raid_configuration
     content {
       controller_slot = m2_virtual_drive.value.slot
-      enable          = true
+      enable          = m2_virtual_drive.value.enable
       # additional_properties = ""
       # object_type           = "storage.DiskGroupPolicy"
     }
@@ -29,18 +30,18 @@ resource "intersight_storage_storage_policy" "storage" {
     for_each = toset(each.value.single_drive_raid_configuration)
     content {
       drive_slots = raid0_drive.value.drive_slots
-      enable      = raid0_drive.value.enable
+      enable      = lookup(raid0_drive.value, "enable", local.lstsdr.enable)
       object_type = "server.Profile"
       virtual_drive_policy = [
         {
           additional_properties = ""
-          access_policy         = raid0_drive.value.access_policy
+          access_policy         = lookup(raid0_drive.value, "access_policy", local.lstsdr.access_policy)
           class_id              = "storage.VirtualDriveConfig"
-          drive_cache           = raid0_drive.value.drive_cache
+          drive_cache           = lookup(raid0_drive.value, "drive_cache", local.lstsdr.drive_cache)
           object_type           = "storage.VirtualDriveConfig"
-          read_policy           = raid0_drive.value.read_policy
-          strip_size            = raid0_drive.value.strip_size
-          write_policy          = raid0_drive.value.write_policy
+          read_policy           = lookup(raid0_drive.value, "read_policy", local.lstsdr.read_policy)
+          strip_size            = lookup(raid0_drive.value, "strip_size", local.lstsdr.strip_size)
+          write_policy          = lookup(raid0_drive.value, "write_policy", local.lstsdr.write_policy)
         }
       ]
     }
@@ -97,7 +98,7 @@ resource "intersight_storage_drive_group" "drive_groups" {
     }
   }
   dynamic "manual_drive_group" {
-    for_each = toset(each.value.manual_drive_groups)
+    for_each = toset(each.value.manual_drive_group)
     content {
       class_id = "storage.ManualDriveGroup"
       dedicated_hot_spares = lookup(
@@ -134,13 +135,13 @@ resource "intersight_storage_drive_group" "drive_groups" {
       virtual_drive_policy = [
         {
           additional_properties = ""
-          access_policy         = lookup(virtual_drives.value, "access_policy", local.ldgv.virtual_drive_policy.access_policy)
+          access_policy         = lookup(virtual_drives.value, "access_policy", local.ldgvdp.access_policy)
           class_id              = "storage.VirtualDrivePolicy"
-          drive_cache           = lookup(virtual_drives.value, "disk_cache", local.ldgv.virtual_drive_policy.drive_cache)
+          drive_cache           = lookup(virtual_drives.value, "disk_cache", local.ldgvdp.drive_cache)
           object_type           = "storage.VirtualDrivePolicy"
-          read_policy           = lookup(virtual_drives.value, "read_policy", local.ldgv.virtual_drive_policy.read_policy)
-          strip_size            = lookup(virtual_drives.value, "strip_size", local.ldgv.virtual_drive_policy.strip_size)
-          write_policy          = lookup(virtual_drives.value, "write_policy", local.ldgv.virtual_drive_policy.write_policy)
+          read_policy           = lookup(virtual_drives.value, "read_policy", local.ldgvdp.read_policy)
+          strip_size            = lookup(virtual_drives.value, "strip_size", local.ldgvdp.strip_size)
+          write_policy          = lookup(virtual_drives.value, "write_policy", local.ldgvdp.write_policy)
         }
       ]
     }

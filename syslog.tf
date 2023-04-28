@@ -28,10 +28,10 @@ resource "intersight_syslog_policy" "syslog" {
     content {
       enabled      = lookup(remote_clients.value, "enable", local.lsyslog.remote_logging.enable)
       hostname     = remote_clients.value.hostname
-      port         = lookup(remote_clients.value, "port", 514)
-      protocol     = lookup(remote_clients.value, "protocol", "udp")
       min_severity = lookup(remote_clients.value, "minimum_severity", "warning")
       object_type  = "syslog.RemoteLoggingClient"
+      port         = lookup(remote_clients.value, "port", 514)
+      protocol     = lookup(remote_clients.value, "protocol", "udp")
     }
   }
   dynamic "tags" {

@@ -19,21 +19,21 @@ resource "intersight_vmedia_policy" "virtual_media" {
     for_each = { for v in each.value.add_virtual_media : v.name => v }
     content {
       additional_properties   = ""
-      authentication_protocol = lookup(mappings.value, "authentication_protocol", "none")
+      authentication_protocol = lookup(mappings.value, "authentication_protocol", local.lvm_add.authentication_protocol)
       class_id                = "vmedia.Mapping"
-      device_type             = mappings.value.device_type
+      device_type             = lookup(mappings.value, "device_type", local.lvm_add.device_type)
       file_location           = mappings.value.file_location
       host_name               = ""
-      mount_options           = mappings.value.mount_options
-      mount_protocol          = mappings.value.protocol
+      mount_options           = lookup(mappings.value, "mount_options", local.lvm_add.mount_options)
+      mount_protocol          = lookup(mappings.value, "protocol", local.lvm_add.protocol)
       object_type             = "vmedia.Mapping"
       password = length(
-        regexall("1", lookup(mappings.value, "password", 0))) > 0 ? var.vmedia_password_1 : length(
-        regexall("2", lookup(mappings.value, "password", 0))) > 0 ? var.vmedia_password_2 : length(
-        regexall("3", lookup(mappings.value, "password", 0))) > 0 ? var.vmedia_password_3 : length(
+        regexall("5", lookup(mappings.value, "password", 0))) > 0 ? var.vmedia_password_5 : length(
         regexall("4", lookup(mappings.value, "password", 0))) > 0 ? var.vmedia_password_4 : length(
-        regexall("5", lookup(mappings.value, "password", 0))
-      ) > 0 ? var.vmedia_password_5 : ""
+        regexall("3", lookup(mappings.value, "password", 0))) > 0 ? var.vmedia_password_3 : length(
+        regexall("2", lookup(mappings.value, "password", 0))) > 0 ? var.vmedia_password_2 : length(
+        regexall("1", lookup(mappings.value, "password", 0))
+      ) > 0 ? var.vmedia_password_1 : ""
       remote_file = ""
       remote_path = ""
       username    = lookup(mappings.value, "username", "")

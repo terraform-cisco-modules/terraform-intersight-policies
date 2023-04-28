@@ -53,8 +53,9 @@ locals {
     for v in local.vnics : v.iscsi_boot_policy.name if v.iscsi_boot_policy.name != "UNUSED"]
   ))
   ldga = local.defaults.storage.drive_groups.automatic_drive_groups
-  ldgm = local.defaults.storage.drive_groups.manual_drive_groups
+  ldgm = local.defaults.storage.drive_groups.manual_drive_group
   ldgv = local.defaults.storage.drive_groups.virtual_drives
+  ldgvdp = local.defaults.storage.drive_groups.virtual_drives.virtual_drive_policy
   ldns = local.defaults.network_connectivity
   link_agg = distinct(compact(concat([
     for v in local.port_channel_appliances : v.link_aggregation_policy.name if v.link_aggregation_policy.name != "UNUSED"], [
@@ -74,11 +75,14 @@ locals {
   lscp        = local.defaults.san_connectivity
   lsnmp       = local.defaults.snmp
   lstorage    = local.defaults.storage
+  lstsdr      = local.storage.single_drive_raid_configuration
   lsyslog     = local.defaults.syslog
   lsystem_qos = local.defaults.system_qos
   luser       = local.defaults.local_user
   lvlan       = local.defaults.vlan
   lvsan       = local.defaults.vsan
+  lvm_add     = local.lvmedia.add_virtual_media
+  lvmedia     = local.defaults.virtual_media
   mac_pools = distinct(compact([
     for v in local.vnics : v.mac_address_pool.name if v.mac_address_pool.name != "UNUSED"]
   ))
@@ -1013,8 +1017,8 @@ locals {
           ethernet_qos_policy = lookup(
             v, "ethernet_qos_policy", local.lcp.vnics.ethernet_qos_policy
           )
-          iscsi_boot_policy = lookup(
-            v, "iscsi_boot_policy", local.lcp.vnics.iscsi_boot_policy
+          iscsi_boot_policies = lookup(
+            v, "iscsi_boot_policies", local.lcp.vnics.iscsi_boot_policies
           )
           mac_address_allocation_type = lookup(
             v, "mac_address_allocation_type", local.lcp.vnics.mac_address_allocation_type
@@ -1107,12 +1111,12 @@ locals {
             },
             v.ethernet_qos_policy
           )
-          iscsi_boot_policy = v.iscsi_boot_policy != "" ? try(
+          iscsi_boot_policy = length(v.iscsi_boot_policies) > 0 ? try(
             {
-              name = tostring(v.iscsi_boot_policy)
+              name = tostring(element(v.iscsi_boot_policies), s)
               org  = value.organization
             },
-            v.iscsi_boot_policy
+            element(v.iscsi_boot_policies, s)
             ) : {
             name = "UNUSED"
             org  = "UNUSED"
@@ -1517,7 +1521,7 @@ locals {
             breakout_port_id = lookup(v, "breakout_port_id", 0)
             port_list        = v.port_list
             slot_id          = lookup(v, "slot_id", 1)
-            vsan_id          = v.vsan_id
+            vsan_id          = length(v.vsan_ids) == 1 ? element(v.vsan_ids, 0) : element(v.vsan_ids, i)
           }
         ]
         port_role_fc_uplinks = [
@@ -1527,7 +1531,7 @@ locals {
             fill_pattern     = lookup(v, "fill_pattern", local.lport.port_role_fc_uplinks.fill_pattern)
             port_list        = v.port_list
             slot_id          = lookup(v, "slot_id", 1)
-            vsan_id          = v.vsan_id
+            vsan_id          = length(v.vsan_ids) == 1 ? element(v.vsan_ids, 0) : element(v.vsan_ids, i)
           }
         ]
         port_role_fcoe_uplinks = [
@@ -2220,7 +2224,7 @@ locals {
     for value in local.storage : [
       for v in value.drive_groups : {
         automatic_drive_groups = lookup(v, "automatic_drive_groups", [])
-        manual_drive_groups    = lookup(v, "manual_drive_groups", [])
+        manual_drive_group     = lookup(v, "manual_drive_group", [])
         name                   = v.name
         raid_level             = lookup(v, "raid_level", "Raid1")
         storage_policy         = value.name
