@@ -18,6 +18,7 @@ locals {
     for v in local.port_channel_ethernet_uplinks : v.flow_control_policy.name if v.flow_control_policy.name != "UNUSED"], [
     for v in local.port_role_ethernet_uplinks : v.flow_control_policy.name if v.flow_control_policy.name != "UNUSED"]
   )))
+  fw    = local.defaults.firmware
   iboot = local.defaults.iscsi_boot
   ip_pools = distinct(compact(concat([
     for v in local.imc_access : v.inband_ip_pool.name if v.inband_ip_pool.name != "UNUSED"], [
@@ -52,11 +53,11 @@ locals {
   lcp_iboot = distinct(compact([
     for v in local.vnics : v.iscsi_boot_policy.name if v.iscsi_boot_policy.name != "UNUSED"]
   ))
-  ldga = local.defaults.storage.drive_groups.automatic_drive_groups
-  ldgm = local.defaults.storage.drive_groups.manual_drive_group
-  ldgv = local.defaults.storage.drive_groups.virtual_drives
+  ldga   = local.defaults.storage.drive_groups.automatic_drive_groups
+  ldgm   = local.defaults.storage.drive_groups.manual_drive_group
+  ldgv   = local.defaults.storage.drive_groups.virtual_drives
   ldgvdp = local.defaults.storage.drive_groups.virtual_drives.virtual_drive_policy
-  ldns = local.defaults.network_connectivity
+  ldns   = local.defaults.network_connectivity
   link_agg = distinct(compact(concat([
     for v in local.port_channel_appliances : v.link_aggregation_policy.name if v.link_aggregation_policy.name != "UNUSED"], [
     for v in local.port_channel_ethernet_uplinks : v.link_aggregation_policy.name if v.link_aggregation_policy.name != "UNUSED"], [

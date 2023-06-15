@@ -127,6 +127,50 @@ variable "base64_private_key_5" {
   type        = string
 }
 
+#__________________________________________________________________
+#
+# Firmware Sensitive Variables
+#__________________________________________________________________
+
+variable "cco_password" {
+  default     = ""
+  description = "CCO User Account Password."
+  sensitive   = true
+  type        = string
+}
+
+variable "cco_user" {
+  default     = "cco_user"
+  description = "CCO User Account Email for Firmware Policies."
+  type        = string
+}
+
+variable "model" {
+  default     = "UCSC-C220-M5"
+  description = <<-EOT
+    description = <<-EOT
+    The server family that will be impacted by this upgrade.
+    * UCSC-C220-M4 - The upgrade on all C220-M4 servers claimed in setup.
+    * UCSC-C240-M4 - The upgrade on all C240-M4 servers claimed in setup.
+    * UCSC-C460-M4 - The upgrade on all C460-M4 servers claimed in setup.
+    * UCSB-B200-M5 - The upgrade on all B200-M5 servers claimed in setup.
+    * UCSB-B480-M5 - The upgrade on all B480-M5 servers claimed in setup.
+    * UCSC-C220-M5 - The upgrade on all C220-M5 servers claimed in setup.
+    * UCSC-C240-M5 - The upgrade on all C240-M5 servers claimed in setup.
+    * UCSC-C480-M5 - The upgrade on all C480-M5 servers claimed in setup.
+    * UCSB-B200-M6 - The upgrade on all B200-M6 servers claimed in setup.
+    * UCSC-C220-M6 - The upgrade on all C220-M6 servers claimed in setup.
+    * UCSC-C225-M6 - The upgrade on all C225-M6 servers claimed in setup.
+    * UCSC-C240-M6 - The upgrade on all C240-M6 servers claimed in setup.
+    * UCSC-C245-M6 - The upgrade on all C245-M6 servers claimed in setup.
+    * UCSX-210C-M6 - The upgrade on all 210C-M6 servers claimed in setup.
+    * UCSX-210C-M7 - The upgrade on all 210C-M7 servers claimed in setup.
+    * UCSX-220-M7 - The upgrade on all C220-M7 servers claimed in setup.
+    * UCSX-240-M7 - The upgrade on all C240-M7 servers claimed in setup.
+    * UCSC-C125 - The upgrade on all C125 servers claimed in setup.
+  EOT
+  type        = string
+}
 
 #__________________________________________________________________
 #
