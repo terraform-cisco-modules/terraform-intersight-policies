@@ -16,13 +16,6 @@ resource "intersight_syslog_policy" "syslog" {
     moid        = local.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
-  dynamic "profiles" {
-    for_each = { for v in each.value.profiles : v.name => v }
-    content {
-      moid        = var.domains[var.organization].switch_profiles[profiles.value.name].moid
-      object_type = profiles.value.object_type
-    }
-  }
   dynamic "remote_clients" {
     for_each = { for k, v in each.value.remote_logging : k => v }
     content {

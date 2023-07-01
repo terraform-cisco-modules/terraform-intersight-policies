@@ -23,13 +23,6 @@ resource "intersight_fabric_switch_control_policy" "switch_control" {
     message_interval = each.value.udld_message_interval
     recovery_action  = each.value.udld_recovery_action
   }
-  dynamic "profiles" {
-    for_each = { for v in each.value.profiles : v => v }
-    content {
-      moid        = var.domains[var.organization].switch_profiles[profiles.value].moid
-      object_type = "fabric.SwitchProfile"
-    }
-  }
   dynamic "tags" {
     for_each = each.value.tags
     content {

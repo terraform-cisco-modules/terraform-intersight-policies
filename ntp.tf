@@ -25,13 +25,6 @@ resource "intersight_ntp_policy" "ntp" {
       sym_key_value = authenticated_ntp_servers.value.sym_key_value
     }
   }
-  dynamic "profiles" {
-    for_each = { for v in each.value.profiles : v.name => v }
-    content {
-      moid        = var.domains[var.organization].switch_profiles[profiles.value.name].moid
-      object_type = profiles.value.object_type
-    }
-  }
   dynamic "tags" {
     for_each = each.value.tags
     content {

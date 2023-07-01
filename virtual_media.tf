@@ -36,7 +36,7 @@ resource "intersight_vmedia_policy" "virtual_media" {
       ) > 0 ? var.vmedia_password_1 : ""
       remote_file = ""
       remote_path = ""
-      username    = lookup(mappings.value, "username", "")
+      username    = lookup(mappings.value, "username", local.lvm_add.mount_options)
       volume_name = mappings.value.name
     }
   }

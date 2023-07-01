@@ -53,11 +53,10 @@ locals {
   lcp_iboot = distinct(compact([
     for v in local.vnics : v.iscsi_boot_policy.name if v.iscsi_boot_policy.name != "UNUSED"]
   ))
-  ldga   = local.defaults.storage.drive_groups.automatic_drive_groups
-  ldgm   = local.defaults.storage.drive_groups.manual_drive_group
-  ldgv   = local.defaults.storage.drive_groups.virtual_drives
-  ldgvdp = local.defaults.storage.drive_groups.virtual_drives.virtual_drive_policy
-  ldns   = local.defaults.network_connectivity
+  ldga = local.defaults.storage.drive_groups.automatic_drive_groups
+  ldgm = local.defaults.storage.drive_groups.manual_drive_groups
+  ldgv = local.defaults.storage.drive_groups.virtual_drives
+  ldns = local.defaults.network_connectivity
   link_agg = distinct(compact(concat([
     for v in local.port_channel_appliances : v.link_aggregation_policy.name if v.link_aggregation_policy.name != "UNUSED"], [
     for v in local.port_channel_ethernet_uplinks : v.link_aggregation_policy.name if v.link_aggregation_policy.name != "UNUSED"], [
@@ -76,7 +75,7 @@ locals {
   lscp        = local.defaults.san_connectivity
   lsnmp       = local.defaults.snmp
   lstorage    = local.defaults.storage
-  lstsdr      = local.storage.single_drive_raid_configuration
+  lstsdr      = local.lstorage.single_drive_raid0_configuration
   lsyslog     = local.defaults.syslog
   lsystem_qos = local.defaults.system_qos
   luser       = local.defaults.local_user
@@ -1328,16 +1327,7 @@ locals {
       obtain_ipv6_dns_from_dhcp = lookup(
         v, "obtain_ipv6_dns_from_dhcp", local.ldns.obtain_ipv6_dns_from_dhcp
       )
-      organization = var.organization
-      #profiles     = []
-      profiles = [
-        for i in var.domains[var.organization].switch_profiles : {
-          name        = i.name
-          object_type = "fabric.SwitchProfile"
-          } if length(regexall(
-          "^${local.name_prefix}${v.name}${local.ldns.name_suffix}$", i.network_connectivity)
-        ) > 0
-      ]
+      organization  = var.organization
       tags          = lookup(v, "tags", var.tags)
       update_domain = lookup(v, "update_domain", local.ldns.update_domain)
     }
@@ -1355,17 +1345,8 @@ locals {
       name         = "${local.name_prefix}${v.name}${local.lntp.name_suffix}"
       ntp_servers  = lookup(v, "ntp_servers", local.lntp.ntp_servers)
       organization = var.organization
-      #profiles     = []
-      profiles = [
-        for i in var.domains[var.organization].switch_profiles : {
-          name        = i.name
-          object_type = "fabric.SwitchProfile"
-          } if length(regexall(
-          "^${local.name_prefix}${v.name}${local.lntp.name_suffix}$", i.ntp)
-        ) > 0
-      ]
-      tags     = lookup(v, "tags", var.tags)
-      timezone = lookup(v, "timezone", local.lntp.timezone)
+      tags         = lookup(v, "tags", var.tags)
+      timezone     = lookup(v, "timezone", local.lntp.timezone)
     }
   }
 
@@ -1558,12 +1539,6 @@ locals {
             port_list             = v.port_list
             slot_id               = lookup(v, "slot_id", 1)
           }
-        ]
-        #profiles = []
-        profiles = [
-          for v in var.domains[var.organization].switch_profiles : v.name if length(regexall(
-            "^${local.name_prefix}${element(value.names, i)}${local.lport.name_suffix}$", v.port)
-          ) > 0
         ]
         tags = lookup(value, "tags", var.tags)
 
@@ -2177,24 +2152,15 @@ locals {
       enable_snmp             = lookup(v, "enable_snmp", local.lsnmp.enable_snmp)
       name                    = "${local.name_prefix}${v.name}${local.lsnmp.name_suffix}"
       organization            = var.organization
-      #profiles                = []
-      profiles = [
-        for i in var.domains[var.organization].switch_profiles : {
-          name        = i.name
-          object_type = "fabric.SwitchProfile"
-          } if length(regexall("^${v.name}$", i.snmp)) > 0 || length(regexall(
-          "^${v.name}${local.lsnmp.name_suffix}$", i.snmp)
-        ) > 0
-      ]
-      snmp_community_access  = lookup(v, "snmp_community_access", local.lsnmp.snmp_community_access)
-      snmp_engine_input_id   = lookup(v, "snmp_engine_input_id", local.lsnmp.snmp_engine_input_id)
-      snmp_port              = lookup(v, "snmp_port", local.lsnmp.snmp_port)
-      snmp_trap_destinations = lookup(v, "snmp_trap_destinations", [])
-      snmp_users             = lookup(v, "snmp_users", [])
-      system_contact         = lookup(v, "system_contact", local.lsnmp.system_contact)
-      system_location        = lookup(v, "system_location", local.lsnmp.system_location)
-      tags                   = lookup(v, "tags", var.tags)
-      trap_community_string  = lookup(v, "trap_community_string", 0)
+      snmp_community_access   = lookup(v, "snmp_community_access", local.lsnmp.snmp_community_access)
+      snmp_engine_input_id    = lookup(v, "snmp_engine_input_id", local.lsnmp.snmp_engine_input_id)
+      snmp_port               = lookup(v, "snmp_port", local.lsnmp.snmp_port)
+      snmp_trap_destinations  = lookup(v, "snmp_trap_destinations", [])
+      snmp_users              = lookup(v, "snmp_users", [])
+      system_contact          = lookup(v, "system_contact", local.lsnmp.system_contact)
+      system_location         = lookup(v, "system_location", local.lsnmp.system_location)
+      tags                    = lookup(v, "tags", var.tags)
+      trap_community_string   = lookup(v, "trap_community_string", 0)
     }
   }
 
@@ -2205,15 +2171,22 @@ locals {
   #_________________________________________________________________________
   storage = {
     for v in lookup(local.policies, "storage", []) : v.name => {
+      default_drive_state   = lookup(v, "default_drive_state", local.lstorage.default_drive_state)
       description           = lookup(v, "description", "")
       drive_groups          = lookup(v, "drive_groups", [])
       global_hot_spares     = lookup(v, "global_hot_spares", local.lstorage.global_hot_spares)
       m2_raid_configuration = lookup(v, "m2_raid_configuration", {})
       name                  = "${local.name_prefix}${v.name}${local.lstorage.name_suffix}"
       organization          = var.organization
-      single_drive_raid_configuration = lookup(
-        v, "single_drive_raid_configuration", []
-      )
+      single_drive_raid0_configuration = length(
+        lookup(v, "single_drive_raid0_configuration", [])) > 0 ? [
+        {
+          drive_slots = v.single_drive_raid0_configuration.drive_slots
+          virtual_drive_policy = merge(local.lstsdr.virtual_drive_policy, lookup(
+            v.single_drive_raid0_configuration, "virtual_drive_policy", {})
+          )
+        }
+      ] : []
       tags               = lookup(v, "tags", var.tags)
       unused_disks_state = lookup(v, "unused_disks_state", local.lstorage.unused_disks_state)
       use_jbod_for_vd_creation = lookup(
@@ -2225,7 +2198,7 @@ locals {
     for value in local.storage : [
       for v in value.drive_groups : {
         automatic_drive_groups = lookup(v, "automatic_drive_groups", [])
-        manual_drive_group     = lookup(v, "manual_drive_group", [])
+        manual_drive_groups    = lookup(v, "manual_drive_groups", [])
         name                   = v.name
         raid_level             = lookup(v, "raid_level", "Raid1")
         storage_policy         = value.name
@@ -2251,15 +2224,9 @@ locals {
       mac_address_table_aging = lookup(
         v, "mac_address_table_aging", local.swctrl.mac_address_table_aging
       )
-      mac_aging_time = lookup(v, "mac_aging_time", local.swctrl.mac_aging_time)
-      name           = "${local.name_prefix}${v.name}${local.swctrl.name_suffix}"
-      organization   = var.organization
-      #profiles       = []
-      profiles = [
-        for i in var.domains[var.organization].switch_profiles : i.name if length(regexall(
-          "^${local.name_prefix}${v.name}${local.swctrl.name_suffix}$", i.switch_control)
-        ) > 0
-      ]
+      mac_aging_time        = lookup(v, "mac_aging_time", local.swctrl.mac_aging_time)
+      name                  = "${local.name_prefix}${v.name}${local.swctrl.name_suffix}"
+      organization          = var.organization
       tags                  = lookup(v, "tags", var.tags)
       udld_message_interval = lookup(v, "udld_message_interval", local.swctrl.udld_message_interval)
       udld_recovery_action  = lookup(v, "udld_recovery_action", local.swctrl.udld_recovery_action)
@@ -2280,15 +2247,8 @@ locals {
       local_min_severity = lookup(lookup(
         v, "local_logging", {}), "minimum_severity", local.lsyslog.local_logging.minimum_severity
       )
-      name         = "${local.name_prefix}${v.name}${local.lsyslog.name_suffix}"
-      organization = var.organization
-      #profiles     = []
-      profiles = [
-        for i in var.domains[var.organization].switch_profiles : {
-          name        = i.name
-          object_type = "fabric.SwitchProfile"
-        } if length(regexall("^${local.name_prefix}${v.name}${local.lsyslog.name_suffix}$", i.syslog)) > 0
-      ]
+      name           = "${local.name_prefix}${v.name}${local.lsyslog.name_suffix}"
+      organization   = var.organization
       remote_logging = lookup(v, "remote_logging", [])
       tags           = lookup(v, "tags", var.tags)
     }
@@ -2305,13 +2265,7 @@ locals {
       description  = lookup(v, "description", "")
       name         = "${local.name_prefix}${v.name}${local.lsystem_qos.name_suffix}"
       organization = var.organization
-      #profiles     = []
-      profiles = [
-        for i in var.domains[var.organization].switch_profiles : i.name if length(regexall(
-          "${local.name_prefix}${v.name}${local.lsystem_qos.name_suffix}", i.system_qos)
-        ) > 0
-      ]
-      tags = lookup(v, "tags", var.tags)
+      tags         = lookup(v, "tags", var.tags)
     }
   }
 
@@ -2345,13 +2299,7 @@ locals {
       description  = lookup(v, "description", "")
       name         = "${local.name_prefix}${v.name}${local.lvlan.name_suffix}"
       organization = var.organization
-      #profiles     = []
-      profiles = [
-        for i in var.domains[var.organization].switch_profiles : i.name if length(regexall(
-          "^${local.name_prefix}${v.name}${local.lvlan.name_suffix}$", i.vlan)
-        ) > 0
-      ]
-      tags = lookup(v, "tags", var.tags)
+      tags         = lookup(v, "tags", var.tags)
       vlans = [
         for v in lookup(v, "vlans", []) : {
           auto_allow_on_uplinks = lookup(v, "auto_allow_on_uplinks", local.lvlan.vlans.auto_allow_on_uplinks)
@@ -2412,15 +2360,9 @@ locals {
   #_________________________________________________________________________
   vsan = {
     for v in lookup(local.policies, "vsan", []) : v.name => {
-      description  = lookup(v, "description", "")
-      name         = "${local.name_prefix}${v.name}${local.lvsan.name_suffix}"
-      organization = var.organization
-      #profiles     = []
-      profiles = [
-        for i in var.domains[var.organization].switch_profiles : i.name if length(regexall(
-          "^${local.name_prefix}${v.name}${local.lvsan.name_suffix}$", i.vsan)
-        ) > 0
-      ]
+      description     = lookup(v, "description", "")
+      name            = "${local.name_prefix}${v.name}${local.lvsan.name_suffix}"
+      organization    = var.organization
       tags            = lookup(v, "tags", var.tags)
       uplink_trunking = lookup(v, "uplink_trunking", local.lvsan.uplink_trunking)
       vsans           = lookup(v, "vsans", [])

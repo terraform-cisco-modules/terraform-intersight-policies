@@ -25,13 +25,6 @@ resource "intersight_fabric_port_policy" "port" {
     moid        = local.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
-  dynamic "profiles" {
-    for_each = { for v in each.value.profiles : v => v }
-    content {
-      moid        = var.domains[var.organization].switch_profiles[profiles.value].moid
-      object_type = "fabric.SwitchProfile"
-    }
-  }
   dynamic "tags" {
     for_each = each.value.tags
     content {

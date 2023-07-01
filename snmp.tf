@@ -38,13 +38,6 @@ resource "intersight_snmp_policy" "snmp" {
     moid        = local.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
-  dynamic "profiles" {
-    for_each = { for v in each.value.profiles : v.name => v }
-    content {
-      moid        = var.domains[var.organization].switch_profiles[profiles.value.name].moid
-      object_type = profiles.value.object_type
-    }
-  }
   dynamic "snmp_traps" {
     for_each = { for v in each.value.snmp_trap_destinations : v.destination_address => v }
     content {
@@ -85,7 +78,7 @@ resource "intersight_snmp_policy" "snmp" {
       auth_type = lookup(snmp_users.value, "auth_type", local.lsnmp.snmp_users.auth_type)
       name      = snmp_users.value.name
       privacy_password = lookup(
-        snmp_users.value, "auth_type", local.lsnmp.snmp_users.auth_type) == "AuthPriv" ? length(
+        snmp_users.value, "security_level", local.lsnmp.snmp_users.security_level) == "AuthPriv" ? length(
         regexall("1", coalesce(snmp_users.value.privacy_password, 10))
         ) > 0 ? var.snmp_privacy_password_1 : length(
         regexall("2", coalesce(snmp_users.value.privacy_password, 10))
@@ -96,7 +89,7 @@ resource "intersight_snmp_policy" "snmp" {
         ) > 0 ? var.snmp_privacy_password_3 : length(
         regexall("5", coalesce(snmp_users.value.privacy_password, 10))
       ) > 0 ? var.snmp_privacy_password_5 : "" : ""
-      privacy_type = lookup(snmp_users.value, "auth_type", local.lsnmp.snmp_users.auth_type
+      privacy_type = lookup(snmp_users.value, "security_level", local.lsnmp.snmp_users.security_level
       ) == "AuthPriv" ? lookup(snmp_users.value, "privacy_type", local.lsnmp.snmp_users.privacy_type) : "NA"
       security_level = lookup(snmp_users.value, "security_level", local.lsnmp.snmp_users.security_level)
     }

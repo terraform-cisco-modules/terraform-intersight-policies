@@ -8,11 +8,6 @@ variable "defaults" {
   type        = any
 }
 
-variable "domains" {
-  description = "Domain Moids."
-  type        = any
-}
-
 variable "moids_policies" {
   default     = false
   description = "Flag to Determine if Policies Should be associated using resource or data object."

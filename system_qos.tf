@@ -36,13 +36,6 @@ resource "intersight_fabric_system_qos_policy" "system_qos" {
       weight = classes.value.weight
     }
   }
-  dynamic "profiles" {
-    for_each = { for v in each.value.profiles : v => v }
-    content {
-      moid        = var.domains[var.organization].switch_profiles[profiles.value].moid
-      object_type = "fabric.SwitchProfile"
-    }
-  }
   dynamic "tags" {
     for_each = each.value.tags
     content {

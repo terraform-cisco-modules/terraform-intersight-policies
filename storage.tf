@@ -21,29 +21,24 @@ resource "intersight_storage_storage_policy" "storage" {
     for_each = each.value.m2_raid_configuration
     content {
       controller_slot = m2_virtual_drive.value.slot
-      enable          = m2_virtual_drive.value.enable
+      enable          = true
       # additional_properties = ""
       # object_type           = "storage.DiskGroupPolicy"
     }
   }
   dynamic "raid0_drive" {
-    for_each = toset(each.value.single_drive_raid_configuration)
+    for_each = {
+      for v in each.value.single_drive_raid0_configuration : "default" => v if length(compact([v.drive_slots])) > 0
+    }
     content {
       drive_slots = raid0_drive.value.drive_slots
-      enable      = lookup(raid0_drive.value, "enable", local.lstsdr.enable)
+      enable      = true
       object_type = "server.Profile"
-      virtual_drive_policy = [
-        {
-          additional_properties = ""
-          access_policy         = lookup(raid0_drive.value, "access_policy", local.lstsdr.access_policy)
-          class_id              = "storage.VirtualDriveConfig"
-          drive_cache           = lookup(raid0_drive.value, "drive_cache", local.lstsdr.drive_cache)
-          object_type           = "storage.VirtualDriveConfig"
-          read_policy           = lookup(raid0_drive.value, "read_policy", local.lstsdr.read_policy)
-          strip_size            = lookup(raid0_drive.value, "strip_size", local.lstsdr.strip_size)
-          write_policy          = lookup(raid0_drive.value, "write_policy", local.lstsdr.write_policy)
-        }
-      ]
+      virtual_drive_policy = merge(raid0_drive.value.virtual_drive_policy, {
+        additional_properties = "",
+        class_id              = "storage.VirtualDrivePolicy"
+        object_type           = "storage.VirtualDrivePolicy"
+      })
     }
   }
   dynamic "tags" {
@@ -98,7 +93,7 @@ resource "intersight_storage_drive_group" "drive_groups" {
     }
   }
   dynamic "manual_drive_group" {
-    for_each = toset(each.value.manual_drive_group)
+    for_each = toset(each.value.manual_drive_groups)
     content {
       class_id = "storage.ManualDriveGroup"
       dedicated_hot_spares = lookup(
@@ -132,18 +127,14 @@ resource "intersight_storage_drive_group" "drive_groups" {
       name                  = virtual_drives.key
       object_type           = "storage.VirtualDriveConfiguration"
       size                  = lookup(virtual_drives.value, "size", local.ldgv.size)
-      virtual_drive_policy = [
-        {
-          additional_properties = ""
-          access_policy         = lookup(virtual_drives.value, "access_policy", local.ldgvdp.access_policy)
-          class_id              = "storage.VirtualDrivePolicy"
-          drive_cache           = lookup(virtual_drives.value, "disk_cache", local.ldgvdp.drive_cache)
-          object_type           = "storage.VirtualDrivePolicy"
-          read_policy           = lookup(virtual_drives.value, "read_policy", local.ldgvdp.read_policy)
-          strip_size            = lookup(virtual_drives.value, "strip_size", local.ldgvdp.strip_size)
-          write_policy          = lookup(virtual_drives.value, "write_policy", local.ldgvdp.write_policy)
-        }
-      ]
+      virtual_drive_policy = [merge(merge(
+        local.ldgv.virtual_drive_policy, lookup(
+        virtual_drives.value, "virtual_drive_policy", local.ldgv.virtual_drive_policy)
+        ), {
+        additional_properties = ""
+        class_id              = "storage.VirtualDrivePolicy"
+        object_type           = "storage.VirtualDrivePolicy"
+      })]
     }
   }
 }
