@@ -9,14 +9,15 @@ resource "intersight_fabric_eth_network_control_policy" "ethernet_network_contro
   cdp_enabled = lookup(
     each.value, "cdp_enable", local.defaults.ethernet_network_control.cdp_enable
   )
-  description = lookup(each.value, "description", "${each.value.name} Ethernet Network Control Policy.")
+  description = lookup(
+  each.value, "description", "${local.name_prefix.ethernet_network_control}${each.key}${local.name_suffix.ethernet_network_control} Ethernet Network Control Policy.")
   forge_mac = lookup(
     each.value, "mac_security_forge", local.defaults.ethernet_network_control.mac_security_forge
   )
   mac_registration_mode = lookup(
     each.value, "mac_register_mode", local.defaults.ethernet_network_control.mac_register_mode
   )
-  name = "${each.key}${local.defaults.ethernet_network_control.name_suffix}"
+  name = "${local.name_prefix.ethernet_network_control}${each.key}${local.name_suffix.ethernet_network_control}"
   uplink_fail_action = lookup(
     each.value, "action_on_uplink_fail", local.defaults.ethernet_network_control.action_on_uplink_fail
   )

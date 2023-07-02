@@ -3,10 +3,10 @@
 # Model Data and policy from domains and pools
 #__________________________________________________________________
 
-variable "defaults" {
-  description = "Map of Defaults for Intersight Profiles."
-  type        = any
-}
+#variable "defaults" {
+#  description = "Map of Defaults for Intersight Profiles."
+#  type        = any
+#}
 
 variable "moids_policies" {
   default     = false

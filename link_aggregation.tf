@@ -5,10 +5,11 @@
 #__________________________________________________________________
 
 resource "intersight_fabric_link_aggregation_policy" "link_aggregation" {
-  for_each    = { for v in lookup(local.policies, "link_aggregation", []) : v.name => v }
-  description = lookup(each.value, "description", "${each.value.name} Link Aggregation Policy.")
-  lacp_rate   = lookup(each.value, "lacp_rate", local.defaults.link_aggregation.lacp_rate)
-  name        = "${each.key}${local.defaults.link_aggregation.name_suffix}"
+  for_each = { for v in lookup(local.policies, "link_aggregation", []) : v.name => v }
+  description = lookup(
+  each.value, "description", "${local.name_prefix.link_aggregation}${each.key}${local.name_suffix.link_aggregation} Link Aggregation Policy.")
+  lacp_rate = lookup(each.value, "lacp_rate", local.defaults.link_aggregation.lacp_rate)
+  name      = "${local.name_prefix.link_aggregation}${each.key}${local.name_suffix.link_aggregation}"
   suspend_individual = lookup(
     each.value, "suspend_individual", local.defaults.link_aggregation.suspend_individual
   )

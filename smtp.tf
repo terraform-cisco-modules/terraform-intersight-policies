@@ -5,11 +5,12 @@
 #__________________________________________________________________
 
 resource "intersight_smtp_policy" "smtp" {
-  for_each     = { for v in lookup(local.policies, "smtp", []) : v.name => v }
-  description  = lookup(each.value, "description", "${each.value.name} LDAP Policy.")
+  for_each = { for v in lookup(local.policies, "smtp", []) : v.name => v }
+  description = lookup(
+  each.value, "description", "${local.name_prefix.smtp}${each.key}${local.name_suffix.smtp} SMTP Policy.")
   enabled      = lookup(each.value, "enable_smtp", local.defaults.smtp.enable_smtp)
   min_severity = lookup(each.value, "minimum_severity", local.defaults.smtp.minimum_severity)
-  name         = "${each.key}${local.defaults.smtp.name_suffix}"
+  name         = "${local.name_prefix.smtp}${each.key}${local.name_suffix.smtp}"
   sender_email = lookup(
     each.value, "smtp_alert_sender_address", local.defaults.smtp.smtp_alert_sender_address
   )

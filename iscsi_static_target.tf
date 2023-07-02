@@ -5,10 +5,11 @@
 #__________________________________________________________________
 
 resource "intersight_vnic_iscsi_static_target_policy" "iscsi_static_target" {
-  for_each    = { for v in lookup(local.policies, "iscsi_static_target", []) : v.name => v }
-  description = lookup(each.value, "description", "${each.value.name} iSCSI Static Target Policy.")
+  for_each = { for v in lookup(local.policies, "iscsi_static_target", []) : v.name => v }
+  description = lookup(
+  each.value, "description", "${local.name_prefix.iscsi_static_target}${each.key}${local.name_suffix.iscsi_static_target} iSCSI Static Target Policy.")
   ip_address  = each.value.ip_address
-  name        = "${each.key}${local.defaults.iscsi_static_target.name_suffix}"
+  name        = "${local.name_prefix.iscsi_static_target}${each.key}${local.name_suffix.iscsi_static_target}"
   port        = each.value.port
   target_name = each.value.target_name
   organization {

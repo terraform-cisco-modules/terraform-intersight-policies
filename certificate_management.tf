@@ -5,9 +5,10 @@
 #__________________________________________________________________
 
 resource "intersight_certificatemanagement_policy" "certificate_management" {
-  for_each    = { for v in lookup(local.policies, "certificate_management", []) : v.name => v }
-  description = lookup(each.value, "description", "${each.value.name} Certificate Management Policy.")
-  name        = "${each.key}${local.defaults.certificate_management.name_suffix}"
+  for_each = { for v in lookup(local.policies, "certificate_management", []) : v.name => v }
+  description = lookup(
+  each.value, "description", "${local.name_prefix.certificate_management}${each.key}${local.name_suffix.certificate_management} Certificate Management Policy.")
+  name = "${local.name_prefix.certificate_management}${each.key}${local.name_suffix.certificate_management}"
   organization {
     moid        = local.orgs[var.organization]
     object_type = "organization.Organization"

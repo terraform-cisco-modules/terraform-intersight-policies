@@ -5,12 +5,13 @@
 #__________________________________________________________________
 
 resource "intersight_fabric_fc_zone_policy" "fc_zone" {
-  for_each    = { for v in lookup(local.policies, "fc_zone", []) : v.name => v }
-  description = lookup(each.value, "description", "${each.value.name} FC Zone Policy.")
+  for_each = { for v in lookup(local.policies, "fc_zone", []) : v.name => v }
+  description = lookup(
+  each.value, "description", "${local.name_prefix.fc_zone}${each.key}${local.name_suffix.fc_zone} FC Zone Policy.")
   fc_target_zoning_type = lookup(
     each.value, "fc_target_zoning_type", local.defaults.fc_zone.fc_target_zoning_type
   )
-  name = "${each.key}${local.defaults.fc_zone.name_suffix}"
+  name = "${local.name_prefix.fc_zone}${each.key}${local.name_suffix.fc_zone}"
   organization {
     moid        = local.orgs[var.organization]
     object_type = "organization.Organization"

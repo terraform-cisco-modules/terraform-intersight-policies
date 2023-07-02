@@ -13,7 +13,7 @@ resource "intersight_adapter_config_policy" "adapter_configuration" {
     object_type = "organization.Organization"
   }
   dynamic "settings" {
-    for_each = each.value.add_vic_adapter_configuration
+    for_each = { for v in each.value.add_vic_adapter_configuration : v.pci_slot => v }
     content {
       dce_interface_settings = settings.value.dce_interface_settings
       object_type            = "adapter.AdapterConfig"

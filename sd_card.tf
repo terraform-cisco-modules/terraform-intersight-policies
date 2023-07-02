@@ -5,9 +5,10 @@
 #__________________________________________________________________
 
 resource "intersight_sdcard_policy" "sd_card" {
-  for_each    = { for v in lookup(local.policies, "sd_card", []) : v.name => v }
-  description = lookup(each.value, "description", "${each.value.name} SD Card Policy.")
-  name        = "${each.key}${local.defaults.sd_card.name_suffix}"
+  for_each = { for v in lookup(local.policies, "sd_card", []) : v.name => v }
+  description = lookup(
+  each.value, "description", "${local.name_prefix.sd_card}${each.key}${local.name_suffix.sd_card} SD Card Policy.")
+  name = "${local.name_prefix.sd_card}${each.key}${local.name_suffix.sd_card}"
   organization {
     moid        = local.orgs[var.organization]
     object_type = "organization.Organization"

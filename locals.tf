@@ -1,5 +1,5 @@
 locals {
-  defaults  = var.defaults
+  defaults  = yamldecode(file("${path.module}/defaults.yaml")).policies
   eth_adapt = local.defaults.ethernet_adapter
   eth_ntwk_ctrl = distinct(compact(concat([
     for v in local.port_channel_appliances : v.ethernet_network_control_policy.name if v.ethernet_network_control_policy.name != "UNUSED"], [
@@ -36,6 +36,7 @@ locals {
     for v in local.iscsi_boot : v.secondary_target_policy.name if v.secondary_target_policy.name != "UNUSED"]
   )))
   ladapter = local.defaults.adapter_configuration
+  ladd_vic = local.ladapter.add_vic_adapter_configuration
   lbios    = local.defaults.bios
   lboot    = local.defaults.boot_order
   lcp      = local.defaults.lan_connectivity
@@ -89,9 +90,106 @@ locals {
   mcast = distinct(compact([
     for v in local.vlans : v.multicast_policy.name if v.multicast_policy.name != "UNUSED"]
   ))
-  name_prefix = local.defaults.name_prefix
-  orgs        = var.orgs
-  policies    = var.policies
+  name_prefix = [for v in [merge(lookup(local.policies, "name_prefix", {}), local.defaults.name_prefix)] : {
+    adapter_configuration    = v.adapter_configuration != "" ? v.adapter_configuration : v.default
+    bios                     = v.bios != "" ? v.bios : v.default
+    boot_order               = v.boot_order != "" ? v.boot_order : v.default
+    certificate_management   = v.certificate_management != "" ? v.certificate_management : v.default
+    device_connector         = v.device_connector != "" ? v.device_connector : v.default
+    ethernet_adapter         = v.ethernet_adapter != "" ? v.ethernet_adapter : v.default
+    ethernet_network         = v.ethernet_network != "" ? v.ethernet_network : v.default
+    ethernet_network_control = v.ethernet_network_control != "" ? v.ethernet_network_control : v.default
+    ethernet_network_group   = v.ethernet_network_group != "" ? v.ethernet_network_group : v.default
+    ethernet_qos             = v.ethernet_qos != "" ? v.ethernet_qos : v.default
+    fc_zone                  = v.fc_zone != "" ? v.fc_zone : v.default
+    fibre_channel_adapter    = v.fibre_channel_adapter != "" ? v.fibre_channel_adapter : v.default
+    fibre_channel_network    = v.fibre_channel_network != "" ? v.fibre_channel_network : v.default
+    fibre_channel_qos        = v.fibre_channel_qos != "" ? v.fibre_channel_qos : v.default
+    firmware                 = v.firmware != "" ? v.firmware : v.default
+    flow_control             = v.flow_control != "" ? v.flow_control : v.default
+    imc_access               = v.imc_access != "" ? v.imc_access : v.default
+    ipmi_over_lan            = v.ipmi_over_lan != "" ? v.ipmi_over_lan : v.default
+    iscsi_adapter            = v.iscsi_adapter != "" ? v.iscsi_adapter : v.default
+    iscsi_boot               = v.iscsi_boot != "" ? v.iscsi_boot : v.default
+    iscsi_static_target      = v.iscsi_static_target != "" ? v.iscsi_static_target : v.default
+    lan_connectivity         = v.lan_connectivity != "" ? v.lan_connectivity : v.default
+    ldap                     = v.ldap != "" ? v.ldap : v.default
+    link_aggregation         = v.link_aggregation != "" ? v.link_aggregation : v.default
+    link_control             = v.link_control != "" ? v.link_control : v.default
+    local_user               = v.local_user != "" ? v.local_user : v.default
+    multicast                = v.multicast != "" ? v.multicast : v.default
+    network_connectivity     = v.network_connectivity != "" ? v.network_connectivity : v.default
+    ntp                      = v.ntp != "" ? v.ntp : v.default
+    persistent_memory        = v.persistent_memory != "" ? v.persistent_memory : v.default
+    port                     = v.port != "" ? v.port : v.default
+    power                    = v.power != "" ? v.power : v.default
+    san_connectivity         = v.san_connectivity != "" ? v.san_connectivity : v.default
+    sd_card                  = v.sd_card != "" ? v.sd_card : v.default
+    serial_over_lan          = v.serial_over_lan != "" ? v.serial_over_lan : v.default
+    smtp                     = v.smtp != "" ? v.smtp : v.default
+    snmp                     = v.snmp != "" ? v.snmp : v.default
+    ssh                      = v.ssh != "" ? v.ssh : v.default
+    storage                  = v.storage != "" ? v.storage : v.default
+    switch_control           = v.switch_control != "" ? v.switch_control : v.default
+    syslog                   = v.syslog != "" ? v.syslog : v.default
+    system_qos               = v.system_qos != "" ? v.system_qos : v.default
+    thermal                  = v.thermal != "" ? v.thermal : v.default
+    virtual_kvm              = v.virtual_kvm != "" ? v.virtual_kvm : v.default
+    virtual_media            = v.virtual_media != "" ? v.virtual_media : v.default
+    vlan                     = v.vlan != "" ? v.vlan : v.default
+    vsan                     = v.vsan != "" ? v.vsan : v.default
+  }][0]
+  name_suffix = [for v in [merge(lookup(local.policies, "name_suffix", {}), local.defaults.name_suffix)] : {
+    adapter_configuration    = v.adapter_configuration != "" ? v.adapter_configuration : v.default
+    bios                     = v.bios != "" ? v.bios : v.default
+    boot_order               = v.boot_order != "" ? v.boot_order : v.default
+    certificate_management   = v.certificate_management != "" ? v.certificate_management : v.default
+    device_connector         = v.device_connector != "" ? v.device_connector : v.default
+    ethernet_adapter         = v.ethernet_adapter != "" ? v.ethernet_adapter : v.default
+    ethernet_network         = v.ethernet_network != "" ? v.ethernet_network : v.default
+    ethernet_network_control = v.ethernet_network_control != "" ? v.ethernet_network_control : v.default
+    ethernet_network_group   = v.ethernet_network_group != "" ? v.ethernet_network_group : v.default
+    ethernet_qos             = v.ethernet_qos != "" ? v.ethernet_qos : v.default
+    fc_zone                  = v.fc_zone != "" ? v.fc_zone : v.default
+    fibre_channel_adapter    = v.fibre_channel_adapter != "" ? v.fibre_channel_adapter : v.default
+    fibre_channel_network    = v.fibre_channel_network != "" ? v.fibre_channel_network : v.default
+    fibre_channel_qos        = v.fibre_channel_qos != "" ? v.fibre_channel_qos : v.default
+    firmware                 = v.firmware != "" ? v.firmware : v.default
+    flow_control             = v.flow_control != "" ? v.flow_control : v.default
+    imc_access               = v.imc_access != "" ? v.imc_access : v.default
+    ipmi_over_lan            = v.ipmi_over_lan != "" ? v.ipmi_over_lan : v.default
+    iscsi_adapter            = v.iscsi_adapter != "" ? v.iscsi_adapter : v.default
+    iscsi_boot               = v.iscsi_boot != "" ? v.iscsi_boot : v.default
+    iscsi_static_target      = v.iscsi_static_target != "" ? v.iscsi_static_target : v.default
+    lan_connectivity         = v.lan_connectivity != "" ? v.lan_connectivity : v.default
+    ldap                     = v.ldap != "" ? v.ldap : v.default
+    link_aggregation         = v.link_aggregation != "" ? v.link_aggregation : v.default
+    link_control             = v.link_control != "" ? v.link_control : v.default
+    local_user               = v.local_user != "" ? v.local_user : v.default
+    multicast                = v.multicast != "" ? v.multicast : v.default
+    network_connectivity     = v.network_connectivity != "" ? v.network_connectivity : v.default
+    ntp                      = v.ntp != "" ? v.ntp : v.default
+    persistent_memory        = v.persistent_memory != "" ? v.persistent_memory : v.default
+    port                     = v.port != "" ? v.port : v.default
+    power                    = v.power != "" ? v.power : v.default
+    san_connectivity         = v.san_connectivity != "" ? v.san_connectivity : v.default
+    sd_card                  = v.sd_card != "" ? v.sd_card : v.default
+    serial_over_lan          = v.serial_over_lan != "" ? v.serial_over_lan : v.default
+    smtp                     = v.smtp != "" ? v.smtp : v.default
+    snmp                     = v.snmp != "" ? v.snmp : v.default
+    ssh                      = v.ssh != "" ? v.ssh : v.default
+    storage                  = v.storage != "" ? v.storage : v.default
+    switch_control           = v.switch_control != "" ? v.switch_control : v.default
+    syslog                   = v.syslog != "" ? v.syslog : v.default
+    system_qos               = v.system_qos != "" ? v.system_qos : v.default
+    thermal                  = v.thermal != "" ? v.thermal : v.default
+    virtual_kvm              = v.virtual_kvm != "" ? v.virtual_kvm : v.default
+    virtual_media            = v.virtual_media != "" ? v.virtual_media : v.default
+    vlan                     = v.vlan != "" ? v.vlan : v.default
+    vsan                     = v.vsan != "" ? v.vsan : v.default
+  }][0]
+  orgs     = var.orgs
+  policies = var.policies
   scp_fc_adtr = distinct(compact(concat([
     for v in local.vhbas : v.fibre_channel_adapter_policy.name if v.fibre_channel_adapter_policy.name != "UNUSED"]
   )))
@@ -116,9 +214,9 @@ locals {
   # GUI Location: Policies > Create Policy > Adapter Configuration
   #_________________________________________________________________
   adapter_configuration = {
-    for value in lookup(local.policies, "adapter_configuration", []) : value.name => {
+    for value in lookup(local.policies, "adapter_configuration", {}) : value.name => {
       add_vic_adapter_configuration = [
-        for v in value.add_vic_configuration : {
+        for v in value.add_vic_adapter_configuration : {
           dce_interface_settings = [for i in range(4) :
             {
               additional_properties = ""
@@ -126,27 +224,26 @@ locals {
               fec_mode = length(
                 lookup(lookup(
                   v, "dce_interface_settings", {}
-                ), "dce_interface_fec_modes", local.ladapter.dce_interface_settings.dce_interface_fec_modes)
+                ), "dce_interface_fec_modes", local.ladd_vic.dce_interface_settings.dce_interface_fec_modes)
                 ) == 4 ? element(lookup(lookup(
                   v, "dce_interface_settings", {}
-                ), "dce_interface_fec_modes", local.ladapter.dce_interface_settings.dce_interface_fec_modes), i
+                ), "dce_interface_fec_modes", local.ladd_vic.dce_interface_settings.dce_interface_fec_modes), i
                 ) : element(lookup(lookup(
                   v, "dce_interface_settings", {}
-                ), "dce_interface_fec_modes", local.ladapter.dce_interface_settings.dce_interface_fec_modes), 0
+                ), "dce_interface_fec_modes", local.ladd_vic.dce_interface_settings.dce_interface_fec_modes), 0
               )
               interface_id = i
               object_type  = "adapter.DceInterfaceSettings"
             }
           ]
-          enable_fip          = lookup(v, "enable_fip", local.ladapter.enable_fip)
-          enable_lldp         = lookup(v, "enable_lldp", local.ladapter.enable_lldp)
-          enable_port_channel = lookup(v, "enable_port_channel", local.ladapter.enable_port_channel)
-          fec_modes           = lookup(v, "fec_modes", local.ladapter.fec_modes)
-          pci_slot            = lookup(v, "pci_slot", local.ladapter.pci_slot)
+          enable_fip          = lookup(v, "enable_fip", local.ladd_vic.enable_fip)
+          enable_lldp         = lookup(v, "enable_lldp", local.ladd_vic.enable_lldp)
+          enable_port_channel = lookup(v, "enable_port_channel", local.ladd_vic.enable_port_channel)
+          pci_slot            = lookup(v, "pci_slot", local.ladd_vic.pci_slot)
         }
       ]
       description  = lookup(value, "description", "")
-      name         = "${local.name_prefix}${value.name}${local.ladapter.name_suffix}"
+      name         = "${local.name_prefix.adapter_configuration}${value.name}${local.name_suffix.adapter_configuration}"
       organization = var.organization
       tags         = lookup(value, "tags", var.tags)
     }
@@ -161,7 +258,7 @@ locals {
     for v in lookup(local.policies, "bios", []) : v.name => {
       bios_template = lookup(v, "bios_template", "")
       description   = lookup(v, "description", "")
-      name          = "${local.name_prefix}${v.name}${local.lbios.name_suffix}"
+      name          = "${local.name_prefix.bios}${v.name}${local.name_suffix.bios}"
       organization  = var.organization
       tags          = lookup(v, "tags", var.tags)
       #+++++++++++++++++++++++++++++++
@@ -739,7 +836,7 @@ locals {
       enable_secure_boot = lookup(
         i, "enable_secure_boot", local.lboot.enable_secure_boot
       )
-      name         = "${local.name_prefix}${i.name}${local.lboot.name_suffix}"
+      name         = "${local.name_prefix.boot_order}${i.name}${local.name_suffix.boot_order}"
       organization = lookup(i, "organization", var.organization)
       tags         = lookup(i, "tags", var.tags)
     }
@@ -770,7 +867,7 @@ locals {
       interrupt_mode  = lookup(v, "interrupt_mode", local.eth_adapt.interrupt_mode)
       interrupt_timer = lookup(v, "interrupt_timer", local.eth_adapt.interrupt_timer)
       interrupts      = lookup(v, "interrupts", local.eth_adapt.interrupts)
-      name            = "${local.name_prefix}${v.name}${local.eth_adapt.name_suffix}"
+      name            = "${local.name_prefix.ethernet_adapter}${v.name}${local.name_suffix.ethernet_adapter}"
       organization    = var.organization
       receive_side_scaling_enable = lookup(
         v, "receive_side_scaling_enable", local.eth_adapt.receive_side_scaling_enable
@@ -843,7 +940,7 @@ locals {
       io_throttle_count   = lookup(v, "io_throttle_count", local.fc_adapt.io_throttle_count)
       lun_queue_depth     = lookup(v, "lun_queue_depth", local.fc_adapt.lun_queue_depth)
       max_luns_per_target = lookup(v, "max_luns_per_target", local.fc_adapt.max_luns_per_target)
-      name                = "${local.name_prefix}${v.name}${local.fc_adapt.name_suffix}"
+      name                = "${local.name_prefix.fibre_channel_adapter}${v.name}${local.name_suffix.fibre_channel_adapter}"
       organization        = var.organization
       plogi_retries       = lookup(v, "plogi_retries", local.fc_adapt.plogi_retries)
       plogi_timeout       = lookup(v, "plogi_timeout", local.fc_adapt.plogi_timeout)
@@ -867,7 +964,7 @@ locals {
     for v in lookup(local.policies, "imc_access", {}) : v.name => {
       description    = lookup(v, "description", "")
       inband_vlan_id = lookup(v, "inband_vlan_id", local.defaults.imc_access.inband_vlan_id)
-      name           = "${local.name_prefix}${v.name}${local.defaults.imc_access.name_suffix}"
+      name           = "${local.name_prefix.imc_access}${v.name}${local.name_suffix.imc_access}"
       ipv4_address_configuration = lookup(
         v, "ipv4_address_configuration", local.defaults.imc_access.ipv4_address_configuration
       )
@@ -932,7 +1029,7 @@ locals {
         name = "UNUSED"
         org  = "UNUSED"
       }
-      name         = "${local.name_prefix}${v.name}${local.iboot.name_suffix}"
+      name         = "${local.name_prefix.iscsi_boot}${v.name}${local.name_suffix.iscsi_boot}"
       netmask      = lookup(lookup(v, "initiator_static_ipv4_config", {}), "subnet_mask", "")
       organization = var.organization
       primary_dns  = lookup(lookup(v, "initiator_static_ipv4_config", {}), "primary_dns", "")
@@ -990,7 +1087,7 @@ locals {
       iqn_static_identifier = lookup(
         v, "iqn_static_identifier", ""
       )
-      name            = "${local.name_prefix}${v.name}${local.lcp.name_suffix}"
+      name            = "${local.name_prefix.lan_connectivity}${v.name}${local.name_suffix.lan_connectivity}"
       organization    = var.organization
       tags            = lookup(v, "tags", var.tags)
       target_platform = lookup(v, "target_platform", local.lcp.target_platform)
@@ -1060,7 +1157,7 @@ locals {
     }
   }
   vnics = { for i in flatten([
-    for value in local.lan_connectivity : [
+    for key, value in local.lan_connectivity : [
       for v in value.vnics : [
         for s in range(length(v.names)) : {
           cdn_source = v.cdn_source
@@ -1121,7 +1218,7 @@ locals {
             name = "UNUSED"
             org  = "UNUSED"
           }
-          lan_connectivity            = value.name
+          lan_connectivity            = key
           mac_address_allocation_type = v.mac_address_allocation_type
           mac_address_pool = length(v.mac_address_pools) > 0 ? try(
             {
@@ -1218,7 +1315,7 @@ locals {
       }
       ldap_groups    = lookup(v, "ldap_groups", [])
       ldap_providers = lookup(v, "ldap_providers", [])
-      name           = "${local.name_prefix}${v.name}${local.lldap.name_suffix}"
+      name           = "${local.name_prefix.ldap}${v.name}${local.name_suffix.ldap}"
       nested_group_search_depth = lookup(
       v, "nested_group_search_depth", local.lldap.nested_group_search_depth)
       organization = var.organization
@@ -1237,20 +1334,20 @@ locals {
     }
   }
   ldap_groups = { for i in flatten([
-    for value in local.ldap : [
+    for key, value in local.ldap : [
       for v in value.ldap_groups : {
         domain        = lookup(v, "domain", "")
         base_settings = value.base_settings
-        ldap_policy   = value.name
+        ldap_policy   = key
         name          = v.name
         role          = v.role
       }
     ]
   ]) : "${i.ldap_policy}:${i.name}" => i }
   ldap_providers = { for i in flatten([
-    for value in local.ldap : [
+    for key, value in local.ldap : [
       for v in value.ldap_providers : {
-        ldap_policy = value.name
+        ldap_policy = key
         port        = lookup(v, "port", local.lldap.ldap_providers.port)
         server      = v.server
       }
@@ -1279,7 +1376,7 @@ locals {
         v, "enforce_strong_password", local.luser.enforce_strong_password
       )
       grace_period = lookup(v, "grace_period", local.luser.grace_period)
-      name         = "${local.name_prefix}${v.name}${local.luser.name_suffix}"
+      name         = "${local.name_prefix.local_user}${v.name}${local.name_suffix.local_user}"
       notification_period = lookup(
         v, "notification_period", local.luser.notification_period
       )
@@ -1295,10 +1392,10 @@ locals {
     }
   }
   users = { for i in flatten([
-    for value in local.local_user : [
+    for key, value in local.local_user : [
       for v in value.users : {
         enabled      = lookup(v, "enabled", true)
-        local_user   = value.name
+        local_user   = key
         name         = v.username
         organization = value.organization
         password     = lookup(v, "password", 1)
@@ -1320,7 +1417,7 @@ locals {
       dns_servers_v6     = lookup(v, "dns_servers_v6", local.ldns.dns_servers_v6)
       enable_dynamic_dns = lookup(v, "enable_dynamic_dns", local.ldns.enable_dynamic_dns)
       enable_ipv6        = lookup(v, "enable_ipv6", local.ldns.enable_ipv6)
-      name               = "${local.name_prefix}${v.name}${local.ldns.name_suffix}"
+      name               = "${local.name_prefix.network_connectivity}${v.name}${local.name_suffix.network_connectivity}"
       obtain_ipv4_dns_from_dhcp = lookup(
         v, "obtain_ipv4_dns_from_dhcp", local.ldns.obtain_ipv4_dns_from_dhcp
       )
@@ -1342,7 +1439,7 @@ locals {
     for v in lookup(local.policies, "ntp", []) : v.name => {
       description  = lookup(v, "description", "")
       enabled      = lookup(v, "enabled", local.lntp.enabled)
-      name         = "${local.name_prefix}${v.name}${local.lntp.name_suffix}"
+      name         = "${local.name_prefix.ntp}${v.name}${local.name_suffix.ntp}"
       ntp_servers  = lookup(v, "ntp_servers", local.lntp.ntp_servers)
       organization = var.organization
       tags         = lookup(v, "tags", var.tags)
@@ -1362,7 +1459,7 @@ locals {
       memory_mode_percentage = lookup(
         v, "memory_mode_percentage", local.lpmem.memory_mode_percentage
       )
-      name = "${local.name_prefix}${v.name}${local.lpmem.name_suffix}"
+      name = "${local.name_prefix.persistent_memory}${v.name}${local.name_suffix.persistent_memory}"
       namespaces = [for v in lookup(v, "namespaces", []) :
         {
           capacity         = v.capacity
@@ -1394,7 +1491,8 @@ locals {
       for i in range(length(value.names)) : {
         description  = lookup(value, "description", "")
         device_model = lookup(value, "device_model", local.lport.device_model)
-        name         = "${element(value.names, i)}${local.lport.name_suffix}"
+        key          = element(value.names, i)
+        name         = "${local.name_prefix.port}${element(value.names, i)}${local.name_suffix.port}"
         organization = lookup(value, "organization", var.organization)
         port_channel_appliances = [
           for v in lookup(value, "port_channel_appliances", []) : {
@@ -1544,9 +1642,9 @@ locals {
 
       }
     ]
-  ]) : "${s.name}" => s }
+  ]) : "${s.key}" => s }
   port_channel_appliances = { for i in flatten([
-    for value in local.port : [
+    for key, value in local.port : [
       for v in value.port_channel_appliances : {
         admin_speed = v.admin_speed
         ethernet_network_control_policy = try(
@@ -1577,14 +1675,14 @@ locals {
         mode         = v.mode
         organization = value.organization
         pc_id        = v.pc_id
-        port_policy  = value.name
+        port_policy  = key
         priority     = v.priority
         tags         = value.tags
       }
     ]
   ]) : "${i.port_policy}:${i.pc_id}" => i }
   port_channel_ethernet_uplinks = { for i in flatten([
-    for value in local.port : [
+    for key, value in local.port : [
       for v in value.port_channel_ethernet_uplinks : {
         admin_speed = v.admin_speed
         ethernet_network_group_policy = v.ethernet_network_group_policy != "" ? try(
@@ -1630,26 +1728,26 @@ locals {
         }
         organization = value.organization
         pc_id        = v.pc_id
-        port_policy  = value.name
+        port_policy  = key
         tags         = value.tags
       }
     ]
   ]) : "${i.port_policy}:${i.pc_id}" => i }
   port_channel_fc_uplinks = { for i in flatten([
-    for value in local.port : [
+    for key, value in local.port : [
       for v in value.port_channel_fc_uplinks : {
         admin_speed  = v.admin_speed
         fill_pattern = v.fill_pattern
         interfaces   = v.interfaces
         pc_id        = v.pc_id
-        port_policy  = value.name
+        port_policy  = key
         tags         = value.tags
         vsan_id      = v.vsan_id
       }
     ]
   ]) : "${i.port_policy}:${i.pc_id}" => i }
   port_channel_fcoe_uplinks = { for i in flatten([
-    for value in local.port : [
+    for key, value in local.port : [
       for v in value.port_channel_fcoe_uplinks : {
         admin_speed = v.admin_speed
         interfaces  = v.interfaces
@@ -1675,17 +1773,17 @@ locals {
         }
         organization = value.organization
         pc_id        = v.pc_id
-        port_policy  = value.name
+        port_policy  = key
         tags         = value.tags
       }
     ]
   ]) : "${i.port_policy}:${i.pc_id}" => i }
   port_modes = { for i in flatten([
-    for value in local.port : [
+    for key, value in local.port : [
       for v in value.port_modes : {
         custom_mode = v.custom_mode
         port_list   = v.port_list
-        port_policy = value.name
+        port_policy = key
         slot_id     = v.slot_id
         tags        = value.tags
       }
@@ -1699,7 +1797,7 @@ locals {
   And then to return these values as a list
   */
   port_role_appliances_loop = flatten([
-    for value in local.port : [
+    for key, value in local.port : [
       for v in value.port_role_appliances : {
         admin_speed                     = v.admin_speed
         breakout_port_id                = v.breakout_port_id
@@ -1714,7 +1812,7 @@ locals {
             ) : length(regexall("-", s)) > 0 ? [for v in range(tonumber(element(split("-", s), 0)
           ), (tonumber(element(split("-", s), 1)) + 1)) : tonumber(v)] : [s]]
         )
-        port_policy = value.name
+        port_policy = key
         priority    = v.priority
         slot_id     = v.slot_id
         tags        = value.tags
@@ -1723,7 +1821,7 @@ locals {
   ])
   # Loop 2 will take the port_list created in Loop 1 and expand this out to a list of port_id's.
   port_role_appliances = { for i in flatten([
-    for v in local.port_role_appliances_loop : [
+    for k, v in local.port_role_appliances_loop : [
       for s in v.port_list : {
         admin_speed      = v.admin_speed
         breakout_port_id = v.breakout_port_id
@@ -1764,7 +1862,7 @@ locals {
   And then to return these values as a list
   */
   port_role_ethernet_uplinks_loop = flatten([
-    for value in local.port : [
+    for key, value in local.port : [
       for v in value.port_role_ethernet_uplinks : {
         admin_speed                   = v.admin_speed
         breakout_port_id              = v.breakout_port_id
@@ -1779,7 +1877,7 @@ locals {
             ) : length(regexall("-", s)) > 0 ? [for v in range(tonumber(element(split("-", s), 0)
           ), (tonumber(element(split("-", s), 1)) + 1)) : tonumber(v)] : [s]]
         )
-        port_policy = value.name
+        port_policy = key
         slot_id     = v.slot_id
         tags        = value.tags
       }
@@ -1842,7 +1940,7 @@ locals {
   And then to return these values as a list
   */
   port_role_fc_storage_loop = flatten([
-    for value in local.port : [
+    for key, value in local.port : [
       for v in value.port_role_fc_storage : {
         admin_speed      = v.admin_speed
         breakout_port_id = v.breakout_port_id
@@ -1852,7 +1950,7 @@ locals {
             ) : length(regexall("-", s)) > 0 ? [for v in range(tonumber(element(split("-", s), 0)
           ), (tonumber(element(split("-", s), 1)) + 1)) : tonumber(v)] : [s]]
         )
-        port_policy = value.name
+        port_policy = key
         slot_id     = v.slot_id
         tags        = value.tags
         vsan_id     = v.vsan_id
@@ -1885,7 +1983,7 @@ locals {
   And then to return these values as a list
   */
   port_role_fc_uplinks_loop = flatten([
-    for value in local.port : [
+    for key, value in local.port : [
       for v in value.port_role_fc_uplinks : {
         admin_speed      = v.admin_speed
         breakout_port_id = v.breakout_port_id
@@ -1895,7 +1993,7 @@ locals {
             ) : length(regexall("-", s)) > 0 ? [for v in range(tonumber(element(split("-", s), 0)
           ), (tonumber(element(split("-", s), 1)) + 1)) : tonumber(v)] : [s]]
         )
-        port_policy = value.name
+        port_policy = key
         slot_id     = v.slot_id
         tags        = value.tags
         vsan_id     = v.vsan_id
@@ -1929,7 +2027,7 @@ locals {
   And then to return these values as a list
   */
   port_role_fcoe_uplinks_loop = flatten([
-    for value in local.port : [
+    for key, value in local.port : [
       for v in value.port_role_fcoe_uplinks : {
         admin_speed         = v.admin_speed
         breakout_port_id    = v.breakout_port_id
@@ -1942,7 +2040,7 @@ locals {
             ) : length(regexall("-", s)) > 0 ? [for v in range(tonumber(element(split("-", s), 0)
           ), (tonumber(element(split("-", s), 1)) + 1)) : tonumber(v)] : [s]]
         )
-        port_policy = value.name
+        port_policy = key
         slot_id     = v.slot_id
         tags        = value.tags
       }
@@ -1983,7 +2081,7 @@ locals {
   And then to return these values as a list
   */
   port_role_servers_loop = flatten([
-    for value in local.port : [
+    for key, value in local.port : [
       for v in value.port_role_servers : {
         auto_negotiation      = v.auto_negotiation
         breakout_port_id      = v.breakout_port_id
@@ -1996,7 +2094,7 @@ locals {
             ) : length(regexall("-", s)) > 0 ? [for v in range(tonumber(element(split("-", s), 0)
           ), (tonumber(element(split("-", s), 1)) + 1)) : tonumber(v)] : [s]]
         )
-        port_policy = value.name
+        port_policy = key
         slot_id     = v.slot_id
         tags        = value.tags
       }
@@ -2026,7 +2124,7 @@ locals {
   #_________________________________________________________________________
   san_connectivity = { for v in lookup(local.policies, "san_connectivity", []) : v.name => {
     description         = lookup(v, "description", "")
-    name                = "${local.name_prefix}${v.name}${local.lscp.name_suffix}"
+    name                = "${local.name_prefix.san_connectivity}${v.name}${local.name_suffix.san_connectivity}"
     organization        = var.organization
     tags                = lookup(v, "tags", var.tags)
     target_platform     = lookup(v, "target_platform", local.lscp.target_platform)
@@ -2069,7 +2167,7 @@ locals {
     }
   }
   vhbas = { for i in flatten([
-    for value in local.san_connectivity : [
+    for key, value in local.san_connectivity : [
       for v in value.vhbas : [
         for s in range(length(v.names)) : {
           fc_zone_policies = length(v.fc_zone_policies) > 0 ? element(
@@ -2121,7 +2219,7 @@ locals {
           placement_uplink_port = length(v.placement_uplink_port) == 1 ? element(
             v.placement_uplink_port, 0) : element(v.placement_uplink_port, s
           )
-          san_connectivity     = value.name
+          san_connectivity     = key
           vhba_type            = v.vhba_type
           wwpn_allocation_type = v.wwpn_allocation_type
           wwpn_pool = length(v.wwpn_pools) > 0 ? try(
@@ -2150,7 +2248,7 @@ locals {
       access_community_string = lookup(v, "access_community_string", 0)
       description             = lookup(v, "description", "")
       enable_snmp             = lookup(v, "enable_snmp", local.lsnmp.enable_snmp)
-      name                    = "${local.name_prefix}${v.name}${local.lsnmp.name_suffix}"
+      name                    = "${local.name_prefix.snmp}${v.name}${local.name_suffix.snmp}"
       organization            = var.organization
       snmp_community_access   = lookup(v, "snmp_community_access", local.lsnmp.snmp_community_access)
       snmp_engine_input_id    = lookup(v, "snmp_engine_input_id", local.lsnmp.snmp_engine_input_id)
@@ -2176,7 +2274,7 @@ locals {
       drive_groups          = lookup(v, "drive_groups", [])
       global_hot_spares     = lookup(v, "global_hot_spares", local.lstorage.global_hot_spares)
       m2_raid_configuration = lookup(v, "m2_raid_configuration", {})
-      name                  = "${local.name_prefix}${v.name}${local.lstorage.name_suffix}"
+      name                  = "${local.name_prefix.storage}${v.name}${local.name_suffix.storage}"
       organization          = var.organization
       single_drive_raid0_configuration = length(
         lookup(v, "single_drive_raid0_configuration", [])) > 0 ? [
@@ -2195,13 +2293,13 @@ locals {
     }
   }
   drive_groups = { for i in flatten([
-    for value in local.storage : [
+    for key, value in local.storage : [
       for v in value.drive_groups : {
         automatic_drive_groups = lookup(v, "automatic_drive_groups", [])
         manual_drive_groups    = lookup(v, "manual_drive_groups", [])
         name                   = v.name
         raid_level             = lookup(v, "raid_level", "Raid1")
-        storage_policy         = value.name
+        storage_policy         = key
         tags                   = value.tags
         virtual_drives         = lookup(v, "virtual_drives", [])
       }
@@ -2225,7 +2323,7 @@ locals {
         v, "mac_address_table_aging", local.swctrl.mac_address_table_aging
       )
       mac_aging_time        = lookup(v, "mac_aging_time", local.swctrl.mac_aging_time)
-      name                  = "${local.name_prefix}${v.name}${local.swctrl.name_suffix}"
+      name                  = "${local.name_prefix.switch_control}${v.name}${local.name_suffix.switch_control}"
       organization          = var.organization
       tags                  = lookup(v, "tags", var.tags)
       udld_message_interval = lookup(v, "udld_message_interval", local.swctrl.udld_message_interval)
@@ -2247,7 +2345,7 @@ locals {
       local_min_severity = lookup(lookup(
         v, "local_logging", {}), "minimum_severity", local.lsyslog.local_logging.minimum_severity
       )
-      name           = "${local.name_prefix}${v.name}${local.lsyslog.name_suffix}"
+      name           = "${local.name_prefix.syslog}${v.name}${local.name_suffix.syslog}"
       organization   = var.organization
       remote_logging = lookup(v, "remote_logging", [])
       tags           = lookup(v, "tags", var.tags)
@@ -2263,7 +2361,7 @@ locals {
     for v in lookup(local.policies, "system_qos", []) : v.name => {
       classes      = lookup(v, "classes", [])
       description  = lookup(v, "description", "")
-      name         = "${local.name_prefix}${v.name}${local.lsystem_qos.name_suffix}"
+      name         = "${local.name_prefix.system_qos}${v.name}${local.name_suffix.system_qos}"
       organization = var.organization
       tags         = lookup(v, "tags", var.tags)
     }
@@ -2283,7 +2381,7 @@ locals {
       enable_virtual_media_encryption = lookup(
         v, "enable_virtual_media_encryption", local.vmedia.enable_virtual_media_encryption
       )
-      name         = "${local.name_prefix}${v.name}${local.vmedia.name_suffix}"
+      name         = "${local.name_prefix.virtual_media}${v.name}${local.name_suffix.virtual_media}"
       organization = var.organization
       tags         = lookup(v, "tags", var.tags)
     }
@@ -2297,7 +2395,7 @@ locals {
   vlan = {
     for v in lookup(local.policies, "vlan", []) : v.name => {
       description  = lookup(v, "description", "")
-      name         = "${local.name_prefix}${v.name}${local.lvlan.name_suffix}"
+      name         = "${local.name_prefix.vlan}${v.name}${local.name_suffix.vlan}"
       organization = var.organization
       tags         = lookup(v, "tags", var.tags)
       vlans = [
@@ -2312,7 +2410,7 @@ locals {
     }
   }
   vlans_loop = flatten([
-    for value in local.vlan : [
+    for key, value in local.vlan : [
       for v in value.vlans : {
         auto_allow_on_uplinks = v.auto_allow_on_uplinks
         multicast_policy      = v.multicast_policy
@@ -2325,7 +2423,7 @@ locals {
             ) : length(regexall(",", v.vlan_list)) > 0 ? tolist(split(",", v.vlan_list)) : [v.vlan_list]
             ) : length(regexall("-", s)) > 0 ? [for v in range(tonumber(element(split("-", s), 0)
         ), (tonumber(element(split("-", s), 1)) + 1)) : tonumber(v)] : [s]])
-        vlan_policy = value.name
+        vlan_policy = key
       }
     ]
   ])
@@ -2361,7 +2459,7 @@ locals {
   vsan = {
     for v in lookup(local.policies, "vsan", []) : v.name => {
       description     = lookup(v, "description", "")
-      name            = "${local.name_prefix}${v.name}${local.lvsan.name_suffix}"
+      name            = "${local.name_prefix.vsan}${v.name}${local.name_suffix.vsan}"
       organization    = var.organization
       tags            = lookup(v, "tags", var.tags)
       uplink_trunking = lookup(v, "uplink_trunking", local.lvsan.uplink_trunking)
@@ -2369,14 +2467,14 @@ locals {
     }
   }
   vsans = { for i in flatten([
-    for value in local.vsan : [
+    for key, value in local.vsan : [
       for v in value.vsans : {
         default_zoning = lookup(v, "default_zoning", local.lvsan.vsans.default_zoning)
         fcoe_vlan_id   = lookup(v, "fcoe_vlan_id", v.vsan_id)
         name           = v.name
         organization   = value.organization
         vsan_id        = v.vsan_id
-        vsan_policy    = value.name
+        vsan_policy    = key
         vsan_scope     = lookup(v, "vsan_scope", local.lvsan.vsans.vsan_scope)
       }
     ]

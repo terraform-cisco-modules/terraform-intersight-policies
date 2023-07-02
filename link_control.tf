@@ -5,9 +5,10 @@
 #__________________________________________________________________
 
 resource "intersight_fabric_link_control_policy" "link_control" {
-  for_each    = { for v in lookup(local.policies, "link_control", []) : v.name => v }
-  description = lookup(each.value, "description", "${each.value.name} Link Control Policy.")
-  name        = "${each.key}${local.defaults.link_control.name_suffix}"
+  for_each = { for v in lookup(local.policies, "link_control", []) : v.name => v }
+  description = lookup(
+  each.value, "description", "${local.name_prefix.link_control}${each.key}${local.name_suffix.link_control} Link Control Policy.")
+  name = "${local.name_prefix.link_control}${each.key}${local.name_suffix.link_control}"
   organization {
     moid        = local.orgs[var.organization]
     object_type = "organization.Organization"

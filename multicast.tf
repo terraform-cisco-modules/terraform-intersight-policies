@@ -5,9 +5,10 @@
 #__________________________________________________________________
 
 resource "intersight_fabric_multicast_policy" "multicast" {
-  for_each    = { for v in lookup(local.policies, "multicast", []) : v.name => v }
-  description = lookup(each.value, "description", "${each.value.name} Multicast Policy.")
-  name        = "${each.key}${local.defaults.multicast.name_suffix}"
+  for_each = { for v in lookup(local.policies, "multicast", []) : v.name => v }
+  description = lookup(
+  each.value, "description", "${local.name_prefix.multicast}${each.key}${local.name_suffix.multicast} Multicast Policy.")
+  name = "${local.name_prefix.multicast}${each.key}${local.name_suffix.multicast}"
   querier_ip_address = lookup(
     each.value, "querier_ip_address", local.defaults.multicast.querier_ip_address
   )

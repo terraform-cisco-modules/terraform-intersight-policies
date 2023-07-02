@@ -5,9 +5,10 @@
 #__________________________________________________________________
 
 resource "intersight_vnic_fc_network_policy" "fibre_channel_network" {
-  for_each    = { for v in lookup(local.policies, "fibre_channel_network", []) : v.name => v }
-  description = lookup(each.value, "description", "${each.value.name} Fibre-Channel Network Policy.")
-  name        = "${each.key}${local.defaults.fibre_channel_network.name_suffix}"
+  for_each = { for v in lookup(local.policies, "fibre_channel_network", []) : v.name => v }
+  description = lookup(
+  each.value, "description", "${local.name_prefix.fibre_channel_network}${each.key}${local.name_suffix.fibre_channel_network} Fibre-Channel Network Policy.")
+  name = "${local.name_prefix.fibre_channel_network}${each.key}${local.name_suffix.fibre_channel_network}"
   organization {
     moid        = local.orgs[var.organization]
     object_type = "organization.Organization"

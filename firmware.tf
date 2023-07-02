@@ -43,7 +43,7 @@ resource "intersight_firmware_policy" "fw" {
       length(regexall(true, lookup(each.value.advanced_mode, "exclude_storage_sas_expander", false))) > 0 ? "storage-sasexpander" : ""], [
       length(regexall(true, lookup(each.value.advanced_mode, "exclude_storage_u2", false))) > 0 ? "storage-u2" : ""
   ])) : ["none"]
-  name            = "${each.key}${local.fw.name_suffix}"
+  name            = "${local.name_prefix.firmware}${each.key}${local.name_suffix.firmware}"
   target_platform = lookup(each.value, "target_platform", local.fw.target_platform)
   organization {
     moid        = local.orgs[var.organization]
