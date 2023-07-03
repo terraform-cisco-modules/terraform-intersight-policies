@@ -9,13 +9,13 @@ resource "intersight_iam_end_point_user_policy" "local_user" {
   description = lookup(each.value, "description", "${each.value.name} Local User Policy.")
   name        = each.value.name
   password_properties {
-    enable_password_expiry   = each.value.enable_password_expiry
-    enforce_strong_password  = each.value.enforce_strong_password
-    force_send_password      = each.value.always_send_user_password
-    grace_period             = each.value.grace_period
-    notification_period      = each.value.notification_period
-    password_expiry_duration = each.value.password_expiry_duration
-    password_history         = each.value.password_history
+    enable_password_expiry   = each.value.password_properties.enable_password_expiry
+    enforce_strong_password  = each.value.password_properties.enforce_strong_password
+    force_send_password      = each.value.password_properties.always_send_user_password
+    grace_period             = each.value.password_properties.grace_period
+    notification_period      = each.value.password_properties.notification_period
+    password_expiry_duration = each.value.password_properties.password_expiry_duration
+    password_history         = each.value.password_properties.password_history
   }
   organization {
     moid        = local.orgs[each.value.organization]

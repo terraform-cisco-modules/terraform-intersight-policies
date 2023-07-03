@@ -1105,8 +1105,8 @@ locals {
           ethernet_network_control_policy = lookup(
             v, "ethernet_network_control_policy", local.lcp.vnics.ethernet_network_control_policy
           )
-          ethernet_network_group_policy = lookup(
-            v, "ethernet_network_group_policy", local.lcp.vnics.ethernet_network_group_policy
+          ethernet_network_group_policies = lookup(
+            v, "ethernet_network_group_policies", local.lcp.vnics.ethernet_network_group_policies
           )
           ethernet_network_policy = lookup(
             v, "ethernet_network_policy", local.lcp.vnics.ethernet_network_policy
@@ -1171,12 +1171,18 @@ locals {
             },
             v.ethernet_adapter_policy
           )
-          ethernet_network_control_policy = v.ethernet_network_control_policy != "" ? try(
+          ethernet_network_control_policy = length(v.ethernet_network_control_policies) == 2 ?  try(
             {
-              name = tostring(v.ethernet_network_control_policy)
+              name = tostring(element(v.ethernet_network_control_policy, s))
               org  = value.organization
             },
-            v.ethernet_network_control_policy
+            element(v.ethernet_network_control_policy, s)
+            ) : length(v.ethernet_network_control_policies) == 1 ? try(
+            {
+              name = tostring(element(v.ethernet_network_control_policy, 0))
+              org  = value.organization
+            },
+            element(v.ethernet_network_control_policy, 0)
             ) : {
             name = "UNUSED"
             org  = "UNUSED"
@@ -1365,28 +1371,10 @@ locals {
   #__________________________________________________________________
   local_user = {
     for v in lookup(local.policies, "local_user", []) : v.name => {
-      always_send_user_password = lookup(
-        v, "always_send_user_password", local.luser.always_send_user_password
-      )
       description = lookup(v, "description", "")
-      enable_password_expiry = lookup(
-        v, "enable_password_expiry", local.luser.enable_password_expiry
-      )
-      enforce_strong_password = lookup(
-        v, "enforce_strong_password", local.luser.enforce_strong_password
-      )
-      grace_period = lookup(v, "grace_period", local.luser.grace_period)
+      password_properties = merge(local.luser.password_properties, lookup(v, "password_properties", {}))
       name         = "${local.name_prefix.local_user}${v.name}${local.name_suffix.local_user}"
-      notification_period = lookup(
-        v, "notification_period", local.luser.notification_period
-      )
       organization = var.organization
-      password_expiry_duration = lookup(
-        v, "password_expiry_duration", local.luser.password_expiry_duration
-      )
-      password_history = lookup(
-        v, "password_history", local.luser.password_history
-      )
       tags  = lookup(v, "tags", var.tags)
       users = lookup(v, "users", [])
     }
@@ -2143,7 +2131,7 @@ locals {
         v, "persistent_lun_bindings", local.lscp.vhbas.persistent_lun_bindings)
         placement_pci_link    = lookup(v, "placement_pci_link", local.lscp.vhbas.placement_pci_link)
         placement_pci_order   = lookup(v, "placement_pci_order", local.lscp.vhbas.placement_pci_order)
-        placement_slot_id     = lookup(v, "placement_slot_id", local.lscp.vhbas.placement_slot_id)
+        placement_slot_ids    = lookup(v, "placement_slot_ids", local.lscp.vhbas.placement_slot_ids)
         placement_switch_id   = lookup(v, "placement_switch_id", local.lscp.vhbas.placement_switch_id)
         placement_uplink_port = lookup(v, "placement_uplink_port", local.lscp.vhbas.placement_uplink_port)
         vhba_type             = lookup(v, "vhba_type", local.lscp.vhbas.vhba_type)
@@ -2210,8 +2198,8 @@ locals {
             v.placement_pci_link, 0) : element(v.placement_pci_link, s
           )
           placement_pci_order = element(v.placement_pci_order, s)
-          placement_slot_id = length(v.placement_slot_id) == 1 ? element(
-            v.placement_slot_id, 0) : element(v.placement_slot_id, s
+          placement_slot_id = length(v.placement_slot_ids) == 1 ? element(
+            v.placement_slot_ids, 0) : element(v.placement_slot_ids, s
           )
           placement_switch_id = length(compact(
             [v.placement_switch_id])

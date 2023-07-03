@@ -714,7 +714,7 @@ policies:
       enable_failover: false
       ethernet_adapter_policy: ''
       ethernet_network_control_policy: ''
-      ethernet_network_group_policy: ''
+      ethernet_network_group_policies: []
       ethernet_network_policy: ''
       ethernet_qos_policy: ''
       iscsi_boot_policies: []
@@ -778,15 +778,16 @@ policies:
       key: ''
       value: ''
   local_user:
-    always_send_user_password: false
     description: ''
-    enable_password_expiry: false
-    enforce_strong_password: true
-    grace_period: 0
     name: '**REQUIRED**'
-    notification_period: 15
-    password_expiry_duration: 90
-    password_history: 5
+    password_properties:
+      always_send_user_password: false
+      enable_password_expiry: false
+      enforce_strong_password: true
+      grace_period: 0
+      notification_period: 15
+      password_expiry_duration: 90
+      password_history: 5
     tags:
       key: ''
       value: ''
