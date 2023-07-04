@@ -20,7 +20,7 @@ resource "intersight_vnic_fc_network_policy" "fibre_channel_network" {
     id = each.value.vsan_id
   }
   dynamic "tags" {
-    for_each = lookup(each.value, "tags", var.tags)
+    for_each = { for v in lookup(each.value, "tags", var.tags) : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value

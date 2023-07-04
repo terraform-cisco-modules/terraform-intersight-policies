@@ -18,7 +18,7 @@ resource "intersight_fabric_link_control_policy" "link_control" {
     mode        = lookup(each.value, "mode", local.defaults.link_control.mode)
   }
   dynamic "tags" {
-    for_each = lookup(each.value, "tags", var.tags)
+    for_each = { for v in lookup(each.value, "tags", var.tags) : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value

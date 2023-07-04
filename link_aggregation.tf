@@ -18,7 +18,7 @@ resource "intersight_fabric_link_aggregation_policy" "link_aggregation" {
     object_type = "organization.Organization"
   }
   dynamic "tags" {
-    for_each = lookup(each.value, "tags", var.tags)
+    for_each = { for v in lookup(each.value, "tags", var.tags) : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value

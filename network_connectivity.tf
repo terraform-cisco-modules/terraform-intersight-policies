@@ -22,7 +22,7 @@ resource "intersight_networkconfig_policy" "network_connectivity" {
     object_type = "organization.Organization"
   }
   dynamic "tags" {
-    for_each = each.value.tags
+    for_each = { for v in each.value.tags : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value

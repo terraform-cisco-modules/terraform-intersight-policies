@@ -54,7 +54,7 @@ resource "intersight_access_policy" "imc_access" {
     }
   }
   dynamic "tags" {
-    for_each = each.value.tags
+    for_each = { for v in each.value.tags : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value

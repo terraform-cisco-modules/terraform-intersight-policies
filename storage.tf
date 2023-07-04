@@ -27,9 +27,7 @@ resource "intersight_storage_storage_policy" "storage" {
     }
   }
   dynamic "raid0_drive" {
-    for_each = {
-      for v in each.value.single_drive_raid0_configuration : "default" => v if length(compact([v.drive_slots])) > 0
-    }
+    for_each = { for v in each.value.single_drive_raid0_configuration : "default" => v }
     content {
       drive_slots = raid0_drive.value.drive_slots
       enable      = true
@@ -42,7 +40,7 @@ resource "intersight_storage_storage_policy" "storage" {
     }
   }
   dynamic "tags" {
-    for_each = each.value.tags
+    for_each = { for v in each.value.tags : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value
@@ -111,7 +109,7 @@ resource "intersight_storage_drive_group" "drive_groups" {
     }
   }
   dynamic "tags" {
-    for_each = each.value.tags
+    for_each = { for v in each.value.tags : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value

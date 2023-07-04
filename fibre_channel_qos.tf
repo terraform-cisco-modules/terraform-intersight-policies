@@ -22,7 +22,7 @@ resource "intersight_vnic_fc_qos_policy" "fibre_channel_qos" {
     object_type = "organization.Organization"
   }
   dynamic "tags" {
-    for_each = lookup(each.value, "tags", var.tags)
+    for_each = { for v in lookup(each.value, "tags", var.tags) : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value

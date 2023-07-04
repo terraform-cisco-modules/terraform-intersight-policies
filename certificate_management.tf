@@ -5,10 +5,9 @@
 #__________________________________________________________________
 
 resource "intersight_certificatemanagement_policy" "certificate_management" {
-  for_each = { for v in lookup(local.policies, "certificate_management", []) : v.name => v }
-  description = lookup(
-  each.value, "description", "${local.name_prefix.certificate_management}${each.key}${local.name_suffix.certificate_management} Certificate Management Policy.")
-  name = "${local.name_prefix.certificate_management}${each.key}${local.name_suffix.certificate_management}"
+  for_each    = local.certificate_management
+  description = lookup(each.value, "description", "${each.value.name} Certificate Management Policy.")
+  name        = each.value.name
   organization {
     moid        = local.orgs[var.organization]
     object_type = "organization.Organization"
@@ -16,32 +15,22 @@ resource "intersight_certificatemanagement_policy" "certificate_management" {
   certificates {
     certificate {
       pem_certificate = length(
-        regexall("1", lookup(each.value, "base64_certificate", 1))
-        ) > 0 ? var.base64_certificate_1 : length(
-        regexall("2", lookup(each.value, "base64_certificate", 1))
-        ) > 0 ? var.base64_certificate_2 : length(
-        regexall("3", lookup(each.value, "base64_certificate", 1))
-        ) > 0 ? var.base64_certificate_3 : length(
-        regexall("4", lookup(each.value, "base64_certificate", 1))
-        ) > 0 ? var.base64_certificate_4 : length(
-        regexall("5", lookup(each.value, "base64_certificate", 1))
-      ) > 0 ? var.base64_certificate_5 : null
+        regexall("1", tostring(each.value.certificate))) > 0 ? base64encode(var.cert_mgmt_certificate_1) : length(
+        regexall("2", tostring(each.value.certificate))) > 0 ? base64encode(var.cert_mgmt_certificate_2) : length(
+        regexall("3", tostring(each.value.certificate))) > 0 ? base64encode(var.cert_mgmt_certificate_3) : length(
+        regexall("4", tostring(each.value.certificate))) > 0 ? base64encode(var.cert_mgmt_certificate_4) : length(
+      regexall("5", tostring(each.value.certificate))) > 0 ? base64encode(var.cert_mgmt_certificate_5) : null
     }
-    enabled = lookup(each.value, "enabled", local.defaults.certificate_management.enabled)
+    enabled = true
     privatekey = length(
-      regexall("1", lookup(each.value, "base64_private_key", 1))
-      ) > 0 ? var.base64_private_key_1 : length(
-      regexall("2", lookup(each.value, "base64_private_key", 1))
-      ) > 0 ? var.base64_private_key_2 : length(
-      regexall("3", lookup(each.value, "base64_private_key", 1))
-      ) > 0 ? var.base64_private_key_3 : length(
-      regexall("4", lookup(each.value, "base64_private_key", 1))
-      ) > 0 ? var.base64_private_key_4 : length(
-      regexall("5", lookup(each.value, "base64_private_key", 1))
-    ) > 0 ? var.base64_private_key_5 : null
+      regexall("1", tostring(each.value.private_key))) > 0 ? base64encode(var.cert_mgmt_private_key_1) : length(
+      regexall("2", tostring(each.value.private_key))) > 0 ? base64encode(var.cert_mgmt_private_key_2) : length(
+      regexall("3", tostring(each.value.private_key))) > 0 ? base64encode(var.cert_mgmt_private_key_3) : length(
+      regexall("4", tostring(each.value.private_key))) > 0 ? base64encode(var.cert_mgmt_private_key_4) : length(
+    regexall("5", tostring(each.value.private_key))) > 0 ? base64encode(var.cert_mgmt_private_key_5) : null
   }
   dynamic "tags" {
-    for_each = lookup(each.value, "tags", var.tags)
+    for_each = { for v in each.value.tags : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value

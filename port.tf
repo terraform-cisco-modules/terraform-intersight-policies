@@ -26,7 +26,7 @@ resource "intersight_fabric_port_policy" "port" {
     object_type = "organization.Organization"
   }
   dynamic "tags" {
-    for_each = each.value.tags
+    for_each = { for v in each.value.tags : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value
@@ -91,7 +91,7 @@ resource "intersight_fabric_appliance_pc_role" "port_channel_appliances" {
     }
   }
   dynamic "tags" {
-    for_each = each.value.tags
+    for_each = { for v in each.value.tags : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value
@@ -178,7 +178,7 @@ resource "intersight_fabric_uplink_pc_role" "port_channel_ethernet_uplinks" {
     }
   }
   dynamic "tags" {
-    for_each = each.value.tags
+    for_each = { for v in each.value.tags : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value
@@ -215,7 +215,7 @@ resource "intersight_fabric_fc_uplink_pc_role" "port_channel_fc_uplinks" {
     }
   }
   dynamic "tags" {
-    for_each = each.value.tags
+    for_each = { for v in each.value.tags : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value
@@ -275,7 +275,7 @@ resource "intersight_fabric_fcoe_uplink_pc_role" "port_channel_fcoe_uplinks" {
     }
   }
   dynamic "tags" {
-    for_each = each.value.tags
+    for_each = { for v in each.value.tags : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value
@@ -303,7 +303,7 @@ resource "intersight_fabric_port_mode" "port_modes" {
     moid = intersight_fabric_port_policy.port[each.value.port_policy].moid
   }
   dynamic "tags" {
-    for_each = each.value.tags
+    for_each = { for v in each.value.tags : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value
@@ -350,7 +350,7 @@ resource "intersight_fabric_appliance_role" "port_role_appliances" {
     ] && jsondecode(i.additional_properties).Name == each.value.ethernet_network_group_policy.name][0]
   }
   dynamic "tags" {
-    for_each = each.value.tags
+    for_each = { for v in each.value.tags : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value
@@ -418,7 +418,7 @@ resource "intersight_fabric_uplink_role" "port_role_ethernet_uplinks" {
     }
   }
   dynamic "tags" {
-    for_each = each.value.tags
+    for_each = { for v in each.value.tags : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value
@@ -448,7 +448,7 @@ resource "intersight_fabric_fc_storage_role" "port_role_fc_storage" {
     moid = intersight_fabric_port_policy.port[each.value.port_policy].moid
   }
   dynamic "tags" {
-    for_each = each.value.tags
+    for_each = { for v in each.value.tags : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value
@@ -479,7 +479,7 @@ resource "intersight_fabric_fc_uplink_role" "port_role_fc_uplinks" {
     moid = intersight_fabric_port_policy.port[each.value.port_policy].moid
   }
   dynamic "tags" {
-    for_each = each.value.tags
+    for_each = { for v in each.value.tags : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value
@@ -521,7 +521,7 @@ resource "intersight_fabric_fcoe_uplink_role" "port_role_fcoe_uplinks" {
     }
   }
   dynamic "tags" {
-    for_each = each.value.tags
+    for_each = { for v in each.value.tags : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value
@@ -552,7 +552,7 @@ resource "intersight_fabric_server_role" "port_role_servers" {
     moid = intersight_fabric_port_policy.port[each.value.port_policy].moid
   }
   dynamic "tags" {
-    for_each = each.value.tags
+    for_each = { for v in each.value.tags : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value

@@ -26,7 +26,7 @@ resource "intersight_fabric_fc_zone_policy" "fc_zone" {
     }
   }
   dynamic "tags" {
-    for_each = lookup(each.value, "tags", var.tags)
+    for_each = { for v in lookup(each.value, "tags", var.tags) : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value

@@ -20,7 +20,7 @@ resource "intersight_vnic_eth_network_policy" "ethernet_network" {
     object_type   = "vnic.VlanSettings"
   }
   dynamic "tags" {
-    for_each = lookup(each.value, "tags", var.tags)
+    for_each = { for v in lookup(each.value, "tags", var.tags) : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value

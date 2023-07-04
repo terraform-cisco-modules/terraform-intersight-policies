@@ -26,7 +26,7 @@ resource "intersight_power_policy" "power" {
     object_type = "organization.Organization"
   }
   dynamic "tags" {
-    for_each = lookup(each.value, "tags", var.tags)
+    for_each = { for v in lookup(each.value, "tags", var.tags) : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value

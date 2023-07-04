@@ -126,7 +126,7 @@ resource "intersight_vnic_iscsi_boot_policy" "iscsi_boot" {
     }
   }
   dynamic "tags" {
-    for_each = each.value.tags
+    for_each = { for v in each.value.tags : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value

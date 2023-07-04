@@ -32,7 +32,7 @@ resource "intersight_vnic_lan_connectivity_policy" "lan_connectivity" {
     }
   }
   dynamic "tags" {
-    for_each = each.value.tags
+    for_each = { for v in each.value.tags : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value
@@ -184,7 +184,7 @@ resource "intersight_vnic_eth_if" "vnics" {
     }
   }
   dynamic "tags" {
-    for_each = each.value.tags
+    for_each = { for v in each.value.tags : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value

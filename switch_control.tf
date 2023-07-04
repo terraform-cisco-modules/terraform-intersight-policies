@@ -10,6 +10,7 @@ resource "intersight_fabric_switch_control_policy" "switch_control" {
   ethernet_switching_mode        = each.value.ethernet_switching_mode
   fc_switching_mode              = each.value.fc_switching_mode
   name                           = each.value.name
+  reserved_vlan_start_id         = each.value.reserved_vlan_start_id
   vlan_port_optimization_enabled = each.value.vlan_port_count_optimization
   mac_aging_settings {
     mac_aging_option = each.value.mac_address_table_aging
@@ -20,11 +21,11 @@ resource "intersight_fabric_switch_control_policy" "switch_control" {
     object_type = "organization.Organization"
   }
   udld_settings {
-    message_interval = each.value.udld_message_interval
-    recovery_action  = each.value.udld_recovery_action
+    message_interval = each.value.udld_global_settings.message_interval
+    recovery_action  = each.value.udld_global_settings.recovery_action
   }
   dynamic "tags" {
-    for_each = each.value.tags
+    for_each = { for v in each.value.tags : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value

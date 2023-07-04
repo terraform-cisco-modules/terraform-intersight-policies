@@ -475,6 +475,7 @@ policies:
       key: ''
       value: ''
   certificate_management:
+    assigned_sensitive_data: false
     enabled: true
     certificate: 0 # Value between 1 and 5 to define the TF_VAR_base64_certificate_[1-5]
     description: ''
@@ -490,9 +491,24 @@ policies:
     tags:
       key: ''
       value: ''
+  drive_security:
+    assigned_sensitive_data: false
+    description: ''
+    name: '**REQUIRED**'
+    primary_kmip_server:
+      ip_address_hostname: '**REQUIRED**'
+      port: 5696
+      timeout: 60
+    secondary_kmip_server:
+      ip_address_hostname: ''
+      port: 5696
+      timeout: 60
+    username: ''
   ethernet_adapter:
-    completion_queue_count: 5
-    completion_ring_size: 1
+    adapter_template: ''
+    completion:
+      queue_count: 5
+      ring_size: 1
     description: ''
     enable_accelerated_receive_flow_steering: false
     enable_advanced_filter: false
@@ -500,37 +516,43 @@ policies:
     enable_interrupt_scaling: false
     enable_nvgre_offload: false
     enable_vxlan_offload: false
-    interrupt_coalescing_type: MIN
-    interrupt_mode: MSIx
-    interrupt_timer: 125
-    interrupts: 8
+    interrupt_settings:
+      coalescing_type: MIN
+      mode: MSIx
+      timer: 125
+      interrupts: 8
     name: '**REQUIRED**'
+    receive:
+      queue_count: 4
+      ring_size: 512
+    receive_side_scaling:
+      enable_ipv4_hash: true
+      enable_ipv6_extensions_hash: false
+      enable_ipv6_hash: true
+      enable_tcp_and_ipv4_hash: true
+      enable_tcp_and_ipv6_extensions_hash: false
+      enable_tcp_and_ipv6_hash: true
+      enable_udp_and_ipv4_hash: false
+      enable_udp_and_ipv6_hash: false
     receive_side_scaling_enable: true
-    roce_cos: 6
-    roce_enable: false
-    roce_memory_regions: 0
-    roce_queue_pairs: 0
-    roce_resource_groups: 0
-    roce_version: 1
-    rss_enable_ipv4_hash: true
-    rss_enable_ipv6_extensions_hash: false
-    rss_enable_ipv6_hash: true
-    rss_enable_tcp_and_ipv4_hash: true
-    rss_enable_tcp_and_ipv6_extensions_hash: false
-    rss_enable_tcp_and_ipv6_hash: true
-    rss_enable_udp_and_ipv4_hash: false
-    rss_enable_udp_and_ipv6_hash: false
-    receive_queue_count: 4
-    receive_ring_size: 512
+    roce_settings:
+      enable_rdma_over_converged_ethernet: false
+      cos: 6
+      memory_regions: 0
+      queue_pairs: 0
+      resource_groups: 0
+      version: 2
     tags:
       key: ''
       value: ''
-    tcp_offload_large_recieve: true
-    tcp_offload_large_send: true
-    tcp_offload_rx_checksum: true
-    tcp_offload_tx_checksum: true
-    transmit_queue_count: 1
-    transmit_ring_size: 256
+    tcp_offload:
+      enable_large_recieve_offload: true
+      enable_large_send_offload: true
+      enable_rx_checksum_offload: true
+      enable_tx_checksum_offload: true
+    transmit:
+      queue_count: 1
+      ring_size: 256
     uplink_failback_timeout: 5
   ethernet_network:
     default_vlan: 0
@@ -553,8 +575,10 @@ policies:
       key: ''
       value: ''
   ethernet_network_group:
+    allowed_vlans: '**REQUIRED**'
     description: ''
     name: '**REQUIRED**'
+    native_vlan: null
     tags:
       key: ''
       value: ''
@@ -583,34 +607,44 @@ policies:
       key: ''
       value: ''
   fibre_channel_adapter:
+    adapter_template: ''
     description: ''
     error_detection_timeout: 2000
-    enable_fcp_error_recovery: false
-    error_recovery_io_retry_timeout: 5
-    error_recovery_link_down_timeout: 30000
-    error_recovery_port_down_io_retry: 8
-    error_recovery_port_down_timeout: 10000
-    flogi_retries: 8
-    flogi_timeout: 4000
-    interrupt_mode: MSIx
+    error_recovery:
+      fcp_error_recovery: false
+      io_retry_timeout: 5
+      link_down_timeout: 30000
+      port_down_io_retry: 8
+      port_down_timeout: 10000
+    flogi:
+      retries: 8
+      timeout: 4000
+    interrupt:
+      mode: MSIx
     io_throttle_count: 512
-    lun_queue_depth: 20
-    max_luns_per_target: 1024
+    lun:
+      queue_depth: 20
+      maximum_luns_per_target: 1024
     name: '**REQUIRED**'
-    plogi_retries: 8
-    plogi_timeout: 20000
-    receive_ring_size: 64
+    plogi:
+      retries: 8
+      timeout: 20000
+    receive:
+      ring_size: 64
     resource_allocation_timeout: 10000
-    scsi_io_queue_count: 1
-    scsi_io_ring_size: 512
+    scsi_io:
+      queue_count: 1
+      ring_size: 512
     tags:
       key: ''
       value: ''
-    transmit_ring_size: 64
+    transmit:
+      ring_size: 64
   fibre_channel_network:
     default_vlan_id: 0
     description: ''
     name: '**REQUIRED**'
+    vsan_id: '**REQUIRED**'
     tags:
       key: ''
       value: ''
@@ -636,6 +670,9 @@ policies:
     models:
       firmware_version: '4.2(3d)'
       server_model: 'UCSX-210C-M7'
+    tags:
+      key: ''
+      value: ''
     target_platform: 'FIAttached'
   flow_control:
     description: ''
@@ -648,10 +685,12 @@ policies:
       value: ''
   imc_access:
     description: ''
+    inband_ip_pool: ''
     inband_vlan_id: 4
     ipv4_address_configuration: true
     ipv6_address_configuration: false
     name: '**REQUIRED**'
+    out_of_band_ip_pool: ''
     tags:
       key: ''
       value: ''
@@ -690,12 +729,14 @@ policies:
     target_source_type: Auto
   iscsi_static_target:
     description: ''
-    luns:
-      bootable: false
+    ip_address: '**REQUIRED**'
+    lun_id: 0
     name: '**REQUIRED**'
+    port: 3260
     tags:
       key: ''
       value: ''
+    target_name: '**REQUIRED**' # 
   lan_connectivity:
     description: ''
     enable_azure_stack_host_qos: false
@@ -737,6 +778,8 @@ policies:
       vmq_vmmq_adapter_policy: ''
   ldap:
     base_settings:
+      base_dn: '**REQUIRED**'
+      domain: '**REQUIRED**'
       timeout: 0
     binding_parameters:
       bind_dn: ''
@@ -750,6 +793,12 @@ policies:
       search_domain: ''
       search_forest: ''
       source: Extracted
+    ldap_groups:
+      name: '**REQUIRED**'
+      role: readonly
+    ldap_servers:
+      port: 636
+      server: '**REQUIRED**'
     name: '**REQUIRED**'
     nested_group_search_depth: 128
     search_parameters:
@@ -787,10 +836,15 @@ policies:
       grace_period: 0
       notification_period: 15
       password_expiry_duration: 90
-      password_history: 5
+      password_history: 0
     tags:
       key: ''
       value: ''
+    users:
+      enabled: true
+      password: 1
+      role: readonly
+      username: '**REQUIRED**'
   multicast:
     description: ''
     name: '**REQUIRED**'
@@ -808,6 +862,7 @@ policies:
     bios: ''
     boot_order: ''
     certificate_management: ''
+    drive_security: ''
     device_connector: ''
     ethernet_adapter: ''
     ethernet_network: ''
@@ -858,6 +913,7 @@ policies:
     boot_order: ''
     certificate_management: ''
     device_connector: ''
+    drive_security: ''
     ethernet_adapter: ''
     ethernet_network: ''
     ethernet_network_control: ''
@@ -928,7 +984,9 @@ policies:
     memory_mode_percentage: 0
     name: '**REQUIRED**'
     namespaces:
+      capacity: '**REQUIRED**'
       mode: raw
+      name: '**REQUIRED**'
       socket_id: 1
       socket_memory_id: 'Not Applicable'
     persistent_memory_type: app-direct
@@ -1064,6 +1122,7 @@ policies:
     name: '**REQUIRED**'
     smtp_alert_sender_address: ''
     smtp_port: 25
+    smtp_server_address: '**REQUIRED**'
     tags:
       key: ''
       value: ''
@@ -1108,14 +1167,14 @@ policies:
     default_drive_state: UnconfiguredGood # [UnconfiguredGood Jbod RAID0]
     description: ''
     drive_groups:
-      automatic_drive_groups:
+      automatic_drive_group:
         drives_per_span: 2
         drive_type: Any
         minimum_drive_size: 50
         num_dedicated_hot_spares: ''
         number_of_spans: 1
         use_remaining_drives: false
-      manual_drive_groups:
+      manual_drive_group:
         dedicated_hot_spares: ''
         drive_array_spans:
           - slots: 1,2
@@ -1132,6 +1191,8 @@ policies:
           strip_size: 64
           write_policy: Default
     global_hot_spares: ''
+    m2_raid_configuration:
+      slot: MSTOR-RAID-1
     name: '**REQUIRED**'
     single_drive_raid0_configuration:
       drive_slots: '' # Required
@@ -1156,8 +1217,10 @@ policies:
     tags:
       key: ''
       value: ''
-    udld_message_interval: 15
-    udld_recovery_action: reset
+    reserved_vlan_start_id: 3915
+    udld_global_settings:
+      message_interval: 15
+      recovery_action: reset
     vlan_port_count_optimization: false
   syslog:
     description: ''
@@ -1174,8 +1237,97 @@ policies:
       key: ''
       value: ''
   system_qos:
+    classes:
+      Best Effort:
+        bandwidth_percent: 50
+        cos: 255
+        packet_drop: true
+        priority: Best Effort
+        state: Enabled
+        weight: 5
+      Bronze:
+        bandwidth_percent: 0
+        cos: 1
+        packet_drop: true
+        priority: Bronze
+        state: Disabled
+        weight: 7
+      Gold:
+        bandwidth_percent: 0
+        cos: 4
+        packet_drop: true
+        priority: Gold
+        state: Disabled
+        weight: 9
+      FC:
+        bandwidth_percent: 50
+        cos: 3
+        packet_drop: false
+        priority: FC
+        state: Enabled
+        weight: 10
+      Platinum:
+        bandwidth_percent: 0
+        cos: 5
+        packet_drop: false
+        priority: Platinum
+        state: Disabled
+        weight: 10
+      Silver:
+        bandwidth_percent: 0
+        cos: 2
+        packet_drop: true
+        priority: Silver
+        state: Disabled
+        weight: 8
+    configure_recommended_policy: false
     description: ''
+    jumbo_mtu: true
     name: '**REQUIRED**'
+    recommended_classes:
+      Best Effort:
+        bandwidth_percent: 10
+        cos: 255
+        packet_drop: true
+        priority: Best Effort
+        state: Enabled
+        weight: 5
+      Bronze:
+        bandwidth_percent: 14
+        cos: 1
+        packet_drop: true
+        priority: Bronze
+        state: Enabled
+        weight: 7
+      Gold:
+        bandwidth_percent: 18
+        cos: 4
+        packet_drop: true
+        priority: Gold
+        state: Enabled
+        weight: 9
+      FC:
+        bandwidth_percent: 20
+        cos: 3
+        mtu: 2240
+        packet_drop: false
+        priority: FC
+        state: Enabled
+        weight: 10
+      Platinum:
+        bandwidth_percent: 20
+        cos: 5
+        packet_drop: false
+        priority: Platinum
+        state: Enabled
+        weight: 10
+      Silver:
+        bandwidth_percent: 18
+        cos: 2
+        packet_drop: true
+        priority: Silver
+        state: Enabled
+        weight: 8
     tags:
       key: ''
       value: ''
@@ -1226,6 +1378,9 @@ policies:
       auto_allow_on_uplinks: false
       multicast_policy: ''
       native_vlan: false
+      name: ''
+      sharing_type: None
+      vlan_list: '**REQUIRED**'
   vsan:
     description: ''
     name: '**REQUIRED**'

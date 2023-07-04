@@ -13,7 +13,7 @@ resource "intersight_fabric_eth_network_policy" "vlan" {
     object_type = "organization.Organization"
   }
   dynamic "tags" {
-    for_each = each.value.tags
+    for_each = { for v in each.value.tags : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value
@@ -33,7 +33,7 @@ resource "intersight_fabric_vlan" "vlans" {
     data.intersight_search_search_item.multicast,
     intersight_fabric_eth_network_policy.vlan
   ]
-  for_each              = local.vlans
+  for_each              = { for k, v in local.vlans : k => v if v.vlan_id > 0 && v.vlan_id < 4094 }
   auto_allow_on_uplinks = each.value.auto_allow_on_uplinks
   is_native             = each.value.native_vlan
   name = length(
@@ -47,6 +47,9 @@ resource "intersight_fabric_vlan" "vlans" {
     ) > 0 ? join("-vl00", [each.value.name, each.value.vlan_id]) : join(
     "-vl000", [each.value.name, each.value.vlan_id]
   )
+  primary_vlan_id = each.value.primary_vlan_id
+  sharing_type = length(regexall(tostring(each.value.vlan_id), tostring(each.value.primary_vlan_id))
+  ) > 0 ? "Primary" : each.value.primary_vlan_id > 0 ? each.value.sharing_type : "None"
   vlan_id = each.value.vlan_id
   eth_network_policy {
     moid = intersight_fabric_eth_network_policy.vlan[each.value.vlan_policy].moid
