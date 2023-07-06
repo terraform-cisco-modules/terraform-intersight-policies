@@ -20,8 +20,8 @@ resource "intersight_vnic_fc_adapter_policy" "fibre_channel_adapter" {
   io_throttle_count = length(
     regexall("(FCNVMeInitiator|Initiator|Solaris|VMware|Windows)", each.value.adapter_template)
   ) > 0 ? 256 : each.value.io_throttle_count
-  lun_count                   = each.value.lun.maximum_luns_per_target
-  lun_queue_depth             = each.value.lun.queue_depth
+  lun_count                   = each.value.maximum_luns_per_target
+  lun_queue_depth             = each.value.lun_queue_depth
   name                        = each.value.name
   resource_allocation_timeout = each.value.resource_allocation_timeout
   error_recovery_settings {
@@ -40,7 +40,7 @@ resource "intersight_vnic_fc_adapter_policy" "fibre_channel_adapter" {
     timeout = each.value.flogi.timeout
   }
   interrupt_settings {
-    mode = each.value.interrupt.mode
+    mode = each.value.interrupt_settings.mode
   }
   organization {
     moid        = local.orgs[each.value.organization]

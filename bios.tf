@@ -52,6 +52,7 @@ resource "intersight_bios_policy" "bios" {
   lom_port2state                 = each.value.lom_port2state                 # LOM Port 2 OptionROM
   lom_port3state                 = each.value.lom_port3state                 # LOM Port 3 OptionROM
   lom_ports_all_state            = each.value.lom_ports_all_state            # All Onboard LOM Ports
+  pch_pcie_pll_ssc               = each.value.pch_pcie_pll_ssc               # PCIe PLL SSC Percent *
   pci_option_ro_ms               = each.value.pci_option_ro_ms               # All PCIe Slots OptionROM
   pci_rom_clp                    = each.value.pci_rom_clp                    # PCI ROM CLP
   pcie_ari_support               = each.value.pcie_ari_support               # PCI ARI Support
@@ -107,19 +108,31 @@ resource "intersight_bios_policy" "bios" {
   slot_front_nvme11option_rom    = each.value.slot_front_nvme11option_rom    # Front NVME 11 OptionROM
   slot_front_nvme12link_speed    = each.value.slot_front_nvme12link_speed    # Front NVME 12 Link Speed
   slot_front_nvme12option_rom    = each.value.slot_front_nvme12option_rom    # Front NVME 12 OptionROM
+  slot_front_nvme13link_speed    = each.value.slot_front_nvme13link_speed    # Front NVME 13 Link Speed
   slot_front_nvme13option_rom    = each.value.slot_front_nvme13option_rom    # Front NVME 13 OptionROM
+  slot_front_nvme14link_speed    = each.value.slot_front_nvme14link_speed    # Front NVME 14 Link Speed
   slot_front_nvme14option_rom    = each.value.slot_front_nvme14option_rom    # Front NVME 14 OptionROM
+  slot_front_nvme15link_speed    = each.value.slot_front_nvme15link_speed    # Front NVME 15 Link Speed
   slot_front_nvme15option_rom    = each.value.slot_front_nvme15option_rom    # Front NVME 15 OptionROM
+  slot_front_nvme16link_speed    = each.value.slot_front_nvme16link_speed    # Front NVME 16 Link Speed
   slot_front_nvme16option_rom    = each.value.slot_front_nvme16option_rom    # Front NVME 16 OptionROM
+  slot_front_nvme17link_speed    = each.value.slot_front_nvme17link_speed    # Front NVME 17 Link Speed
   slot_front_nvme17option_rom    = each.value.slot_front_nvme17option_rom    # Front NVME 17 OptionROM
+  slot_front_nvme18link_speed    = each.value.slot_front_nvme18link_speed    # Front NVME 18 Link Speed
   slot_front_nvme18option_rom    = each.value.slot_front_nvme18option_rom    # Front NVME 18 OptionROM
+  slot_front_nvme19link_speed    = each.value.slot_front_nvme19link_speed    # Front NVME 19 Link Speed
   slot_front_nvme19option_rom    = each.value.slot_front_nvme19option_rom    # Front NVME 19 OptionROM
   slot_front_nvme1link_speed     = each.value.slot_front_nvme1link_speed     # PCIe Slot:Front NVME 1 Link Speed
   slot_front_nvme1option_rom     = each.value.slot_front_nvme1option_rom     # Front NVME 1 OptionROM
+  slot_front_nvme20link_speed    = each.value.slot_front_nvme20link_speed    # Front NVME 20 Link Speed
   slot_front_nvme20option_rom    = each.value.slot_front_nvme20option_rom    # Front NVME 20 OptionROM
+  slot_front_nvme21link_speed    = each.value.slot_front_nvme21link_speed    # Front NVME 21 Link Speed
   slot_front_nvme21option_rom    = each.value.slot_front_nvme21option_rom    # Front NVME 21 OptionROM
+  slot_front_nvme22link_speed    = each.value.slot_front_nvme22link_speed    # Front NVME 22 Link Speed
   slot_front_nvme22option_rom    = each.value.slot_front_nvme22option_rom    # Front NVME 22 OptionROM
+  slot_front_nvme23link_speed    = each.value.slot_front_nvme23link_speed    # Front NVME 23 Link Speed
   slot_front_nvme23option_rom    = each.value.slot_front_nvme23option_rom    # Front NVME 23 OptionROM
+  slot_front_nvme24link_speed    = each.value.slot_front_nvme24link_speed    # Front NVME 24 Link Speed
   slot_front_nvme24option_rom    = each.value.slot_front_nvme24option_rom    # Front NVME 24 OptionROM
   slot_front_nvme2link_speed     = each.value.slot_front_nvme2link_speed     # PCIe Slot:Front NVME 2 Link Speed
   slot_front_nvme2option_rom     = each.value.slot_front_nvme2option_rom     # Front NVME 2 OptionROM
@@ -213,6 +226,7 @@ resource "intersight_bios_policy" "bios" {
   #+++++++++++++++++++++++++++++++
   # Memory Section
   #+++++++++++++++++++++++++++++++
+  adaptive_refresh_mgmt_level           = each.value.adaptive_refresh_mgmt_level           # Adaptive Refresh Management Level
   advanced_mem_test                     = each.value.advanced_mem_test                     # Enhanced Memory Test
   bme_dma_mitigation                    = each.value.bme_dma_mitigation                    # BME DMA Mitigation
   burst_and_postponed_refresh           = each.value.burst_and_postponed_refresh           # Burst and Postponed Refresh
@@ -233,6 +247,8 @@ resource "intersight_bios_policy" "bios" {
   dram_refresh_rate                     = each.value.dram_refresh_rate                     # DRAM Refresh Rate
   dram_sw_thermal_throttling            = each.value.dram_sw_thermal_throttling            # DRAM SW Thermal Throttling
   eadr_support                          = each.value.eadr_support                          # eADR Support
+  enable_rmt                            = each.value.enable_rmt                            # Rank Margin Tool
+  error_check_scrub                     = each.value.error_check_scrub                     # Error Check Scrub
   lv_ddr_mode                           = each.value.lv_ddr_mode                           # Low Voltage DDR Mode
   memory_bandwidth_boost                = each.value.memory_bandwidth_boost                # Memory Bandwidth Boost
   memory_refresh_rate = length(
@@ -398,6 +414,7 @@ resource "intersight_bios_policy" "bios" {
   work_load_config = length(                       # Workload Configuration
     regexall("(M6_)?(analytical_DB|Data|HPC)(_tpm)?", each.value.bios_template)
   ) > 0 ? "Balanced" : each.value.work_load_config
+  x2apic_opt_out = each.value.x2apic_opt_out # X2 APIC Opt-Out Flag
   xpt_prefetch = length(
     regexall("M6_(HPC|relational_DB)(_tpm)?", each.value.bios_template)
   ) > 0 ? "enabled" : each.value.xpt_prefetch # XPT Prefetch
@@ -436,6 +453,7 @@ resource "intersight_bios_policy" "bios" {
   # Trusted Platform Section
   #+++++++++++++++++++++++++++++++
   cpu_pa_limit                    = each.value.cpu_pa_limit                    # CPU PA to 46 Bits
+  dma_ctrl_opt_in                 = each.value.dma_ctrl_opt_in                 # DMA Control Opt-In Flag
   enable_mktme                    = each.value.enable_mktme                    # Multikey Total Memory Encryption (MK-TME)
   enable_sgx                      = each.value.enable_sgx                      # Software Guard Extensions
   enable_tme                      = each.value.enable_tme                      # Total Memory Encryption

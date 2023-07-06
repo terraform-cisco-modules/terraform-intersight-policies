@@ -67,6 +67,7 @@ policies:
     lom_port2state: platform-default
     lom_port3state: platform-default
     lom_ports_all_state: platform-default
+    pch_pcie_pll_ssc: platform-default
     pci_option_ro_ms: platform-default
     pci_rom_clp: platform-default
     pcie_ari_support: platform-default
@@ -122,19 +123,31 @@ policies:
     slot_front_nvme11option_rom: platform-default
     slot_front_nvme12link_speed: platform-default
     slot_front_nvme12option_rom: platform-default
+    slot_front_nvme13link_speed: platform-default
     slot_front_nvme13option_rom: platform-default
+    slot_front_nvme14link_speed: platform-default
     slot_front_nvme14option_rom: platform-default
+    slot_front_nvme15link_speed: platform-default
     slot_front_nvme15option_rom: platform-default
+    slot_front_nvme16link_speed: platform-default
     slot_front_nvme16option_rom: platform-default
+    slot_front_nvme17link_speed: platform-default
     slot_front_nvme17option_rom: platform-default
+    slot_front_nvme18link_speed: platform-default
     slot_front_nvme18option_rom: platform-default
+    slot_front_nvme19link_speed: platform-default
     slot_front_nvme19option_rom: platform-default
     slot_front_nvme1link_speed: platform-default
     slot_front_nvme1option_rom: platform-default
+    slot_front_nvme20link_speed: platform-default
     slot_front_nvme20option_rom: platform-default
+    slot_front_nvme21link_speed: platform-default
     slot_front_nvme21option_rom: platform-default
+    slot_front_nvme22link_speed: platform-default
     slot_front_nvme22option_rom: platform-default
+    slot_front_nvme23link_speed: platform-default
     slot_front_nvme23option_rom: platform-default
+    slot_front_nvme24link_speed: platform-default
     slot_front_nvme24option_rom: platform-default
     slot_front_nvme2link_speed: platform-default
     slot_front_nvme2option_rom: platform-default
@@ -229,6 +242,7 @@ policies:
     #+++++++++++++++++++++++++++++++
     # Memory Section
     #+++++++++++++++++++++++++++++++
+    adaptive_refresh_mgmt_level: platform-default
     advanced_mem_test: platform-default
     bme_dma_mitigation: platform-default
     burst_and_postponed_refresh: platform-default
@@ -249,6 +263,8 @@ policies:
     dram_refresh_rate: platform-default
     dram_sw_thermal_throttling: platform-default
     eadr_support: platform-default
+    enable_rmt: platform-default
+    error_check_scrub: platform-default
     lv_ddr_mode: platform-default
     memory_bandwidth_boost: platform-default
     memory_refresh_rate: platform-default
@@ -308,6 +324,7 @@ policies:
     upi_link_enablement: platform-default
     upi_power_management: platform-default
     virtual_numa: platform-default
+    x2apic_opt_out: platform-default
     xpt_remote_prefetch: platform-default
     #+++++++++++++++++++++++++++++++
     # Processor Section
@@ -415,6 +432,7 @@ policies:
     #+++++++++++++++++++++++++++++++
     cpu_pa_limit: platform-default
     enable_mktme: platform-default
+    dma_ctrl_opt_in: platform-default
     enable_sgx: platform-default
     enable_tme: platform-default
     epoch_update: platform-default
@@ -452,13 +470,14 @@ policies:
     usb_xhci_support: platform-default
   boot_order:
     boot_devices: # Optional List of Map
-      bootloader_description: '' # Optional for Uefi
-      bootloader_name: 'BOOTx64.EFI' # Optional for Uefi
-      bootloader_path: '\\EFI\\BOOT\\' # Optional for Uefi, used by boot.Iscsi, boot.LocalDisk, boot.Nvme, boot.PchStorage, boot.San, boot.SdCard
+      bootloader:
+        description: '' # Optional for Uefi
+        name: 'BOOTx64.EFI' # Optional for Uefi
+        path: '\\EFI\\BOOT\\' # Optional for Uefi, used by boot.Iscsi, boot.LocalDisk, boot.Nvme, boot.PchStorage, boot.San, boot.SdCard
       enabled: true #Optional
       interface_name: '' # Used by boot.Iscsi, boot.Pxe, boot.San
       interface_source: name # Used only by boot.Pxe. Options are name, mac, port
-      ip_type: None # Used only by boot.Pxe.  Options are None, IPv4, IPv6
+      ip_type: IPv4 # Used only by boot.Pxe.  Options are None, IPv4, IPv6
       lun: 0 # Used by the following: boot.PchStorage, boot.San, boot.SdCard
       mac_ddress: '' # Used by boot.Pxe if Interface_Source is mac
       name: '**REQUIRED**'
@@ -596,7 +615,7 @@ policies:
       value: ''
   fc_zone:
     description: ''
-    fc_target_members: # This is a list of target_members
+    targets: # This is a list of target_members
       name: '**REQUIRED**'
       switch_id: A # A or B
       vsan_id: '**REQUIRED**'
@@ -619,12 +638,11 @@ policies:
     flogi:
       retries: 8
       timeout: 4000
-    interrupt:
+    interrupt_settings:
       mode: MSIx
     io_throttle_count: 512
-    lun:
-      queue_depth: 20
-      maximum_luns_per_target: 1024
+    lun_queue_depth: 20
+    maximum_luns_per_target: 1024
     name: '**REQUIRED**'
     plogi:
       retries: 8
@@ -715,7 +733,7 @@ policies:
     authentication: ''
     description: ''
     dhcp_vendor_id_iqn: ''
-    initiator_ip_source: Pool
+    initiator_ip_source: DHCP
     initiator_static_ipv4_config: # If Defined Following are Required
       ip_address: '**REQUIRED**'
       gateway: '**REQUIRED**'
@@ -726,7 +744,10 @@ policies:
     tags:
       key: ''
       value: ''
+    primary_target_policy: ''
+    secondary_target_policy: ''
     target_source_type: Auto
+    username: ''
   iscsi_static_target:
     description: ''
     ip_address: '**REQUIRED**'
@@ -762,23 +783,27 @@ policies:
       mac_address_allocation_type: POOL
       mac_address_pools: []
       mac_addresses_static: []
-      placement_pci_links: [0]
-      placement_pci_order: [2, 3]
-      placement_slot_ids: [MLOM]
-      placement_switch_id: ''
-      placement_uplink_ports: [0]
-      usnic_adapter_policy: ''
-      usnic_class_of_service: 5
-      usnic_number_of_usnics: 0
-      vmq_enable_virtual_machine_multi_queue: false
-      vmq_enabled: false
-      vmq_number_of_interrupts: 16
-      vmq_number_of_sub_vnics: 64
-      vmq_number_of_virtual_machine_queues: 4
-      vmq_vmmq_adapter_policy: ''
+      names: ['**REQUIRED**']
+      placement:
+        pci_links: [0]
+        pci_order: [2, 3]
+        slot_ids: [MLOM]
+        switch_ids: []
+        uplink_ports: [0]
+      usnic_settings:
+        class_of_service: 5
+        number_of_usnics: 0
+        usnic_adapter_policy: ''
+      vmq_settings:
+        enable_virtual_machine_multi_queue: false
+        enabled: false
+        number_of_interrupts: 16
+        number_of_sub_vnics: 64
+        number_of_virtual_machine_queues: 4
+        vmmq_adapter_policy: ''
   ldap:
     base_settings:
-      base_dn: '**REQUIRED**'
+      base_dn: '' ## Default is Domain Name
       domain: '**REQUIRED**'
       timeout: 0
     binding_parameters:
@@ -789,7 +814,6 @@ policies:
     enable_group_authorization: false
     enable_ldap: true
     ldap_from_dns:
-      enable: false
       search_domain: ''
       search_forest: ''
       source: Extracted
@@ -808,7 +832,6 @@ policies:
     tags:
       key: ''
       value: ''
-    timeout: 0
     user_search_precedence: LocalUserDb
   link_aggregation:
     description: ''
@@ -980,16 +1003,17 @@ policies:
     timezone: Etc/GMT
   persistent_memory:
     description: ''
+    goal:
+      memory_mode_percentage: 0
+      persistent_memory_type: app-direct
     management_mode: configured-from-intersight
-    memory_mode_percentage: 0
     name: '**REQUIRED**'
     namespaces:
       capacity: '**REQUIRED**'
       mode: raw
       name: '**REQUIRED**'
-      socket_id: 1
+      socket_id: 2
       socket_memory_id: 'Not Applicable'
-    persistent_memory_type: app-direct
     retain_namespaces: true
     tags:
       key: ''
@@ -1002,54 +1026,87 @@ policies:
       admin_speed: Auto
       ethernet_network_control_policy: ''
       ethernet_network_group_policy: ''
+      interfaces:
+        breakout_port_id: 0
+        port_id: '**REQUIRED**'
+        slot_id: 1
+      link_aggregation_policy: ''
       mode: trunk
       priority: Best Effort
     port_channel_ethernet_uplinks:
       admin_speed: Auto
       ethernet_network_group_policy: ''
+      interfaces:
+        breakout_port_id: 0
+        port_id: '**REQUIRED**'
+        slot_id: 1
       flow_control_policy: ''
       link_aggregation_policy: ''
       link_control_policy: ''
     port_channel_fc_uplinks:
       admin_speed: 32Gbps
       fill_pattern: Idle
-      vsan_id: 1
+      interfaces:
+        breakout_port_id: 0
+        port_id: '**REQUIRED**'
+        slot_id: 1
+      vsan_ids: [1, 2]
     port_channel_fcoe_uplinks:
       admin_speed: Auto
+      interfaces:
+        breakout_port_id: 0
+        port_id: '**REQUIRED**'
+        slot_id: 1
       link_aggregation_policy: ''
       link_control_policy: ''
     port_modes:
       custom_mode: FibreChannel
+      port_list: [1, 4]
     port_role_appliances:
       admin_speed: Auto
+      breakout_port_id: 0
       ethernet_network_control_policy: ''
       ethernet_network_group_policy: ''
       fec: Auto
       mode: trunk
+      port_list: '**REQUIRED**'
       priority: Best Effort
+      slot_id: 1
     port_role_ethernet_uplinks:
       admin_speed: Auto
+      breakout_port_id: 0
       ethernet_network_group_policy: ''
       fec: Auto
       flow_control_policy: ''
       link_control_policy: ''
+      port_list: '**REQUIRED**'
+      slot_id: 1
     port_role_fc_storage:
       admin_speed: 16Gbps
+      breakout_port_id: 0
+      port_list: '**REQUIRED**'
+      slot_id: 1
       vsan_id: 1
     port_role_fc_uplinks:
       admin_speed: 32Gbps
-      fill_pattern: Idle
+      breakout_port_id: 0
+      port_list: '**REQUIRED**'
+      slot_id: 1
       vsan_id: 1
     port_role_fcoe_uplinks:
       admin_speed: Auto
+      breakout_port_id: 0
       fec: Auto
       link_control_policy: ''
+      port_list: '**REQUIRED**'
+      slot_id: 1
     port_role_servers:
       auto_negotiation: false
       breakout_port_id: 0
       connected_device_type: Auto
       device_number: 0
       fec: Auto
+      port_list: '**REQUIRED**'
       slot_id: 1
     tags:
       key: ''
@@ -1081,18 +1138,21 @@ policies:
       fibre_channel_adapter_policy: ''
       fibre_channel_network_policies: []
       fibre_channel_qos_policy: ''
+      names: [] # Required
       persistent_lun_bindings: false
-      placement_pci_link: [0]
-      placement_pci_order: [0, 1]
-      placement_slot_id: [MLOM]
-      placement_switch_id: ''
-      placement_uplink_port: [0]
+      placement:
+        pci_links: [0]
+        pci_order: [0, 1]
+        slot_ids: [MLOM]
+        switch_ids: []
+        uplink_ports: [0]
       vhba_type: fc-initiator
       wwpn_allocation_type: POOL
       wwpn_pools: []
       wwpn_static_addresses: []
     wwnn_allocation_type: POOL
     wwnn_pool: ''
+    wwnn_static_address: ''
   sd_card:
     description: ''
     enable_diagnostics: false
@@ -1179,6 +1239,7 @@ policies:
         drive_array_spans:
           - slots: 1,2
       name: '**REQUIRED**'
+      raid_level: Raid1
       virtual_drives:
         boot_drive: false
         expand_to_available: true
@@ -1228,7 +1289,7 @@ policies:
       minimum_severity: warning
     name: '**REQUIRED**'
     remote_logging: # Defined as server1: and server2:
-      enable: false
+      enable: true
       hostname: 0.0.0.0
       minimum_severity: warning
       port: 514
@@ -1390,5 +1451,7 @@ policies:
     uplink_trunking: false
     vsans:
       default_zoning: Disabled
-      fc_zone_sharing_mode: ''
+      fcoe_vlan_id: null # Default is same as the 
+      name: '**REQUIRED**'
       vsan_scope: Uplink # Common, Storage, Uplink
+      vsan_id: '**REQUIRED**'

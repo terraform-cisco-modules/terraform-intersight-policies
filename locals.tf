@@ -310,6 +310,7 @@ locals {
       lom_port2state                 = lookup(v, "lom_port2state", local.lbios.lom_port2state)
       lom_port3state                 = lookup(v, "lom_port3state", local.lbios.lom_port3state)
       lom_ports_all_state            = lookup(v, "lom_ports_all_state", local.lbios.lom_ports_all_state)
+      pch_pcie_pll_ssc               = lookup(v, "pch_pcie_pll_ssc", local.lbios.pch_pcie_pll_ssc)
       pci_option_ro_ms               = lookup(v, "pci_option_ro_ms", local.lbios.pci_option_ro_ms)
       pci_rom_clp                    = lookup(v, "pci_rom_clp", local.lbios.pci_rom_clp)
       pcie_ari_support               = lookup(v, "pcie_ari_support", local.lbios.pcie_ari_support)
@@ -365,19 +366,31 @@ locals {
       slot_front_nvme11option_rom    = lookup(v, "slot_front_nvme11option_rom", local.lbios.slot_front_nvme11option_rom)
       slot_front_nvme12link_speed    = lookup(v, "slot_front_nvme12link_speed", local.lbios.slot_front_nvme12link_speed)
       slot_front_nvme12option_rom    = lookup(v, "slot_front_nvme12option_rom", local.lbios.slot_front_nvme12option_rom)
+      slot_front_nvme13link_speed    = lookup(v, "slot_front_nvme13link_speed", local.lbios.slot_front_nvme13link_speed)
       slot_front_nvme13option_rom    = lookup(v, "slot_front_nvme13option_rom", local.lbios.slot_front_nvme13option_rom)
+      slot_front_nvme14link_speed    = lookup(v, "slot_front_nvme14link_speed", local.lbios.slot_front_nvme14link_speed)
       slot_front_nvme14option_rom    = lookup(v, "slot_front_nvme14option_rom", local.lbios.slot_front_nvme14option_rom)
+      slot_front_nvme15link_speed    = lookup(v, "slot_front_nvme15link_speed", local.lbios.slot_front_nvme15link_speed)
       slot_front_nvme15option_rom    = lookup(v, "slot_front_nvme15option_rom", local.lbios.slot_front_nvme15option_rom)
+      slot_front_nvme16link_speed    = lookup(v, "slot_front_nvme16link_speed", local.lbios.slot_front_nvme16link_speed)
       slot_front_nvme16option_rom    = lookup(v, "slot_front_nvme16option_rom", local.lbios.slot_front_nvme16option_rom)
+      slot_front_nvme17link_speed    = lookup(v, "slot_front_nvme17link_speed", local.lbios.slot_front_nvme17link_speed)
       slot_front_nvme17option_rom    = lookup(v, "slot_front_nvme17option_rom", local.lbios.slot_front_nvme17option_rom)
+      slot_front_nvme18link_speed    = lookup(v, "slot_front_nvme18link_speed", local.lbios.slot_front_nvme18link_speed)
       slot_front_nvme18option_rom    = lookup(v, "slot_front_nvme18option_rom", local.lbios.slot_front_nvme18option_rom)
+      slot_front_nvme19link_speed    = lookup(v, "slot_front_nvme19link_speed", local.lbios.slot_front_nvme19link_speed)
       slot_front_nvme19option_rom    = lookup(v, "slot_front_nvme19option_rom", local.lbios.slot_front_nvme19option_rom)
       slot_front_nvme1link_speed     = lookup(v, "slot_front_nvme1link_speed", local.lbios.slot_front_nvme1link_speed)
       slot_front_nvme1option_rom     = lookup(v, "slot_front_nvme1option_rom", local.lbios.slot_front_nvme1option_rom)
+      slot_front_nvme20link_speed    = lookup(v, "slot_front_nvme20link_speed", local.lbios.slot_front_nvme20link_speed)
       slot_front_nvme20option_rom    = lookup(v, "slot_front_nvme20option_rom", local.lbios.slot_front_nvme20option_rom)
+      slot_front_nvme21link_speed    = lookup(v, "slot_front_nvme21link_speed", local.lbios.slot_front_nvme21link_speed)
       slot_front_nvme21option_rom    = lookup(v, "slot_front_nvme21option_rom", local.lbios.slot_front_nvme21option_rom)
+      slot_front_nvme22link_speed    = lookup(v, "slot_front_nvme22link_speed", local.lbios.slot_front_nvme22link_speed)
       slot_front_nvme22option_rom    = lookup(v, "slot_front_nvme22option_rom", local.lbios.slot_front_nvme22option_rom)
+      slot_front_nvme23link_speed    = lookup(v, "slot_front_nvme23link_speed", local.lbios.slot_front_nvme23link_speed)
       slot_front_nvme23option_rom    = lookup(v, "slot_front_nvme23option_rom", local.lbios.slot_front_nvme23option_rom)
+      slot_front_nvme24link_speed    = lookup(v, "slot_front_nvme24link_speed", local.lbios.slot_front_nvme24link_speed)
       slot_front_nvme24option_rom    = lookup(v, "slot_front_nvme24option_rom", local.lbios.slot_front_nvme24option_rom)
       slot_front_nvme2link_speed     = lookup(v, "slot_front_nvme2link_speed", local.lbios.slot_front_nvme2link_speed)
       slot_front_nvme2option_rom     = lookup(v, "slot_front_nvme2option_rom", local.lbios.slot_front_nvme2option_rom)
@@ -472,6 +485,7 @@ locals {
       #+++++++++++++++++++++++++++++++
       # Memory Section
       #+++++++++++++++++++++++++++++++
+      adaptive_refresh_mgmt_level           = lookup(v, "adaptive_refresh_mgmt_level", local.lbios.adaptive_refresh_mgmt_level)
       advanced_mem_test                     = lookup(v, "advanced_mem_test", local.lbios.advanced_mem_test)
       bme_dma_mitigation                    = lookup(v, "bme_dma_mitigation", local.lbios.bme_dma_mitigation)
       burst_and_postponed_refresh           = lookup(v, "burst_and_postponed_refresh", local.lbios.burst_and_postponed_refresh)
@@ -492,6 +506,8 @@ locals {
       dram_refresh_rate                     = lookup(v, "dram_refresh_rate", local.lbios.dram_refresh_rate)
       dram_sw_thermal_throttling            = lookup(v, "dram_sw_thermal_throttling", local.lbios.dram_sw_thermal_throttling)
       eadr_support                          = lookup(v, "eadr_support", local.lbios.eadr_support)
+      enable_rmt                            = lookup(v, "enable_rmt", local.lbios.enable_rmt)
+      error_check_scrub                     = lookup(v, "error_check_scrub", local.lbios.error_check_scrub)
       lv_ddr_mode                           = lookup(v, "lv_ddr_mode", local.lbios.lv_ddr_mode)
       memory_bandwidth_boost                = lookup(v, "memory_bandwidth_boost", local.lbios.memory_bandwidth_boost)
       memory_refresh_rate                   = lookup(v, "memory_refresh_rate", local.lbios.memory_refresh_rate)
@@ -621,6 +637,7 @@ locals {
       svm_mode                          = lookup(v, "svm_mode", local.lbios.svm_mode)
       ufs_disable                       = lookup(v, "ufs_disable", local.lbios.ufs_disable)
       work_load_config                  = lookup(v, "work_load_config", local.lbios.work_load_config)
+      x2apic_opt_out                    = lookup(v, "x2apic_opt_out", local.lbios.x2apic_opt_out)
       xpt_prefetch                      = lookup(v, "xpt_prefetch", local.lbios.xpt_prefetch)
       #+++++++++++++++++++++++++++++++
       # QPI Section
@@ -657,6 +674,7 @@ locals {
       # Trusted Platform Section
       #+++++++++++++++++++++++++++++++
       cpu_pa_limit                    = lookup(v, "cpu_pa_limit", local.lbios.cpu_pa_limit)
+      dma_ctrl_opt_in                 = lookup(v, "dma_ctrl_opt_in", local.lbios.dma_ctrl_opt_in)
       enable_mktme                    = lookup(v, "enable_mktme", local.lbios.enable_mktme)
       enable_sgx                      = lookup(v, "enable_sgx", local.lbios.enable_sgx)
       enable_tme                      = lookup(v, "enable_tme", local.lbios.enable_tme)
@@ -711,10 +729,10 @@ locals {
             {
               Bootloader = {
                 ClassId     = "boot.Bootloader"
-                Description = lookup(v, "bootloader_description", "")
-                Name        = lookup(v, "bootloader_name", "BOOTx64.EFI")
+                Description = lookup(lookup(v, "bootloader", {}), "description", "")
+                Name        = lookup(lookup(v, "bootloader", {}), "name", "BOOTx64.EFI")
                 ObjectType  = "boot.Bootloader"
-                Path        = lookup(v, "bootloader_path", "\\EFI\\BOOT\\")
+                Path        = lookup(lookup(v, "bootloader", {}), "path", "\\EFI\\BOOT\\")
               },
               InterfaceName = lookup(v, "interface_name", null)
               Port          = lookup(v, "port", 0)
@@ -731,10 +749,10 @@ locals {
             {
               Bootloader = {
                 ClassId     = "boot.Bootloader"
-                Description = lookup(v, "bootloader_description", "")
-                Name        = lookup(v, "bootloader_name", "BOOTx64.EFI")
+                Description = lookup(lookup(v, "bootloader", {}), "description", "")
+                Name        = lookup(lookup(v, "bootloader", {}), "name", "BOOTx64.EFI")
                 ObjectType  = "boot.Bootloader"
-                Path        = lookup(v, "bootloader_path", "\\EFI\\BOOT\\")
+                Path        = lookup(lookup(v, "bootloader", {}), "path", "\\EFI\\BOOT\\")
               },
               Slot = v.slot
             }
@@ -747,10 +765,10 @@ locals {
             {
               Bootloader = {
                 ClassId     = "boot.Bootloader"
-                Description = lookup(v, "bootloader_description", "")
-                Name        = lookup(v, "bootloader_name", "BOOTx64.EFI")
+                Description = lookup(lookup(v, "bootloader", {}), "description", "")
+                Name        = lookup(lookup(v, "bootloader", {}), "name", "BOOTx64.EFI")
                 ObjectType  = "boot.Bootloader"
-                Path        = lookup(v, "bootloader_path", "\\EFI\\BOOT\\")
+                Path        = lookup(lookup(v, "bootloader", {}), "path", "\\EFI\\BOOT\\")
               },
             }
             ) : length(regexall("Uefi", i.boot_mode)) > 0 && length(
@@ -758,10 +776,10 @@ locals {
             {
               Bootloader = {
                 ClassId     = "boot.Bootloader"
-                Description = lookup(v, "bootloader_description", "")
-                Name        = lookup(v, "bootloader_name", "BOOTx64.EFI")
+                Description = lookup(lookup(v, "bootloader", {}), "description", "")
+                Name        = lookup(lookup(v, "bootloader", {}), "name", "BOOTx64.EFI")
                 ObjectType  = "boot.Bootloader"
-                Path        = lookup(v, "bootloader_path", "\\EFI\\BOOT\\")
+                Path        = lookup(lookup(v, "bootloader", {}), "path", "\\EFI\\BOOT\\")
               },
               Lun = lookup(v, "lun", 0)
             }
@@ -774,7 +792,7 @@ locals {
               InterfaceName   = lookup(v, "interface_name", null)
               InterfaceSource = lookup(v, "interface_source", "name")
               IpType          = lookup(v, "ip_type", "IPv4")
-              MacAddress      = lookup(v, "mac_ddress", "")
+              MacAddress      = lookup(v, "mac_address", "")
               Port            = lookup(v, "port", -1)
               Slot            = lookup(v, "slot", "MLOM")
             }
@@ -783,10 +801,10 @@ locals {
             {
               Bootloader = {
                 ClassId     = "boot.Bootloader"
-                Description = lookup(v, "bootloader_description", "")
-                Name        = lookup(v, "bootloader_name", "BOOTx64.EFI")
+                Description = lookup(lookup(v, "bootloader", {}), "description", "")
+                Name        = lookup(lookup(v, "bootloader", {}), "name", "BOOTx64.EFI")
                 ObjectType  = "boot.Bootloader"
-                Path        = lookup(v, "bootloader_path", "\\EFI\\BOOT\\")
+                Path        = lookup(lookup(v, "bootloader", {}), "path", "\\EFI\\BOOT\\")
               },
               InterfaceName = lookup(v, "interface_name", null)
               Lun           = lookup(v, "lun", 0)
@@ -805,10 +823,10 @@ locals {
             {
               Bootloader = {
                 ClassId     = "boot.Bootloader"
-                Description = lookup(v, "bootloader_description", "")
-                Name        = lookup(v, "bootloader_name", "BOOTx64.EFI")
+                Description = lookup(lookup(v, "bootloader", {}), "description", "")
+                Name        = lookup(lookup(v, "bootloader", {}), "name", "BOOTx64.EFI")
                 ObjectType  = "boot.Bootloader"
-                Path        = lookup(v, "bootloader_path", "\\EFI\\BOOT\\")
+                Path        = lookup(lookup(v, "bootloader", {}), "path", "\\EFI\\BOOT\\")
               },
               Lun     = lookup(v, "lun", 0)
               Subtype = lookup(v, "sub_type", "None")
@@ -930,15 +948,15 @@ locals {
       error_detection_timeout = lookup(
         v, "error_detection_timeout", local.fc_adapt.error_detection_timeout
       )
-      error_recovery    = merge(local.fc_adapt.error_recovery, lookup(v, "error_recovery", {}))
-      flogi             = merge(local.fc_adapt.flogi, lookup(v, "flogi", {}))
-      interrupt         = merge(local.fc_adapt.interrupt, lookup(v, "interrupt", {}))
-      io_throttle_count = lookup(v, "io_throttle_count", local.fc_adapt.io_throttle_count)
-      lun               = merge(local.fc_adapt.lun, lookup(v, "lun", {}))
-      name              = "${local.name_prefix.fibre_channel_adapter}${v.name}${local.name_suffix.fibre_channel_adapter}"
-      organization      = var.organization
-      plogi             = merge(local.fc_adapt.plogi, lookup(v, "plogi", {}))
-      receive           = merge(local.fc_adapt.receive, lookup(v, "receive", {}))
+      error_recovery     = merge(local.fc_adapt.error_recovery, lookup(v, "error_recovery", {}))
+      flogi              = merge(local.fc_adapt.flogi, lookup(v, "flogi", {}))
+      interrupt_settings = merge(local.fc_adapt.interrupt_settings, lookup(v, "interrupt_settings", {}))
+      io_throttle_count  = lookup(v, "io_throttle_count", local.fc_adapt.io_throttle_count)
+      lun                = merge(local.fc_adapt.lun, lookup(v, "lun", {}))
+      name               = "${local.name_prefix.fibre_channel_adapter}${v.name}${local.name_suffix.fibre_channel_adapter}"
+      organization       = var.organization
+      plogi              = merge(local.fc_adapt.plogi, lookup(v, "plogi", {}))
+      receive            = merge(local.fc_adapt.receive, lookup(v, "receive", {}))
       resource_allocation_timeout = lookup(
         v, "resource_allocation_timeout", local.fc_adapt.resource_allocation_timeout
       )
@@ -1116,35 +1134,9 @@ locals {
           mac_address_pools    = lookup(v, "mac_address_pools", local.lcp.vnics.mac_address_pools)
           mac_addresses_static = lookup(v, "mac_addresses_static", [])
           names                = v.names
-          placement_pci_links = lookup(
-            v, "placement_pci_links", local.lcp.vnics.placement_pci_links
-          )
-          placement_pci_order = lookup(
-            v, "placement_pci_order", local.lcp.vnics.placement_pci_order
-          )
-          placement_slot_ids = lookup(
-            v, "placement_slot_ids", local.lcp.vnics.placement_slot_ids
-          )
-          placement_switch_id = lookup(
-            v, "placement_switch_id", local.lcp.vnics.placement_switch_id
-          )
-          placement_uplink_ports = lookup(
-            v, "placement_uplink_ports", local.lcp.vnics.placement_uplink_ports
-          )
-          usnic_adapter_policy = lookup(v, "usnic_adapter_policy", local.lcp.vnics.usnic_adapter_policy)
-          usnic_number_of_usnics = lookup(
-            v, "usnic_number_of_usnics", local.lcp.vnics.usnic_number_of_usnics
-          )
-          vmq_enable_virtual_machine_multi_queue = lookup(
-            v, "vmq_enable_virtual_machine_multi_queue", local.lcp.vnics.vmq_enable_virtual_machine_multi_queue
-          )
-          vmq_enabled              = lookup(v, "vmq_enabled", local.lcp.vnics.vmq_enabled)
-          vmq_number_of_interrupts = lookup(v, "vmq_number_of_interrupts", local.lcp.vnics.vmq_number_of_interrupts)
-          vmq_number_of_sub_vnics  = lookup(v, "vmq_number_of_sub_vnics", local.lcp.vnics.vmq_number_of_sub_vnics)
-          vmq_number_of_virtual_machine_queues = lookup(
-            v, "vmq_number_of_virtual_machine_queues", local.lcp.vnics.vmq_number_of_virtual_machine_queues
-          )
-          vmq_vmmq_adapter_policy = lookup(v, "vmq_vmmq_adapter_policy", local.lcp.vnics.vmq_vmmq_adapter_policy)
+          placement            = merge(local.lcp.vhbas.placement, lookup(v, "placement", {}))
+          usnic_settings       = merge(local.lcp.vnics.usnic_settings, lookup(v, "usnic_settings", {}))
+          vmq_settings         = merge(local.lcp.vnics.vmq_settings, lookup(v, "vmq_settings", {}))
         }
       ]
     }
@@ -1233,20 +1225,16 @@ locals {
           ) > 0 ? element(v.mac_addresses_static, s) : ""
           name         = element(v.names, s)
           organization = value.organization
-          placement_pci_link = length(v.placement_pci_links) == 1 ? element(
-            v.placement_pci_links, 0) : element(v.placement_pci_links, s
-          )
-          placement_pci_order = element(v.placement_pci_order, s)
-          placement_slot_id = length(v.placement_slot_ids) == 1 ? element(
-            v.placement_slot_ids, 0) : element(v.placement_slot_ids, s
-          )
-          placement_switch_id = length(compact(
-            [v.placement_switch_id])
-          ) > 0 ? v.placement_switch_id : index(v.names, element(v.names, s)) == 0 ? "A" : "B"
-          placement_uplink_port = length(v.placement_uplink_ports) == 1 ? element(
-            v.placement_uplink_ports, 0) : element(v.placement_uplink_ports, s
-          )
+          placement = [for e in [v.placement] : {
+            pci_link  = length(v.pci_links) == 1 ? element(v.pci_links, 0) : element(v.pci_links, s)
+            pci_order = length(v.pci_order) == 1 ? element(v.pci_order, 0) : element(v.pci_order, s)
+            slot_id   = length(v.slot_ids) == 1 ? element(v.slot_ids, 0) : element(v.slot_ids, s)
+            switch_id = length(v.switch_ids) == 1 ? element(v.switch_ids, 0) : element(v.switch_ids, s)
+          }][0]
           tags = value.tags
+          usnic_settings = {
+
+          }
           usnic_adapter_policy = v.usnic_adapter_policy != "" ? try(
             {
               name = tostring(v.usnic_adapter_policy)
@@ -1257,22 +1245,25 @@ locals {
             name = "UNUSED"
             org  = "UNUSED"
           }
-          usnic_class_of_service                 = lookup(v, "usnic_class_of_service", 5)
-          usnic_number_of_usnics                 = lookup(v, "usnic_number_of_usnics", 0)
-          vmq_enable_virtual_machine_multi_queue = v.vmq_enable_virtual_machine_multi_queue
-          vmq_enabled                            = v.vmq_enabled
-          vmq_number_of_interrupts               = lookup(v, "vmq_number_of_interrupts", 16)
-          vmq_number_of_sub_vnics                = lookup(v, "vmq_number_of_sub_vnics", 64)
-          vmq_number_of_virtual_machine_queues   = lookup(v, "vmq_number_of_virtual_machine_queues", 4)
-          vmq_vmmq_adapter_policy = v.vmq_vmmq_adapter_policy != "" ? try(
-            {
-              name = tostring(v.vmq_vmmq_adapter_policy)
-              org  = value.organization
-            },
-            v.vmq_vmmq_adapter_policy
-            ) : {
-            name = "UNUSED"
-            org  = "UNUSED"
+          usnic_class_of_service = lookup(v, "usnic_class_of_service", 5)
+          usnic_number_of_usnics = lookup(v, "usnic_number_of_usnics", 0)
+          vmq_settings = {
+            enable_virtual_machine_multi_queue = v.vmq_settings.enable_virtual_machine_multi_queue
+            enabled                            = v.vmq_settings.enabled
+            number_of_interrupts               = v.vmq_settings.number_of_interrupts
+            number_of_sub_vnics                = v.vmq_settings.number_of_sub_vnics
+            number_of_virtual_machine_queues   = v.vmq_settings.number_of_virtual_machine_queues
+            vmmq_adapter_policy = v.vmq_settings.vmmq_adapter_policy != "" ? try(
+              {
+                name = tostring(v.vmq_settings.vmmq_adapter_policy)
+                org  = value.organization
+              },
+              v.vmq_settings.vmq_vmmq_adapter_policy
+              ) : {
+              name = "UNUSED"
+              org  = "UNUSED"
+            }
+
           }
         }
       ]
@@ -1287,7 +1278,8 @@ locals {
   ldap = {
     for v in lookup(local.policies, "ldap", []) : v.name => {
       base_settings = {
-        base_dn = v.base_settings.base_dn
+        base_dn = length(compact([lookup(v.base_settings, "base_dn", "")])
+        ) == 0 ? "DC=${join(",DC=", split(".", v.base_settings.domain))}" : v.base_settings.base_dn
         domain  = v.base_settings.domain
         timeout = lookup(v.base_settings, "timeout", local.lldap.base_settings.timeout)
       }
@@ -1301,32 +1293,16 @@ locals {
       enable_group_authorization = lookup(
         v, "enable_group_authorization", local.lldap.enable_group_authorization
       )
-      enable_ldap = lookup(v, "enable_ldap", local.lldap.enable_ldap)
-      ldap_from_dns = {
-        enable = lookup(lookup(
-        v, "ldap_from_dns", {}), "enable", local.lldap.ldap_from_dns.enable)
-        search_domain = lookup(lookup(
-        v, "ldap_from_dns", {}), "search_domain", local.lldap.ldap_from_dns.search_domain)
-        search_forest = lookup(lookup(
-        v, "ldap_from_dns", {}), "search_forest", local.lldap.ldap_from_dns.search_forest)
-        source = lookup(lookup(
-        v, "ldap_from_dns", {}), "source", local.lldap.ldap_from_dns.source)
-      }
+      enable_ldap    = lookup(v, "enable_ldap", local.lldap.enable_ldap)
+      ldap_from_dns  = merge(local.lldap.ldap_from_dns, lookup(v, "ldap_from_dns", {}))
       ldap_groups    = lookup(v, "ldap_groups", [])
       ldap_providers = lookup(v, "ldap_providers", [])
       name           = "${local.name_prefix.ldap}${v.name}${local.name_suffix.ldap}"
       nested_group_search_depth = lookup(
       v, "nested_group_search_depth", local.lldap.nested_group_search_depth)
-      organization = var.organization
-      search_parameters = {
-        attribute = lookup(
-        v.search_parameters, "attribute", local.lldap.search_parameters.attribute)
-        filter = lookup(
-        v.search_parameters, "filter", local.lldap.search_parameters.filter)
-        group_attribute = lookup(
-        v.search_parameters, "group_attribute", local.lldap.search_parameters.group_attribute)
-      }
-      tags = lookup(v, "tags", var.tags)
+      organization      = var.organization
+      search_parameters = merge(local.lldap.search_parameters, lookup(v, "search_parameters", {}))
+      tags              = lookup(v, "tags", var.tags)
       user_search_precedence = lookup(
         v, "user_search_precedence", local.lldap.user_search_precedence
       )
@@ -2122,11 +2098,7 @@ locals {
         names = v.names
         persistent_lun_bindings = lookup(
         v, "persistent_lun_bindings", local.lscp.vhbas.persistent_lun_bindings)
-        placement_pci_link    = lookup(v, "placement_pci_link", local.lscp.vhbas.placement_pci_link)
-        placement_pci_order   = lookup(v, "placement_pci_order", local.lscp.vhbas.placement_pci_order)
-        placement_slot_ids    = lookup(v, "placement_slot_ids", local.lscp.vhbas.placement_slot_ids)
-        placement_switch_id   = lookup(v, "placement_switch_id", local.lscp.vhbas.placement_switch_id)
-        placement_uplink_port = lookup(v, "placement_uplink_port", local.lscp.vhbas.placement_uplink_port)
+        placement             = merge(local.lscp.vhbas.placement, lookup(v, "placement", {}))
         vhba_type             = lookup(v, "vhba_type", local.lscp.vhbas.vhba_type)
         wwpn_allocation_type  = lookup(v, "wwpn_allocation_type", local.lscp.vhbas.wwpn_allocation_type)
         wwpn_pools            = lookup(v, "wwpn_pools", local.lscp.vhbas.wwpn_pools)
@@ -2187,19 +2159,12 @@ locals {
           name                    = element(v.names, s)
           organization            = value.organization
           persistent_lun_bindings = v.persistent_lun_bindings
-          placement_pci_link = length(v.placement_pci_link) == 1 ? element(
-            v.placement_pci_link, 0) : element(v.placement_pci_link, s
-          )
-          placement_pci_order = element(v.placement_pci_order, s)
-          placement_slot_id = length(v.placement_slot_ids) == 1 ? element(
-            v.placement_slot_ids, 0) : element(v.placement_slot_ids, s
-          )
-          placement_switch_id = length(compact(
-            [v.placement_switch_id])
-          ) > 0 ? v.placement_switch_id : index(v.names, element(v.names, s)) == 0 ? "A" : "B"
-          placement_uplink_port = length(v.placement_uplink_port) == 1 ? element(
-            v.placement_uplink_port, 0) : element(v.placement_uplink_port, s
-          )
+          placement = [for e in [v.placement] : {
+            pci_link  = length(v.pci_links) == 1 ? element(v.pci_links, 0) : element(v.pci_links, s)
+            pci_order = length(v.pci_order) == 1 ? element(v.pci_order, 0) : element(v.pci_order, s)
+            slot_id   = length(v.slot_ids) == 1 ? element(v.slot_ids, 0) : element(v.slot_ids, s)
+            switch_id = length(v.switch_ids) == 1 ? element(v.switch_ids, 0) : element(v.switch_ids, s)
+          }][0]
           san_connectivity     = key
           vhba_type            = v.vhba_type
           wwpn_allocation_type = v.wwpn_allocation_type

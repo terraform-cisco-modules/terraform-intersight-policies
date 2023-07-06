@@ -93,10 +93,10 @@ resource "intersight_vnic_fc_if" "vhbas" {
     moid = intersight_vnic_san_connectivity_policy.san_connectivity[each.value.san_connectivity].moid
   }
   placement {
-    id        = each.value.placement_slot_id
-    pci_link  = each.value.placement_pci_link
-    switch_id = each.value.placement_switch_id
-    uplink    = each.value.placement_uplink_port
+    id        = each.value.placement.slot_id
+    pci_link  = each.value.placement.pci_link
+    switch_id = each.value.placement.switch_id
+    uplink    = each.value.placement.uplink_port
   }
   dynamic "fc_zone_policies" {
     for_each = { for v in each.value.fc_zone_policies : v => v }

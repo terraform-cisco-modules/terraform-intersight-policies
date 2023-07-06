@@ -103,10 +103,10 @@ resource "intersight_vnic_eth_if" "vnics" {
     moid = intersight_vnic_lan_connectivity_policy.lan_connectivity[each.value.lan_connectivity].moid
   }
   placement {
-    id        = each.value.placement_slot_id
-    pci_link  = each.value.placement_pci_link
-    switch_id = each.value.placement_switch_id
-    uplink    = each.value.placement_uplink_port
+    id        = each.value.placement.slot_id
+    pci_link  = each.value.placement.pci_link
+    switch_id = each.value.placement.switch_id
+    uplink    = each.value.placement.uplink_port
   }
   usnic_settings {
     cos      = each.value.usnic_class_of_service
@@ -120,17 +120,17 @@ resource "intersight_vnic_eth_if" "vnics" {
     ] && jsondecode(i.additional_properties).Name == each.value.usnic_adapter_policy.name][0] : ""
   }
   vmq_settings {
-    enabled             = each.value.vmq_enabled
-    multi_queue_support = each.value.vmq_enable_virtual_machine_multi_queue
-    num_interrupts      = each.value.vmq_number_of_interrupts
-    num_vmqs            = each.value.vmq_number_of_virtual_machine_queues
-    num_sub_vnics       = each.value.vmq_number_of_sub_vnics
-    vmmq_adapter_policy = length(regexall("UNUSED", each.value.vmq_vmmq_adapter_policy.name)
-      ) == 0 ? length(regexall(each.value.vmq_vmmq_adapter_policy.org, each.value.organization)
-      ) > 0 ? intersight_vnic_eth_adapter_policy.ethernet_adapter[each.value.vmq_vmmq_adapter_policy.name
+    enabled             = each.value.vmq_settings.enabled
+    multi_queue_support = each.value.vmq_settings.enable_virtual_machine_multi_queue
+    num_interrupts      = each.value.vmq_settings.number_of_interrupts
+    num_vmqs            = each.value.vmq_settings.number_of_virtual_machine_queues
+    num_sub_vnics       = each.value.vmq_settings.number_of_sub_vnics
+    vmmq_adapter_policy = length(regexall("UNUSED", each.value.vmq_settings.vmmq_adapter_policy.name)
+      ) == 0 ? length(regexall(each.value.vmq_settings.vmmq_adapter_policy.org, each.value.organization)
+      ) > 0 ? intersight_vnic_eth_adapter_policy.ethernet_adapter[each.value.vmq_settings.vmmq_adapter_policy.name
       ].moid : [for i in data.intersight_search_search_item.ethernet_adapter[0].results : i.moid if jsondecode(
-        i.additional_properties).Organization.Moid == local.orgs[each.value.vmq_vmmq_adapter_policy.org
-    ] && jsondecode(i.additional_properties).Name == each.value.vmq_vmmq_adapter_policy.name][0] : ""
+        i.additional_properties).Organization.Moid == local.orgs[each.value.vmq_settings.vmmq_adapter_policy.org
+    ] && jsondecode(i.additional_properties).Name == each.value.vmq_settings.vmmq_adapter_policy.name][0] : ""
   }
   dynamic "eth_network_policy" {
     for_each = {

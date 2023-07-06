@@ -20,7 +20,7 @@ A comprehensive example using this module is available here: https://github.com/
 
 | Name | Version |
 |------|---------|
-| <a name="provider_intersight"></a> [intersight](#provider\_intersight) | >=1.0.36 |
+| <a name="provider_intersight"></a> [intersight](#provider\_intersight) | 1.0.36 |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
@@ -32,16 +32,18 @@ A comprehensive example using this module is available here: https://github.com/
 | <a name="input_policies"></a> [policies](#input\_policies) | Policies - YAML to HCL data. | `any` | n/a | yes |
 | <a name="input_pools"></a> [pools](#input\_pools) | Pool Moids. | `any` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | List of Key/Value Pairs to Assign as Attributes to the Policy. | `list(map(string))` | `[]` | no |
-| <a name="input_base64_certificate_1"></a> [base64\_certificate\_1](#input\_base64\_certificate\_1) | The Server Certificate in Base64 format. | `string` | `""` | no |
-| <a name="input_base64_certificate_2"></a> [base64\_certificate\_2](#input\_base64\_certificate\_2) | The Server Certificate in Base64 format. | `string` | `""` | no |
-| <a name="input_base64_certificate_3"></a> [base64\_certificate\_3](#input\_base64\_certificate\_3) | The Server Certificate in Base64 format. | `string` | `""` | no |
-| <a name="input_base64_certificate_4"></a> [base64\_certificate\_4](#input\_base64\_certificate\_4) | The Server Certificate in Base64 format. | `string` | `""` | no |
-| <a name="input_base64_certificate_5"></a> [base64\_certificate\_5](#input\_base64\_certificate\_5) | The Server Certificate in Base64 format. | `string` | `""` | no |
-| <a name="input_base64_private_key_1"></a> [base64\_private\_key\_1](#input\_base64\_private\_key\_1) | Private Key in Base64 Format. | `string` | `""` | no |
-| <a name="input_base64_private_key_2"></a> [base64\_private\_key\_2](#input\_base64\_private\_key\_2) | Private Key in Base64 Format. | `string` | `""` | no |
-| <a name="input_base64_private_key_3"></a> [base64\_private\_key\_3](#input\_base64\_private\_key\_3) | Private Key in Base64 Format. | `string` | `""` | no |
-| <a name="input_base64_private_key_4"></a> [base64\_private\_key\_4](#input\_base64\_private\_key\_4) | Private Key in Base64 Format. | `string` | `""` | no |
-| <a name="input_base64_private_key_5"></a> [base64\_private\_key\_5](#input\_base64\_private\_key\_5) | Private Key in Base64 Format. | `string` | `""` | no |
+| <a name="input_cert_mgmt_certificate_1"></a> [cert\_mgmt\_certificate\_1](#input\_cert\_mgmt\_certificate\_1) | The Server Certificate in PEM format. | `string` | `""` | no |
+| <a name="input_cert_mgmt_certificate_2"></a> [cert\_mgmt\_certificate\_2](#input\_cert\_mgmt\_certificate\_2) | The Server Certificate in PEM format. | `string` | `""` | no |
+| <a name="input_cert_mgmt_certificate_3"></a> [cert\_mgmt\_certificate\_3](#input\_cert\_mgmt\_certificate\_3) | The Server Certificate in PEM format. | `string` | `""` | no |
+| <a name="input_cert_mgmt_certificate_4"></a> [cert\_mgmt\_certificate\_4](#input\_cert\_mgmt\_certificate\_4) | The Server Certificate in PEM format. | `string` | `""` | no |
+| <a name="input_cert_mgmt_certificate_5"></a> [cert\_mgmt\_certificate\_5](#input\_cert\_mgmt\_certificate\_5) | The Server Certificate in PEM format. | `string` | `""` | no |
+| <a name="input_cert_mgmt_private_key_1"></a> [cert\_mgmt\_private\_key\_1](#input\_cert\_mgmt\_private\_key\_1) | Private Key in PEM Format. | `string` | `""` | no |
+| <a name="input_cert_mgmt_private_key_2"></a> [cert\_mgmt\_private\_key\_2](#input\_cert\_mgmt\_private\_key\_2) | Private Key in PEM Format. | `string` | `""` | no |
+| <a name="input_cert_mgmt_private_key_3"></a> [cert\_mgmt\_private\_key\_3](#input\_cert\_mgmt\_private\_key\_3) | Private Key in PEM Format. | `string` | `""` | no |
+| <a name="input_cert_mgmt_private_key_4"></a> [cert\_mgmt\_private\_key\_4](#input\_cert\_mgmt\_private\_key\_4) | Private Key in PEM Format. | `string` | `""` | no |
+| <a name="input_cert_mgmt_private_key_5"></a> [cert\_mgmt\_private\_key\_5](#input\_cert\_mgmt\_private\_key\_5) | Private Key in PEM Format. | `string` | `""` | no |
+| <a name="input_drive_security_password"></a> [drive\_security\_password](#input\_drive\_security\_password) | Drive Security User Password. | `string` | `""` | no |
+| <a name="input_drive_security_server_ca_certificate"></a> [drive\_security\_server\_ca\_certificate](#input\_drive\_security\_server\_ca\_certificate) | Drive Security Server CA Certificate in PEM Format. | `string` | `""` | no |
 | <a name="input_cco_password"></a> [cco\_password](#input\_cco\_password) | CCO User Account Password. | `string` | `""` | no |
 | <a name="input_cco_user"></a> [cco\_user](#input\_cco\_user) | CCO User Account Email for Firmware Policies. | `string` | `"cco_user"` | no |
 | <a name="input_model"></a> [model](#input\_model) | description = <<-EOT<br>The server family that will be impacted by this upgrade.<br>* UCSC-C220-M4 - The upgrade on all C220-M4 servers claimed in setup.<br>* UCSC-C240-M4 - The upgrade on all C240-M4 servers claimed in setup.<br>* UCSC-C460-M4 - The upgrade on all C460-M4 servers claimed in setup.<br>* UCSB-B200-M5 - The upgrade on all B200-M5 servers claimed in setup.<br>* UCSB-B480-M5 - The upgrade on all B480-M5 servers claimed in setup.<br>* UCSC-C220-M5 - The upgrade on all C220-M5 servers claimed in setup.<br>* UCSC-C240-M5 - The upgrade on all C240-M5 servers claimed in setup.<br>* UCSC-C480-M5 - The upgrade on all C480-M5 servers claimed in setup.<br>* UCSB-B200-M6 - The upgrade on all B200-M6 servers claimed in setup.<br>* UCSC-C220-M6 - The upgrade on all C220-M6 servers claimed in setup.<br>* UCSC-C225-M6 - The upgrade on all C225-M6 servers claimed in setup.<br>* UCSC-C240-M6 - The upgrade on all C240-M6 servers claimed in setup.<br>* UCSC-C245-M6 - The upgrade on all C245-M6 servers claimed in setup.<br>* UCSX-210C-M6 - The upgrade on all 210C-M6 servers claimed in setup.<br>* UCSX-210C-M7 - The upgrade on all 210C-M7 servers claimed in setup.<br>* UCSX-220-M7 - The upgrade on all C220-M7 servers claimed in setup.<br>* UCSX-240-M7 - The upgrade on all C240-M7 servers claimed in setup.<br>* UCSC-C125 - The upgrade on all C125 servers claimed in setup. | `string` | `"UCSC-C220-M5"` | no |
@@ -173,6 +175,7 @@ A comprehensive example using this module is available here: https://github.com/
 | [intersight_sol_policy.serial_over_lan](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/sol_policy) | resource |
 | [intersight_ssh_policy.ssh](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/ssh_policy) | resource |
 | [intersight_storage_drive_group.drive_groups](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/storage_drive_group) | resource |
+| [intersight_storage_drive_security_policy.drive_security](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/storage_drive_security_policy) | resource |
 | [intersight_storage_storage_policy.storage](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/storage_storage_policy) | resource |
 | [intersight_syslog_policy.syslog](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/syslog_policy) | resource |
 | [intersight_thermal_policy.thermal](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/thermal_policy) | resource |

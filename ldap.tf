@@ -29,7 +29,8 @@ resource "intersight_iam_ldap_policy" "ldap" {
     nested_group_search_depth  = each.value.nested_group_search_depth
   }
   # Configure LDAP Servers
-  enable_dns = each.value.ldap_from_dns.enable
+  enable_dns = length(compact([each.value.ldap_from_dns.search_domain])
+  ) > 0 || length(compact([each.value.ldap_from_dns.search_forest])) > 0 ? true : false
   dns_parameters {
     nr_source     = each.value.ldap_from_dns.source
     search_domain = each.value.ldap_from_dns.search_domain
