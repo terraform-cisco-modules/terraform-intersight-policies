@@ -525,7 +525,7 @@ locals {
   iscsi_boot = {
     for v in lookup(local.policies, "iscsi_boot", {}) : v.name => merge(local.defaults.iscsi_boot, v, {
       initiator_static_ipv4_config = merge(
-        local.defaults.iscsi_boot.initiator_static_ipv4_config, lookup(v, "initiator_static_ipv4_config", {}))
+      local.defaults.iscsi_boot.initiator_static_ipv4_config, lookup(v, "initiator_static_ipv4_config", {}))
       initiator_ip_pool = lookup(v, "initiator_ip_pool", "") != "" ? {
         name = v.initiator_ip_pool, org = var.organization
       } : { name = "UNUSED", org = "UNUSED" }
@@ -540,7 +540,7 @@ locals {
       secondary_target_policy = lookup(v, "secondary_target_policy", "") != "" ? {
         name = v.secondary_target_policy, org = var.organization
       } : { name = "UNUSED", org = "UNUSED" }
-      tags               = lookup(v, "tags", var.tags)
+      tags = lookup(v, "tags", var.tags)
     })
   }
 
