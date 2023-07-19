@@ -67,7 +67,7 @@ resource "intersight_vnic_eth_if" "vnics" {
   failover_enabled = each.value.enable_failover
   mac_address_type = each.value.mac_address_allocation_type
   name             = each.value.name
-  order            = each.value.placement_pci_order
+  order            = each.value.placement.pci_order
   static_mac_address = length(regexall("STATIC", each.value.mac_address_allocation_type)
   ) > 0 ? each.value.mac_address_static : null
   cdn {
@@ -109,15 +109,15 @@ resource "intersight_vnic_eth_if" "vnics" {
     uplink    = each.value.placement.uplink_port
   }
   usnic_settings {
-    cos      = each.value.usnic_class_of_service
-    nr_count = each.value.usnic_number_of_usnics
-    usnic_adapter_policy = length(regexall("UNUSED", each.value.usnic_adapter_policy.name)
+    cos      = each.value.usnic_settings.class_of_service
+    nr_count = each.value.usnic_settings.number_of_usnics
+    usnic_adapter_policy = length(regexall("UNUSED", each.value.usnic_settings.usnic_adapter_policy.name)
       ) == 0 ? length(regexall(false, var.moids_policies)) > 0 && length(regexall(
-      each.value.usnic_adapter_policy.org, each.value.organization)
-      ) > 0 ? intersight_vnic_eth_adapter_policy.ethernet_adapter[each.value.usnic_adapter_policy.name
+      each.value.usnic_settings.usnic_adapter_policy.org, each.value.organization)
+      ) > 0 ? intersight_vnic_eth_adapter_policy.ethernet_adapter[each.value.usnic_settings.usnic_adapter_policy.name
       ].moid : [for i in data.intersight_search_search_item.ethernet_adapter[0].results : i.moid if jsondecode(
         i.additional_properties).Organization.Moid == local.orgs[each.value.usnic_adapter_policy.org
-    ] && jsondecode(i.additional_properties).Name == each.value.usnic_adapter_policy.name][0] : ""
+    ] && jsondecode(i.additional_properties).Name == each.value.usnic_settings.usnic_adapter_policy.name][0] : ""
   }
   vmq_settings {
     enabled             = each.value.vmq_settings.enabled

@@ -14,6 +14,7 @@ policies:
       key: ''
       value: ''
   bios:
+    bios_template: EMPTY
     description: ''
     name: '**REQUIRED**'
     tags:
@@ -496,10 +497,10 @@ policies:
   certificate_management:
     assigned_sensitive_data: false
     enabled: true
-    certificate: 0 # Value between 1 and 5 to define the TF_VAR_base64_certificate_[1-5]
+    certificate: 0
     description: ''
     name: '**REQUIRED**'
-    private_key: 0 # Value between 1 and 5 to define the TF_VAR_base64_private_key_[1-5]
+    private_key: 0
     tags:
       key: ''
       value: ''
@@ -524,7 +525,7 @@ policies:
       timeout: 60
     username: ''
   ethernet_adapter:
-    adapter_template: ''
+    adapter_template: 'EMTPY'
     completion:
       queue_count: 5
       ring_size: 1
@@ -626,7 +627,7 @@ policies:
       key: ''
       value: ''
   fibre_channel_adapter:
-    adapter_template: ''
+    adapter_template: 'EMPTY'
     description: ''
     error_detection_timeout: 2000
     error_recovery:
@@ -788,7 +789,7 @@ policies:
         pci_links: [0]
         pci_order: [2, 3]
         slot_ids: [MLOM]
-        switch_ids: []
+        switch_ids: [A, B]
         uplink_ports: [0]
       usnic_settings:
         class_of_service: 5
@@ -1144,7 +1145,7 @@ policies:
         pci_links: [0]
         pci_order: [0, 1]
         slot_ids: [MLOM]
-        switch_ids: []
+        switch_ids: [A, B]
         uplink_ports: [0]
       vhba_type: fc-initiator
       wwpn_allocation_type: POOL
@@ -1392,6 +1393,7 @@ policies:
     tags:
       key: ''
       value: ''
+    use_recommendations: true
   thermal:
     description: ''
     fan_control_mode: Balanced

@@ -36,7 +36,7 @@ resource "intersight_vnic_iscsi_boot_policy" "iscsi_boot" {
   description         = lookup(each.value, "description", "${each.value.name} iSCSI Boot Policy.")
   initiator_ip_source = each.value.target_source_type == "Auto" ? "DHCP" : each.value.initiator_ip_source
   initiator_static_ip_v4_address = length(regexall("Static", each.value.initiator_ip_source)
-  ) > 0 ? each.value.ip_address : ""
+  ) > 0 ? each.value.initiator_static_ip_v4_config.ip_address : ""
   initiator_static_ip_v4_config = each.value.initiator_ip_source == "Static" ? [
     {
       additional_properties = ""

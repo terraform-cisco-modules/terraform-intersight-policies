@@ -27,7 +27,7 @@ resource "intersight_storage_storage_policy" "storage" {
     }
   }
   dynamic "raid0_drive" {
-    for_each = { for v in each.value.single_drive_raid0_configuration : "default" => v }
+    for_each = each.value.single_drive_raid0_configuration
     content {
       drive_slots = raid0_drive.value.drive_slots
       enable      = true
@@ -66,7 +66,7 @@ resource "intersight_storage_drive_group" "drive_groups" {
     # object_type = "organization.Organization"
   }
   dynamic "automatic_drive_group" {
-    for_each = toset(each.value.automatic_drive_groups)
+    for_each = toset(each.value.automatic_drive_group)
     content {
       class_id = "storage.ManualDriveGroup"
       drives_per_span = lookup(
@@ -91,7 +91,7 @@ resource "intersight_storage_drive_group" "drive_groups" {
     }
   }
   dynamic "manual_drive_group" {
-    for_each = toset(each.value.manual_drive_groups)
+    for_each = toset(each.value.manual_drive_group)
     content {
       class_id = "storage.ManualDriveGroup"
       dedicated_hot_spares = lookup(

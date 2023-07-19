@@ -60,7 +60,7 @@ resource "intersight_vnic_fc_if" "vhbas" {
   ]
   for_each            = local.vhbas
   name                = each.value.name
-  order               = each.value.placement_pci_order
+  order               = each.value.placement.pci_order
   persistent_bindings = each.value.persistent_lun_bindings
   static_wwpn_address = each.value.wwpn_allocation_type == "STATIC" ? each.value.wwpn_static_address : ""
   type                = each.value.vhba_type
