@@ -557,11 +557,11 @@ policies:
     receive_side_scaling_enable: true
     roce_settings:
       enable_rdma_over_converged_ethernet: false
-      cos: 6
+      cos: 5
       memory_regions: 0
       queue_pairs: 0
       resource_groups: 0
-      version: 2
+      version: 1
     tags:
       key: ''
       value: ''

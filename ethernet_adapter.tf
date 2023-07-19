@@ -104,22 +104,22 @@ resource "intersight_vnic_eth_adapter_policy" "ethernet_adapter" {
     ) > 0 ? 2 : each.value.roce_settings.version
   }
   rss_hash_settings {
-    ipv4_hash = length(regexall(false, each.value.receive_side_scaling_enable)
-    ) > 0 ? true : each.value.receive_side_scaling.enable_ipv4_hash
-    ipv6_ext_hash = length(regexall(false, each.value.receive_side_scaling_enable)
-    ) > 0 ? true : each.value.receive_side_scaling.enable_ipv6_extensions_hash
-    ipv6_hash = length(regexall(false, each.value.receive_side_scaling_enable)
-    ) > 0 ? true : each.value.receive_side_scaling.enable_ipv6_hash
-    tcp_ipv4_hash = length(regexall(false, each.value.receive_side_scaling_enable)
-    ) > 0 ? true : each.value.receive_side_scaling.enable_tcp_and_ipv4_hash
-    tcp_ipv6_ext_hash = length(regexall(false, each.value.receive_side_scaling_enable)
-    ) > 0 ? true : each.value.receive_side_scaling.enable_tcp_and_ipv6_extensions_hash
-    tcp_ipv6_hash = length(regexall(false, each.value.receive_side_scaling_enable)
-    ) > 0 ? true : each.value.receive_side_scaling.enable_tcp_and_ipv6_hash
-    udp_ipv4_hash = length(regexall(false, each.value.receive_side_scaling_enable)
-    ) > 0 ? true : each.value.receive_side_scaling.enable_udp_and_ipv4_hash
-    udp_ipv6_hash = length(regexall(false, each.value.receive_side_scaling_enable)
-    ) > 0 ? true : each.value.receive_side_scaling.enable_udp_and_ipv6_hash
+    ipv4_hash = length(regexall(false, each.value.rss)
+    ) > 0 ? false : each.value.receive_side_scaling.enable_ipv4_hash
+    ipv6_ext_hash = length(regexall(false, each.value.rss)
+    ) > 0 ? false : each.value.receive_side_scaling.enable_ipv6_extensions_hash
+    ipv6_hash = length(regexall(false, each.value.rss)
+    ) > 0 ? false : each.value.receive_side_scaling.enable_ipv6_hash
+    tcp_ipv4_hash = length(regexall(false, each.value.rss)
+    ) > 0 ? false : each.value.receive_side_scaling.enable_tcp_and_ipv4_hash
+    tcp_ipv6_ext_hash = length(regexall(false, each.value.rss)
+    ) > 0 ? false : each.value.receive_side_scaling.enable_tcp_and_ipv6_extensions_hash
+    tcp_ipv6_hash = length(regexall(false, each.value.rss)
+    ) > 0 ? false : each.value.receive_side_scaling.enable_tcp_and_ipv6_hash
+    udp_ipv4_hash = length(regexall(false, each.value.rss)
+    ) > 0 ? false : each.value.receive_side_scaling.enable_udp_and_ipv4_hash
+    udp_ipv6_hash = length(regexall(false, each.value.rss)
+    ) > 0 ? false : each.value.receive_side_scaling.enable_udp_and_ipv6_hash
   }
   rx_queue_settings {
     nr_count = length(

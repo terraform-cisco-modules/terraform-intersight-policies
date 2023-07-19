@@ -455,11 +455,13 @@ locals {
       name         = "${local.name_prefix.ethernet_adapter}${v.name}${local.name_suffix.ethernet_adapter}"
       organization = var.organization
       receive      = merge(local.eth_adapt.receive, lookup(v, "receive", {}))
+      rss = length(regexall("EMPTY", lookup(v, "adapter_template", "EMPTY"))
+      ) == 0 ? false : lookup(v, "receive_side_scaling_enable", local.eth_adapt.receive_side_scaling_enable)
       receive_side_scaling = merge(
         local.eth_adapt.receive_side_scaling, lookup(v, "receive_side_scaling", {})
       )
       receive_side_scaling_enable = length(regexall("EMPTY", lookup(v, "adapter_template", "EMPTY"))
-      ) > 0 ? false : lookup(v, "receive_side_scaling_enable", local.eth_adapt.receive_side_scaling_enable)
+      ) == 0 ? false : lookup(v, "receive_side_scaling_enable", local.eth_adapt.receive_side_scaling_enable)
       roce_settings = merge(local.eth_adapt.roce_settings, lookup(v, "roce_settings", {}))
       tags          = lookup(v, "tags", var.tags)
       tcp_offload   = merge(local.eth_adapt.tcp_offload, lookup(v, "tcp_offload", {}))
