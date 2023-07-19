@@ -1,5 +1,6 @@
 locals {
   defaults  = yamldecode(file("${path.module}/defaults.yaml")).policies
+  cert_mgmt = local.defaults.certificate_management
   eth_adapt = local.defaults.ethernet_adapter
   eth_ntwk_ctrl = distinct(compact(concat([
     for v in local.port_channel_appliances : v.ethernet_network_control_policy.name if v.ethernet_network_control_policy.name != "UNUSED"], [
@@ -41,9 +42,11 @@ locals {
   lboot    = local.defaults.boot_order
   lcp      = local.defaults.lan_connectivity
   lcp_eth_adtr = distinct(compact(concat([
-    for v in local.vnics : v.ethernet_adapter_policy.name if v.ethernet_adapter_policy.name != "UNUSED"], [
-    for v in local.vnics : v.usnic_adapter_policy.name if v.usnic_adapter_policy.name != "UNUSED"], [
-    for v in local.vnics : v.vmq_vmmq_adapter_policy.name if v.vmq_vmmq_adapter_policy.name != "UNUSED"]
+    for v in local.vnics : v.ethernet_adapter_policy.name if v.ethernet_adapter_policy.name != "UNUSED"
+    ], distinct(compact(concat([
+      for v in local.vnics : [for e in [v.usnic_settings] : e.usnic_adapter_policy.name][0]], [
+      for v in local.vnics : [for e in [v.vmq_settings] : e.vmmq_adapter_policy.name][0]
+    ])))
   )))
   lcp_eth_ntwk = distinct(compact([
     for v in local.vnics : v.ethernet_network_policy.name if v.ethernet_network_policy.name != "UNUSED"]
@@ -59,6 +62,7 @@ locals {
   ldgv = local.defaults.storage.drive_groups.virtual_drives
   lds  = local.defaults.drive_security
   ldns = local.defaults.network_connectivity
+  limc = local.defaults.imc_access
   link_agg = distinct(compact(concat([
     for v in local.port_channel_appliances : v.link_aggregation_policy.name if v.link_aggregation_policy.name != "UNUSED"], [
     for v in local.port_channel_ethernet_uplinks : v.link_aggregation_policy.name if v.link_aggregation_policy.name != "UNUSED"], [
@@ -256,463 +260,11 @@ locals {
   # GUI Location: Policies > Create Policy > BIOS
   #__________________________________________________________________
   bios = {
-    for v in lookup(local.policies, "bios", []) : v.name => {
-      bios_template = lookup(v, "bios_template", "EMPTY")
-      description   = lookup(v, "description", "")
-      name          = "${local.name_prefix.bios}${v.name}${local.name_suffix.bios}"
-      organization  = var.organization
-      tags          = lookup(v, "tags", var.tags)
-      #+++++++++++++++++++++++++++++++
-      # Boot Options Section
-      #+++++++++++++++++++++++++++++++
-      boot_option_num_retry        = lookup(v, "boot_option_num_retry", local.lbios.boot_option_num_retry)
-      boot_option_re_cool_down     = lookup(v, "boot_option_re_cool_down", local.lbios.boot_option_re_cool_down)
-      boot_option_retry            = lookup(v, "boot_option_retry", local.lbios.boot_option_retry)
-      ipv4http                     = lookup(v, "ipv4http", local.lbios.ipv4http)
-      ipv4pxe                      = lookup(v, "ipv4pxe", local.lbios.ipv4pxe)
-      ipv6http                     = lookup(v, "ipv6http", local.lbios.ipv6http)
-      ipv6pxe                      = lookup(v, "ipv6pxe", local.lbios.ipv6pxe)
-      network_stack                = lookup(v, "network_stack", local.lbios.network_stack)
-      onboard_scu_storage_support  = lookup(v, "onboard_scu_storage_support", local.lbios.onboard_scu_storage_support)
-      onboard_scu_storage_sw_stack = lookup(v, "onboard_scu_storage_sw_stack", local.lbios.onboard_scu_storage_sw_stack)
-      pop_support                  = lookup(v, "pop_support", local.lbios.pop_support)
-      psata                        = lookup(v, "psata", local.lbios.psata)
-      sata_mode_select             = lookup(v, "sata_mode_select", local.lbios.sata_mode_select)
-      vmd_enable                   = lookup(v, "vmd_enable", local.lbios.vmd_enable)
-      #+++++++++++++++++++++++++++++++
-      # Intel Directed IO Section
-      #+++++++++++++++++++++++++++++++
-      intel_vt_for_directed_io           = lookup(v, "intel_vt_for_directed_io", local.lbios.intel_vt_for_directed_io)
-      intel_vtd_coherency_support        = lookup(v, "intel_vtd_coherency_support", local.lbios.intel_vtd_coherency_support)
-      intel_vtd_interrupt_remapping      = lookup(v, "intel_vtd_interrupt_remapping", local.lbios.intel_vtd_interrupt_remapping)
-      intel_vtd_pass_through_dma_support = lookup(v, "intel_vtd_pass_through_dma_support", local.lbios.intel_vtd_pass_through_dma_support)
-      intel_vtdats_support               = lookup(v, "intel_vtdats_support", local.lbios.intel_vtdats_support)
-      #+++++++++++++++++++++++++++++++
-      # LOM and PCIe Slots Section
-      #+++++++++++++++++++++++++++++++
-      acs_control_gpu1state          = lookup(v, "acs_control_gpu1state", local.lbios.acs_control_gpu1state)
-      acs_control_gpu2state          = lookup(v, "acs_control_gpu2state", local.lbios.acs_control_gpu2state)
-      acs_control_gpu3state          = lookup(v, "acs_control_gpu3state", local.lbios.acs_control_gpu3state)
-      acs_control_gpu4state          = lookup(v, "acs_control_gpu4state", local.lbios.acs_control_gpu4state)
-      acs_control_gpu5state          = lookup(v, "acs_control_gpu5state", local.lbios.acs_control_gpu5state)
-      acs_control_gpu6state          = lookup(v, "acs_control_gpu6state", local.lbios.acs_control_gpu6state)
-      acs_control_gpu7state          = lookup(v, "acs_control_gpu7state", local.lbios.acs_control_gpu7state)
-      acs_control_gpu8state          = lookup(v, "acs_control_gpu8state", local.lbios.acs_control_gpu8state)
-      acs_control_slot11state        = lookup(v, "acs_control_slot11state", local.lbios.acs_control_slot11state)
-      acs_control_slot12state        = lookup(v, "acs_control_slot12state", local.lbios.acs_control_slot12state)
-      acs_control_slot13state        = lookup(v, "acs_control_slot13state", local.lbios.acs_control_slot13state)
-      acs_control_slot14state        = lookup(v, "acs_control_slot14state", local.lbios.acs_control_slot14state)
-      cdn_support                    = lookup(v, "cdn_support", local.lbios.cdn_support)
-      edpc_en                        = lookup(v, "edpc_en", local.lbios.edpc_en)
-      enable_clock_spread_spec       = lookup(v, "enable_clock_spread_spec", local.lbios.enable_clock_spread_spec)
-      lom_port0state                 = lookup(v, "lom_port0state", local.lbios.lom_port0state)
-      lom_port1state                 = lookup(v, "lom_port1state", local.lbios.lom_port1state)
-      lom_port2state                 = lookup(v, "lom_port2state", local.lbios.lom_port2state)
-      lom_port3state                 = lookup(v, "lom_port3state", local.lbios.lom_port3state)
-      lom_ports_all_state            = lookup(v, "lom_ports_all_state", local.lbios.lom_ports_all_state)
-      pch_pcie_pll_ssc               = lookup(v, "pch_pcie_pll_ssc", local.lbios.pch_pcie_pll_ssc)
-      pci_option_ro_ms               = lookup(v, "pci_option_ro_ms", local.lbios.pci_option_ro_ms)
-      pci_rom_clp                    = lookup(v, "pci_rom_clp", local.lbios.pci_rom_clp)
-      pcie_ari_support               = lookup(v, "pcie_ari_support", local.lbios.pcie_ari_support)
-      pcie_pll_ssc                   = lookup(v, "pcie_pll_ssc", local.lbios.pcie_pll_ssc)
-      pcie_slot_mraid1link_speed     = lookup(v, "pcie_slot_mraid1link_speed", local.lbios.pcie_slot_mraid1link_speed)
-      pcie_slot_mraid1option_rom     = lookup(v, "pcie_slot_mraid1option_rom", local.lbios.pcie_slot_mraid1option_rom)
-      pcie_slot_mraid2link_speed     = lookup(v, "pcie_slot_mraid2link_speed", local.lbios.pcie_slot_mraid2link_speed)
-      pcie_slot_mraid2option_rom     = lookup(v, "pcie_slot_mraid2option_rom", local.lbios.pcie_slot_mraid2option_rom)
-      pcie_slot_mstorraid_link_speed = lookup(v, "pcie_slot_mstorraid_link_speed", local.lbios.pcie_slot_mstorraid_link_speed)
-      pcie_slot_mstorraid_option_rom = lookup(v, "pcie_slot_mstorraid_option_rom", local.lbios.pcie_slot_mstorraid_option_rom)
-      pcie_slot_nvme1link_speed      = lookup(v, "pcie_slot_nvme1link_speed", local.lbios.pcie_slot_nvme1link_speed)
-      pcie_slot_nvme1option_rom      = lookup(v, "pcie_slot_nvme1option_rom", local.lbios.pcie_slot_nvme1option_rom)
-      pcie_slot_nvme2link_speed      = lookup(v, "pcie_slot_nvme2link_speed", local.lbios.pcie_slot_nvme2link_speed)
-      pcie_slot_nvme2option_rom      = lookup(v, "pcie_slot_nvme2option_rom", local.lbios.pcie_slot_nvme2option_rom)
-      pcie_slot_nvme3link_speed      = lookup(v, "pcie_slot_nvme3link_speed", local.lbios.pcie_slot_nvme3link_speed)
-      pcie_slot_nvme3option_rom      = lookup(v, "pcie_slot_nvme3option_rom", local.lbios.pcie_slot_nvme3option_rom)
-      pcie_slot_nvme4link_speed      = lookup(v, "pcie_slot_nvme4link_speed", local.lbios.pcie_slot_nvme4link_speed)
-      pcie_slot_nvme4option_rom      = lookup(v, "pcie_slot_nvme4option_rom", local.lbios.pcie_slot_nvme4option_rom)
-      pcie_slot_nvme5link_speed      = lookup(v, "pcie_slot_nvme5link_speed", local.lbios.pcie_slot_nvme5link_speed)
-      pcie_slot_nvme5option_rom      = lookup(v, "pcie_slot_nvme5option_rom", local.lbios.pcie_slot_nvme5option_rom)
-      pcie_slot_nvme6link_speed      = lookup(v, "pcie_slot_nvme6link_speed", local.lbios.pcie_slot_nvme6link_speed)
-      pcie_slot_nvme6option_rom      = lookup(v, "pcie_slot_nvme6option_rom", local.lbios.pcie_slot_nvme6option_rom)
-      slot10link_speed               = lookup(v, "slot10link_speed", local.lbios.slot10link_speed)
-      slot10state                    = lookup(v, "slot10state", local.lbios.slot10state)
-      slot11link_speed               = lookup(v, "slot11link_speed", local.lbios.slot11link_speed)
-      slot11state                    = lookup(v, "slot11state", local.lbios.slot11state)
-      slot12link_speed               = lookup(v, "slot12link_speed", local.lbios.slot12link_speed)
-      slot12state                    = lookup(v, "slot12state", local.lbios.slot12state)
-      slot13state                    = lookup(v, "slot13state", local.lbios.slot13state)
-      slot14state                    = lookup(v, "slot14state", local.lbios.slot14state)
-      slot1link_speed                = lookup(v, "slot1link_speed", local.lbios.slot1link_speed)
-      slot1state                     = lookup(v, "slot1state", local.lbios.slot1state)
-      slot2link_speed                = lookup(v, "slot2link_speed", local.lbios.slot2link_speed)
-      slot2state                     = lookup(v, "slot2state", local.lbios.slot2state)
-      slot3link_speed                = lookup(v, "slot3link_speed", local.lbios.slot3link_speed)
-      slot3state                     = lookup(v, "slot3state", local.lbios.slot3state)
-      slot4link_speed                = lookup(v, "slot4link_speed", local.lbios.slot4link_speed)
-      slot4state                     = lookup(v, "slot4state", local.lbios.slot4state)
-      slot5link_speed                = lookup(v, "slot5link_speed", local.lbios.slot5link_speed)
-      slot5state                     = lookup(v, "slot5state", local.lbios.slot5state)
-      slot6link_speed                = lookup(v, "slot6link_speed", local.lbios.slot6link_speed)
-      slot6state                     = lookup(v, "slot6state", local.lbios.slot6state)
-      slot7link_speed                = lookup(v, "slot7link_speed", local.lbios.slot7link_speed)
-      slot7state                     = lookup(v, "slot7state", local.lbios.slot7state)
-      slot8link_speed                = lookup(v, "slot8link_speed", local.lbios.slot8link_speed)
-      slot8state                     = lookup(v, "slot8state", local.lbios.slot8state)
-      slot9link_speed                = lookup(v, "slot9link_speed", local.lbios.slot9link_speed)
-      slot9state                     = lookup(v, "slot9state", local.lbios.slot9state)
-      slot_flom_link_speed           = lookup(v, "slot_flom_link_speed", local.lbios.slot_flom_link_speed)
-      slot_front_nvme10link_speed    = lookup(v, "slot_front_nvme10link_speed", local.lbios.slot_front_nvme10link_speed)
-      slot_front_nvme10option_rom    = lookup(v, "slot_front_nvme10option_rom", local.lbios.slot_front_nvme10option_rom)
-      slot_front_nvme11link_speed    = lookup(v, "slot_front_nvme11link_speed", local.lbios.slot_front_nvme11link_speed)
-      slot_front_nvme11option_rom    = lookup(v, "slot_front_nvme11option_rom", local.lbios.slot_front_nvme11option_rom)
-      slot_front_nvme12link_speed    = lookup(v, "slot_front_nvme12link_speed", local.lbios.slot_front_nvme12link_speed)
-      slot_front_nvme12option_rom    = lookup(v, "slot_front_nvme12option_rom", local.lbios.slot_front_nvme12option_rom)
-      slot_front_nvme13link_speed    = lookup(v, "slot_front_nvme13link_speed", local.lbios.slot_front_nvme13link_speed)
-      slot_front_nvme13option_rom    = lookup(v, "slot_front_nvme13option_rom", local.lbios.slot_front_nvme13option_rom)
-      slot_front_nvme14link_speed    = lookup(v, "slot_front_nvme14link_speed", local.lbios.slot_front_nvme14link_speed)
-      slot_front_nvme14option_rom    = lookup(v, "slot_front_nvme14option_rom", local.lbios.slot_front_nvme14option_rom)
-      slot_front_nvme15link_speed    = lookup(v, "slot_front_nvme15link_speed", local.lbios.slot_front_nvme15link_speed)
-      slot_front_nvme15option_rom    = lookup(v, "slot_front_nvme15option_rom", local.lbios.slot_front_nvme15option_rom)
-      slot_front_nvme16link_speed    = lookup(v, "slot_front_nvme16link_speed", local.lbios.slot_front_nvme16link_speed)
-      slot_front_nvme16option_rom    = lookup(v, "slot_front_nvme16option_rom", local.lbios.slot_front_nvme16option_rom)
-      slot_front_nvme17link_speed    = lookup(v, "slot_front_nvme17link_speed", local.lbios.slot_front_nvme17link_speed)
-      slot_front_nvme17option_rom    = lookup(v, "slot_front_nvme17option_rom", local.lbios.slot_front_nvme17option_rom)
-      slot_front_nvme18link_speed    = lookup(v, "slot_front_nvme18link_speed", local.lbios.slot_front_nvme18link_speed)
-      slot_front_nvme18option_rom    = lookup(v, "slot_front_nvme18option_rom", local.lbios.slot_front_nvme18option_rom)
-      slot_front_nvme19link_speed    = lookup(v, "slot_front_nvme19link_speed", local.lbios.slot_front_nvme19link_speed)
-      slot_front_nvme19option_rom    = lookup(v, "slot_front_nvme19option_rom", local.lbios.slot_front_nvme19option_rom)
-      slot_front_nvme1link_speed     = lookup(v, "slot_front_nvme1link_speed", local.lbios.slot_front_nvme1link_speed)
-      slot_front_nvme1option_rom     = lookup(v, "slot_front_nvme1option_rom", local.lbios.slot_front_nvme1option_rom)
-      slot_front_nvme20link_speed    = lookup(v, "slot_front_nvme20link_speed", local.lbios.slot_front_nvme20link_speed)
-      slot_front_nvme20option_rom    = lookup(v, "slot_front_nvme20option_rom", local.lbios.slot_front_nvme20option_rom)
-      slot_front_nvme21link_speed    = lookup(v, "slot_front_nvme21link_speed", local.lbios.slot_front_nvme21link_speed)
-      slot_front_nvme21option_rom    = lookup(v, "slot_front_nvme21option_rom", local.lbios.slot_front_nvme21option_rom)
-      slot_front_nvme22link_speed    = lookup(v, "slot_front_nvme22link_speed", local.lbios.slot_front_nvme22link_speed)
-      slot_front_nvme22option_rom    = lookup(v, "slot_front_nvme22option_rom", local.lbios.slot_front_nvme22option_rom)
-      slot_front_nvme23link_speed    = lookup(v, "slot_front_nvme23link_speed", local.lbios.slot_front_nvme23link_speed)
-      slot_front_nvme23option_rom    = lookup(v, "slot_front_nvme23option_rom", local.lbios.slot_front_nvme23option_rom)
-      slot_front_nvme24link_speed    = lookup(v, "slot_front_nvme24link_speed", local.lbios.slot_front_nvme24link_speed)
-      slot_front_nvme24option_rom    = lookup(v, "slot_front_nvme24option_rom", local.lbios.slot_front_nvme24option_rom)
-      slot_front_nvme2link_speed     = lookup(v, "slot_front_nvme2link_speed", local.lbios.slot_front_nvme2link_speed)
-      slot_front_nvme2option_rom     = lookup(v, "slot_front_nvme2option_rom", local.lbios.slot_front_nvme2option_rom)
-      slot_front_nvme3link_speed     = lookup(v, "slot_front_nvme3link_speed", local.lbios.slot_front_nvme3link_speed)
-      slot_front_nvme3option_rom     = lookup(v, "slot_front_nvme3option_rom", local.lbios.slot_front_nvme3option_rom)
-      slot_front_nvme4link_speed     = lookup(v, "slot_front_nvme4link_speed", local.lbios.slot_front_nvme4link_speed)
-      slot_front_nvme4option_rom     = lookup(v, "slot_front_nvme4option_rom", local.lbios.slot_front_nvme4option_rom)
-      slot_front_nvme5link_speed     = lookup(v, "slot_front_nvme5link_speed", local.lbios.slot_front_nvme5link_speed)
-      slot_front_nvme5option_rom     = lookup(v, "slot_front_nvme5option_rom", local.lbios.slot_front_nvme5option_rom)
-      slot_front_nvme6link_speed     = lookup(v, "slot_front_nvme6link_speed", local.lbios.slot_front_nvme6link_speed)
-      slot_front_nvme6option_rom     = lookup(v, "slot_front_nvme6option_rom", local.lbios.slot_front_nvme6option_rom)
-      slot_front_nvme7link_speed     = lookup(v, "slot_front_nvme7link_speed", local.lbios.slot_front_nvme7link_speed)
-      slot_front_nvme7option_rom     = lookup(v, "slot_front_nvme7option_rom", local.lbios.slot_front_nvme7option_rom)
-      slot_front_nvme8link_speed     = lookup(v, "slot_front_nvme8link_speed", local.lbios.slot_front_nvme8link_speed)
-      slot_front_nvme8option_rom     = lookup(v, "slot_front_nvme8option_rom", local.lbios.slot_front_nvme8option_rom)
-      slot_front_nvme9link_speed     = lookup(v, "slot_front_nvme9link_speed", local.lbios.slot_front_nvme9link_speed)
-      slot_front_nvme9option_rom     = lookup(v, "slot_front_nvme9option_rom", local.lbios.slot_front_nvme9option_rom)
-      slot_front_slot5link_speed     = lookup(v, "slot_front_slot5link_speed", local.lbios.slot_front_slot5link_speed)
-      slot_front_slot6link_speed     = lookup(v, "slot_front_slot6link_speed", local.lbios.slot_front_slot6link_speed)
-      slot_gpu1state                 = lookup(v, "slot_gpu1state", local.lbios.slot_gpu1state)
-      slot_gpu2state                 = lookup(v, "slot_gpu2state", local.lbios.slot_gpu2state)
-      slot_gpu3state                 = lookup(v, "slot_gpu3state", local.lbios.slot_gpu3state)
-      slot_gpu4state                 = lookup(v, "slot_gpu4state", local.lbios.slot_gpu4state)
-      slot_gpu5state                 = lookup(v, "slot_gpu5state", local.lbios.slot_gpu5state)
-      slot_gpu6state                 = lookup(v, "slot_gpu6state", local.lbios.slot_gpu6state)
-      slot_gpu7state                 = lookup(v, "slot_gpu7state", local.lbios.slot_gpu7state)
-      slot_gpu8state                 = lookup(v, "slot_gpu8state", local.lbios.slot_gpu8state)
-      slot_hba_link_speed            = lookup(v, "slot_hba_link_speed", local.lbios.slot_hba_link_speed)
-      slot_hba_state                 = lookup(v, "slot_hba_state", local.lbios.slot_hba_state)
-      slot_lom1link                  = lookup(v, "slot_lom1link", local.lbios.slot_lom1link)
-      slot_lom2link                  = lookup(v, "slot_lom2link", local.lbios.slot_lom2link)
-      slot_mezz_state                = lookup(v, "slot_mezz_state", local.lbios.slot_mezz_state)
-      slot_mlom_link_speed           = lookup(v, "slot_mlom_link_speed", local.lbios.slot_mlom_link_speed)
-      slot_mlom_state                = lookup(v, "slot_mlom_state", local.lbios.slot_mlom_state)
-      slot_mraid_link_speed          = lookup(v, "slot_mraid_link_speed", local.lbios.slot_mraid_link_speed)
-      slot_mraid_state               = lookup(v, "slot_mraid_state", local.lbios.slot_mraid_state)
-      slot_n10state                  = lookup(v, "slot_n10state", local.lbios.slot_n10state)
-      slot_n11state                  = lookup(v, "slot_n11state", local.lbios.slot_n11state)
-      slot_n12state                  = lookup(v, "slot_n12state", local.lbios.slot_n12state)
-      slot_n13state                  = lookup(v, "slot_n13state", local.lbios.slot_n13state)
-      slot_n14state                  = lookup(v, "slot_n14state", local.lbios.slot_n14state)
-      slot_n15state                  = lookup(v, "slot_n15state", local.lbios.slot_n15state)
-      slot_n16state                  = lookup(v, "slot_n16state", local.lbios.slot_n16state)
-      slot_n17state                  = lookup(v, "slot_n17state", local.lbios.slot_n17state)
-      slot_n18state                  = lookup(v, "slot_n18state", local.lbios.slot_n18state)
-      slot_n19state                  = lookup(v, "slot_n19state", local.lbios.slot_n19state)
-      slot_n1state                   = lookup(v, "slot_n1state", local.lbios.slot_n1state)
-      slot_n20state                  = lookup(v, "slot_n20state", local.lbios.slot_n20state)
-      slot_n21state                  = lookup(v, "slot_n21state", local.lbios.slot_n21state)
-      slot_n22state                  = lookup(v, "slot_n22state", local.lbios.slot_n22state)
-      slot_n23state                  = lookup(v, "slot_n23state", local.lbios.slot_n23state)
-      slot_n24state                  = lookup(v, "slot_n24state", local.lbios.slot_n24state)
-      slot_n2state                   = lookup(v, "slot_n2state", local.lbios.slot_n2state)
-      slot_n3state                   = lookup(v, "slot_n3state", local.lbios.slot_n3state)
-      slot_n4state                   = lookup(v, "slot_n4state", local.lbios.slot_n4state)
-      slot_n5state                   = lookup(v, "slot_n5state", local.lbios.slot_n5state)
-      slot_n6state                   = lookup(v, "slot_n6state", local.lbios.slot_n6state)
-      slot_n7state                   = lookup(v, "slot_n7state", local.lbios.slot_n7state)
-      slot_n8state                   = lookup(v, "slot_n8state", local.lbios.slot_n8state)
-      slot_n9state                   = lookup(v, "slot_n9state", local.lbios.slot_n9state)
-      slot_raid_link_speed           = lookup(v, "slot_raid_link_speed", local.lbios.slot_raid_link_speed)
-      slot_raid_state                = lookup(v, "slot_raid_state", local.lbios.slot_raid_state)
-      slot_rear_nvme1link_speed      = lookup(v, "slot_rear_nvme1link_speed", local.lbios.slot_rear_nvme1link_speed)
-      slot_rear_nvme1state           = lookup(v, "slot_rear_nvme1state", local.lbios.slot_rear_nvme1state)
-      slot_rear_nvme2link_speed      = lookup(v, "slot_rear_nvme2link_speed", local.lbios.slot_rear_nvme2link_speed)
-      slot_rear_nvme2state           = lookup(v, "slot_rear_nvme2state", local.lbios.slot_rear_nvme2state)
-      slot_rear_nvme3link_speed      = lookup(v, "slot_rear_nvme3link_speed", local.lbios.slot_rear_nvme3link_speed)
-      slot_rear_nvme3state           = lookup(v, "slot_rear_nvme3state", local.lbios.slot_rear_nvme3state)
-      slot_rear_nvme4link_speed      = lookup(v, "slot_rear_nvme4link_speed", local.lbios.slot_rear_nvme4link_speed)
-      slot_rear_nvme4state           = lookup(v, "slot_rear_nvme4state", local.lbios.slot_rear_nvme4state)
-      slot_rear_nvme5state           = lookup(v, "slot_rear_nvme5state", local.lbios.slot_rear_nvme5state)
-      slot_rear_nvme6state           = lookup(v, "slot_rear_nvme6state", local.lbios.slot_rear_nvme6state)
-      slot_rear_nvme7state           = lookup(v, "slot_rear_nvme7state", local.lbios.slot_rear_nvme7state)
-      slot_rear_nvme8state           = lookup(v, "slot_rear_nvme8state", local.lbios.slot_rear_nvme8state)
-      slot_riser1link_speed          = lookup(v, "slot_riser1link_speed", local.lbios.slot_riser1link_speed)
-      slot_riser1slot1link_speed     = lookup(v, "slot_riser1slot1link_speed", local.lbios.slot_riser1slot1link_speed)
-      slot_riser1slot2link_speed     = lookup(v, "slot_riser1slot2link_speed", local.lbios.slot_riser1slot2link_speed)
-      slot_riser1slot3link_speed     = lookup(v, "slot_riser1slot3link_speed", local.lbios.slot_riser1slot3link_speed)
-      slot_riser2link_speed          = lookup(v, "slot_riser2link_speed", local.lbios.slot_riser2link_speed)
-      slot_riser2slot4link_speed     = lookup(v, "slot_riser2slot4link_speed", local.lbios.slot_riser2slot4link_speed)
-      slot_riser2slot5link_speed     = lookup(v, "slot_riser2slot5link_speed", local.lbios.slot_riser2slot5link_speed)
-      slot_riser2slot6link_speed     = lookup(v, "slot_riser2slot6link_speed", local.lbios.slot_riser2slot6link_speed)
-      slot_sas_state                 = lookup(v, "slot_sas_state", local.lbios.slot_sas_state)
-      slot_ssd_slot1link_speed       = lookup(v, "slot_ssd_slot1link_speed", local.lbios.slot_ssd_slot1link_speed)
-      slot_ssd_slot2link_speed       = lookup(v, "slot_ssd_slot2link_speed", local.lbios.slot_ssd_slot2link_speed)
-      #+++++++++++++++++++++++++++++++
-      # Main Section
-      #+++++++++++++++++++++++++++++++
-      pcie_slots_cdn_enable = lookup(v, "pcie_slots_cdn_enable", local.lbios.pcie_slots_cdn_enable)
-      post_error_pause      = lookup(v, "post_error_pause", local.lbios.post_error_pause)
-      tpm_support           = lookup(v, "tpm_support", local.lbios.tpm_support)
-      #+++++++++++++++++++++++++++++++
-      # Memory Section
-      #+++++++++++++++++++++++++++++++
-      adaptive_refresh_mgmt_level           = lookup(v, "adaptive_refresh_mgmt_level", local.lbios.adaptive_refresh_mgmt_level)
-      advanced_mem_test                     = lookup(v, "advanced_mem_test", local.lbios.advanced_mem_test)
-      bme_dma_mitigation                    = lookup(v, "bme_dma_mitigation", local.lbios.bme_dma_mitigation)
-      burst_and_postponed_refresh           = lookup(v, "burst_and_postponed_refresh", local.lbios.burst_and_postponed_refresh)
-      cbs_cmn_cpu_smee                      = lookup(v, "cbs_cmn_cpu_smee", local.lbios.cbs_cmn_cpu_smee)
-      cbs_cmn_gnb_nb_iommu                  = lookup(v, "cbs_cmn_gnb_nb_iommu", local.lbios.cbs_cmn_gnb_nb_iommu)
-      cbs_cmn_mem_ctrl_bank_group_swap_ddr4 = lookup(v, "cbs_cmn_mem_ctrl_bank_group_swap_ddr4", local.lbios.cbs_cmn_mem_ctrl_bank_group_swap_ddr4)
-      cbs_cmn_mem_map_bank_interleave_ddr4  = lookup(v, "cbs_cmn_mem_map_bank_interleave_ddr4", local.lbios.cbs_cmn_mem_map_bank_interleave_ddr4)
-      cbs_dbg_cpu_snp_mem_cover             = lookup(v, "cbs_dbg_cpu_snp_mem_cover", local.lbios.cbs_dbg_cpu_snp_mem_cover)
-      cbs_dbg_cpu_snp_mem_size_cover        = lookup(v, "cbs_dbg_cpu_snp_mem_size_cover", local.lbios.cbs_dbg_cpu_snp_mem_size_cover)
-      cbs_df_cmn_dram_nps                   = lookup(v, "cbs_df_cmn_dram_nps", local.lbios.cbs_df_cmn_dram_nps)
-      cbs_df_cmn_mem_intlv                  = lookup(v, "cbs_df_cmn_mem_intlv", local.lbios.cbs_df_cmn_mem_intlv)
-      cbs_df_cmn_mem_intlv_size             = lookup(v, "cbs_df_cmn_mem_intlv_size", local.lbios.cbs_df_cmn_mem_intlv_size)
-      cbs_sev_snp_support                   = lookup(v, "cbs_sev_snp_support", local.lbios.cbs_sev_snp_support)
-      cke_low_policy                        = lookup(v, "cke_low_policy", local.lbios.cke_low_policy)
-      cr_qos                                = lookup(v, "cr_qos", local.lbios.cr_qos)
-      crfastgo_config                       = lookup(v, "crfastgo_config", local.lbios.crfastgo_config)
-      dcpmm_firmware_downgrade              = lookup(v, "dcpmm_firmware_downgrade", local.lbios.dcpmm_firmware_downgrade)
-      dram_refresh_rate                     = lookup(v, "dram_refresh_rate", local.lbios.dram_refresh_rate)
-      dram_sw_thermal_throttling            = lookup(v, "dram_sw_thermal_throttling", local.lbios.dram_sw_thermal_throttling)
-      eadr_support                          = lookup(v, "eadr_support", local.lbios.eadr_support)
-      enable_rmt                            = lookup(v, "enable_rmt", local.lbios.enable_rmt)
-      error_check_scrub                     = lookup(v, "error_check_scrub", local.lbios.error_check_scrub)
-      lv_ddr_mode                           = lookup(v, "lv_ddr_mode", local.lbios.lv_ddr_mode)
-      memory_bandwidth_boost                = lookup(v, "memory_bandwidth_boost", local.lbios.memory_bandwidth_boost)
-      memory_refresh_rate                   = lookup(v, "memory_refresh_rate", local.lbios.memory_refresh_rate)
-      memory_size_limit                     = lookup(v, "memory_size_limit", local.lbios.memory_size_limit)
-      memory_thermal_throttling             = lookup(v, "memory_thermal_throttling", local.lbios.memory_thermal_throttling)
-      mirroring_mode                        = lookup(v, "mirroring_mode", local.lbios.mirroring_mode)
-      numa_optimized                        = lookup(v, "numa_optimized", local.lbios.numa_optimized)
-      nvmdimm_perform_config                = lookup(v, "nvmdimm_perform_config", local.lbios.nvmdimm_perform_config)
-      operation_mode                        = lookup(v, "operation_mode", local.lbios.operation_mode)
-      panic_high_watermark                  = lookup(v, "panic_high_watermark", local.lbios.panic_high_watermark)
-      partial_cache_line_sparing            = lookup(v, "partial_cache_line_sparing", local.lbios.partial_cache_line_sparing)
-      partial_mirror_mode_config            = lookup(v, "partial_mirror_mode_config", local.lbios.partial_mirror_mode_config)
-      partial_mirror_percent                = lookup(v, "partial_mirror_percent", local.lbios.partial_mirror_percent)
-      partial_mirror_value1                 = lookup(v, "partial_mirror_value1", local.lbios.partial_mirror_value1)
-      partial_mirror_value2                 = lookup(v, "partial_mirror_value2", local.lbios.partial_mirror_value2)
-      partial_mirror_value3                 = lookup(v, "partial_mirror_value3", local.lbios.partial_mirror_value3)
-      partial_mirror_value4                 = lookup(v, "partial_mirror_value4", local.lbios.partial_mirror_value4)
-      pc_ie_ras_support                     = lookup(v, "pc_ie_ras_support", local.lbios.pc_ie_ras_support)
-      post_package_repair                   = lookup(v, "post_package_repair", local.lbios.post_package_repair)
-      select_memory_ras_configuration       = lookup(v, "select_memory_ras_configuration", local.lbios.select_memory_ras_configuration)
-      select_ppr_type                       = lookup(v, "select_ppr_type", local.lbios.select_ppr_type)
-      sev                                   = lookup(v, "sev", local.lbios.sev)
-      smee                                  = lookup(v, "smee", local.lbios.smee)
-      snoopy_mode_for2lm                    = lookup(v, "snoopy_mode_for2lm", local.lbios.snoopy_mode_for2lm)
-      snoopy_mode_for_ad                    = lookup(v, "snoopy_mode_for_ad", local.lbios.snoopy_mode_for_ad)
-      sparing_mode                          = lookup(v, "sparing_mode", local.lbios.sparing_mode)
-      tsme                                  = lookup(v, "tsme", local.lbios.tsme)
-      uma_based_clustering                  = lookup(v, "uma_based_clustering", local.lbios.uma_based_clustering)
-      vol_memory_mode                       = lookup(v, "vol_memory_mode", local.lbios.vol_memory_mode)
-      #+++++++++++++++++++++++++++++++
-      # PCI Section
-      #+++++++++++++++++++++++++++++++
-      aspm_support               = lookup(v, "aspm_support", local.lbios.aspm_support)
-      ioh_resource               = lookup(v, "ioh_resource", local.lbios.ioh_resource)
-      memory_mapped_io_above4gb  = lookup(v, "memory_mapped_io_above4gb", local.lbios.memory_mapped_io_above4gb)
-      mmcfg_base                 = lookup(v, "mmcfg_base", local.lbios.mmcfg_base)
-      onboard10gbit_lom          = lookup(v, "onboard10gbit_lom", local.lbios.onboard10gbit_lom)
-      onboard_gbit_lom           = lookup(v, "onboard_gbit_lom", local.lbios.onboard_gbit_lom)
-      pc_ie_ssd_hot_plug_support = lookup(v, "pc_ie_ssd_hot_plug_support", local.lbios.pc_ie_ssd_hot_plug_support)
-      sr_iov                     = lookup(v, "sr_iov", local.lbios.sr_iov)
-      vga_priority               = lookup(v, "vga_priority", local.lbios.vga_priority)
-      #+++++++++++++++++++++++++++++++
-      # Power and Performance Section
-      #+++++++++++++++++++++++++++++++
-      c1auto_demotion                    = lookup(v, "c1auto_demotion", local.lbios.c1auto_demotion)
-      c1auto_un_demotion                 = lookup(v, "c1auto_un_demotion", local.lbios.c1auto_un_demotion)
-      cbs_cmn_cpu_cpb                    = lookup(v, "cbs_cmn_cpu_cpb", local.lbios.cbs_cmn_cpu_cpb)
-      cbs_cmn_cpu_global_cstate_ctrl     = lookup(v, "cbs_cmn_cpu_global_cstate_ctrl", local.lbios.cbs_cmn_cpu_global_cstate_ctrl)
-      cbs_cmn_cpu_l1stream_hw_prefetcher = lookup(v, "cbs_cmn_cpu_l1stream_hw_prefetcher", local.lbios.cbs_cmn_cpu_l1stream_hw_prefetcher)
-      cbs_cmn_cpu_l2stream_hw_prefetcher = lookup(v, "cbs_cmn_cpu_l2stream_hw_prefetcher", local.lbios.cbs_cmn_cpu_l2stream_hw_prefetcher)
-      cbs_cmn_determinism_slider         = lookup(v, "cbs_cmn_determinism_slider", local.lbios.cbs_cmn_determinism_slider)
-      cbs_cmn_efficiency_mode_en         = lookup(v, "cbs_cmn_efficiency_mode_en", local.lbios.cbs_cmn_efficiency_mode_en)
-      cbs_cmn_gnb_smucppc                = lookup(v, "cbs_cmn_gnb_smucppc", local.lbios.cbs_cmn_gnb_smucppc)
-      cbs_cmnc_tdp_ctl                   = lookup(v, "cbs_cmnc_tdp_ctl", local.lbios.cbs_cmnc_tdp_ctl)
-      cpu_perf_enhancement               = lookup(v, "cpu_perf_enhancement", local.lbios.cpu_perf_enhancement)
-      llc_alloc                          = lookup(v, "llc_alloc", local.lbios.llc_alloc)
-      upi_link_enablement                = lookup(v, "upi_link_enablement", local.lbios.upi_link_enablement)
-      upi_power_management               = lookup(v, "upi_power_management", local.lbios.upi_power_management)
-      virtual_numa                       = lookup(v, "virtual_numa", local.lbios.virtual_numa)
-      xpt_remote_prefetch                = lookup(v, "xpt_remote_prefetch", local.lbios.xpt_remote_prefetch)
-      #+++++++++++++++++++++++++++++++
-      # Processor Section
-      #+++++++++++++++++++++++++++++++
-      adjacent_cache_line_prefetch      = lookup(v, "adjacent_cache_line_prefetch", local.lbios.adjacent_cache_line_prefetch)
-      altitude                          = lookup(v, "altitude", local.lbios.altitude)
-      auto_cc_state                     = lookup(v, "auto_cc_state", local.lbios.auto_cc_state)
-      autonumous_cstate_enable          = lookup(v, "autonumous_cstate_enable", local.lbios.autonumous_cstate_enable)
-      boot_performance_mode             = lookup(v, "boot_performance_mode", local.lbios.boot_performance_mode)
-      cbs_cmn_apbdis                    = lookup(v, "cbs_cmn_apbdis", local.lbios.cbs_cmn_apbdis)
-      cbs_cmn_cpu_gen_downcore_ctrl     = lookup(v, "cbs_cmn_cpu_gen_downcore_ctrl", local.lbios.cbs_cmn_cpu_gen_downcore_ctrl)
-      cbs_cmn_cpu_streaming_stores_ctrl = lookup(v, "cbs_cmn_cpu_streaming_stores_ctrl", local.lbios.cbs_cmn_cpu_streaming_stores_ctrl)
-      cbs_cmn_fixed_soc_pstate          = lookup(v, "cbs_cmn_fixed_soc_pstate", local.lbios.cbs_cmn_fixed_soc_pstate)
-      cbs_cmn_gnb_smu_df_cstates        = lookup(v, "cbs_cmn_gnb_smu_df_cstates", local.lbios.cbs_cmn_gnb_smu_df_cstates)
-      cbs_cpu_ccd_ctrl_ssp              = lookup(v, "cbs_cpu_ccd_ctrl_ssp", local.lbios.cbs_cpu_ccd_ctrl_ssp)
-      cbs_cpu_core_ctrl                 = lookup(v, "cbs_cpu_core_ctrl", local.lbios.cbs_cpu_core_ctrl)
-      cbs_cpu_smt_ctrl                  = lookup(v, "cbs_cpu_smt_ctrl", local.lbios.cbs_cpu_smt_ctrl)
-      cbs_df_cmn_acpi_srat_l3numa       = lookup(v, "cbs_df_cmn_acpi_srat_l3numa", local.lbios.cbs_df_cmn_acpi_srat_l3numa)
-      channel_inter_leave               = lookup(v, "channel_inter_leave", local.lbios.channel_inter_leave)
-      cisco_xgmi_max_speed              = lookup(v, "cisco_xgmi_max_speed", local.lbios.cisco_xgmi_max_speed)
-      closed_loop_therm_throtl          = lookup(v, "closed_loop_therm_throtl", local.lbios.closed_loop_therm_throtl)
-      cmci_enable                       = lookup(v, "cmci_enable", local.lbios.cmci_enable)
-      config_tdp                        = lookup(v, "config_tdp", local.lbios.config_tdp)
-      config_tdp_level                  = lookup(v, "config_tdp_level", local.lbios.config_tdp_level)
-      core_multi_processing             = lookup(v, "core_multi_processing", local.lbios.core_multi_processing)
-      cpu_energy_performance            = lookup(v, "cpu_energy_performance", local.lbios.cpu_energy_performance)
-      cpu_frequency_floor               = lookup(v, "cpu_frequency_floor", local.lbios.cpu_frequency_floor)
-      cpu_performance                   = lookup(v, "cpu_performance", local.lbios.cpu_performance)
-      cpu_power_management              = lookup(v, "cpu_power_management", local.lbios.cpu_power_management)
-      demand_scrub                      = lookup(v, "demand_scrub", local.lbios.demand_scrub)
-      direct_cache_access               = lookup(v, "direct_cache_access", local.lbios.direct_cache_access)
-      dram_clock_throttling             = lookup(v, "dram_clock_throttling", local.lbios.dram_clock_throttling)
-      energy_efficient_turbo            = lookup(v, "energy_efficient_turbo", local.lbios.energy_efficient_turbo)
-      eng_perf_tuning                   = lookup(v, "eng_perf_tuning", local.lbios.eng_perf_tuning)
-      enhanced_intel_speed_step_tech    = lookup(v, "enhanced_intel_speed_step_tech", local.lbios.enhanced_intel_speed_step_tech)
-      epp_enable                        = lookup(v, "epp_enable", local.lbios.epp_enable)
-      epp_profile                       = lookup(v, "epp_profile", local.lbios.epp_profile)
-      execute_disable_bit               = lookup(v, "execute_disable_bit", local.lbios.execute_disable_bit)
-      extended_apic                     = lookup(v, "extended_apic", local.lbios.extended_apic)
-      hardware_prefetch                 = lookup(v, "hardware_prefetch", local.lbios.hardware_prefetch)
-      hwpm_enable                       = lookup(v, "hwpm_enable", local.lbios.hwpm_enable)
-      imc_interleave                    = lookup(v, "imc_interleave", local.lbios.imc_interleave)
-      intel_dynamic_speed_select        = lookup(v, "intel_dynamic_speed_select", local.lbios.intel_dynamic_speed_select)
-      intel_hyper_threading_tech        = lookup(v, "intel_hyper_threading_tech", local.lbios.intel_hyper_threading_tech)
-      intel_speed_select                = lookup(v, "intel_speed_select", local.lbios.intel_speed_select)
-      intel_turbo_boost_tech            = lookup(v, "intel_turbo_boost_tech", local.lbios.intel_turbo_boost_tech)
-      intel_virtualization_technology   = lookup(v, "intel_virtualization_technology", local.lbios.intel_virtualization_technology)
-      ioh_error_enable                  = lookup(v, "ioh_error_enable", local.lbios.ioh_error_enable)
-      ip_prefetch                       = lookup(v, "ip_prefetch", local.lbios.ip_prefetch)
-      kti_prefetch                      = lookup(v, "kti_prefetch", local.lbios.kti_prefetch)
-      llc_prefetch                      = lookup(v, "llc_prefetch", local.lbios.llc_prefetch)
-      memory_inter_leave                = lookup(v, "memory_inter_leave", local.lbios.memory_inter_leave)
-      package_cstate_limit              = lookup(v, "package_cstate_limit", local.lbios.package_cstate_limit)
-      patrol_scrub                      = lookup(v, "patrol_scrub", local.lbios.patrol_scrub)
-      patrol_scrub_duration             = lookup(v, "patrol_scrub_duration", local.lbios.patrol_scrub_duration)
-      processor_c1e                     = lookup(v, "processor_c1e", local.lbios.processor_c1e)
-      processor_c3report                = lookup(v, "processor_c3report", local.lbios.processor_c3report)
-      processor_c6report                = lookup(v, "processor_c6report", local.lbios.processor_c6report)
-      processor_cstate                  = lookup(v, "processor_cstate", local.lbios.processor_cstate)
-      pstate_coord_type                 = lookup(v, "pstate_coord_type", local.lbios.pstate_coord_type)
-      pwr_perf_tuning                   = lookup(v, "pwr_perf_tuning", local.lbios.pwr_perf_tuning)
-      qpi_link_speed                    = lookup(v, "qpi_link_speed", local.lbios.qpi_link_speed)
-      rank_inter_leave                  = lookup(v, "rank_inter_leave", local.lbios.rank_inter_leave)
-      single_pctl_enable                = lookup(v, "single_pctl_enable", local.lbios.single_pctl_enable)
-      smt_mode                          = lookup(v, "smt_mode", local.lbios.smt_mode)
-      snc                               = lookup(v, "snc", local.lbios.snc)
-      streamer_prefetch                 = lookup(v, "streamer_prefetch", local.lbios.streamer_prefetch)
-      svm_mode                          = lookup(v, "svm_mode", local.lbios.svm_mode)
-      ufs_disable                       = lookup(v, "ufs_disable", local.lbios.ufs_disable)
-      work_load_config                  = lookup(v, "work_load_config", local.lbios.work_load_config)
-      x2apic_opt_out                    = lookup(v, "x2apic_opt_out", local.lbios.x2apic_opt_out)
-      xpt_prefetch                      = lookup(v, "xpt_prefetch", local.lbios.xpt_prefetch)
-      #+++++++++++++++++++++++++++++++
-      # QPI Section
-      #+++++++++++++++++++++++++++++++
-      qpi_link_frequency = lookup(v, "qpi_link_frequency", local.lbios.qpi_link_frequency)
-      qpi_snoop_mode     = lookup(v, "qpi_snoop_mode", local.lbios.qpi_snoop_mode)
-      #+++++++++++++++++++++++++++++++
-      # Serial Port Section
-      #+++++++++++++++++++++++++++++++
-      serial_port_aenable = lookup(v, "serial_port_aenable", local.lbios.serial_port_aenable)
-      #+++++++++++++++++++++++++++++++
-      # Server Management Section
-      #+++++++++++++++++++++++++++++++
-      assert_nmi_on_perr              = lookup(v, "assert_nmi_on_perr", local.lbios.assert_nmi_on_perr)
-      assert_nmi_on_serr              = lookup(v, "assert_nmi_on_serr", local.lbios.assert_nmi_on_serr)
-      baud_rate                       = lookup(v, "baud_rate", local.lbios.baud_rate)
-      cdn_enable                      = lookup(v, "cdn_enable", local.lbios.cdn_enable)
-      cisco_adaptive_mem_training     = lookup(v, "cisco_adaptive_mem_training", local.lbios.cisco_adaptive_mem_training)
-      cisco_debug_level               = lookup(v, "cisco_debug_level", local.lbios.cisco_debug_level)
-      cisco_oprom_launch_optimization = lookup(v, "cisco_oprom_launch_optimization", local.lbios.cisco_oprom_launch_optimization)
-      console_redirection             = lookup(v, "console_redirection", local.lbios.console_redirection)
-      flow_control                    = lookup(v, "flow_control", local.lbios.flow_control)
-      frb2enable                      = lookup(v, "frb2enable", local.lbios.frb2enable)
-      legacy_os_redirection           = lookup(v, "legacy_os_redirection", local.lbios.legacy_os_redirection)
-      os_boot_watchdog_timer          = lookup(v, "os_boot_watchdog_timer", local.lbios.os_boot_watchdog_timer)
-      os_boot_watchdog_timer_policy   = lookup(v, "os_boot_watchdog_timer_policy", local.lbios.os_boot_watchdog_timer_policy)
-      os_boot_watchdog_timer_timeout  = lookup(v, "os_boot_watchdog_timer_timeout", local.lbios.os_boot_watchdog_timer_timeout)
-      out_of_band_mgmt_port           = lookup(v, "out_of_band_mgmt_port", local.lbios.out_of_band_mgmt_port)
-      putty_key_pad                   = lookup(v, "putty_key_pad", local.lbios.putty_key_pad)
-      redirection_after_post          = lookup(v, "redirection_after_post", local.lbios.redirection_after_post)
-      terminal_type                   = lookup(v, "terminal_type", local.lbios.terminal_type)
-      ucsm_boot_order_rule            = lookup(v, "ucsm_boot_order_rule", local.lbios.ucsm_boot_order_rule)
-      #+++++++++++++++++++++++++++++++
-      # Trusted Platform Section
-      #+++++++++++++++++++++++++++++++
-      cpu_pa_limit                    = lookup(v, "cpu_pa_limit", local.lbios.cpu_pa_limit)
-      dma_ctrl_opt_in                 = lookup(v, "dma_ctrl_opt_in", local.lbios.dma_ctrl_opt_in)
-      enable_mktme                    = lookup(v, "enable_mktme", local.lbios.enable_mktme)
-      enable_sgx                      = lookup(v, "enable_sgx", local.lbios.enable_sgx)
-      enable_tme                      = lookup(v, "enable_tme", local.lbios.enable_tme)
-      epoch_update                    = lookup(v, "epoch_update", local.lbios.epoch_update)
-      sgx_auto_registration_agent     = lookup(v, "sgx_auto_registration_agent", local.lbios.sgx_auto_registration_agent)
-      sgx_epoch0                      = lookup(v, "sgx_epoch0", local.lbios.sgx_epoch0)
-      sgx_epoch1                      = lookup(v, "sgx_epoch1", local.lbios.sgx_epoch1)
-      sgx_factory_reset               = lookup(v, "sgx_factory_reset", local.lbios.sgx_factory_reset)
-      sgx_le_pub_key_hash0            = lookup(v, "sgx_le_pub_key_hash0", local.lbios.sgx_le_pub_key_hash0)
-      sgx_le_pub_key_hash1            = lookup(v, "sgx_le_pub_key_hash1", local.lbios.sgx_le_pub_key_hash1)
-      sgx_le_pub_key_hash2            = lookup(v, "sgx_le_pub_key_hash2", local.lbios.sgx_le_pub_key_hash2)
-      sgx_le_pub_key_hash3            = lookup(v, "sgx_le_pub_key_hash3", local.lbios.sgx_le_pub_key_hash3)
-      sgx_le_wr                       = lookup(v, "sgx_le_wr", local.lbios.sgx_le_wr)
-      sgx_package_info_in_band_access = lookup(v, "sgx_package_info_in_band_access", local.lbios.sgx_package_info_in_band_access)
-      sgx_qos                         = lookup(v, "sgx_qos", local.lbios.sgx_qos)
-      sha1pcr_bank                    = lookup(v, "sha1pcr_bank", local.lbios.sha1pcr_bank)
-      sha256pcr_bank                  = lookup(v, "sha256pcr_bank", local.lbios.sha256pcr_bank)
-      tpm_control                     = lookup(v, "tpm_control", local.lbios.tpm_control)
-      tpm_pending_operation           = lookup(v, "tpm_pending_operation", local.lbios.tpm_pending_operation)
-      tpm_ppi_required                = lookup(v, "tpm_ppi_required", local.lbios.tpm_ppi_required)
-      txt_support                     = lookup(v, "txt_support", local.lbios.txt_support)
-      #+++++++++++++++++++++++++++++++
-      # USB Section
-      #+++++++++++++++++++++++++++++++
-      all_usb_devices          = lookup(v, "all_usb_devices", local.lbios.all_usb_devices)
-      legacy_usb_support       = lookup(v, "legacy_usb_support", local.lbios.legacy_usb_support)
-      make_device_non_bootable = lookup(v, "make_device_non_bootable", local.lbios.make_device_non_bootable)
-      pch_usb30mode            = lookup(v, "pch_usb30mode", local.lbios.pch_usb30mode)
-      usb_emul6064             = lookup(v, "usb_emul6064", local.lbios.usb_emul6064)
-      usb_port_front           = lookup(v, "usb_port_front", local.lbios.usb_port_front)
-      usb_port_internal        = lookup(v, "usb_port_internal", local.lbios.usb_port_internal)
-      usb_port_kvm             = lookup(v, "usb_port_kvm", local.lbios.usb_port_kvm)
-      usb_port_rear            = lookup(v, "usb_port_rear", local.lbios.usb_port_rear)
-      usb_port_sd_card         = lookup(v, "usb_port_sd_card", local.lbios.usb_port_sd_card)
-      usb_port_vmedia          = lookup(v, "usb_port_vmedia", local.lbios.usb_port_vmedia)
-      usb_xhci_support         = lookup(v, "usb_xhci_support", local.lbios.usb_xhci_support)
-
-    }
+    for v in lookup(local.policies, "bios", []) : v.name => merge(local.lbios, v, {
+      name         = "${local.name_prefix.bios}${v.name}${local.name_suffix.bios}"
+      organization = var.organization
+      tags         = lookup(v, "tags", var.tags)
+    })
   }
 
   #__________________________________________________________________
@@ -850,14 +402,12 @@ locals {
           object_type = v.object_type
         }
       ]
-      boot_mode   = lookup(i, "boot_mode", local.lboot.boot_mode)
-      description = lookup(i, "description", "")
-      enable_secure_boot = lookup(
-        i, "enable_secure_boot", local.lboot.enable_secure_boot
-      )
-      name         = "${local.name_prefix.boot_order}${i.name}${local.name_suffix.boot_order}"
-      organization = lookup(i, "organization", var.organization)
-      tags         = lookup(i, "tags", var.tags)
+      boot_mode          = lookup(i, "boot_mode", local.lboot.boot_mode)
+      description        = lookup(i, "description", "")
+      enable_secure_boot = lookup(i, "enable_secure_boot", local.lboot.enable_secure_boot)
+      name               = "${local.name_prefix.boot_order}${i.name}${local.name_suffix.boot_order}"
+      organization       = lookup(i, "organization", var.organization)
+      tags               = lookup(i, "tags", var.tags)
     }
   }
 
@@ -867,14 +417,12 @@ locals {
   # GUI Location: Policies > Create Policy > Ethernet Adapter
   #__________________________________________________________________
   certificate_management = {
-    for v in lookup(local.policies, "certificate_management", []) : v.name => {
-      base64_certificate = lookup(v, "base64_certificate", 0)
-      base64_private_key = lookup(v, "base64_private_key", 0)
-      description        = lookup(v, "description", "")
-      name               = "${local.name_prefix.certificate_management}${v.name}${local.name_suffix.certificate_management}"
-      organization       = var.organization
-      tags               = lookup(v, "tags", var.tags)
-    } if lookup(v, "assigned_sensitive_data", local.defaults.certificate_management.assigned_sensitive_data) == true
+    for v in lookup(local.policies, "certificate_management", []) : v.name => merge(
+      local.cert_mgmt, v, {
+        name         = "${local.name_prefix.certificate_management}${v.name}${local.name_suffix.certificate_management}"
+        organization = var.organization
+        tags         = lookup(v, "tags", var.tags)
+    }) if lookup(v, "assigned_sensitive_data", false) == true
   }
 
   #__________________________________________________________________
@@ -884,17 +432,13 @@ locals {
   #__________________________________________________________________
   drive_security = {
     for v in lookup(local.policies, "drive_security", []) : v.name => {
-      description  = lookup(v, "description", "")
-      name         = "${local.name_prefix.drive_security}${v.name}${local.name_suffix.drive_security}"
-      organization = var.organization
-      primary_server = merge(
-        local.lds.primary_server, lookup(v, "primary_server", {})
-      )
-      secondary_server = merge(
-        local.lds.secondary_server, lookup(v, "secondary_server", {})
-      )
-      tags     = lookup(v, "tags", var.tags)
-      username = lookup(v, "username", local.lds.username)
+      description      = lookup(v, "description", "")
+      name             = "${local.name_prefix.drive_security}${v.name}${local.name_suffix.drive_security}"
+      organization     = var.organization
+      primary_server   = merge(local.lds.primary_server, lookup(v, "primary_server", {}))
+      secondary_server = merge(local.lds.secondary_server, lookup(v, "secondary_server", {}))
+      tags             = lookup(v, "tags", var.tags)
+      username         = lookup(v, "username", local.lds.username)
     } if lookup(v, "assigned_sensitive_data", local.lds.assigned_sensitive_data) == true
   }
 
@@ -904,20 +448,9 @@ locals {
   # GUI Location: Policies > Create Policy > Ethernet Adapter
   #__________________________________________________________________
   ethernet_adapter = {
-    for v in lookup(local.policies, "ethernet_adapter", []) : v.name => {
-      adapter_template = lookup(v, "adapter_template", "EMPTY")
-      completion       = merge(local.eth_adapt.completion, lookup(v, "completion", {}))
-      description      = lookup(v, "description", "")
-      enable_accelerated_receive_flow_steering = lookup(
-        v, "enable_accelerated_receive_flow_steering", local.eth_adapt.enable_accelerated_receive_flow_steering
-      )
-      enable_advanced_filter   = lookup(v, "enable_advanced_filter", local.eth_adapt.enable_advanced_filter)
-      enable_geneve_offload    = lookup(v, "enable_geneve_offload", local.eth_adapt.enable_geneve_offload)
-      enable_interrupt_scaling = lookup(v, "enable_interrupt_scaling", local.eth_adapt.enable_interrupt_scaling)
-      enable_nvgre_offload     = lookup(v, "enable_nvgre_offload", local.eth_adapt.enable_nvgre_offload)
-      enable_vxlan_offload     = lookup(v, "enable_vxlan_offload", local.eth_adapt.enable_vxlan_offload)
-      interrupt_settings = merge(
-        local.eth_adapt.interrupt_settings, lookup(v, "interrupt_settings", {})
+    for v in lookup(local.policies, "ethernet_adapter", []) : v.name => merge(local.eth_adapt, v, {
+      interrupt_settings = merge(local.eth_adapt.interrupt_settings,
+        lookup(v, "interrupt_settings", {})
       )
       name         = "${local.name_prefix.ethernet_adapter}${v.name}${local.name_suffix.ethernet_adapter}"
       organization = var.organization
@@ -927,12 +460,11 @@ locals {
       )
       receive_side_scaling_enable = length(regexall("EMPTY", lookup(v, "adapter_template", "EMPTY"))
       ) > 0 ? false : lookup(v, "receive_side_scaling_enable", local.eth_adapt.receive_side_scaling_enable)
-      roce_settings           = merge(local.eth_adapt.roce_settings, lookup(v, "roce_settings", {}))
-      tags                    = lookup(v, "tags", var.tags)
-      tcp_offload             = merge(local.eth_adapt.tcp_offload, lookup(v, "tcp_offload", {}))
-      transmit                = merge(local.eth_adapt.transmit, lookup(v, "transmit", {}))
-      uplink_failback_timeout = lookup(v, "uplink_failback_timeout", local.eth_adapt.uplink_failback_timeout)
-    }
+      roce_settings = merge(local.eth_adapt.roce_settings, lookup(v, "roce_settings", {}))
+      tags          = lookup(v, "tags", var.tags)
+      tcp_offload   = merge(local.eth_adapt.tcp_offload, lookup(v, "tcp_offload", {}))
+      transmit      = merge(local.eth_adapt.transmit, lookup(v, "transmit", {}))
+    })
   }
 
   #__________________________________________________________________
@@ -942,28 +474,22 @@ locals {
   #__________________________________________________________________
 
   fibre_channel_adapter = {
-    for v in lookup(local.policies, "fibre_channel_adapter", []) : v.name => {
-      adapter_template = lookup(v, "adapter_template", "")
-      description      = lookup(v, "description", "")
-      error_detection_timeout = lookup(
-        v, "error_detection_timeout", local.fc_adapt.error_detection_timeout
-      )
-      error_recovery     = merge(local.fc_adapt.error_recovery, lookup(v, "error_recovery", {}))
-      flogi              = merge(local.fc_adapt.flogi, lookup(v, "flogi", {}))
-      interrupt_settings = merge(local.fc_adapt.interrupt_settings, lookup(v, "interrupt_settings", {}))
-      io_throttle_count  = lookup(v, "io_throttle_count", local.fc_adapt.io_throttle_count)
-      lun                = merge(local.fc_adapt.lun, lookup(v, "lun", {}))
-      name               = "${local.name_prefix.fibre_channel_adapter}${v.name}${local.name_suffix.fibre_channel_adapter}"
-      organization       = var.organization
-      plogi              = merge(local.fc_adapt.plogi, lookup(v, "plogi", {}))
-      receive            = merge(local.fc_adapt.receive, lookup(v, "receive", {}))
-      resource_allocation_timeout = lookup(
-        v, "resource_allocation_timeout", local.fc_adapt.resource_allocation_timeout
-      )
-      scsi_io  = merge(local.fc_adapt.scsi_io, lookup(v, "scsi_io", {}))
-      tags     = lookup(v, "tags", var.tags)
-      transmit = merge(local.fc_adapt.transmit, lookup(v, "transmit", {}))
-    }
+    for v in lookup(local.policies, "fibre_channel_adapter", []) : v.name => merge(
+      local.fc_adapt, v, {
+        error_recovery = merge(local.fc_adapt.error_recovery, lookup(v, "error_recovery", {}))
+        flogi          = merge(local.fc_adapt.flogi, lookup(v, "flogi", {}))
+        interrupt_settings = merge(
+          local.fc_adapt.interrupt_settings, lookup(v, "interrupt_settings", {})
+        )
+        name         = "${local.name_prefix.fibre_channel_adapter}${v.name}${local.name_suffix.fibre_channel_adapter}"
+        organization = var.organization
+        plogi        = merge(local.fc_adapt.plogi, lookup(v, "plogi", {}))
+        receive      = merge(local.fc_adapt.receive, lookup(v, "receive", {}))
+        scsi_io      = merge(local.fc_adapt.scsi_io, lookup(v, "scsi_io", {}))
+        tags         = lookup(v, "tags", var.tags)
+        transmit     = merge(local.fc_adapt.transmit, lookup(v, "transmit", {}))
+      }
+    )
   }
 
   #__________________________________________________________________
@@ -973,36 +499,18 @@ locals {
   #__________________________________________________________________
   imc_access = {
     for v in lookup(local.policies, "imc_access", {}) : v.name => {
-      description    = lookup(v, "description", "")
-      inband_vlan_id = lookup(v, "inband_vlan_id", local.defaults.imc_access.inband_vlan_id)
-      name           = "${local.name_prefix.imc_access}${v.name}${local.name_suffix.imc_access}"
-      ipv4_address_configuration = lookup(
-        v, "ipv4_address_configuration", local.defaults.imc_access.ipv4_address_configuration
-      )
-      ipv6_address_configuration = lookup(
-        v, "ipv6_address_configuration", local.defaults.imc_access.ipv6_address_configuration
-      )
-      inband_ip_pool = lookup(v, "inband_ip_pool", "") != "" ? try(
-        {
-          name = tostring(v.inband_ip_pool)
-          org  = var.organization
-        },
-        v.inband_ip_pool
-        ) : {
-        name = "UNUSED"
-        org  = "UNUSED"
-      }
+      description                = lookup(v, "description", "")
+      inband_vlan_id             = lookup(v, "inband_vlan_id", local.limc.inband_vlan_id)
+      name                       = "${local.name_prefix.imc_access}${v.name}${local.name_suffix.imc_access}"
+      ipv4_address_configuration = lookup(v, "ipv4_address_configuration", local.limc.ipv4_address_configuration)
+      ipv6_address_configuration = lookup(v, "ipv6_address_configuration", local.limc.ipv6_address_configuration)
+      inband_ip_pool = lookup(v, "inband_ip_pool", "") != "" ? {
+        name = v.inband_ip_pool, org = var.organization
+      } : { name = "UNUSED", org = "UNUSED" }
       organization = var.organization
-      out_of_band_ip_pool = lookup(v, "out_of_band_ip_pool", "") != "" ? try(
-        {
-          name = tostring(v.out_of_band_ip_pool)
-          org  = var.organization
-        },
-        v.out_of_band_ip_pool
-        ) : {
-        name = "UNUSED"
-        org  = "UNUSED"
-      }
+      out_of_band_ip_pool = lookup(v, "out_of_band_ip_pool", "") != "" ? {
+        name = v.out_of_band_ip_pool, org = var.organization
+      } : { name = "UNUSED", org = "UNUSED" }
       tags = lookup(v, "tags", var.tags)
     }
   }
@@ -1013,62 +521,25 @@ locals {
   # GUI Location: Policies > Create Policy > IMC Access
   #__________________________________________________________________
   iscsi_boot = {
-    for v in lookup(local.policies, "iscsi_boot", {}) : v.name => {
-      authentication     = lookup(v, "authentication", local.defaults.iscsi_boot.authentication)
-      dhcp_vendor_id_iqn = lookup(v, "dhcp_vendor_id_iqn", local.iboot.dhcp_vendor_id_iqn)
-      description        = lookup(v, "description", "")
-      gateway            = lookup(lookup(v, "initiator_static_ipv4_config", {}), "default_gateway", "")
-      initiator_ip_pool = lookup(v, "initiator_ip_pool", "") != "" ? try(
-        {
-          name = tostring(v.initiator_ip_pool)
-          org  = var.organization
-        },
-        v.initiator_ip_pool
-        ) : {
-        name = "UNUSED"
-        org  = "UNUSED"
-      }
-      initiator_ip_source = lookup(v, "initiator_ip_source", local.iboot.initiator_ip_source)
-      ip_address          = lookup(lookup(v, "initiator_static_ipv4_config", {}), "ip_address", "")
-      iscsi_adapter_policy = lookup(v, "iscsi_adapter_policy", "") != "" ? try(
-        {
-          name = tostring(v.iscsi_adapter_policy)
-          org  = var.organization
-        },
-        v.iscsi_adapter_policy
-        ) : {
-        name = "UNUSED"
-        org  = "UNUSED"
-      }
+    for v in lookup(local.policies, "iscsi_boot", {}) : v.name => merge(local.defaults.iscsi_boot, v, {
+      initiator_static_ipv4_config = merge(
+        local.defaults.iscsi_boot.initiator_static_ipv4_config, lookup(v, "initiator_static_ipv4_config", {}))
+      initiator_ip_pool = lookup(v, "initiator_ip_pool", "") != "" ? {
+        name = v.initiator_ip_pool, org = var.organization
+      } : { name = "UNUSED", org = "UNUSED" }
+      iscsi_adapter_policy = lookup(v, "iscsi_adapter_policy", "") != "" ? {
+        name = v.iscsi_adapter_policy, org = var.organization
+      } : { name = "UNUSED", org = "UNUSED" }
       name         = "${local.name_prefix.iscsi_boot}${v.name}${local.name_suffix.iscsi_boot}"
-      netmask      = lookup(lookup(v, "initiator_static_ipv4_config", {}), "subnet_mask", "")
       organization = var.organization
-      primary_dns  = lookup(lookup(v, "initiator_static_ipv4_config", {}), "primary_dns", "")
-      primary_target_policy = lookup(v, "primary_target_policy", "") != "" ? try(
-        {
-          name = tostring(v.primary_target_policy)
-          org  = var.organization
-        },
-        v.primary_target_policy
-        ) : {
-        name = "UNUSED"
-        org  = "UNUSED"
-      }
-      secondary_dns = lookup(lookup(v, "initiator_static_ipv4_config", {}), "secondary_dns", "")
-      secondary_target_policy = lookup(v, "secondary_target_policy", "") != "" ? try(
-        {
-          name = tostring(v.secondary_target_policy)
-          org  = var.organization
-        },
-        v.secondary_target_policy
-        ) : {
-        name = "UNUSED"
-        org  = "UNUSED"
-      }
+      primary_target_policy = lookup(v, "primary_target_policy", "") != "" ? {
+        name = v.primary_target_policy, org = var.organization
+      } : { name = "UNUSED", org = "UNUSED" }
+      secondary_target_policy = lookup(v, "secondary_target_policy", "") != "" ? {
+        name = v.secondary_target_policy, org = var.organization
+      } : { name = "UNUSED", org = "UNUSED" }
       tags               = lookup(v, "tags", var.tags)
-      target_source_type = lookup(v, "target_source_type", local.iboot.target_source_type)
-      username           = lookup(v, "username", "")
-    }
+    })
   }
 
   #_________________________________________________________________________
@@ -1076,65 +547,47 @@ locals {
   # Intersight LAN Connectivity
   # GUI Location: Configure > Policies > Create Policy > LAN Connectivity
   #_________________________________________________________________________
+  vmq = local.lcp.vnics.vmq_settings
   lan_connectivity = {
     for v in lookup(local.policies, "lan_connectivity", {}) : v.name => {
       description = lookup(v, "description", "")
       enable_azure_stack_host_qos = lookup(
         v, "enable_azure_stack_host_qos", local.lcp.enable_azure_stack_host_qos
       )
-      iqn_allocation_type = lookup(
-        v, "iqn_allocation_type", local.lcp.iqn_allocation_type
-      )
-      iqn_pool = lookup(v, "iqn_pool", "") != "" ? try(
-        {
-          name         = tostring(v.iqn_pool)
-          organization = var.organization
-        },
-        v.iqn_pool
-        ) : {
-        name         = "UNUSED"
-        organization = "UNUSED"
-      }
-      iqn_static_identifier = lookup(
-        v, "iqn_static_identifier", ""
-      )
-      name            = "${local.name_prefix.lan_connectivity}${v.name}${local.name_suffix.lan_connectivity}"
-      organization    = var.organization
-      tags            = lookup(v, "tags", var.tags)
-      target_platform = lookup(v, "target_platform", local.lcp.target_platform)
+      iqn_allocation_type = lookup(v, "iqn_allocation_type", local.lcp.iqn_allocation_type)
+      iqn_pool = lookup(v, "iqn_pool", "") != "" ? {
+        name = v.iqn_pool, organization = var.organization
+      } : { name = "UNUSED", organization = "UNUSED" }
+      iqn_static_identifier = lookup(v, "iqn_static_identifier", "")
+      name                  = "${local.name_prefix.lan_connectivity}${v.name}${local.name_suffix.lan_connectivity}"
+      organization          = var.organization
+      tags                  = lookup(v, "tags", var.tags)
+      target_platform       = lookup(v, "target_platform", local.lcp.target_platform)
       vnic_placement_mode = lookup(
         v, "vnic_placement_mode", local.lcp.vnic_placement_mode
       )
       vnics = [
         for v in lookup(v, "vnics", []) : {
-          cdn_source      = lookup(v, "cdn_source", local.lcp.vnics.cdn_source)
-          cdn_values      = lookup(v, "cdn_values", local.lcp.vnics.cdn_values)
-          enable_failover = lookup(v, "enable_failover", null)
-          ethernet_adapter_policy = lookup(
-            v, "ethernet_adapter_policy", local.lcp.vnics.ethernet_adapter_policy
-          )
+          cdn_source              = lookup(v, "cdn_source", local.lcp.vnics.cdn_source)
+          cdn_values              = lookup(v, "cdn_values", local.lcp.vnics.cdn_values)
+          enable_failover         = lookup(v, "enable_failover", null)
+          ethernet_adapter_policy = lookup(v, "ethernet_adapter_policy", local.lcp.vnics.ethernet_adapter_policy)
           ethernet_network_control_policy = lookup(
             v, "ethernet_network_control_policy", local.lcp.vnics.ethernet_network_control_policy
           )
           ethernet_network_group_policies = lookup(
             v, "ethernet_network_group_policies", local.lcp.vnics.ethernet_network_group_policies
           )
-          ethernet_network_policy = lookup(
-            v, "ethernet_network_policy", local.lcp.vnics.ethernet_network_policy
-          )
-          ethernet_qos_policy = lookup(
-            v, "ethernet_qos_policy", local.lcp.vnics.ethernet_qos_policy
-          )
-          iscsi_boot_policies = lookup(
-            v, "iscsi_boot_policies", local.lcp.vnics.iscsi_boot_policies
-          )
+          ethernet_network_policy = lookup(v, "ethernet_network_policy", local.lcp.vnics.ethernet_network_policy)
+          ethernet_qos_policy     = lookup(v, "ethernet_qos_policy", local.lcp.vnics.ethernet_qos_policy)
+          iscsi_boot_policies     = lookup(v, "iscsi_boot_policies", local.lcp.vnics.iscsi_boot_policies)
           mac_address_allocation_type = lookup(
             v, "mac_address_allocation_type", local.lcp.vnics.mac_address_allocation_type
           )
           mac_address_pools    = lookup(v, "mac_address_pools", local.lcp.vnics.mac_address_pools)
           mac_addresses_static = lookup(v, "mac_addresses_static", [])
           names                = v.names
-          placement            = merge(local.lcp.vhbas.placement, lookup(v, "placement", {}))
+          placement            = merge(local.lcp.vnics.placement, lookup(v, "placement", {}))
           usnic_settings       = merge(local.lcp.vnics.usnic_settings, lookup(v, "usnic_settings", {}))
           vmq_settings         = merge(local.lcp.vnics.vmq_settings, lookup(v, "vmq_settings", {}))
         }
@@ -1149,122 +602,58 @@ locals {
           cdn_value  = length(v.cdn_values) > 0 ? element(v.cdn_values, s) : ""
           enable_failover = length(compact([v.enable_failover])
           ) > 0 ? v.enable_failover : length(v.names) == 1 ? true : local.lcp.vnics.enable_failover
-          ethernet_adapter_policy = try(
-            {
-              name = tostring(v.ethernet_adapter_policy)
-              org  = value.organization
-            },
-            v.ethernet_adapter_policy
-          )
-          ethernet_network_control_policy = length(v.ethernet_network_control_policies) == 2 ? try(
-            {
-              name = tostring(element(v.ethernet_network_control_policy, s))
-              org  = value.organization
-            },
-            element(v.ethernet_network_control_policy, s)
-            ) : length(v.ethernet_network_control_policies) == 1 ? try(
-            {
-              name = tostring(element(v.ethernet_network_control_policy, 0))
-              org  = value.organization
-            },
-            element(v.ethernet_network_control_policy, 0)
-            ) : {
-            name = "UNUSED"
-            org  = "UNUSED"
-          }
-          ethernet_network_group_policy = v.ethernet_network_group_policy != "" ? try(
-            {
-              name = tostring(v.ethernet_network_group_policy)
-              org  = value.organization
-            },
-            v.ethernet_network_group_policy
-            ) : {
-            name = "UNUSED"
-            org  = "UNUSED"
-          }
-          ethernet_network_policy = v.ethernet_network_policy != "" ? try(
-            {
-              name = tostring(v.ethernet_network_policy)
-              org  = value.organization
-            },
-            v.ethernet_network_policy
-            ) : {
-            name = "UNUSED"
-            org  = "UNUSED"
-          }
-          ethernet_qos_policy = try(
-            {
-              name = tostring(v.ethernet_qos_policy)
-              org  = value.organization
-            },
-            v.ethernet_qos_policy
-          )
-          iscsi_boot_policy = length(v.iscsi_boot_policies) > 0 ? try(
-            {
-              name = tostring(element(v.iscsi_boot_policies), s)
-              org  = value.organization
-            },
-            element(v.iscsi_boot_policies, s)
-            ) : {
-            name = "UNUSED"
-            org  = "UNUSED"
-          }
+          ethernet_adapter_policy = { name = v.ethernet_adapter_policy, org = value.organization }
+          ethernet_network_control_policy = v.ethernet_network_control_policy != "" ? {
+            name = v.ethernet_network_control_policy, org = value.organization
+          } : { name = "UNUSED", org = "UNUSED" }
+          ethernet_network_group_policy = length(v.ethernet_network_group_policies) == 2 ? {
+            name = element(v.ethernet_network_group_policies, s), org = value.organization
+            } : length(v.ethernet_network_group_policies) == 1 ? {
+            name = element(v.ethernet_network_group_policies, 0), org = value.organization
+          } : { name = "UNUSED", org = "UNUSED" }
+          ethernet_network_policy = length(compact([lookup(v, "ethernet_network_policy", "")])) > 0 ? {
+            name = v.ethernet_network_policy, org = value.organization
+          } : { name = "UNUSED", org = "UNUSED" }
+          ethernet_qos_policy = { name = v.ethernet_qos_policy, org = value.organization }
+          iscsi_boot_policy = length(v.iscsi_boot_policies) > 0 ? {
+            name = element(v.iscsi_boot_policies, s), org = value.organization
+          } : { name = "UNUSED", org = "UNUSED" }
           lan_connectivity            = key
           mac_address_allocation_type = v.mac_address_allocation_type
-          mac_address_pool = length(v.mac_address_pools) > 0 ? try(
-            {
-              name = tostring(element(v.mac_address_pools, s))
-              org  = value.organization
-            },
-            element(v.mac_address_pools, s)
-            ) : {
-            name = "UNUSED"
-            org  = "UNUSED"
-          }
+          mac_address_pool = length(v.mac_address_pools) == 2 ? {
+            name = element(v.mac_address_pools, s), org = value.organization
+            } : length(v.mac_address_pools) == 1 ? {
+            name = element(v.mac_address_pools, 0), org = value.organization
+          } : { name = "UNUSED", org = "UNUSED" }
           mac_address_static = length(lookup(v, "mac_addresses_static", [])
-          ) > 0 ? element(v.mac_addresses_static, s) : ""
+          ) == length(v.names) ? element(v.mac_addresses_static, s) : ""
           name         = element(v.names, s)
           organization = value.organization
           placement = [for e in [v.placement] : {
-            pci_link  = length(v.pci_links) == 1 ? element(v.pci_links, 0) : element(v.pci_links, s)
-            pci_order = length(v.pci_order) == 1 ? element(v.pci_order, 0) : element(v.pci_order, s)
-            slot_id   = length(v.slot_ids) == 1 ? element(v.slot_ids, 0) : element(v.slot_ids, s)
-            switch_id = length(v.switch_ids) == 1 ? element(v.switch_ids, 0) : element(v.switch_ids, s)
+            pci_link    = length(e.pci_links) == 1 ? element(e.pci_links, 0) : element(e.pci_links, s)
+            pci_order   = length(e.pci_order) == 1 ? element(e.pci_order, 0) : element(e.pci_order, s)
+            slot_id     = length(e.slot_ids) == 1 ? element(e.slot_ids, 0) : element(e.slot_ids, s)
+            switch_id   = length(e.switch_ids) == 1 ? element(e.switch_ids, 0) : element(e.switch_ids, s)
+            uplink_port = length(e.uplink_ports) == 1 ? element(e.uplink_ports, 0) : element(e.uplink_ports, s)
           }][0]
           tags = value.tags
-          usnic_settings = {
-
-          }
-          usnic_adapter_policy = v.usnic_adapter_policy != "" ? try(
-            {
-              name = tostring(v.usnic_adapter_policy)
-              org  = value.organization
-            },
-            v.usnic_adapter_policy
-            ) : {
-            name = "UNUSED"
-            org  = "UNUSED"
-          }
-          usnic_class_of_service = lookup(v, "usnic_class_of_service", 5)
-          usnic_number_of_usnics = lookup(v, "usnic_number_of_usnics", 0)
-          vmq_settings = {
-            enable_virtual_machine_multi_queue = v.vmq_settings.enable_virtual_machine_multi_queue
-            enabled                            = v.vmq_settings.enabled
-            number_of_interrupts               = v.vmq_settings.number_of_interrupts
-            number_of_sub_vnics                = v.vmq_settings.number_of_sub_vnics
-            number_of_virtual_machine_queues   = v.vmq_settings.number_of_virtual_machine_queues
-            vmmq_adapter_policy = v.vmq_settings.vmmq_adapter_policy != "" ? try(
-              {
-                name = tostring(v.vmq_settings.vmmq_adapter_policy)
-                org  = value.organization
-              },
-              v.vmq_settings.vmq_vmmq_adapter_policy
-              ) : {
-              name = "UNUSED"
-              org  = "UNUSED"
-            }
-
-          }
+          usnic_settings = [for e in [v.usnic_settings] : {
+            class_of_service = e.class_of_service
+            number_of_usnics = e.number_of_usnics
+            usnic_adapter_policy = length(compact([lookup(e, "usnic_adapter_policy", "")])) > 0 ? {
+              name = tostring(v.usnic_adapter_policy), org = value.organization
+            } : { name = "UNUSED", org = "UNUSED" }
+          }][0]
+          vmq_settings = [for e in [lookup(v, "vmq_settings", {})] : {
+            enable_virtual_machine_multi_queue = e.enable_virtual_machine_multi_queue
+            enabled                            = e.enabled
+            number_of_interrupts               = e.number_of_interrupts
+            number_of_sub_vnics                = e.number_of_sub_vnics
+            number_of_virtual_machine_queues   = e.number_of_virtual_machine_queues
+            vmmq_adapter_policy = length(compact([lookup(e, "vmmq_adapter_policy", "")])) > 0 ? {
+              name = e.vmmq_adapter_policy, org = value.organization
+            } : { name = "UNUSED", org = "UNUSED" }
+          }][0]
         }
       ]
     ]
@@ -1299,7 +688,8 @@ locals {
       ldap_providers = lookup(v, "ldap_providers", [])
       name           = "${local.name_prefix.ldap}${v.name}${local.name_suffix.ldap}"
       nested_group_search_depth = lookup(
-      v, "nested_group_search_depth", local.lldap.nested_group_search_depth)
+        v, "nested_group_search_depth", local.lldap.nested_group_search_depth
+      )
       organization      = var.organization
       search_parameters = merge(local.lldap.search_parameters, lookup(v, "search_parameters", {}))
       tags              = lookup(v, "tags", var.tags)
@@ -1604,31 +994,16 @@ locals {
     for key, value in local.port : [
       for v in value.port_channel_appliances : {
         admin_speed = v.admin_speed
-        ethernet_network_control_policy = try(
-          {
-            name = tostring(v.ethernet_network_control_policy)
-            org  = var.organization
-          },
-          v.ethernet_network_control_policy
-        )
-        ethernet_network_group_policy = try(
-          {
-            name = tostring(v.ethernet_network_group_policy)
-            org  = var.organization
-          },
-          v.ethernet_network_group_policy
-        )
+        ethernet_network_control_policy = v.ethernet_network_control_policy != "" ? {
+          name = v.ethernet_network_control_policy, org = value.organization
+        } : { name = "UNUSED", org = "UNUSED" }
+        ethernet_network_group_policy = v.ethernet_network_group_policy != "" ? {
+          name = v.ethernet_network_group_policy, org = value.organization
+        } : { name = "UNUSED", org = "UNUSED" }
         interfaces = v.interfaces
-        link_aggregation_policy = v.link_aggregation_policy != "" ? try(
-          {
-            name = tostring(v.link_aggregation_policy)
-            org  = var.organization
-          },
-          v.link_aggregation_policy
-          ) : {
-          name = "UNUSED"
-          org  = "UNUSED"
-        }
+        link_aggregation_policy = v.link_aggregation_policy != "" ? {
+          name = v.link_aggregation_policy, org = value.organization
+        } : { name = "UNUSED", org = "UNUSED" }
         mode         = v.mode
         organization = value.organization
         pc_id        = v.pc_id
@@ -1642,47 +1017,19 @@ locals {
     for key, value in local.port : [
       for v in value.port_channel_ethernet_uplinks : {
         admin_speed = v.admin_speed
-        ethernet_network_group_policy = v.ethernet_network_group_policy != "" ? try(
-          {
-            name = tostring(v.ethernet_network_group_policy)
-            org  = var.organization
-          },
-          v.ethernet_network_group_policy
-          ) : {
-          name = "UNUSED"
-          org  = "UNUSED"
-        }
-        flow_control_policy = v.flow_control_policy != "" ? try(
-          {
-            name = tostring(v.flow_control_policy)
-            org  = var.organization
-          },
-          v.flow_control_policy
-          ) : {
-          name = "UNUSED"
-          org  = "UNUSED"
-        }
+        ethernet_network_group_policy = v.ethernet_network_group_policy != "" ? {
+          name = v.ethernet_network_group_policy, org = value.organization
+        } : { name = "UNUSED", org = "UNUSED" }
+        flow_control_policy = v.flow_control_policy != "" ? {
+          name = v.flow_control_policy, org = value.organization
+        } : { name = "UNUSED", org = "UNUSED" }
         interfaces = v.interfaces
-        link_aggregation_policy = v.link_aggregation_policy != "" ? try(
-          {
-            name = tostring(v.link_aggregation_policy)
-            org  = value.organization
-          },
-          v.link_aggregation_policy
-          ) : {
-          name = "UNUSED"
-          org  = "UNUSED"
-        }
-        link_control_policy = v.link_control_policy != "" ? try(
-          {
-            name = tostring(v.link_control_policy)
-            org  = value.organization
-          },
-          v.link_control_policy
-          ) : {
-          name = "UNUSED"
-          org  = "UNUSED"
-        }
+        link_aggregation_policy = v.link_aggregation_policy != "" ? {
+          name = v.link_aggregation_policy, org = value.organization
+        } : { name = "UNUSED", org = "UNUSED" }
+        link_control_policy = v.link_control_policy != "" ? {
+          name = v.link_control_policy, org = value.organization
+        } : { name = "UNUSED", org = "UNUSED" }
         organization = value.organization
         pc_id        = v.pc_id
         port_policy  = key
@@ -1708,26 +1055,12 @@ locals {
       for v in value.port_channel_fcoe_uplinks : {
         admin_speed = v.admin_speed
         interfaces  = v.interfaces
-        link_aggregation_policy = v.link_aggregation_policy != "" ? try(
-          {
-            name = tostring(v.link_aggregation_policy)
-            org  = value.organization
-          },
-          v.link_aggregation_policy
-          ) : {
-          name = "UNUSED"
-          org  = "UNUSED"
-        }
-        link_control_policy = v.link_control_policy != "" ? try(
-          {
-            name = tostring(v.link_control_policy)
-            org  = value.organization
-          },
-          v.link_control_policy
-          ) : {
-          name = "UNUSED"
-          org  = "UNUSED"
-        }
+        link_aggregation_policy = v.link_aggregation_policy != "" ? {
+          name = v.link_aggregation_policy, org = value.organization
+        } : { name = "UNUSED", org = "UNUSED" }
+        link_control_policy = v.link_control_policy != "" ? {
+          name = v.link_control_policy, org = value.organization
+        } : { name = "UNUSED", org = "UNUSED" }
         organization = value.organization
         pc_id        = v.pc_id
         port_policy  = key
@@ -1778,24 +1111,16 @@ locals {
   ])
   # Loop 2 will take the port_list created in Loop 1 and expand this out to a list of port_id's.
   port_role_appliances = { for i in flatten([
-    for k, v in local.port_role_appliances_loop : [
+    for v in local.port_role_appliances_loop : [
       for s in v.port_list : {
         admin_speed      = v.admin_speed
         breakout_port_id = v.breakout_port_id
-        ethernet_network_control_policy = try(
-          {
-            name = tostring(v.ethernet_network_control_policy)
-            org  = var.organization
-          },
-          v.ethernet_network_control_policy
-        )
-        ethernet_network_group_policy = try(
-          {
-            name = tostring(v.ethernet_network_group_policy)
-            org  = var.organization
-          },
-          v.ethernet_network_group_policy
-        )
+        ethernet_network_control_policy = v.ethernet_network_control_policy != "" ? {
+          name = v.ethernet_network_control_policy, org = v.organization
+        } : { name = "UNUSED", org = "UNUSED" }
+        ethernet_network_group_policy = v.ethernet_network_group_policy != "" ? {
+          name = v.ethernet_network_group_policy, org = v.organization
+        } : { name = "UNUSED", org = "UNUSED" }
         fec          = v.fec
         mode         = v.mode
         organization = v.organization
@@ -1846,37 +1171,16 @@ locals {
       for s in v.port_list : {
         admin_speed      = v.admin_speed
         breakout_port_id = v.breakout_port_id
-        ethernet_network_group_policy = v.ethernet_network_group_policy != "" ? try(
-          {
-            name = tostring(v.ethernet_network_group_policy)
-            org  = var.organization
-          },
-          v.ethernet_network_group_policy
-          ) : {
-          name = "UNUSED"
-          org  = "UNUSED"
-        }
+        ethernet_network_group_policy = v.ethernet_network_group_policy != "" ? {
+          name = v.ethernet_network_group_policy, org = v.organization
+        } : { name = "UNUSED", org = "UNUSED" }
         fec = v.fec
-        flow_control_policy = v.flow_control_policy != "" ? try(
-          {
-            name = tostring(v.flow_control_policy)
-            org  = var.organization
-          },
-          v.flow_control_policy
-          ) : {
-          name = "UNUSED"
-          org  = "UNUSED"
-        }
-        link_control_policy = v.link_control_policy != "" ? try(
-          {
-            name = tostring(v.link_control_policy)
-            org  = var.organization
-          },
-          v.link_control_policy
-          ) : {
-          name = "UNUSED"
-          org  = "UNUSED"
-        }
+        flow_control_policy = v.flow_control_policy != "" ? {
+          name = v.flow_control_policy, org = v.organization
+        } : { name = "UNUSED", org = "UNUSED" }
+        link_control_policy = v.link_control_policy != "" ? {
+          name = v.link_control_policy, org = v.organization
+        } : { name = "UNUSED", org = "UNUSED" }
         organization = v.organization
         port_id      = s
         port_policy  = v.port_policy
@@ -2010,13 +1314,9 @@ locals {
         admin_speed      = v.admin_speed
         breakout_port_id = v.breakout_port_id
         fec              = v.fec
-        link_control_policy = try(
-          {
-            name = tostring(v.link_control_policy)
-            org  = var.organization
-          },
-          v.link_control_policy
-        )
+        link_control_policy = v.link_control_policy != "" ? {
+          name = v.link_control_policy, org = v.organization
+        } : { name = "UNUSED", org = "UNUSED" }
         organization = v.organization
         port_id      = s
         port_policy  = v.port_policy
@@ -2106,16 +1406,8 @@ locals {
       }
     ]
     wwnn_allocation_type = lookup(v, "wwnn_allocation_type", local.lscp.wwnn_allocation_type)
-    wwnn_pool = lookup(v, "wwnn_pool", local.lscp.wwnn_pool) != "" ? try(
-      {
-        name = tostring(lookup(v, "wwnn_pool", local.lscp.wwnn_pool))
-        org  = var.organization
-      },
-      lookup(v, "wwnn_pool", local.lscp.wwnn_pool)
-      ) : {
-      name = "UNUSED"
-      org  = "UNUSED"
-    }
+    wwnn_pool = lookup(v, "wwnn_pool", "") != "" ? { name = v.wwnn_pool, org = var.organization
+    } : { name = "UNUSED", org = "UNUSED" }
     wwnn_static_address = lookup(v, "wwnn_static_address", "")
     }
   }
@@ -2126,58 +1418,30 @@ locals {
           fc_zone_policies = length(v.fc_zone_policies) > 0 ? element(
             chunklist(v.fc_zone_policies, 2), s
           ) : []
-          fibre_channel_adapter_policy = v.fibre_channel_adapter_policy != "" ? try(
-            {
-              name = tostring(v.fibre_channel_adapter_policy)
-              org  = var.organization
-            },
-            v.fibre_channel_adapter_policy
-            ) : {
-            name = "UNUSED"
-            org  = "UNUSED"
-          }
-          fibre_channel_network_policy = element(v.fibre_channel_network_policies, s) != "" ? try(
-            {
-              name = tostring(element(v.fibre_channel_network_policies, s))
-              org  = var.organization
-            },
-            element(v.fibre_channel_network_policies, s)
-            ) : {
-            name = "UNUSED"
-            org  = "UNUSED"
-          }
-          fibre_channel_qos_policy = v.fibre_channel_qos_policy != "" ? try(
-            {
-              name = tostring(v.fibre_channel_qos_policy)
-              org  = value.organization
-            },
-            v.fibre_channel_qos_policy
-            ) : {
-            name = "UNUSED"
-            org  = "UNUSED"
-          }
+          fibre_channel_adapter_policy = v.fibre_channel_adapter_policy != "" ? {
+            name = v.fibre_channel_adapter_policy, org = var.organization
+          } : { name = "UNUSED", org = "UNUSED" }
+          fibre_channel_network_policy = element(v.fibre_channel_network_policies, s) != "" ? {
+            name = element(v.fibre_channel_network_policies, s), org = var.organization
+          } : { name = "UNUSED", org = "UNUSED" }
+          fibre_channel_qos_policy = v.fibre_channel_qos_policy != "" ? {
+            name = tostring(v.fibre_channel_qos_policy), org = value.organization
+          } : { name = "UNUSED", org = "UNUSED" }
           name                    = element(v.names, s)
           organization            = value.organization
           persistent_lun_bindings = v.persistent_lun_bindings
           placement = [for e in [v.placement] : {
-            pci_link  = length(v.pci_links) == 1 ? element(v.pci_links, 0) : element(v.pci_links, s)
-            pci_order = length(v.pci_order) == 1 ? element(v.pci_order, 0) : element(v.pci_order, s)
-            slot_id   = length(v.slot_ids) == 1 ? element(v.slot_ids, 0) : element(v.slot_ids, s)
-            switch_id = length(v.switch_ids) == 1 ? element(v.switch_ids, 0) : element(v.switch_ids, s)
+            pci_link    = length(e.pci_links) == 1 ? element(e.pci_links, 0) : element(e.pci_links, s)
+            pci_order   = length(e.pci_order) == 1 ? element(e.pci_order, 0) : element(e.pci_order, s)
+            slot_id     = length(e.slot_ids) == 1 ? element(e.slot_ids, 0) : element(e.slot_ids, s)
+            switch_id   = length(e.switch_ids) == 1 ? element(e.switch_ids, 0) : element(e.switch_ids, s)
+            uplink_port = length(e.uplink_ports) == 1 ? element(e.uplink_ports, 0) : element(e.uplink_ports, s)
           }][0]
           san_connectivity     = key
           vhba_type            = v.vhba_type
           wwpn_allocation_type = v.wwpn_allocation_type
-          wwpn_pool = length(v.wwpn_pools) > 0 ? try(
-            {
-              name = tostring(element(v.wwpn_pools, s))
-              org  = var.organization
-            },
-            element(v.wwpn_pools, s)
-            ) : {
-            name = "UNUSED"
-            org  = "UNUSED"
-          }
+          wwpn_pool = length(v.wwpn_pools) > 0 ? { name = element(v.wwpn_pools, s), org = var.organization
+          } : { name = "UNUSED", org = "UNUSED" }
           wwpn_static_address = length(v.wwpn_static_addresses) > 0 ? element(v.wwpn_static_addresses, s) : ""
         }
       ]
@@ -2215,13 +1479,14 @@ locals {
   #_________________________________________________________________________
   storage = {
     for v in lookup(local.policies, "storage", []) : v.name => {
-      default_drive_state   = lookup(v, "default_drive_state", local.lstorage.default_drive_state)
-      description           = lookup(v, "description", "")
-      drive_groups          = lookup(v, "drive_groups", [])
-      global_hot_spares     = lookup(v, "global_hot_spares", local.lstorage.global_hot_spares)
-      m2_raid_configuration = compact([lookup(v, "m2_raid_configuration", "")])
-      name                  = "${local.name_prefix.storage}${v.name}${local.name_suffix.storage}"
-      organization          = var.organization
+      default_drive_state = lookup(v, "default_drive_state", local.lstorage.default_drive_state)
+      description         = lookup(v, "description", "")
+      drive_groups        = lookup(v, "drive_groups", [])
+      global_hot_spares   = lookup(v, "global_hot_spares", local.lstorage.global_hot_spares)
+      m2_raid_configuration = length(lookup(v, "m2_raid_configuration", [])
+      ) > 0 ? [v.m2_raid_configuration] : []
+      name         = "${local.name_prefix.storage}${v.name}${local.name_suffix.storage}"
+      organization = var.organization
       single_drive_raid0_configuration = length(compact([
         lookup(lookup(v, "single_drive_raid0_configuration", {}), "drive_slots", "")])) > 0 ? [
         {
@@ -2241,13 +1506,15 @@ locals {
   drive_groups = { for i in flatten([
     for key, value in local.storage : [
       for v in value.drive_groups : {
-        automatic_drive_group = lookup(v, "automatic_drive_group", [])
-        manual_drive_group    = lookup(v, "manual_drive_group", [])
-        name                  = v.name
-        raid_level            = lookup(v, "raid_level", "Raid1")
-        storage_policy        = key
-        tags                  = value.tags
-        virtual_drives        = lookup(v, "virtual_drives", [])
+        automatic_drive_group = length(lookup(v, "automatic_drive_group", [])
+        ) > 0 ? [v.automatic_drive_group] : []
+        manual_drive_group = length(lookup(v, "manual_drive_group", [])
+        ) > 0 ? [v.manual_drive_group] : []
+        name           = v.name
+        raid_level     = lookup(v, "raid_level", "Raid1")
+        storage_policy = key
+        tags           = value.tags
+        virtual_drives = lookup(v, "virtual_drives", [])
       }
     ]
     ]) : "${i.storage_policy}:${i.name}" => i
@@ -2384,24 +1651,15 @@ locals {
     for v in local.vlans_loop : [
       for s in v.vlan_list : {
         auto_allow_on_uplinks = v.auto_allow_on_uplinks
-        multicast_policy = v.multicast_policy != "" ? try(
-          {
-            name = tostring(v.multicast_policy)
-            org  = var.organization
-          },
-          v.multicast_policy
-          ) : {
-          name = "UNUSED"
-          org  = "UNUSED"
-        }
-        name            = v.name
-        name_prefix     = v.name_prefix
-        native_vlan     = v.native_vlan
-        organization    = v.organization
-        primary_vlan_id = v.primary_vlan_id
-        sharing_type    = v.sharing_type
-        vlan_id         = s
-        vlan_policy     = v.vlan_policy
+        multicast_policy      = { name = v.multicast_policy, org = var.organization }
+        name                  = v.name
+        name_prefix           = v.name_prefix
+        native_vlan           = v.native_vlan
+        organization          = v.organization
+        primary_vlan_id       = v.primary_vlan_id
+        sharing_type          = v.sharing_type
+        vlan_id               = s
+        vlan_policy           = v.vlan_policy
       }
     ]
   ]) : "${i.vlan_policy}:${i.vlan_id}" => i }
