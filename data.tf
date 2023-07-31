@@ -4,27 +4,27 @@
 #__________________________________________________________________
 
 data "intersight_search_search_item" "ip" {
-  for_each              = { for v in [0] : v => v if length(local.ip_pools) > 0 }
+  for_each              = { for v in [0] : v => v if length(local.ip_pools) > 0 && var.moids_pools == true }
   additional_properties = jsonencode({ "ObjectType" = "ippool.Pool" })
 }
 
 data "intersight_search_search_item" "iqn" {
-  for_each              = { for v in [0] : v => v if length(local.iqn_pools) > 0 }
+  for_each              = { for v in [0] : v => v if length(local.iqn_pools) > 0 && var.moids_pools == true }
   additional_properties = jsonencode({ "ObjectType" = "iqnpool.Pool" })
 }
 
 data "intersight_search_search_item" "mac" {
-  for_each              = { for v in [0] : v => v if length(local.mac_pools) > 0 }
+  for_each              = { for v in [0] : v => v if length(local.mac_pools) > 0 && var.moids_pools == true }
   additional_properties = jsonencode({ "ObjectType" = "macpool.Pool" })
 }
 
 data "intersight_search_search_item" "wwnn" {
-  for_each              = { for v in [0] : v => v if length(local.wwnn_pools) > 0 }
+  for_each              = { for v in [0] : v => v if length(local.wwnn_pools) > 0 && var.moids_pools == true }
   additional_properties = jsonencode({ "ObjectType" = "fcpool.Pool" })
 }
 
 data "intersight_search_search_item" "wwpn" {
-  for_each              = { for v in [0] : v => v if length(local.wwpn_pools) > 0 }
+  for_each              = { for v in [0] : v => v if length(local.wwpn_pools) > 0 && var.moids_pools == true }
   additional_properties = jsonencode({ "ObjectType" = "fcpool.Pool" })
 }
 
