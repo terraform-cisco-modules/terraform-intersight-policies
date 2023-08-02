@@ -14,8 +14,8 @@ resource "intersight_networkconfig_policy" "network_connectivity" {
   enable_ipv4dns_from_dhcp = each.value.obtain_ipv4_dns_from_dhcp
   enable_ipv6              = each.value.enable_ipv6
   enable_ipv6dns_from_dhcp = each.value.obtain_ipv6_dns_from_dhcp
-  preferred_ipv4dns_server = length(each.value.dns_servers_v4) > 0 ? each.value.dns_servers_v4[0] : null
-  preferred_ipv6dns_server = length(each.value.dns_servers_v6) > 0 ? each.value.dns_servers_v6[0] : null
+  preferred_ipv4dns_server = length(each.value.dns_servers_v4) > 0 ? each.value.dns_servers_v4[0] : "0.0.0.0"
+  preferred_ipv6dns_server = length(each.value.dns_servers_v6) > 0 ? each.value.dns_servers_v6[0] : "::"
   name                     = each.value.name
   organization {
     moid        = local.orgs[each.value.organization]
