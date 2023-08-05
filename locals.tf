@@ -493,7 +493,12 @@ locals {
       }
     )
   }
-
+  firmware = {
+    for v in lookup(local.policies, "firmware", []) : v.name => merge(local.fw, v, {
+      advanced_mode = merge(local.fw.advanced_mode, lookup(v, "advanced_mode", {}))
+      tags          = lookup(v, "tags", var.tags)
+    })
+  }
   #__________________________________________________________________
   #
   # Intersight IMC Access Policy

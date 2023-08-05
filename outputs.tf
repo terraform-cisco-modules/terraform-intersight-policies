@@ -5,9 +5,8 @@
 
 output "adapter_configuration" {
   description = "Moid's of the Adapter Configuration Policies."
-  value = length(local.adapter_configuration) > 0 ? { for v in sort(
-    keys(intersight_adapter_config_policy.adapter_configuration)
-  ) : v => intersight_adapter_config_policy.adapter_configuration[v].moid } : {}
+  value = { for v in sort(keys(intersight_adapter_config_policy.adapter_configuration)
+  ) : v => intersight_adapter_config_policy.adapter_configuration[v].moid }
 }
 
 
@@ -18,9 +17,7 @@ output "adapter_configuration" {
 
 output "bios" {
   description = "Moid's of the BIOS Policies."
-  value = length(local.bios) > 0 ? { for v in sort(
-    keys(intersight_bios_policy.bios)
-  ) : v => intersight_bios_policy.bios[v].moid } : {}
+  value       = { for v in sort(keys(intersight_bios_policy.bios)) : v => intersight_bios_policy.bios[v].moid }
 }
 
 
@@ -31,9 +28,8 @@ output "bios" {
 
 output "boot_order" {
   description = "Moid's of the Boot Order Policies."
-  value = length(local.boot_order) > 0 ? { for v in sort(
-    keys(intersight_boot_precision_policy.boot_order)
-  ) : v => intersight_boot_precision_policy.boot_order[v].moid } : {}
+  value = { for v in sort(keys(intersight_boot_precision_policy.boot_order)
+  ) : v => intersight_boot_precision_policy.boot_order[v].moid }
 }
 
 
@@ -44,9 +40,8 @@ output "boot_order" {
 
 output "certificate_management" {
   description = "Moid's of the Certificate Management Policies."
-  value = length(lookup(local.policies, "certificate_management", [])) > 0 ? { for v in sort(
-    keys(intersight_certificatemanagement_policy.certificate_management)
-  ) : v => intersight_certificatemanagement_policy.certificate_management[v].moid } : {}
+  value = { for v in sort(keys(intersight_certificatemanagement_policy.certificate_management)
+  ) : v => intersight_certificatemanagement_policy.certificate_management[v].moid }
 }
 
 
@@ -57,9 +52,20 @@ output "certificate_management" {
 
 output "device_connector" {
   description = "Moid's of the Device Connector Policies."
-  value = length(lookup(local.policies, "device_connector", [])) > 0 ? { for v in sort(
-    keys(intersight_deviceconnector_policy.device_connector)
-  ) : v => intersight_deviceconnector_policy.device_connector[v].moid } : {}
+  value = { for v in sort(keys(intersight_deviceconnector_policy.device_connector)
+  ) : v => intersight_deviceconnector_policy.device_connector[v].moid }
+}
+
+
+#__________________________________________________________
+#
+# Firmware Policy Outputs
+#__________________________________________________________
+
+output "firmware" {
+  description = "Moid's of the Firmware Policies."
+  value = { for v in sort(keys(intersight_firmware_policy.fw)
+  ) : v => intersight_firmware_policy.fw[v].moid }
 }
 
 
@@ -70,9 +76,8 @@ output "device_connector" {
 
 output "imc_access" {
   description = "Moid's of the IMC Access Policies."
-  value = length(lookup(local.policies, "imc_access", [])) > 0 ? { for v in sort(
-    keys(intersight_access_policy.imc_access)
-  ) : v => intersight_access_policy.imc_access[v].moid } : {}
+  value = { for v in sort(keys(intersight_access_policy.imc_access)
+  ) : v => intersight_access_policy.imc_access[v].moid }
 }
 
 
@@ -83,9 +88,8 @@ output "imc_access" {
 
 output "ipmi_over_lan" {
   description = "Moid's of the IPMI over LAN Policies."
-  value = length(lookup(local.policies, "ipmi_over_lan", [])) > 0 ? { for v in sort(
-    keys(intersight_ipmioverlan_policy.ipmi_over_lan)
-  ) : v => intersight_ipmioverlan_policy.ipmi_over_lan[v].moid } : {}
+  value = { for v in sort(keys(intersight_ipmioverlan_policy.ipmi_over_lan)
+  ) : v => intersight_ipmioverlan_policy.ipmi_over_lan[v].moid }
 }
 
 
@@ -96,9 +100,8 @@ output "ipmi_over_lan" {
 
 output "lan_connectivity" {
   description = "Moid's of the LAN Connectivity Policies."
-  value = length(local.lan_connectivity) > 0 ? { for v in sort(
-    keys(intersight_vnic_lan_connectivity_policy.lan_connectivity)
-  ) : v => intersight_vnic_lan_connectivity_policy.lan_connectivity[v].moid } : {}
+  value = { for v in sort(keys(intersight_vnic_lan_connectivity_policy.lan_connectivity)
+  ) : v => intersight_vnic_lan_connectivity_policy.lan_connectivity[v].moid }
 }
 
 #__________________________________________________________
@@ -108,9 +111,7 @@ output "lan_connectivity" {
 
 output "ldap" {
   description = "Moid's of the LDAP Policies."
-  value = length(local.ldap) > 0 ? { for v in sort(
-    keys(intersight_iam_ldap_policy.ldap)
-  ) : v => intersight_iam_ldap_policy.ldap[v].moid } : {}
+  value       = { for v in sort(keys(intersight_iam_ldap_policy.ldap)) : v => intersight_iam_ldap_policy.ldap[v].moid }
 }
 
 
@@ -121,9 +122,8 @@ output "ldap" {
 
 output "local_user" {
   description = "Moid's of the Local User Policies."
-  value = length(local.local_user) > 0 ? { for v in sort(
-    keys(intersight_iam_end_point_user_policy.local_user)
-  ) : v => intersight_iam_end_point_user_policy.local_user[v].moid } : {}
+  value = { for v in sort(keys(intersight_iam_end_point_user_policy.local_user)
+  ) : v => intersight_iam_end_point_user_policy.local_user[v].moid }
 }
 
 
@@ -134,9 +134,8 @@ output "local_user" {
 
 output "network_connectivity" {
   description = "Moid's of the Network Connectivity Policies."
-  value = length(local.network_connectivity) > 0 ? { for v in sort(
-    keys(intersight_networkconfig_policy.network_connectivity)
-  ) : v => intersight_networkconfig_policy.network_connectivity[v].moid } : {}
+  value = { for v in sort(keys(intersight_networkconfig_policy.network_connectivity)
+  ) : v => intersight_networkconfig_policy.network_connectivity[v].moid }
 }
 
 
@@ -147,9 +146,7 @@ output "network_connectivity" {
 
 output "ntp" {
   description = "Moid's of the NTP Policies."
-  value = length(local.ntp) > 0 ? { for v in sort(
-    keys(intersight_ntp_policy.ntp)
-  ) : v => intersight_ntp_policy.ntp[v].moid } : {}
+  value       = { for v in sort(keys(intersight_ntp_policy.ntp)) : v => intersight_ntp_policy.ntp[v].moid }
 }
 
 
@@ -160,9 +157,8 @@ output "ntp" {
 
 output "persistent_memory" {
   description = "Moid's of the Persistent Memory Policies."
-  value = length(local.persistent_memory) > 0 ? { for v in sort(
-    keys(intersight_memory_persistent_memory_policy.persistent_memory)
-  ) : v => intersight_memory_persistent_memory_policy.persistent_memory[v].moid } : {}
+  value = { for v in sort(keys(intersight_memory_persistent_memory_policy.persistent_memory)
+  ) : v => intersight_memory_persistent_memory_policy.persistent_memory[v].moid }
 }
 
 
@@ -173,9 +169,7 @@ output "persistent_memory" {
 
 output "port" {
   description = "Moid's of the Port Policies."
-  value = length(local.port) > 0 ? { for v in sort(
-    keys(intersight_fabric_port_policy.port)
-  ) : v => intersight_fabric_port_policy.port[v].moid } : {}
+  value       = { for v in sort(keys(intersight_fabric_port_policy.port)) : v => intersight_fabric_port_policy.port[v].moid }
 }
 
 
@@ -186,9 +180,7 @@ output "port" {
 
 output "power" {
   description = "Moid's of the Power Policies."
-  value = length(lookup(local.policies, "power", [])) > 0 ? { for v in sort(
-    keys(intersight_power_policy.power)
-  ) : v => intersight_power_policy.power[v].moid } : {}
+  value       = { for v in sort(keys(intersight_power_policy.power)) : v => intersight_power_policy.power[v].moid }
 }
 
 
@@ -199,9 +191,8 @@ output "power" {
 
 output "san_connectivity" {
   description = "Moid's of the SAN Connectivity Policies."
-  value = length(local.san_connectivity) > 0 ? { for v in sort(
-    keys(intersight_vnic_san_connectivity_policy.san_connectivity)
-  ) : v => intersight_vnic_san_connectivity_policy.san_connectivity[v].moid } : {}
+  value = { for v in sort(keys(intersight_vnic_san_connectivity_policy.san_connectivity)
+  ) : v => intersight_vnic_san_connectivity_policy.san_connectivity[v].moid }
 }
 
 
@@ -212,9 +203,8 @@ output "san_connectivity" {
 
 output "serial_over_lan" {
   description = "Moid's of the Serial over LAN Policies."
-  value = length(lookup(local.policies, "serial_over_lan", [])) > 0 ? { for v in sort(
-    keys(intersight_sol_policy.serial_over_lan)
-  ) : v => intersight_sol_policy.serial_over_lan[v].moid } : {}
+  value = { for v in sort(keys(intersight_sol_policy.serial_over_lan)
+  ) : v => intersight_sol_policy.serial_over_lan[v].moid }
 }
 
 
@@ -225,9 +215,8 @@ output "serial_over_lan" {
 
 output "smtp" {
   description = "Moid's of the SMTP Policies."
-  value = length(lookup(local.policies, "smtp", [])) > 0 ? { for v in sort(
-    keys(intersight_smtp_policy.smtp)
-  ) : v => intersight_smtp_policy.smtp[v].moid } : {}
+  value = { for v in sort(keys(intersight_smtp_policy.smtp)
+  ) : v => intersight_smtp_policy.smtp[v].moid }
 }
 
 
@@ -238,9 +227,7 @@ output "smtp" {
 
 output "snmp" {
   description = "Moid's of the SNMP Policies."
-  value = length(local.snmp) > 0 ? { for v in sort(
-    keys(intersight_snmp_policy.snmp)
-  ) : v => intersight_snmp_policy.snmp[v].moid } : {}
+  value       = { for v in sort(keys(intersight_snmp_policy.snmp)) : v => intersight_snmp_policy.snmp[v].moid }
 }
 
 
@@ -251,9 +238,7 @@ output "snmp" {
 
 output "ssh" {
   description = "Moid's of the SSH Policies."
-  value = length(lookup(local.policies, "ssh", [])) > 0 ? { for v in sort(
-    keys(intersight_ssh_policy.ssh)
-  ) : v => intersight_ssh_policy.ssh[v].moid } : {}
+  value       = { for v in sort(keys(intersight_ssh_policy.ssh)) : v => intersight_ssh_policy.ssh[v].moid }
 }
 
 
@@ -264,9 +249,8 @@ output "ssh" {
 
 output "storage" {
   description = "Moid's of the Storage Policies."
-  value = length(local.storage) > 0 ? { for v in sort(
-    keys(intersight_storage_storage_policy.storage)
-  ) : v => intersight_storage_storage_policy.storage[v].moid } : {}
+  value = { for v in sort(keys(intersight_storage_storage_policy.storage)
+  ) : v => intersight_storage_storage_policy.storage[v].moid }
 }
 
 
@@ -277,9 +261,8 @@ output "storage" {
 
 output "switch_control" {
   description = "Moid's of the Switch Control Policies."
-  value = length(local.switch_control) > 0 ? { for v in sort(
-    keys(intersight_fabric_switch_control_policy.switch_control)
-  ) : v => intersight_fabric_switch_control_policy.switch_control[v].moid } : {}
+  value = { for v in sort(keys(intersight_fabric_switch_control_policy.switch_control)
+  ) : v => intersight_fabric_switch_control_policy.switch_control[v].moid }
 }
 
 
@@ -290,9 +273,7 @@ output "switch_control" {
 
 output "syslog" {
   description = "Moid's of the Syslog Policies."
-  value = length(local.syslog) > 0 ? { for v in sort(
-    keys(intersight_syslog_policy.syslog)
-  ) : v => intersight_syslog_policy.syslog[v].moid } : {}
+  value       = { for v in sort(keys(intersight_syslog_policy.syslog)) : v => intersight_syslog_policy.syslog[v].moid }
 }
 
 
@@ -303,9 +284,8 @@ output "syslog" {
 
 output "system_qos" {
   description = "Moid's of the System QoS Policies."
-  value = length(local.system_qos) > 0 ? { for v in sort(
-    keys(intersight_fabric_system_qos_policy.system_qos)
-  ) : v => intersight_fabric_system_qos_policy.system_qos[v].moid } : {}
+  value = { for v in sort(keys(intersight_fabric_system_qos_policy.system_qos)
+  ) : v => intersight_fabric_system_qos_policy.system_qos[v].moid }
 }
 
 
@@ -316,9 +296,7 @@ output "system_qos" {
 
 output "thermal" {
   description = "Moid's of the Thermal Policies."
-  value = length(lookup(local.policies, "thermal", [])) > 0 ? { for v in sort(
-    keys(intersight_thermal_policy.thermal)
-  ) : v => intersight_thermal_policy.thermal[v].moid } : {}
+  value       = { for v in sort(keys(intersight_thermal_policy.thermal)) : v => intersight_thermal_policy.thermal[v].moid }
 }
 
 
@@ -329,9 +307,7 @@ output "thermal" {
 
 output "virtual_kvm" {
   description = "Moid's of the Virtual KVM Policies."
-  value = length(lookup(local.policies, "virtual_kvm", [])) > 0 ? { for v in sort(
-    keys(intersight_kvm_policy.virtual_kvm)
-  ) : v => intersight_kvm_policy.virtual_kvm[v].moid } : {}
+  value       = { for v in sort(keys(intersight_kvm_policy.virtual_kvm)) : v => intersight_kvm_policy.virtual_kvm[v].moid }
 }
 
 
@@ -342,9 +318,8 @@ output "virtual_kvm" {
 
 output "virtual_media" {
   description = "Moid's of the Virtual Media Policies."
-  value = length(local.virtual_media) > 0 ? { for v in sort(
-    keys(intersight_vmedia_policy.virtual_media)
-  ) : v => intersight_vmedia_policy.virtual_media[v].moid } : {}
+  value = { for v in sort(keys(intersight_vmedia_policy.virtual_media)
+  ) : v => intersight_vmedia_policy.virtual_media[v].moid }
 }
 
 
@@ -355,9 +330,8 @@ output "virtual_media" {
 
 output "vlan" {
   description = "Moid's of the VLAN Policies."
-  value = length(local.vlan) > 0 ? { for v in sort(
-    keys(intersight_fabric_eth_network_policy.vlan)
-  ) : v => intersight_fabric_eth_network_policy.vlan[v].moid } : {}
+  value = { for v in sort(keys(intersight_fabric_eth_network_policy.vlan)
+  ) : v => intersight_fabric_eth_network_policy.vlan[v].moid }
 }
 
 
@@ -368,7 +342,6 @@ output "vlan" {
 
 output "vsan" {
   description = "Moid's of the VSAN Policies."
-  value = length(local.vsan) > 0 ? { for v in sort(
-    keys(intersight_fabric_fc_network_policy.vsan)
-  ) : v => intersight_fabric_fc_network_policy.vsan[v].moid } : {}
+  value = { for v in sort(keys(intersight_fabric_fc_network_policy.vsan)
+  ) : v => intersight_fabric_fc_network_policy.vsan[v].moid }
 }

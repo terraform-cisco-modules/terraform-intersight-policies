@@ -26,22 +26,22 @@ resource "intersight_softwarerepository_authorization" "auth" {
 }
 
 resource "intersight_firmware_policy" "fw" {
-  for_each    = { for v in lookup(local.policies, "firmware", []) : v.name => v }
+  for_each    = local.firmware
   description = lookup(each.value, "description", "${each.value.name} Firmware Policy.")
   exclude_component_list = anytrue(
     [
-      lookup(each.value.advanced_mode, "exclude_drives", local.fw.advanced_mode.exclude_drives),
-      lookup(each.value.advanced_mode, "exclude_drives_except_boot_drives", local.fw.advanced_mode.exclude_drives_except_boot_drives),
-      lookup(each.value.advanced_mode, "exclude_storage_controllers", local.fw.advanced_mode.exclude_storage_controllers),
-      lookup(each.value.advanced_mode, "exclude_storage_sas_expander", local.fw.advanced_mode.exclude_storage_sas_expander),
-      lookup(each.value.advanced_mode, "exclude_storage_u2", local.fw.advanced_mode.exclude_storage_u2)
+      each.value.advanced_mode.exclude_drives,
+      each.value.advanced_mode.exclude_drives_except_boot_drives,
+      each.value.advanced_mode.exclude_storage_controllers,
+      each.value.advanced_mode.exclude_storage_sas_expander,
+      each.value.advanced_mode.exclude_storage_u2
     ]
     ) ? compact(concat([
-      length(regexall(true, lookup(each.value.advanced_mode, "exclude_drives", false))) > 0 ? "local-disk" : ""], [
-      length(regexall(true, lookup(each.value.advanced_mode, "exclude_drives_except_boot_drives", false))) > 0 ? "local-disk" : ""], [
-      length(regexall(true, lookup(each.value.advanced_mode, "exclude_storage_controllers", false))) > 0 ? "storage-controller" : ""], [
-      length(regexall(true, lookup(each.value.advanced_mode, "exclude_storage_sas_expander", false))) > 0 ? "storage-sasexpander" : ""], [
-      length(regexall(true, lookup(each.value.advanced_mode, "exclude_storage_u2", false))) > 0 ? "storage-u2" : ""
+      length(regexall(true, each.value.advanced_mode.exclude_drives)) > 0 ? "local-disk" : ""], [
+      length(regexall(true, each.value.advanced_mode.exclude_drives_except_boot_drives)) > 0 ? "local-disk" : ""], [
+      length(regexall(true, each.value.advanced_mode.exclude_storage_controllers)) > 0 ? "storage-controller" : ""], [
+      length(regexall(true, each.value.advanced_mode.exclude_storage_sas_expander)) > 0 ? "storage-sasexpander" : ""], [
+      length(regexall(true, each.value.advanced_mode.exclude_storage_u2)) > 0 ? "storage-u2" : ""
   ])) : ["none"]
   name            = "${local.name_prefix.firmware}${each.key}${local.name_suffix.firmware}"
   target_platform = lookup(each.value, "target_platform", local.fw.target_platform)
