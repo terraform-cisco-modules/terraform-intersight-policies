@@ -4,14 +4,14 @@
 # GUI Location: Configure > Policies > Create Policy > FC Zone
 #__________________________________________________________________
 
-resource "intersight_fabric_fc_zone_policy" "fc_zone" {
-  for_each = { for v in lookup(local.policies, "fc_zone", []) : v.name => v }
-  description = lookup(
-  each.value, "description", "${local.name_prefix.fc_zone}${each.key}${local.name_suffix.fc_zone} FC Zone Policy.")
-  fc_target_zoning_type = lookup(
-    each.value, "fc_target_zoning_type", local.defaults.fc_zone.fc_target_zoning_type
-  )
-  name = "${local.name_prefix.fc_zone}${each.key}${local.name_suffix.fc_zone}"
+resource "intersight_fabric_fc_zone_policy" "map" {
+  for_each = { for v in lookup(local.policies, "fc_zone", []) : v.name => merge(local.defaults.fc_zone, v, {
+    name = "${local.name_prefix.fc_zone}${v.name}${local.name_suffix.fc_zone}"
+    tags = lookup(v, "tags", var.tags)
+  }) }
+  description           = coalesce(each.value.description, "${each.value.name} FC Zone Policy.")
+  fc_target_zoning_type = each.value.fc_target_zoning_type
+  name                  = each.value.name
   organization {
     moid        = local.orgs[var.organization]
     object_type = "organization.Organization"
@@ -26,7 +26,7 @@ resource "intersight_fabric_fc_zone_policy" "fc_zone" {
     }
   }
   dynamic "tags" {
-    for_each = { for v in lookup(each.value, "tags", var.tags) : v.key => v }
+    for_each = { for v in each.value.tags : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value

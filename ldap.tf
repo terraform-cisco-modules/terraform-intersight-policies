@@ -4,9 +4,9 @@
 # GUI Location: Policies > Create Policy > LDAP
 #__________________________________________________________________
 
-resource "intersight_iam_ldap_policy" "ldap" {
+resource "intersight_iam_ldap_policy" "map" {
   for_each    = local.ldap
-  description = lookup(each.value, "description", "${each.value.name} LDAP Policy.")
+  description = coalesce(each.value.description, "${each.value.name} LDAP Policy.")
   name        = each.value.name
   enabled     = each.value.enable_ldap
   base_properties {
@@ -19,7 +19,7 @@ resource "intersight_iam_ldap_policy" "ldap" {
     # Binding Parameters
     bind_method = each.value.binding_parameters.bind_method
     bind_dn     = each.value.binding_parameters.bind_dn
-    password    = each.value.binding_parameters_password
+    password    = var.ldap.password[each.value.binding_parameters.password]
     # Search Parameters
     attribute       = each.value.search_parameters.attribute
     filter          = each.value.search_parameters.filter
@@ -56,26 +56,26 @@ resource "intersight_iam_ldap_policy" "ldap" {
 # GUI Location: Policies > Create Policy > LDAP > Add New LDAP Group
 #____________________________________________________________________
 
-data "intersight_iam_end_point_role" "roles" {
+data "intersight_iam_end_point_role" "map" {
   for_each = { for v in toset(local.roles) : v => v }
   name     = each.value
   type     = "IMC"
 }
 
-resource "intersight_iam_ldap_group" "ldap_group" {
+resource "intersight_iam_ldap_group" "map" {
   depends_on = [
-    data.intersight_iam_end_point_role.roles,
-    intersight_iam_ldap_policy.ldap
+    data.intersight_iam_end_point_role.map,
+    intersight_iam_ldap_policy.map
   ]
   for_each = local.ldap_groups
   domain   = length(compact([each.value.domain])) > 0 ? each.value.domain : each.value.base_settings.domain
   name     = each.value.name
   end_point_role {
-    moid        = data.intersight_iam_end_point_role.roles[each.value.role].results[0].moid
+    moid        = data.intersight_iam_end_point_role.map[each.value.role].results[0].moid
     object_type = "iam.EndPointRole"
   }
   ldap_policy {
-    moid = intersight_iam_ldap_policy.ldap[each.value.ldap_policy].moid
+    moid = intersight_iam_ldap_policy.map[each.value.ldap_policy].moid
   }
 }
 
@@ -85,13 +85,13 @@ resource "intersight_iam_ldap_group" "ldap_group" {
 # GUI Location: Policies > Create Policy > LDAP Policy > Server
 #__________________________________________________________________
 
-resource "intersight_iam_ldap_provider" "ldap_providers" {
+resource "intersight_iam_ldap_provider" "map" {
   for_each = local.ldap_providers
   depends_on = [
-    intersight_iam_ldap_policy.ldap
+    intersight_iam_ldap_policy.map
   ]
   ldap_policy {
-    moid = intersight_iam_ldap_policy.ldap[each.value.ldap_policy].moid
+    moid = intersight_iam_ldap_policy.map[each.value.ldap_policy].moid
   }
   port   = each.value.port
   server = each.value.server

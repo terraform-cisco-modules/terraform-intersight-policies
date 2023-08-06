@@ -4,21 +4,21 @@
 # GUI Location: Policies > Create Policy > Port
 #__________________________________________________________________
 
-resource "intersight_fabric_port_policy" "port" {
+resource "intersight_fabric_port_policy" "map" {
   depends_on = [
     data.intersight_search_search_item.ethernet_network_control,
     data.intersight_search_search_item.ethernet_network_group,
     data.intersight_search_search_item.flow_control,
     data.intersight_search_search_item.link_aggregation,
     data.intersight_search_search_item.link_control,
-    intersight_fabric_eth_network_control_policy.ethernet_network_control,
-    intersight_fabric_eth_network_group_policy.ethernet_network_group,
-    intersight_fabric_flow_control_policy.flow_control,
-    intersight_fabric_link_aggregation_policy.link_aggregation,
-    intersight_fabric_link_control_policy.link_control
+    intersight_fabric_eth_network_control_policy.map,
+    intersight_fabric_eth_network_group_policy.map,
+    intersight_fabric_flow_control_policy.map,
+    intersight_fabric_link_aggregation_policy.map,
+    intersight_fabric_link_control_policy.map
   ]
   for_each     = local.port
-  description  = each.value.description != "" ? each.value.description : "${each.value.name} Port Policy."
+  description  = coalesce(each.value.description, "${each.value.name} Port Policy.")
   device_model = each.value.device_model
   name         = each.value.name
   organization {
@@ -40,9 +40,9 @@ resource "intersight_fabric_port_policy" "port" {
 # GUI Location: Policies > Create Policy > Port > Port Roles > Configure > Port Role - Appliance
 #________________________________________________________________________________________________
 
-resource "intersight_fabric_appliance_pc_role" "port_channel_appliances" {
+resource "intersight_fabric_appliance_pc_role" "map" {
   depends_on = [
-    intersight_fabric_port_policy.port
+    intersight_fabric_port_policy.map
   ]
   for_each    = local.port_channel_appliances
   admin_speed = each.value.admin_speed
@@ -52,22 +52,20 @@ resource "intersight_fabric_appliance_pc_role" "port_channel_appliances" {
   priority = each.value.priority
   eth_network_control_policy {
     moid = length(regexall(each.value.ethernet_network_control_policy.org, each.value.organization)
-      ) > 0 ? intersight_fabric_eth_network_control_policy.ethernet_network_control[
-      each.value.ethernet_network_control_policy.name
+      ) > 0 ? intersight_fabric_eth_network_control_policy.map[each.value.ethernet_network_control_policy.name
       ].moid : [for i in data.intersight_search_search_item.ethernet_network_control[0].results : i.moid if jsondecode(
         i.additional_properties).Organization.Moid == local.orgs[each.value.ethernet_network_control_policy.org
     ] && jsondecode(i.additional_properties).Name == each.value.ethernet_network_control_policy.name][0]
   }
   eth_network_group_policy {
     moid = length(regexall(each.value.ethernet_network_group_policy.org, each.value.organization)
-      ) > 0 ? intersight_fabric_eth_network_group_policy.ethernet_network_group[
-      each.value.ethernet_network_group_policy.name
+      ) > 0 ? intersight_fabric_eth_network_group_policy.map[each.value.ethernet_network_group_policy.name
       ].moid : [for i in data.intersight_search_search_item.ethernet_network_group[0].results : i.moid if jsondecode(
         i.additional_properties).Organization.Moid == local.orgs[each.value.ethernet_network_group_policy.org
     ] && jsondecode(i.additional_properties).Name == each.value.ethernet_network_group_policy.name][0]
   }
   port_policy {
-    moid = intersight_fabric_port_policy.port[each.value.port_policy].moid
+    moid = intersight_fabric_port_policy.map[each.value.port_policy].moid
   }
   dynamic "link_aggregation_policy" {
     for_each = {
@@ -76,7 +74,7 @@ resource "intersight_fabric_appliance_pc_role" "port_channel_appliances" {
     }
     content {
       moid = length(regexall(each.value.link_aggregation_policy.org, each.value.organization)
-        ) > 0 ? intersight_fabric_link_aggregation_policy.link_aggregation[each.value.link_aggregation_policy.name
+        ) > 0 ? intersight_fabric_link_aggregation_policy.map[each.value.link_aggregation_policy.name
         ].moid : [for i in data.intersight_search_search_item.link_aggregation[0].results : i.moid if jsondecode(
           i.additional_properties).Organization.Moid == local.orgs[each.value.link_aggregation_policy.org
       ] && jsondecode(i.additional_properties).Name == each.value.link_aggregation_policy.name][0]
@@ -106,15 +104,15 @@ resource "intersight_fabric_appliance_pc_role" "port_channel_appliances" {
 # GUI Location: Policies > Create Policy > Port > Port Channels > Create a Port Channel > Ethernet Uplink Port Channel
 #______________________________________________________________________________________________________________________
 
-resource "intersight_fabric_uplink_pc_role" "port_channel_ethernet_uplinks" {
+resource "intersight_fabric_uplink_pc_role" "map" {
   depends_on = [
-    intersight_fabric_port_policy.port
+    intersight_fabric_port_policy.map
   ]
   for_each    = local.port_channel_ethernet_uplinks
   admin_speed = each.value.admin_speed
   pc_id       = each.value.pc_id
   port_policy {
-    moid = intersight_fabric_port_policy.port[each.value.port_policy].moid
+    moid = intersight_fabric_port_policy.map[each.value.port_policy].moid
   }
   dynamic "eth_network_group_policy" {
     for_each = {
@@ -123,8 +121,7 @@ resource "intersight_fabric_uplink_pc_role" "port_channel_ethernet_uplinks" {
     }
     content {
       moid = length(regexall(each.value.ethernet_network_group_policy.org, each.value.organization)
-        ) > 0 ? intersight_fabric_eth_network_group_policy.ethernet_network_group[
-        each.value.ethernet_network_group_policy.name
+        ) > 0 ? intersight_fabric_eth_network_group_policy.map[each.value.ethernet_network_group_policy.name
         ].moid : [for i in data.intersight_search_search_item.ethernet_network_group[0].results : i.moid if jsondecode(
           i.additional_properties).Organization.Moid == local.orgs[each.value.ethernet_network_group_policy.org
       ] && jsondecode(i.additional_properties).Name == each.value.ethernet_network_group_policy.name][0]
@@ -137,7 +134,7 @@ resource "intersight_fabric_uplink_pc_role" "port_channel_ethernet_uplinks" {
     }
     content {
       moid = length(regexall(each.value.flow_control_policy.org, each.value.organization)
-        ) > 0 ? intersight_fabric_flow_control_policy.flow_control[each.value.flow_control_policy.name
+        ) > 0 ? intersight_fabric_flow_control_policy.map[each.value.flow_control_policy.name
         ].moid : [for i in data.intersight_search_search_item.flow_control[0].results : i.moid if jsondecode(
           i.additional_properties).Organization.Moid == local.orgs[each.value.flow_control_policy.org
       ] && jsondecode(i.additional_properties).Name == each.value.flow_control_policy.name][0]
@@ -150,7 +147,7 @@ resource "intersight_fabric_uplink_pc_role" "port_channel_ethernet_uplinks" {
     }
     content {
       moid = length(regexall(each.value.link_aggregation_policy.org, each.value.organization)
-        ) > 0 ? intersight_fabric_link_aggregation_policy.link_aggregation[each.value.link_aggregation_policy.name
+        ) > 0 ? intersight_fabric_link_aggregation_policy.map[each.value.link_aggregation_policy.name
         ].moid : [for i in data.intersight_search_search_item.link_aggregation[0].results : i.moid if jsondecode(
           i.additional_properties).Organization.Moid == local.orgs[each.value.link_aggregation_policy.org
       ] && jsondecode(i.additional_properties).Name == each.value.link_aggregation_policy.name][0]
@@ -163,7 +160,7 @@ resource "intersight_fabric_uplink_pc_role" "port_channel_ethernet_uplinks" {
     }
     content {
       moid = length(regexall(each.value.link_control_policy.org, each.value.organization)
-        ) > 0 ? intersight_fabric_link_control_policy.link_control[each.value.link_control_policy.name
+        ) > 0 ? intersight_fabric_link_control_policy.map[each.value.link_control_policy.name
         ].moid : [for i in data.intersight_search_search_item.link_control[0].results : i.moid if jsondecode(
           i.additional_properties).Organization.Moid == local.orgs[each.value.link_control_policy.org
       ] && jsondecode(i.additional_properties).Name == each.value.link_control_policy.name][0]
@@ -193,10 +190,10 @@ resource "intersight_fabric_uplink_pc_role" "port_channel_ethernet_uplinks" {
 # GUI Location: Policies > Create Policy > Port > Port Channels > Create a Port Channel > FC Uplink Port Channel
 #________________________________________________________________________________________________________________
 
-resource "intersight_fabric_fc_uplink_pc_role" "port_channel_fc_uplinks" {
+resource "intersight_fabric_fc_uplink_pc_role" "map" {
   depends_on = [
-    intersight_fabric_port_policy.port,
-    intersight_fabric_port_mode.port_modes
+    intersight_fabric_port_policy.map,
+    intersight_fabric_port_mode.map
   ]
   for_each     = local.port_channel_fc_uplinks
   admin_speed  = each.value.admin_speed
@@ -204,7 +201,7 @@ resource "intersight_fabric_fc_uplink_pc_role" "port_channel_fc_uplinks" {
   pc_id        = each.value.pc_id
   vsan_id      = each.value.vsan_id
   port_policy {
-    moid = intersight_fabric_port_policy.port[each.value.port_policy].moid
+    moid = intersight_fabric_port_policy.map[each.value.port_policy].moid
   }
   dynamic "ports" {
     for_each = each.value.interfaces
@@ -230,15 +227,15 @@ resource "intersight_fabric_fc_uplink_pc_role" "port_channel_fc_uplinks" {
 # GUI Location: Policies > Create Policy > Port > Port Channels > Create a Port Channel > FCoE Uplink Port Channel
 #______________________________________________________________________________________________________________________
 
-resource "intersight_fabric_fcoe_uplink_pc_role" "port_channel_fcoe_uplinks" {
+resource "intersight_fabric_fcoe_uplink_pc_role" "map" {
   depends_on = [
-    intersight_fabric_port_policy.port
+    intersight_fabric_port_policy.map
   ]
   for_each    = local.port_channel_fcoe_uplinks
   admin_speed = each.value.admin_speed
   pc_id       = each.value.pc_id
   port_policy {
-    moid = intersight_fabric_port_policy.port[each.value.port_policy].moid
+    moid = intersight_fabric_port_policy.map[each.value.port_policy].moid
   }
   dynamic "link_aggregation_policy" {
     for_each = {
@@ -247,7 +244,7 @@ resource "intersight_fabric_fcoe_uplink_pc_role" "port_channel_fcoe_uplinks" {
     }
     content {
       moid = length(regexall(each.value.link_aggregation_policy.org, each.value.organization)
-        ) > 0 ? intersight_fabric_link_aggregation_policy.link_aggregation[each.value.link_aggregation_policy.name
+        ) > 0 ? intersight_fabric_link_aggregation_policy.map[each.value.link_aggregation_policy.name
         ].moid : [for i in data.intersight_search_search_item.link_aggregation[0].results : i.moid if jsondecode(
           i.additional_properties).Organization.Moid == local.orgs[each.value.link_aggregation_policy.org
       ] && jsondecode(i.additional_properties).Name == each.value.link_aggregation_policy.name][0]
@@ -260,7 +257,7 @@ resource "intersight_fabric_fcoe_uplink_pc_role" "port_channel_fcoe_uplinks" {
     }
     content {
       moid = length(regexall(each.value.link_control_policy.org, each.value.organization)
-        ) > 0 ? intersight_fabric_link_control_policy.link_control[each.value.link_control_policy.name
+        ) > 0 ? intersight_fabric_link_control_policy.map[each.value.link_control_policy.name
         ].moid : [for i in data.intersight_search_search_item.link_control[0].results : i.moid if jsondecode(
           i.additional_properties).Organization.Moid == local.orgs[each.value.link_control_policy.org
       ] && jsondecode(i.additional_properties).Name == each.value.link_control_policy.name][0]
@@ -290,9 +287,9 @@ resource "intersight_fabric_fcoe_uplink_pc_role" "port_channel_fcoe_uplinks" {
 # GUI Location: Policies > Create Policy > Port > Move the Slider
 #__________________________________________________________________
 
-resource "intersight_fabric_port_mode" "port_modes" {
+resource "intersight_fabric_port_mode" "map" {
   depends_on = [
-    intersight_fabric_port_policy.port
+    intersight_fabric_port_policy.map
   ]
   for_each      = local.port_modes
   custom_mode   = each.value.custom_mode
@@ -300,7 +297,7 @@ resource "intersight_fabric_port_mode" "port_modes" {
   port_id_start = element(each.value.port_list, 0)
   slot_id       = lookup(each.value, "slot_id", 1)
   port_policy {
-    moid = intersight_fabric_port_policy.port[each.value.port_policy].moid
+    moid = intersight_fabric_port_policy.map[each.value.port_policy].moid
   }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
@@ -318,9 +315,9 @@ resource "intersight_fabric_port_mode" "port_modes" {
 # GUI Location: Policies > Create Policy > Port > Port Roles > Configure > Port Role - Appliance
 #________________________________________________________________________________________________
 
-resource "intersight_fabric_appliance_role" "port_role_appliances" {
+resource "intersight_fabric_appliance_role" "map" {
   depends_on = [
-    intersight_fabric_port_policy.port
+    intersight_fabric_port_policy.map
   ]
   for_each          = local.port_role_appliances
   admin_speed       = each.value.admin_speed
@@ -331,20 +328,18 @@ resource "intersight_fabric_appliance_role" "port_role_appliances" {
   priority          = each.value.priority
   slot_id           = lookup(each.value, "slot_id", 1)
   port_policy {
-    moid = intersight_fabric_port_policy.port[each.value.port_policy].moid
+    moid = intersight_fabric_port_policy.map[each.value.port_policy].moid
   }
   eth_network_control_policy {
     moid = length(regexall(each.value.ethernet_network_control_policy.org, each.value.organization)
-      ) > 0 ? intersight_fabric_eth_network_control_policy.ethernet_network_control[
-      each.value.ethernet_network_control_policy.name
+      ) > 0 ? intersight_fabric_eth_network_control_policy.map[each.value.ethernet_network_control_policy.name
       ].moid : [for i in data.intersight_search_search_item.ethernet_network_control[0].results : i.moid if jsondecode(
         i.additional_properties).Organization.Moid == local.orgs[each.value.ethernet_network_control_policy.org
     ] && jsondecode(i.additional_properties).Name == each.value.ethernet_network_control_policy.name][0]
   }
   eth_network_group_policy {
     moid = length(regexall(each.value.ethernet_network_group_policy.org, each.value.organization)
-      ) > 0 ? intersight_fabric_eth_network_group_policy.ethernet_network_group[
-      each.value.ethernet_network_group_policy.name
+      ) > 0 ? intersight_fabric_eth_network_group_policy.map[each.value.ethernet_network_group_policy.name
       ].moid : [for i in data.intersight_search_search_item.ethernet_network_group[0].results : i.moid if jsondecode(
         i.additional_properties).Organization.Moid == local.orgs[each.value.ethernet_network_group_policy.org
     ] && jsondecode(i.additional_properties).Name == each.value.ethernet_network_group_policy.name][0]
@@ -364,9 +359,9 @@ resource "intersight_fabric_appliance_role" "port_role_appliances" {
 # GUI Location: Policies > Create Policy > Port > Port Roles > Configure > Ethernet Uplink
 #__________________________________________________________________________________________
 
-resource "intersight_fabric_uplink_role" "port_role_ethernet_uplinks" {
+resource "intersight_fabric_uplink_role" "map" {
   depends_on = [
-    intersight_fabric_port_policy.port
+    intersight_fabric_port_policy.map
   ]
   for_each          = local.port_role_ethernet_uplinks
   admin_speed       = each.value.admin_speed
@@ -375,7 +370,7 @@ resource "intersight_fabric_uplink_role" "port_role_ethernet_uplinks" {
   port_id           = each.value.port_id
   slot_id           = lookup(each.value, "slot_id", 1)
   port_policy {
-    moid = intersight_fabric_port_policy.port[each.value.port_policy].moid
+    moid = intersight_fabric_port_policy.map[each.value.port_policy].moid
   }
   dynamic "eth_network_group_policy" {
     for_each = {
@@ -384,8 +379,7 @@ resource "intersight_fabric_uplink_role" "port_role_ethernet_uplinks" {
     }
     content {
       moid = length(regexall(each.value.ethernet_network_group_policy.org, each.value.organization)
-        ) > 0 ? intersight_fabric_eth_network_group_policy.ethernet_network_group[
-        each.value.ethernet_network_group_policy.name
+        ) > 0 ? intersight_fabric_eth_network_group_policy.map[each.value.ethernet_network_group_policy.name
         ].moid : [for i in data.intersight_search_search_item.ethernet_network_group[0].results : i.moid if jsondecode(
           i.additional_properties).Organization.Moid == local.orgs[each.value.ethernet_network_group_policy.org
       ] && jsondecode(i.additional_properties).Name == each.value.ethernet_network_group_policy.name][0]
@@ -398,7 +392,7 @@ resource "intersight_fabric_uplink_role" "port_role_ethernet_uplinks" {
     }
     content {
       moid = length(regexall(each.value.flow_control_policy.org, each.value.organization)
-        ) > 0 ? intersight_fabric_flow_control_policy.flow_control[each.value.flow_control_policy.name
+        ) > 0 ? intersight_fabric_flow_control_policy.map[each.value.flow_control_policy.name
         ].moid : [for i in data.intersight_search_search_item.flow_control[0].results : i.moid if jsondecode(
           i.additional_properties).Organization.Moid == local.orgs[each.value.flow_control_policy.org
       ] && jsondecode(i.additional_properties).Name == each.value.flow_control_policy.name][0]
@@ -411,7 +405,7 @@ resource "intersight_fabric_uplink_role" "port_role_ethernet_uplinks" {
     }
     content {
       moid = length(regexall(each.value.link_control_policy.org, each.value.organization)
-        ) > 0 ? intersight_fabric_link_control_policy.link_control[each.value.link_control_policy.name
+        ) > 0 ? intersight_fabric_link_control_policy.map[each.value.link_control_policy.name
         ].moid : [for i in data.intersight_search_search_item.link_control[0].results : i.moid if jsondecode(
           i.additional_properties).Organization.Moid == local.orgs[each.value.link_control_policy.org
       ] && jsondecode(i.additional_properties).Name == each.value.link_control_policy.name][0]
@@ -433,10 +427,10 @@ resource "intersight_fabric_uplink_role" "port_role_ethernet_uplinks" {
 # GUI Location: Policies > Create Policy > Port > Port Roles > FC Uplink
 #________________________________________________________________________
 
-resource "intersight_fabric_fc_storage_role" "port_role_fc_storage" {
+resource "intersight_fabric_fc_storage_role" "map" {
   depends_on = [
-    intersight_fabric_port_policy.port,
-    intersight_fabric_port_mode.port_modes
+    intersight_fabric_port_policy.map,
+    intersight_fabric_port_mode.map
   ]
   for_each          = local.port_role_fc_storage
   admin_speed       = each.value.admin_speed
@@ -445,7 +439,7 @@ resource "intersight_fabric_fc_storage_role" "port_role_fc_storage" {
   slot_id           = lookup(each.value, "slot_id", 1)
   vsan_id           = each.value.vsan_id
   port_policy {
-    moid = intersight_fabric_port_policy.port[each.value.port_policy].moid
+    moid = intersight_fabric_port_policy.map[each.value.port_policy].moid
   }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
@@ -463,10 +457,10 @@ resource "intersight_fabric_fc_storage_role" "port_role_fc_storage" {
 # GUI Location: Policies > Create Policy > Port > Port Roles > FC Uplink
 #________________________________________________________________________
 
-resource "intersight_fabric_fc_uplink_role" "port_role_fc_uplinks" {
+resource "intersight_fabric_fc_uplink_role" "map" {
   depends_on = [
-    intersight_fabric_port_policy.port,
-    intersight_fabric_port_mode.port_modes
+    intersight_fabric_port_policy.map,
+    intersight_fabric_port_mode.map
   ]
   for_each          = local.port_role_fc_uplinks
   admin_speed       = each.value.admin_speed
@@ -476,7 +470,7 @@ resource "intersight_fabric_fc_uplink_role" "port_role_fc_uplinks" {
   slot_id           = lookup(each.value, "slot_id", 1)
   vsan_id           = each.value.vsan_id
   port_policy {
-    moid = intersight_fabric_port_policy.port[each.value.port_policy].moid
+    moid = intersight_fabric_port_policy.map[each.value.port_policy].moid
   }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
@@ -494,9 +488,9 @@ resource "intersight_fabric_fc_uplink_role" "port_role_fc_uplinks" {
 # GUI Location: Policies > Create Policy > Port > Port Roles > Configure > Ethernet Uplink
 #__________________________________________________________________________________________
 
-resource "intersight_fabric_fcoe_uplink_role" "port_role_fcoe_uplinks" {
+resource "intersight_fabric_fcoe_uplink_role" "map" {
   depends_on = [
-    intersight_fabric_port_policy.port
+    intersight_fabric_port_policy.map
   ]
   for_each          = local.port_role_fcoe_uplinks
   admin_speed       = each.value.admin_speed
@@ -505,7 +499,7 @@ resource "intersight_fabric_fcoe_uplink_role" "port_role_fcoe_uplinks" {
   port_id           = each.value.port_id
   slot_id           = lookup(each.value, "slot_id", 1)
   port_policy {
-    moid = intersight_fabric_port_policy.port[each.value.port_policy].moid
+    moid = intersight_fabric_port_policy.map[each.value.port_policy].moid
   }
   dynamic "link_control_policy" {
     for_each = {
@@ -514,7 +508,7 @@ resource "intersight_fabric_fcoe_uplink_role" "port_role_fcoe_uplinks" {
     }
     content {
       moid = length(regexall(each.value.link_control_policy.org, each.value.organization)
-        ) > 0 ? intersight_fabric_link_control_policy.link_control[each.value.link_control_policy.name
+        ) > 0 ? intersight_fabric_link_control_policy.map[each.value.link_control_policy.name
         ].moid : [for i in data.intersight_search_search_item.link_control[0].results : i.moid if jsondecode(
           i.additional_properties).Organization.Moid == local.orgs[each.value.link_control_policy.org
       ] && jsondecode(i.additional_properties).Name == each.value.link_control_policy.name][0]
@@ -536,9 +530,9 @@ resource "intersight_fabric_fcoe_uplink_role" "port_role_fcoe_uplinks" {
 # GUI Location: Policies > Create Policy > Port > Port Roles > Server
 #_____________________________________________________________________
 
-resource "intersight_fabric_server_role" "port_role_servers" {
+resource "intersight_fabric_server_role" "map" {
   depends_on = [
-    intersight_fabric_port_policy.port
+    intersight_fabric_port_policy.map
   ]
   for_each                  = local.port_role_servers
   aggregate_port_id         = lookup(each.value, "breakout_port_id", 0)
@@ -549,7 +543,7 @@ resource "intersight_fabric_server_role" "port_role_servers" {
   preferred_device_type     = lookup(each.value, "connected_device_type", "Auto") # Chassis, RackServer
   slot_id                   = lookup(each.value, "slot_id", 1)
   port_policy {
-    moid = intersight_fabric_port_policy.port[each.value.port_policy].moid
+    moid = intersight_fabric_port_policy.map[each.value.port_policy].moid
   }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }

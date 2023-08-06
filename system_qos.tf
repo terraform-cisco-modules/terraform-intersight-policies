@@ -4,9 +4,9 @@
 # GUI Location: Policies > Create Policy > System QoS
 #__________________________________________________________________
 
-resource "intersight_fabric_system_qos_policy" "system_qos" {
+resource "intersight_fabric_system_qos_policy" "map" {
   for_each    = local.system_qos
-  description = lookup(each.value, "description", "${each.value.name} System QoS Policy.")
+  description = coalesce(each.value.description, "${each.value.name} System QoS Policy.")
   name        = each.value.name
   organization {
     moid        = local.orgs[each.value.organization]

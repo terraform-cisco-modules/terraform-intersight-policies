@@ -14,36 +14,36 @@ data "intersight_iam_account" "account" {
 #  }
 #}
 
-resource "intersight_softwarerepository_authorization" "auth" {
-  for_each        = { for v in ["cco_auth"] : v => v if length(lookup(local.policies, "firmware", {})) > 0 }
-  password        = var.cco_password
+resource "intersight_softwarerepository_authorization" "map" {
+  for_each        = { for v in [lookup(local.policies, "firmware_authenticate", {})] : "cco_auth" => merge(local.fw, v) }
+  password        = var.firmware.cco_password[each.value.cco_password]
   repository_type = "Cisco"
-  user_id         = var.cco_user
+  user_id         = var.firmware.cco_user[each.value.cco_user]
   account {
     object_type = "iam.Account"
     moid        = data.intersight_iam_account.account.results[0].moid
   }
 }
 
-resource "intersight_firmware_policy" "fw" {
+resource "intersight_firmware_policy" "map" {
   for_each    = local.firmware
-  description = lookup(each.value, "description", "${each.value.name} Firmware Policy.")
-  exclude_component_list = anytrue(
+  description = coalesce(each.value.description, "${each.value.name} Firmware Policy.")
+  exclude_component_list = [for e in [each.value.advanced_mode] : anytrue(
     [
-      each.value.advanced_mode.exclude_drives,
-      each.value.advanced_mode.exclude_drives_except_boot_drives,
-      each.value.advanced_mode.exclude_storage_controllers,
-      each.value.advanced_mode.exclude_storage_sas_expander,
-      each.value.advanced_mode.exclude_storage_u2
+      e.exclude_drives,
+      e.exclude_drives_except_boot_drives,
+      e.exclude_storage_controllers,
+      e.exclude_storage_sas_expander,
+      e.exclude_storage_u2
     ]
     ) ? compact(concat([
-      length(regexall(true, each.value.advanced_mode.exclude_drives)) > 0 ? "local-disk" : ""], [
-      length(regexall(true, each.value.advanced_mode.exclude_drives_except_boot_drives)) > 0 ? "local-disk" : ""], [
-      length(regexall(true, each.value.advanced_mode.exclude_storage_controllers)) > 0 ? "storage-controller" : ""], [
-      length(regexall(true, each.value.advanced_mode.exclude_storage_sas_expander)) > 0 ? "storage-sasexpander" : ""], [
-      length(regexall(true, each.value.advanced_mode.exclude_storage_u2)) > 0 ? "storage-u2" : ""
-  ])) : ["none"]
-  name            = "${local.name_prefix.firmware}${each.key}${local.name_suffix.firmware}"
+      length(regexall(true, e.exclude_drives)) > 0 ? "local-disk" : ""], [
+      length(regexall(true, e.exclude_drives_except_boot_drives)) > 0 ? "local-disk" : ""], [
+      length(regexall(true, e.exclude_storage_controllers)) > 0 ? "storage-controller" : ""], [
+      length(regexall(true, e.exclude_storage_sas_expander)) > 0 ? "storage-sasexpander" : ""], [
+      length(regexall(true, e.exclude_storage_u2)) > 0 ? "storage-u2" : ""
+  ])) : ["none"]][0]
+  name            = each.value.name
   target_platform = lookup(each.value, "target_platform", local.fw.target_platform)
   organization {
     moid        = local.orgs[var.organization]

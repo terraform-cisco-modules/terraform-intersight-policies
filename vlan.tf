@@ -4,9 +4,9 @@
 # GUI Location: Policies > Create Policy > VLAN
 #__________________________________________________________________
 
-resource "intersight_fabric_eth_network_policy" "vlan" {
+resource "intersight_fabric_eth_network_policy" "map" {
   for_each    = local.vlan
-  description = lookup(each.value, "description", "${each.value.name} VLAN Policy.")
+  description = coalesce(each.value.description, "${each.value.name} VLAN Policy.")
   name        = each.value.name
   organization {
     moid        = local.orgs[each.value.organization]
@@ -27,11 +27,11 @@ resource "intersight_fabric_eth_network_policy" "vlan" {
 # GUI Location: Policies > Create Policy > VLAN Policy > Add VLANs
 #__________________________________________________________________
 
-resource "intersight_fabric_vlan" "vlans" {
+resource "intersight_fabric_vlan" "map" {
   depends_on = [
-    intersight_fabric_multicast_policy.multicast,
     data.intersight_search_search_item.multicast,
-    intersight_fabric_eth_network_policy.vlan
+    intersight_fabric_multicast_policy.map,
+    intersight_fabric_eth_network_policy.map
   ]
   for_each              = { for k, v in local.vlans : k => v if v.vlan_id > 0 && v.vlan_id < 4094 }
   auto_allow_on_uplinks = each.value.auto_allow_on_uplinks
@@ -52,11 +52,11 @@ resource "intersight_fabric_vlan" "vlans" {
   ) > 0 ? "Primary" : each.value.primary_vlan_id > 0 ? each.value.sharing_type : "None"
   vlan_id = each.value.vlan_id
   eth_network_policy {
-    moid = intersight_fabric_eth_network_policy.vlan[each.value.vlan_policy].moid
+    moid = intersight_fabric_eth_network_policy.map[each.value.vlan_policy].moid
   }
   multicast_policy {
     moid = length(regexall(each.value.multicast_policy.org, each.value.organization)
-      ) > 0 ? intersight_fabric_multicast_policy.multicast[each.value.multicast_policy.name
+      ) > 0 ? intersight_fabric_multicast_policy.map[each.value.multicast_policy.name
       ].moid : [for i in data.intersight_search_search_item.multicast[0].results : i.moid if jsondecode(
         i.additional_properties).Organization.Moid == local.orgs[each.value.multicast_policy.org
     ] && jsondecode(i.additional_properties).Name == each.value.multicast_policy.name][0]

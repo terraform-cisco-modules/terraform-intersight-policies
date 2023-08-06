@@ -4,18 +4,20 @@
 # GUI Location: Policies > Create Policy > Thermal
 #__________________________________________________________________
 
-resource "intersight_thermal_policy" "thermal" {
-  for_each = { for v in lookup(local.policies, "thermal", []) : v.name => v }
-  description = lookup(
-  each.value, "description", "${local.name_prefix.thermal}${each.key}${local.name_suffix.thermal} Thermal Policy.")
-  fan_control_mode = lookup(each.value, "fan_control_mode", local.defaults.thermal.fan_control_mode)
-  name             = "${local.name_prefix.thermal}${each.key}${local.name_suffix.thermal}"
+resource "intersight_thermal_policy" "map" {
+  for_each = { for v in lookup(local.policies, "thermal", []) : v.name => merge(local.defaults.thermal, v, {
+    name = "${local.name_prefix.thermal}${v.name}${local.name_suffix.thermal}"
+    tags = lookup(v, "tags", var.tags)
+  }) }
+  description      = coalesce(each.value.description, "${each.value.name} Thermal Policy.")
+  fan_control_mode = each.value.fan_control_mode
+  name             = each.value.name
   organization {
     moid        = local.orgs[var.organization]
     object_type = "organization.Organization"
   }
   dynamic "tags" {
-    for_each = { for v in lookup(each.value, "tags", var.tags) : v.key => v }
+    for_each = { for v in each.value.tags : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value

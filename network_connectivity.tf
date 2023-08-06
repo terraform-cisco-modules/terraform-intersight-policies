@@ -4,11 +4,11 @@
 # GUI Location: Policies > Create Policy > Network Connectivity
 #__________________________________________________________________
 
-resource "intersight_networkconfig_policy" "network_connectivity" {
+resource "intersight_networkconfig_policy" "map" {
   for_each                 = local.network_connectivity
   alternate_ipv4dns_server = length(each.value.dns_servers_v4) > 1 ? each.value.dns_servers_v4[1] : "0.0.0.0"
   alternate_ipv6dns_server = length(each.value.dns_servers_v6) > 1 ? each.value.dns_servers_v6[1] : "::"
-  description              = lookup(each.value, "description", "${each.value.name} Network Connectivity Policy.")
+  description              = coalesce(each.value.description, "${each.value.name} Network Connectivity Policy.")
   dynamic_dns_domain       = each.value.update_domain
   enable_dynamic_dns       = each.value.enable_dynamic_dns
   enable_ipv4dns_from_dhcp = each.value.obtain_ipv4_dns_from_dhcp

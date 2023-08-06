@@ -4,14 +4,14 @@
 # GUI Location: Policies > Create Policy > Boot Order
 #__________________________________________________________________
 
-resource "intersight_boot_precision_policy" "boot_order" {
+resource "intersight_boot_precision_policy" "map" {
   depends_on = [
-    intersight_vnic_lan_connectivity_policy.lan_connectivity,
-    intersight_vnic_eth_if.vnics
+    intersight_vnic_lan_connectivity_policy.map,
+    intersight_vnic_eth_if.map
   ]
   for_each                 = local.boot_order
   configured_boot_mode     = each.value.boot_mode
-  description              = lookup(each.value, "description", "${each.value.name} BIOS Policy.")
+  description              = coalesce(each.value.description, "${each.value.name} Boot Order Policy.")
   enforce_uefi_secure_boot = each.value.enable_secure_boot
   name                     = each.value.name
   organization {

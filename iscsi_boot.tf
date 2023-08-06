@@ -4,13 +4,13 @@
 # GUI Location: Policies > Create Policy > iSCSI Boot
 #__________________________________________________________________
 
-resource "intersight_vnic_iscsi_boot_policy" "iscsi_boot" {
+resource "intersight_vnic_iscsi_boot_policy" "map" {
   depends_on = [
     data.intersight_search_search_item.ip,
     data.intersight_search_search_item.iscsi_adapter,
     data.intersight_search_search_item.iscsi_static_target,
-    intersight_vnic_iscsi_adapter_policy.iscsi_adapter,
-    intersight_vnic_iscsi_static_target_policy.iscsi_static_target
+    intersight_vnic_iscsi_adapter_policy.map,
+    intersight_vnic_iscsi_static_target_policy.map
   ]
   for_each               = { for k, v in local.iscsi_boot : k => v }
   auto_targetvendor_name = each.value.dhcp_vendor_id_iqn
@@ -20,7 +20,7 @@ resource "intersight_vnic_iscsi_boot_policy" "iscsi_boot" {
       class_id              = "vnic.IscsiAuthProfile"
       is_password_set       = null
       object_type           = "vnic.IscsiAuthProfile"
-      password              = var.iscsi_boot_password
+      password              = var.iscsi_boot.password[each.value.password]
       user_id               = each.value.username
     }
     ] : each.value.target_source_type == "Static" ? [
@@ -33,7 +33,7 @@ resource "intersight_vnic_iscsi_boot_policy" "iscsi_boot" {
       user_id               = ""
     }
   ] : null
-  description         = lookup(each.value, "description", "${each.value.name} iSCSI Boot Policy.")
+  description         = coalesce(each.value.description, "${each.value.name} iSCSI Boot Policy.")
   initiator_ip_source = each.value.target_source_type == "Auto" ? "DHCP" : each.value.initiator_ip_source
   initiator_static_ip_v4_address = length(regexall("Static", each.value.initiator_ip_source)
   ) > 0 ? each.value.initiator_static_ip_v4_config.ip_address : ""
@@ -54,7 +54,7 @@ resource "intersight_vnic_iscsi_boot_policy" "iscsi_boot" {
       class_id              = "vnic.IscsiAuthProfile"
       is_password_set       = null
       object_type           = "vnic.IscsiAuthProfile"
-      password              = var.iscsi_boot_password
+      password              = var.iscsi_boot.password[each.value.password]
       user_id               = each.value.username
     }
     ] : each.value.target_source_type == "Static" ? [
@@ -93,7 +93,7 @@ resource "intersight_vnic_iscsi_boot_policy" "iscsi_boot" {
     }
     content {
       moid = length(regexall(each.value.iscsi_adapter_policy.org, each.value.organization)
-        ) > 0 ? intersight_vnic_iscsi_adapter_policy.iscsi_adapter[each.value.iscsi_adapter_policy.name
+        ) > 0 ? intersight_vnic_iscsi_adapter_policy.map[each.value.iscsi_adapter_policy.name
         ].moid : [for i in data.intersight_search_search_item.iscsi_adapter[0].results : i.moid if jsondecode(
           i.additional_properties).Organization.Moid == local.orgs[each.value.iscsi_adapter_policy.org
       ] && jsondecode(i.additional_properties).Name == each.value.iscsi_adapter_policy.name][0]
@@ -106,7 +106,7 @@ resource "intersight_vnic_iscsi_boot_policy" "iscsi_boot" {
     }
     content {
       moid = length(regexall(each.value.primary_target_policy.org, each.value.organization)
-        ) > 0 ? intersight_vnic_iscsi_static_target_policy.iscsi_static_target[each.value.primary_target_policy.name
+        ) > 0 ? intersight_vnic_iscsi_static_target_policy.map[each.value.primary_target_policy.name
         ].moid : [for i in data.intersight_search_search_item.iscsi_static_target[0].results : i.moid if jsondecode(
           i.additional_properties).Organization.Moid == local.orgs[each.value.primary_target_policy.org
       ] && jsondecode(i.additional_properties).Name == each.value.primary_target_policy.name][0]
@@ -119,7 +119,7 @@ resource "intersight_vnic_iscsi_boot_policy" "iscsi_boot" {
     }
     content {
       moid = length(regexall(each.value.secondary_target_policy.org, each.value.organization)
-        ) > 0 ? intersight_vnic_iscsi_static_target_policy.iscsi_static_target[each.value.secondary_target_policy.name
+        ) > 0 ? intersight_vnic_iscsi_static_target_policy.map[each.value.secondary_target_policy.name
         ].moid : [for i in data.intersight_search_search_item.iscsi_static_target[0].results : i.moid if jsondecode(
           i.additional_properties).Organization.Moid == local.orgs[each.value.secondary_target_policy.org
       ] && jsondecode(i.additional_properties).Name == each.value.secondary_target_policy.name][0]

@@ -4,13 +4,14 @@
 # GUI Location: Policies > Create Policy > Switch Control
 #__________________________________________________________________
 
-resource "intersight_fabric_switch_control_policy" "switch_control" {
-  for_each                       = local.switch_control
-  description                    = lookup(each.value, "description", "${each.value.name} Switch Control Policy.")
-  ethernet_switching_mode        = each.value.ethernet_switching_mode
-  fc_switching_mode              = each.value.fc_switching_mode
-  name                           = each.value.name
-  reserved_vlan_start_id         = each.value.reserved_vlan_start_id
+resource "intersight_fabric_switch_control_policy" "map" {
+  for_each                = local.switch_control
+  description             = coalesce(each.value.description, "${each.value.name} Switch Control Policy.")
+  ethernet_switching_mode = each.value.ethernet_switching_mode
+  fc_switching_mode       = each.value.fc_switching_mode
+  name                    = each.value.name
+  reserved_vlan_start_id  = each.value.reserved_vlan_start_id
+  #
   vlan_port_optimization_enabled = each.value.vlan_port_count_optimization
   mac_aging_settings {
     mac_aging_option = each.value.mac_address_table_aging

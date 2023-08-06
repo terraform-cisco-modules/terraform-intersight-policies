@@ -4,9 +4,9 @@
 # GUI Location: Policies > Create Policy > Local User
 #__________________________________________________________________
 
-resource "intersight_iam_end_point_user_policy" "local_user" {
+resource "intersight_iam_end_point_user_policy" "map" {
   for_each    = local.local_user
-  description = lookup(each.value, "description", "${each.value.name} Local User Policy.")
+  description = coalesce(each.value.description, "${each.value.name} Local User Policy.")
   name        = each.value.name
   password_properties {
     enable_password_expiry   = each.value.password_properties.enable_password_expiry
@@ -35,9 +35,9 @@ resource "intersight_iam_end_point_user_policy" "local_user" {
 # GUI Location: Policies > Create Policy > Local User > Add New User
 #____________________________________________________________________
 
-resource "intersight_iam_end_point_user" "users" {
+resource "intersight_iam_end_point_user" "map" {
   depends_on = [
-    intersight_iam_end_point_user_policy.local_user
+    intersight_iam_end_point_user_policy.map
   ]
   for_each = local.users
   name     = each.value.name
@@ -47,32 +47,24 @@ resource "intersight_iam_end_point_user" "users" {
   }
 }
 
-resource "intersight_iam_end_point_user_role" "user_role" {
+resource "intersight_iam_end_point_user_role" "map" {
   depends_on = [
-    data.intersight_iam_end_point_role.roles,
-    intersight_iam_end_point_user.users
+    data.intersight_iam_end_point_role.map,
+    intersight_iam_end_point_user.map
   ]
   for_each = local.users
   enabled  = each.value.enabled
-  password = length(
-    regexall("^1$", each.value.password)
-    ) > 0 ? var.local_user_password_1 : length(
-    regexall("^2$", each.value.password)
-    ) > 0 ? var.local_user_password_2 : length(
-    regexall("^3$", each.value.password)
-    ) > 0 ? var.local_user_password_3 : length(
-    regexall("^4$", each.value.password)
-  ) > 0 ? var.local_user_password_4 : var.local_user_password_5
+  password = var.local_user.password[each.value.password]
   end_point_role {
-    moid        = data.intersight_iam_end_point_role.roles[each.value.role].results[0].moid
+    moid        = data.intersight_iam_end_point_role.map[each.value.role].results[0].moid
     object_type = "iam.EndPointRole"
   }
   end_point_user {
-    moid        = intersight_iam_end_point_user.users[each.key].moid
+    moid        = intersight_iam_end_point_user.map[each.key].moid
     object_type = "iam.EndPointUser"
   }
   end_point_user_policy {
-    moid        = intersight_iam_end_point_user_policy.local_user[each.value.local_user].moid
+    moid        = intersight_iam_end_point_user_policy.map[each.value.local_user].moid
     object_type = "iam.EndPointUserPolicy"
   }
 }

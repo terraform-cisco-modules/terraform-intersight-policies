@@ -4,38 +4,30 @@
 # GUI Location: Policies > Create Policy > Ethernet Network Control
 #__________________________________________________________________
 
-resource "intersight_fabric_eth_network_control_policy" "ethernet_network_control" {
-  for_each = { for v in lookup(local.policies, "ethernet_network_control", []) : v.name => v }
-  cdp_enabled = lookup(
-    each.value, "cdp_enable", local.defaults.ethernet_network_control.cdp_enable
-  )
-  description = lookup(
-  each.value, "description", "${local.name_prefix.ethernet_network_control}${each.key}${local.name_suffix.ethernet_network_control} Ethernet Network Control Policy.")
-  forge_mac = lookup(
-    each.value, "mac_security_forge", local.defaults.ethernet_network_control.mac_security_forge
-  )
-  mac_registration_mode = lookup(
-    each.value, "mac_register_mode", local.defaults.ethernet_network_control.mac_register_mode
-  )
-  name = "${local.name_prefix.ethernet_network_control}${each.key}${local.name_suffix.ethernet_network_control}"
-  uplink_fail_action = lookup(
-    each.value, "action_on_uplink_fail", local.defaults.ethernet_network_control.action_on_uplink_fail
-  )
+resource "intersight_fabric_eth_network_control_policy" "map" {
+  for_each = { for v in lookup(
+    local.policies, "ethernet_network_control", []) : v.name => merge(local.defaults.ethernet_network_control, v, {
+      name = "${local.name_prefix.ethernet_network_control}${v.name}${local.name_suffix.ethernet_network_control}"
+      tags = lookup(v, "tags", var.tags)
+    })
+  }
+  cdp_enabled           = each.value.cdp_enable
+  description           = coalesce(each.value.description, "${each.value.name} Ethernet Network Control Policy.")
+  forge_mac             = each.value.mac_security_forge
+  name                  = each.value.name
+  mac_registration_mode = each.value.mac_register_mode
+  uplink_fail_action    = each.value.action_on_uplink_fail
   lldp_settings {
-    object_type = "fabric.LldpSettings"
-    receive_enabled = lookup(
-      each.value, "lldp_enable_receive", local.defaults.ethernet_network_control.lldp_enable_receive
-    )
-    transmit_enabled = lookup(
-      each.value, "lldp_enable_transmit", local.defaults.ethernet_network_control.lldp_enable_transmit
-    )
+    object_type      = "fabric.LldpSettings"
+    receive_enabled  = each.value.lldp_enable_receive
+    transmit_enabled = each.value.lldp_enable_transmit
   }
   organization {
     moid        = local.orgs[var.organization]
     object_type = "organization.Organization"
   }
   dynamic "tags" {
-    for_each = { for v in lookup(each.value, "tags", var.tags) : v.key => v }
+    for_each = { for v in each.value.tags : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value

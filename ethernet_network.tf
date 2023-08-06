@@ -4,23 +4,26 @@
 # GUI Location: Policies > Create Policy > Ethernet Network
 #__________________________________________________________________
 
-resource "intersight_vnic_eth_network_policy" "ethernet_network" {
-  for_each = { for v in lookup(local.policies, "ethernet_network", []) : v.name => v }
-  description = lookup(
-  each.value, "description", "${local.name_prefix.ethernet_network}${each.key}${local.name_suffix.ethernet_network} Ethernet Network Policy.")
-  name = "${local.name_prefix.ethernet_network}${each.key}${local.name_suffix.ethernet_network}"
+resource "intersight_vnic_eth_network_policy" "map" {
+  for_each = { for v in lookup(local.policies, "ethernet_network", []) : v.name => merge(local.defaults.ethernet_network, v, {
+    name = "${local.name_prefix.ethernet_network}${v.name}${local.name_suffix.ethernet_network}"
+    tags = lookup(v, "tags", var.tags)
+    }
+  ) }
+  description = coalesce(each.value.description, "${each.value.name} Ethernet Network Policy.")
+  name        = each.value.name
   organization {
     moid        = local.orgs[var.organization]
     object_type = "organization.Organization"
   }
   vlan_settings {
     allowed_vlans = "" # CSCvx98712.  This is no longer valid for the policy
-    default_vlan  = lookup(each.value, "default_vlan", local.defaults.ethernet_network.default_vlan)
-    mode          = lookup(each.value, "vlan_mode", local.defaults.ethernet_network.vlan_mode)
+    default_vlan  = each.value.default_vlan
+    mode          = each.value.vlan_mode
     object_type   = "vnic.VlanSettings"
   }
   dynamic "tags" {
-    for_each = { for v in lookup(each.value, "tags", var.tags) : v.key => v }
+    for_each = { for v in each.value.tags : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value

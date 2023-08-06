@@ -4,30 +4,28 @@
 # GUI Location: Policies > Create Policy > Certificate Management
 #__________________________________________________________________
 
-resource "intersight_certificatemanagement_policy" "certificate_management" {
+resource "intersight_certificatemanagement_policy" "map" {
   for_each    = local.certificate_management
-  description = lookup(each.value, "description", "${each.value.name} Certificate Management Policy.")
+  description = coalesce(each.value.description, "${each.value.name} Certificate Management Policy.")
   name        = each.value.name
   organization {
     moid        = local.orgs[var.organization]
     object_type = "organization.Organization"
   }
-  certificates {
-    certificate {
-      pem_certificate = length(
-        regexall("1", tostring(each.value.certificate))) > 0 ? base64encode(var.cert_mgmt_certificate_1) : length(
-        regexall("2", tostring(each.value.certificate))) > 0 ? base64encode(var.cert_mgmt_certificate_2) : length(
-        regexall("3", tostring(each.value.certificate))) > 0 ? base64encode(var.cert_mgmt_certificate_3) : length(
-        regexall("4", tostring(each.value.certificate))) > 0 ? base64encode(var.cert_mgmt_certificate_4) : length(
-      regexall("5", tostring(each.value.certificate))) > 0 ? base64encode(var.cert_mgmt_certificate_5) : null
+  dynamic "certificates" {
+    for_each = { for k, v in each.value.certificates : k => v }
+    content {
+      certificate { additional_properties = jsonencode({
+        PemCertificate = base64encode(var.certificate_management.certificate[certificates.value.id])
+      }) }
+      additional_properties = certificates.value.type == "IMC" ? jsonencode({
+        CertType   = certificates.value.cert_type
+        Privatekey = base64encode(var.certificate_management.private_key[certificates.value.id])
+      }) : jsonencode({ CertificateName = certificates.value.name })
+      enabled = certificates.value.enabled
+      object_type = length(regexall("RootCA", certificates.value.type)
+      ) > 0 ? "certificatemanagement.RootCaCertificate" : "certificatemanagement.Imc"
     }
-    enabled = true
-    privatekey = length(
-      regexall("1", tostring(each.value.private_key))) > 0 ? base64encode(var.cert_mgmt_private_key_1) : length(
-      regexall("2", tostring(each.value.private_key))) > 0 ? base64encode(var.cert_mgmt_private_key_2) : length(
-      regexall("3", tostring(each.value.private_key))) > 0 ? base64encode(var.cert_mgmt_private_key_3) : length(
-      regexall("4", tostring(each.value.private_key))) > 0 ? base64encode(var.cert_mgmt_private_key_4) : length(
-    regexall("5", tostring(each.value.private_key))) > 0 ? base64encode(var.cert_mgmt_private_key_5) : null
   }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }

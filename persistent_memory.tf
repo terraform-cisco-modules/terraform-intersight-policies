@@ -4,9 +4,9 @@
 # GUI Location: Policies > Create Policy > Persistent Memory
 #__________________________________________________________________
 
-resource "intersight_memory_persistent_memory_policy" "persistent_memory" {
+resource "intersight_memory_persistent_memory_policy" "map" {
   for_each          = local.persistent_memory
-  description       = lookup(each.value, "description", "${each.value.name} Persistent Memory Policy.")
+  description       = coalesce(each.value.description, "${each.value.name} Persistent Memory Policy.")
   management_mode   = each.value.management_mode
   name              = each.value.name
   retain_namespaces = each.value.retain_namespaces
@@ -23,12 +23,12 @@ resource "intersight_memory_persistent_memory_policy" "persistent_memory" {
   dynamic "local_security" {
     for_each = {
       for v in compact([each.value.name]
-      ) : each.value.name => v if each.value.secure_passphrase == true
+      ) : each.value.name => v if length(var.persistent_memory.passphrase[each.value.passphrase]) > 0
     }
     content {
       object_type       = "memory.PersistentMemoryLocalSecurity"
-      enabled           = each.value.persistent_passphrase != "" ? true : false
-      secure_passphrase = each.value.persistent_passphrase
+      enabled           = length(var.persistent_memory.passphrase[each.value.passphrase]) > 0 ? true : false
+      secure_passphrase = var.persistent_memory.passphrase[each.value.passphrase]
     }
   }
   dynamic "logical_namespaces" {

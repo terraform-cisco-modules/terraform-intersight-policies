@@ -1,6 +1,6 @@
-resource "intersight_bios_policy" "bios" {
+resource "intersight_bios_policy" "map" {
   for_each    = local.bios
-  description = lookup(each.value, "description", "${each.value.name} BIOS Policy.")
+  description = coalesce(each.value.description, "${each.value.name} BIOS Policy.")
   name        = each.value.name
   #+++++++++++++++++++++++++++++++
   # Boot Options Section

@@ -4,9 +4,9 @@
 # GUI Location: Policies > Create Policy > Virtual Media
 #__________________________________________________________________
 
-resource "intersight_vmedia_policy" "virtual_media" {
+resource "intersight_vmedia_policy" "map" {
   for_each      = local.virtual_media
-  description   = lookup(each.value, "description", "${each.value.name} Virtual Media Policy.")
+  description   = coalesce(each.value.description, "${each.value.name} Virtual Media Policy.")
   enabled       = each.value.enable_virtual_media
   encryption    = each.value.enable_virtual_media_encryption
   low_power_usb = each.value.enable_low_power_usb
@@ -19,25 +19,20 @@ resource "intersight_vmedia_policy" "virtual_media" {
     for_each = { for v in each.value.add_virtual_media : v.name => v }
     content {
       additional_properties   = ""
-      authentication_protocol = lookup(mappings.value, "authentication_protocol", local.lvm_add.authentication_protocol)
+      authentication_protocol = mappings.value.authentication_protocol
       class_id                = "vmedia.Mapping"
-      device_type             = lookup(mappings.value, "device_type", local.lvm_add.device_type)
+      device_type             = mappings.value.device_type
       file_location           = mappings.value.file_location
       host_name               = ""
-      mount_options           = lookup(mappings.value, "mount_options", local.lvm_add.mount_options)
-      mount_protocol          = lookup(mappings.value, "protocol", local.lvm_add.protocol)
+      mount_options           = mappings.value.mount_options
+      mount_protocol          = mappings.value.protocol
       object_type             = "vmedia.Mapping"
-      password = length(
-        regexall("5", lookup(mappings.value, "password", 0))) > 0 ? var.vmedia_password_5 : length(
-        regexall("4", lookup(mappings.value, "password", 0))) > 0 ? var.vmedia_password_4 : length(
-        regexall("3", lookup(mappings.value, "password", 0))) > 0 ? var.vmedia_password_3 : length(
-        regexall("2", lookup(mappings.value, "password", 0))) > 0 ? var.vmedia_password_2 : length(
-        regexall("1", lookup(mappings.value, "password", 0))
-      ) > 0 ? var.vmedia_password_1 : ""
-      remote_file = ""
-      remote_path = ""
-      username    = lookup(mappings.value, "username", local.lvm_add.mount_options)
-      volume_name = mappings.value.name
+      password                = length(compact([mappings.value.username])
+      ) > 0 ? var.virtual_media.password[mappings.value.password] : ""
+      remote_file             = ""
+      remote_path             = ""
+      username                = mappings.value.username
+      volume_name             = mappings.value.name
     }
   }
   dynamic "tags" {

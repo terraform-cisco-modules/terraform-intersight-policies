@@ -4,9 +4,9 @@
 # GUI Location: Policies > Create Policy > NTP
 #__________________________________________________________________
 
-resource "intersight_ntp_policy" "ntp" {
+resource "intersight_ntp_policy" "map" {
   for_each    = local.ntp
-  description = lookup(each.value, "description", "${each.value.name} NTP Policy.")
+  description = coalesce(each.value.description, "${each.value.name} NTP Policy.")
   enabled     = each.value.enabled
   name        = each.value.name
   ntp_servers = each.value.ntp_servers

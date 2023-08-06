@@ -4,10 +4,10 @@
 # GUI Location: Policies > Create Policy > Storage
 #__________________________________________________________________
 
-resource "intersight_storage_storage_policy" "storage" {
+resource "intersight_storage_storage_policy" "map" {
   for_each                 = local.storage
   default_drive_mode       = each.value.default_drive_state
-  description              = lookup(each.value, "description", "${each.value.name} Storage Policy.")
+  description              = coalesce(each.value.description, "${each.value.name} Storage Policy.")
   global_hot_spares        = each.value.global_hot_spares
   name                     = each.value.name
   unused_disks_state       = each.value.unused_disks_state
@@ -54,19 +54,19 @@ resource "intersight_storage_storage_policy" "storage" {
 # GUI Location: Policies > Create Policy > Storage: Drive Group
 #__________________________________________________________________
 
-resource "intersight_storage_drive_group" "drive_groups" {
+resource "intersight_storage_drive_group" "map" {
   depends_on = [
-    intersight_storage_storage_policy.storage
+    intersight_storage_storage_policy.map
   ]
   for_each   = local.drive_groups
   name       = each.value.name
   raid_level = each.value.raid_level
   storage_policy {
-    moid = intersight_storage_storage_policy.storage[each.value.storage_policy].moid
+    moid = intersight_storage_storage_policy.map[each.value.storage_policy].moid
     # object_type = "organization.Organization"
   }
   dynamic "automatic_drive_group" {
-    for_each = toset(each.value.automatic_drive_group)
+    for_each = { for k, v in each.value.automatic_drive_group : k => merge(local.ldga, v) }
     content {
       class_id = "storage.ManualDriveGroup"
       drives_per_span = lookup(
@@ -76,28 +76,24 @@ resource "intersight_storage_drive_group" "drive_groups" {
           ) > 0 ? 3 : length(regexall("^Raid6[0]$", each.value.raid_level)
         ) > 0 ? 4 : 2
       )
-      drive_type         = lookup(automatic_drive_group.value, "drive_type", local.ldga.drive_type)
-      minimum_drive_size = lookup(automatic_drive_group.value, "minimum_drive_size", local.ldga.minimum_drive_size)
-      num_dedicated_hot_spares = lookup(
-        automatic_drive_group.value, "num_dedicated_hot_spares", local.ldga.num_dedicated_hot_spares
-      )
+      drive_type               = automatic_drive_group.value.drive_type
+      minimum_drive_size       = automatic_drive_group.value.minimum_drive_size
+      num_dedicated_hot_spares = automatic_drive_group.value.num_dedicated_hot_spares
       number_of_spans = lookup(
         automatic_drive_group.value, "number_of_spans", length(regexall("^Raid(0|1|5|6)$", each.value.raid_level)
           ) > 0 ? 1 : length(regexall("^Raid(1|5|6)0?$", each.value.raid_level)
         ) > 0 ? 2 : 1
       )
       object_type          = "storage.ManualDriveGroup"
-      use_remaining_drives = lookup(automatic_drive_group.value, "use_remaining_drives", local.ldga.use_remaining_drives)
+      use_remaining_drives = automatic_drive_group.value.use_remaining_drives
     }
   }
   dynamic "manual_drive_group" {
-    for_each = toset(each.value.manual_drive_group)
+    for_each = { for k, v in each.value.manual_drive_group : k => merge(local.ldgm, v) }
     content {
-      class_id = "storage.ManualDriveGroup"
-      dedicated_hot_spares = lookup(
-        manual_drive_group.value, "dedicated_hot_spares", local.ldgm.dedicated_hot_spares
-      )
-      object_type = "storage.ManualDriveGroup"
+      class_id             = "storage.ManualDriveGroup"
+      dedicated_hot_spares = manual_drive_group.value.dedicated_hot_spares
+      object_type          = "storage.ManualDriveGroup"
       span_groups = [
         for sg in manual_drive_group.value.drive_array_spans : {
           additional_properties = ""
@@ -116,19 +112,18 @@ resource "intersight_storage_drive_group" "drive_groups" {
     }
   }
   dynamic "virtual_drives" {
-    for_each = { for v in each.value.virtual_drives : v.name => v }
+    for_each = { for v in each.value.virtual_drives : v.name => merge(local.ldgv, v, {
+      virtual_drive_policy = merge(local.ldgv.virtual_drive_policy, lookup(v, "virtual_drive_policy", {}))
+    }) }
     content {
       additional_properties = ""
-      boot_drive            = lookup(virtual_drives.value, "boot_drive", local.ldgv.boot_drive)
+      boot_drive            = virtual_drives.value.boot_drive
       class_id              = "storage.VirtualDriveConfiguration"
-      expand_to_available   = lookup(virtual_drives.value, "expand_to_available", local.ldgv.expand_to_available)
+      expand_to_available   = virtual_drives.value.expand_to_available
       name                  = virtual_drives.key
       object_type           = "storage.VirtualDriveConfiguration"
-      size                  = lookup(virtual_drives.value, "size", local.ldgv.size)
-      virtual_drive_policy = [merge(merge(
-        local.ldgv.virtual_drive_policy, lookup(
-        virtual_drives.value, "virtual_drive_policy", local.ldgv.virtual_drive_policy)
-        ), {
+      size                  = virtual_drives.value.size
+      virtual_drive_policy = [merge(virtual_drives.value.virtual_drive_policy, {
         additional_properties = ""
         class_id              = "storage.VirtualDrivePolicy"
         object_type           = "storage.VirtualDrivePolicy"

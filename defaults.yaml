@@ -496,11 +496,13 @@ policies:
       value: ''
   certificate_management:
     assigned_sensitive_data: false
-    enabled: true
-    certificate: 0
+    certificates:
+      enabled: true
+      cert_type: None
+      type: IMC
+      variable_id: 1
     description: ''
     name: '**REQUIRED**'
-    private_key: 0
     tags:
       key: ''
       value: ''
@@ -515,6 +517,7 @@ policies:
     assigned_sensitive_data: false
     description: ''
     name: '**REQUIRED**'
+    password: 1
     primary_kmip_server:
       ip_address_hostname: '**REQUIRED**'
       port: 5696
@@ -523,6 +526,7 @@ policies:
       ip_address_hostname: ''
       port: 5696
       timeout: 60
+    server_public_root_ca_certificate: 1
     username: ''
   ethernet_adapter:
     adapter_template: 'EMTPY'
@@ -684,6 +688,8 @@ policies:
       exclude_storage_controllers: false
       exclude_storage_sas_expander: false
       exclude_storage_u2: false
+    cco_password: 1
+    cco_user: 1
     description: ''
     name: '**REQUIRED**'
     models:
@@ -716,6 +722,7 @@ policies:
   ipmi_over_lan:
     description: ''
     enabled: true
+    encryption_key: 1
     name: '**REQUIRED**'
     privilege: admin
     tags:
@@ -742,11 +749,12 @@ policies:
       primary_dns: '' # Optional
       secondary_dns: '' # Optional
     name: '**REQUIRED**'
+    password: 1
+    primary_target_policy: ''
+    secondary_target_policy: ''
     tags:
       key: ''
       value: ''
-    primary_target_policy: ''
-    secondary_target_policy: ''
     target_source_type: Auto
     username: ''
   iscsi_static_target:
@@ -810,6 +818,7 @@ policies:
     binding_parameters:
       bind_dn: ''
       bind_method: LoginCredentials
+      password: 1
     description: ''
     enable_encryption: false
     enable_group_authorization: false
@@ -1015,6 +1024,7 @@ policies:
       name: '**REQUIRED**'
       socket_id: 2
       socket_memory_id: 'Not Applicable'
+    passphrase: 1
     retain_namespaces: true
     tags:
       key: ''
@@ -1188,7 +1198,7 @@ policies:
       key: ''
       value: ''
   snmp:
-    access_community_string: 0 # value between 1 and 5 to specify the TF_VAR_snmp_access_community_string_[1-5]
+    access_community_string: 1
     enable_snmp: true
     description: ''
     name: '**REQUIRED**'
@@ -1196,17 +1206,17 @@ policies:
     snmp_engine_input_id: ''
     snmp_port: 161
     snmp_trap_destinations: # Optional List of Maps
-      community_string: 0 # value between 1 and 5 to specify the TF_VAR_snmp_trap_community_string_[1-5] for snmpv2c
+      community_string: 1 # value between 1 and 5 to specify the TF_VAR_snmp_trap_community_string_[1-5] for snmpv2c
       destination_address: '**REQUIRED**'
       enable: true
       port: 162
       trap_type: Trap # Inform or Trap
-      user: '**REQUIRED for snmpv3**'
+      user: ''
     snmp_users: # Optional List of Maps
-      auth_password: 0 # value between 1 and 5 to specify the TF_VAR_snmp_auth_password_[1-5]
+      auth_password: 1 # value between 1 and 5 to specify the TF_VAR_snmp_auth_password_[1-5]
       auth_type: SHA # MD5 or SHA
       name: '**REQUIRED**' # Name of snmp user.
-      privacy_password: 0 # Required for AuthPriv.  value between 1 and 5 to specify the TF_VAR_snmp_privacy_password_[1-5]
+      privacy_password: 1 # Required for AuthPriv.  value between 1 and 5 to specify the TF_VAR_snmp_privacy_password_[1-5]
       privacy_type: AES # Optional. AES or DES if privacy password is defined
       security_level: AuthPriv # AuthNoPriv, AuthPriv, NoAuthPriv
     system_contact: ''
@@ -1214,7 +1224,7 @@ policies:
     tags:
       key: ''
       value: ''
-    trap_community_string: 0 # value between 1 and 5 to specify the TF_VAR_snmp_auth_password_[1-5]
+    trap_community_string: 1 # value between 1 and 5 to specify the TF_VAR_snmp_auth_password_[1-5]
   ssh:
     description: ''
     enable_ssh: true
@@ -1421,7 +1431,7 @@ policies:
       mount_options: ''
       name: '**REQUIRED**'
       protocol: https
-      password: 0
+      password: 1
       username: ''
     description: ''
     enable_low_power_usb: true

@@ -4,9 +4,9 @@
 # GUI Location: Policies > Create Policy > Adapter Configuration
 #_________________________________________________________________
 
-resource "intersight_adapter_config_policy" "adapter_configuration" {
+resource "intersight_adapter_config_policy" "map" {
   for_each    = local.adapter_configuration
-  description = lookup(each.value, "description", "${each.value.name} Adapter Configuration Policy.")
+  description = coalesce(each.value.description, "${each.value.name} Adapter Configuration Policy.")
   name        = each.value.name
   organization {
     moid        = local.orgs[each.value.organization]

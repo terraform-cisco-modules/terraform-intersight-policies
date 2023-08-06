@@ -4,7 +4,7 @@
 # GUI Location: Policies > Create Policy > Fibre Channel Adapter
 #__________________________________________________________________
 
-resource "intersight_vnic_fc_adapter_policy" "fibre_channel_adapter" {
+resource "intersight_vnic_fc_adapter_policy" "map" {
   for_each = local.fibre_channel_adapter
   description = length(
     regexall("(FCNVMeInitiator)", each.value.adapter_template)) > 0 ? "Recommended adapter settings for FCNVMeInitiator." : length(

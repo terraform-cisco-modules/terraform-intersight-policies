@@ -4,12 +4,12 @@
 # GUI Location: Policies > Create Policy > IMC Access
 #__________________________________________________________________
 
-resource "intersight_access_policy" "imc_access" {
+resource "intersight_access_policy" "map" {
   depends_on = [
     data.intersight_search_search_item.ip
   ]
   for_each    = { for k, v in local.imc_access : k => v }
-  description = lookup(each.value, "description", "${each.value.name} IMC Access Policy.")
+  description = coalesce(each.value.description, "${each.value.name} IMC Access Policy.")
   inband_vlan = each.value.inband_vlan_id
   name        = each.value.name
   address_type {

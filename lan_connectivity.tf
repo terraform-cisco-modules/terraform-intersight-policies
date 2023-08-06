@@ -4,12 +4,12 @@
 # GUI Location: Policies > Create Policy > LAN Connectivity
 #__________________________________________________________________
 
-resource "intersight_vnic_lan_connectivity_policy" "lan_connectivity" {
+resource "intersight_vnic_lan_connectivity_policy" "map" {
   depends_on = [
     data.intersight_search_search_item.iqn
   ]
   for_each            = local.lan_connectivity
-  description         = lookup(each.value, "description", "${each.value.name} LAN Connectivity Policy.")
+  description         = coalesce(each.value.description, "${each.value.name} LAN Connectivity Policy.")
   azure_qos_enabled   = each.value.enable_azure_stack_host_qos
   iqn_allocation_type = each.value.iqn_allocation_type
   name                = each.value.name
@@ -47,7 +47,7 @@ resource "intersight_vnic_lan_connectivity_policy" "lan_connectivity" {
 # GUI Location: Configure > Policies > Create Policy > LAN Connectivity
 #_________________________________________________________________________
 
-resource "intersight_vnic_eth_if" "vnics" {
+resource "intersight_vnic_eth_if" "map" {
   depends_on = [
     data.intersight_search_search_item.ethernet_adapter,
     data.intersight_search_search_item.ethernet_network,
@@ -55,13 +55,13 @@ resource "intersight_vnic_eth_if" "vnics" {
     data.intersight_search_search_item.ethernet_network_group,
     data.intersight_search_search_item.ethernet_qos,
     data.intersight_search_search_item.iscsi_boot,
-    intersight_fabric_eth_network_control_policy.ethernet_network_control,
-    intersight_fabric_eth_network_group_policy.ethernet_network_group,
-    intersight_vnic_lan_connectivity_policy.lan_connectivity,
-    intersight_vnic_eth_adapter_policy.ethernet_adapter,
-    intersight_vnic_eth_network_policy.ethernet_network,
-    intersight_vnic_eth_qos_policy.ethernet_qos,
-    intersight_vnic_iscsi_boot_policy.iscsi_boot,
+    intersight_fabric_eth_network_control_policy.map,
+    intersight_fabric_eth_network_group_policy.map,
+    intersight_vnic_lan_connectivity_policy.map,
+    intersight_vnic_eth_adapter_policy.map,
+    intersight_vnic_eth_network_policy.map,
+    intersight_vnic_eth_qos_policy.map,
+    intersight_vnic_iscsi_boot_policy.map,
   ]
   for_each         = local.vnics
   failover_enabled = each.value.enable_failover
@@ -77,7 +77,7 @@ resource "intersight_vnic_eth_if" "vnics" {
   eth_adapter_policy {
     moid = length(regexall(false, var.moids_policies)) > 0 && length(regexall(
       each.value.ethernet_adapter_policy.org, each.value.organization)
-      ) > 0 ? intersight_vnic_eth_adapter_policy.ethernet_adapter[each.value.ethernet_adapter_policy.name
+      ) > 0 ? intersight_vnic_eth_adapter_policy.map[each.value.ethernet_adapter_policy.name
       ].moid : [for i in data.intersight_search_search_item.ethernet_adapter[0].results : i.moid if jsondecode(
         i.additional_properties).Organization.Moid == local.orgs[each.value.ethernet_adapter_policy.org
     ] && jsondecode(i.additional_properties).Name == each.value.ethernet_adapter_policy.name][0]
@@ -85,7 +85,7 @@ resource "intersight_vnic_eth_if" "vnics" {
   eth_qos_policy {
     moid = length(regexall(false, var.moids_policies)) > 0 && length(regexall(
       each.value.ethernet_qos_policy.org, each.value.organization)
-      ) > 0 ? intersight_vnic_eth_qos_policy.ethernet_qos[each.value.ethernet_qos_policy.name
+      ) > 0 ? intersight_vnic_eth_qos_policy.map[each.value.ethernet_qos_policy.name
       ].moid : [for i in data.intersight_search_search_item.ethernet_qos[0].results : i.moid if jsondecode(
         i.additional_properties).Organization.Moid == local.orgs[each.value.ethernet_qos_policy.org
     ] && jsondecode(i.additional_properties).Name == each.value.ethernet_qos_policy.name][0]
@@ -93,14 +93,14 @@ resource "intersight_vnic_eth_if" "vnics" {
   fabric_eth_network_control_policy {
     moid = length(regexall(false, var.moids_policies)) > 0 && length(regexall(
       each.value.ethernet_network_control_policy.org, each.value.organization)
-      ) > 0 ? intersight_fabric_eth_network_control_policy.ethernet_network_control[
+      ) > 0 ? intersight_fabric_eth_network_control_policy.map[
       each.value.ethernet_network_control_policy.name
       ].moid : [for i in data.intersight_search_search_item.ethernet_network_control[0].results : i.moid if jsondecode(
         i.additional_properties).Organization.Moid == local.orgs[each.value.ethernet_network_control_policy.org
     ] && jsondecode(i.additional_properties).Name == each.value.ethernet_network_control_policy.name][0]
   }
   lan_connectivity_policy {
-    moid = intersight_vnic_lan_connectivity_policy.lan_connectivity[each.value.lan_connectivity].moid
+    moid = intersight_vnic_lan_connectivity_policy.map[each.value.lan_connectivity].moid
   }
   placement {
     id        = each.value.placement.slot_id
@@ -114,7 +114,7 @@ resource "intersight_vnic_eth_if" "vnics" {
     usnic_adapter_policy = length(regexall("UNUSED", each.value.usnic_settings.usnic_adapter_policy.name)
       ) == 0 ? length(regexall(false, var.moids_policies)) > 0 && length(regexall(
       each.value.usnic_settings.usnic_adapter_policy.org, each.value.organization)
-      ) > 0 ? intersight_vnic_eth_adapter_policy.ethernet_adapter[each.value.usnic_settings.usnic_adapter_policy.name
+      ) > 0 ? intersight_vnic_eth_adapter_policy.map[each.value.usnic_settings.usnic_adapter_policy.name
       ].moid : [for i in data.intersight_search_search_item.ethernet_adapter[0].results : i.moid if jsondecode(
         i.additional_properties).Organization.Moid == local.orgs[each.value.usnic_adapter_policy.org
     ] && jsondecode(i.additional_properties).Name == each.value.usnic_settings.usnic_adapter_policy.name][0] : ""
@@ -127,7 +127,7 @@ resource "intersight_vnic_eth_if" "vnics" {
     num_sub_vnics       = each.value.vmq_settings.number_of_sub_vnics
     vmmq_adapter_policy = length(regexall("UNUSED", each.value.vmq_settings.vmmq_adapter_policy.name)
       ) == 0 ? length(regexall(each.value.vmq_settings.vmmq_adapter_policy.org, each.value.organization)
-      ) > 0 ? intersight_vnic_eth_adapter_policy.ethernet_adapter[each.value.vmq_settings.vmmq_adapter_policy.name
+      ) > 0 ? intersight_vnic_eth_adapter_policy.map[each.value.vmq_settings.vmmq_adapter_policy.name
       ].moid : [for i in data.intersight_search_search_item.ethernet_adapter[0].results : i.moid if jsondecode(
         i.additional_properties).Organization.Moid == local.orgs[each.value.vmq_settings.vmmq_adapter_policy.org
     ] && jsondecode(i.additional_properties).Name == each.value.vmq_settings.vmmq_adapter_policy.name][0] : ""
@@ -138,7 +138,7 @@ resource "intersight_vnic_eth_if" "vnics" {
     }
     content {
       moid = length(regexall(each.value.ethernet_network_policy.org, each.value.organization)
-        ) > 0 ? intersight_vnic_eth_network_policy.ethernet_network[each.value.ethernet_network_policy.name
+        ) > 0 ? intersight_vnic_eth_network_policy.map[each.value.ethernet_network_policy.name
         ].moid : [for i in data.intersight_search_search_item.ethernet_network[0].results : i.moid if jsondecode(
           i.additional_properties).Organization.Moid == local.orgs[each.value.ethernet_network_policy.org
       ] && jsondecode(i.additional_properties).Name == each.value.ethernet_network_policy.name][0]
@@ -151,7 +151,7 @@ resource "intersight_vnic_eth_if" "vnics" {
     }
     content {
       moid = length(regexall(each.value.ethernet_network_group_policy.org, each.value.organization)
-        ) > 0 ? intersight_fabric_eth_network_group_policy.ethernet_network_group[
+        ) > 0 ? intersight_fabric_eth_network_group_policy.map[
         each.value.ethernet_network_group_policy.name
         ].moid : [for i in data.intersight_search_search_item.ethernet_network_group[0].results : i.moid if jsondecode(
           i.additional_properties).Organization.Moid == local.orgs[each.value.ethernet_network_group_policy.org
@@ -164,7 +164,7 @@ resource "intersight_vnic_eth_if" "vnics" {
     }
     content {
       moid = length(regexall(each.value.ethernet_network_control_policy.org, each.value.organization)
-        ) > 0 ? intersight_fabric_eth_network_control_policy.ethernet_network_control[
+        ) > 0 ? intersight_fabric_eth_network_control_policy.map[
         each.value.ethernet_network_control_policy.name
         ].moid : [for i in data.intersight_search_search_item.iscsi_boot[0].results : i.moid if jsondecode(
           i.additional_properties).Organization.Moid == local.orgs[each.value.iscsi_boot_policy.org

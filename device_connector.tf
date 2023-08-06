@@ -4,20 +4,20 @@
 # GUI Location: Policies > Create Policy > Device Connector
 #__________________________________________________________________
 
-resource "intersight_deviceconnector_policy" "device_connector" {
-  for_each = { for v in lookup(local.policies, "device_connector", []) : v.name => v }
-  description = lookup(
-  each.value, "description", "${local.name_prefix.device_connector}${each.key}${local.name_suffix.device_connector} Device Connector Policy.")
-  lockout_enabled = lookup(
-    each.value, "configuration_lockout", local.defaults.device_connector.configuration_lockout
-  )
-  name = "${local.name_prefix.certificate_management}${each.key}${local.name_suffix.certificate_management}"
+resource "intersight_deviceconnector_policy" "map" {
+  for_each = { for v in lookup(local.policies, "device_connector", []) : v.name => merge(local.defaults.device_connector, v, {
+    name = "${local.name_prefix.device_connector}${v.name}${local.name_suffix.device_connector}"
+    tags = lookup(v, "tags", var.tags
+  ) }) }
+  description     = coalesce(each.value.description, "${each.value.name} Device Connector Policy.")
+  lockout_enabled = each.value.configuration_lockout
+  name            = each.value.name
   organization {
     moid        = local.orgs[var.organization]
     object_type = "organization.Organization"
   }
   dynamic "tags" {
-    for_each = { for v in lookup(each.value, "tags", var.tags) : v.key => v }
+    for_each = { for v in each.value.tags : v.key => v }
     content {
       key   = tags.value.key
       value = tags.value.value

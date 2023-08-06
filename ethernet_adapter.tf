@@ -4,7 +4,7 @@
 # GUI Location: Policies > Create Policy > Ethernet Adapter
 #__________________________________________________________________
 
-resource "intersight_vnic_eth_adapter_policy" "ethernet_adapter" {
+resource "intersight_vnic_eth_adapter_policy" "map" {
   for_each = local.ethernet_adapter
   advanced_filter = length(regexall("EMPTY", each.value.adapter_template)
   ) == 0 ? false : each.value.enable_geneve_offload == true ? false : each.value.enable_advanced_filter

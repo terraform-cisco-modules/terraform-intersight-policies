@@ -14,13 +14,16 @@ locals {
     for v in local.port_role_ethernet_uplinks : v.ethernet_network_group_policy.name if v.ethernet_network_group_policy.name != "UNUSED"], [
     for v in local.vnics : v.ethernet_network_group_policy.name if v.ethernet_network_group_policy.name != "UNUSED"]
   )))
+  eng = local.defaults.ethernet_network_group
   fc_adapt = local.defaults.fibre_channel_adapter
+  fcn      = local.defaults.fibre_channel_network
   flow_ctrl = distinct(compact(concat([
     for v in local.port_channel_ethernet_uplinks : v.flow_control_policy.name if v.flow_control_policy.name != "UNUSED"], [
     for v in local.port_role_ethernet_uplinks : v.flow_control_policy.name if v.flow_control_policy.name != "UNUSED"]
   )))
   fw    = local.defaults.firmware
   iboot = local.defaults.iscsi_boot
+  ipmi  = local.defaults.ipmi_over_lan
   ip_pools = distinct(compact(concat([
     for v in local.imc_access : v.inband_ip_pool.name if v.inband_ip_pool.name != "UNUSED"], [
     for v in local.imc_access : v.out_of_band_ip_pool.name if v.out_of_band_ip_pool.name != "UNUSED"], [
@@ -417,11 +420,11 @@ locals {
   # GUI Location: Policies > Create Policy > Ethernet Adapter
   #__________________________________________________________________
   certificate_management = {
-    for v in lookup(local.policies, "certificate_management", []) : v.name => merge(
-      local.cert_mgmt, v, {
-        name         = "${local.name_prefix.certificate_management}${v.name}${local.name_suffix.certificate_management}"
-        organization = var.organization
-        tags         = lookup(v, "tags", var.tags)
+    for v in lookup(local.policies, "certificate_management", []) : v.name => merge(local.cert_mgmt, v, {
+      certificates = [for e in lookup(v, "certificates", []) : merge(local.cert_mgmt.certificates, e)]
+      name         = "${local.name_prefix.certificate_management}${v.name}${local.name_suffix.certificate_management}"
+      organization = var.organization
+      tags         = lookup(v, "tags", var.tags)
     }) if lookup(v, "assigned_sensitive_data", false) == true
   }
 
@@ -496,6 +499,7 @@ locals {
   firmware = {
     for v in lookup(local.policies, "firmware", []) : v.name => merge(local.fw, v, {
       advanced_mode = merge(local.fw.advanced_mode, lookup(v, "advanced_mode", {}))
+      name          = "${local.name_prefix.firmware}${v.name}${local.name_suffix.firmware}"
       tags          = lookup(v, "tags", var.tags)
     })
   }
@@ -672,43 +676,26 @@ locals {
   # GUI Location: Policies > Create Policy > LDAP
   #__________________________________________________________________
   ldap = {
-    for v in lookup(local.policies, "ldap", []) : v.name => {
-      base_settings = {
+    for v in lookup(local.policies, "ldap", []) : v.name => merge(local.lldap, v, {
+      base_settings = merge(local.lldap.base_settings, lookup(v, "base_settings", {}), {
         base_dn = length(compact([lookup(v.base_settings, "base_dn", "")])
         ) == 0 ? "DC=${join(",DC=", split(".", v.base_settings.domain))}" : v.base_settings.base_dn
-        domain  = v.base_settings.domain
-        timeout = lookup(v.base_settings, "timeout", local.lldap.base_settings.timeout)
-      }
-      binding_parameters = {
-        bind_dn     = lookup(v.binding_parameters, "bind_dn", local.lldap.binding_parameters.bind_dn)
-        bind_method = lookup(v.binding_parameters, "timeout", local.lldap.binding_parameters.bind_method)
-      }
-      binding_parameters_password = var.binding_parameters_password
-      description                 = lookup(v, "description", "")
-      enable_encryption           = lookup(v, "enable_encryption", local.lldap.enable_encryption)
-      enable_group_authorization = lookup(
-        v, "enable_group_authorization", local.lldap.enable_group_authorization
-      )
-      enable_ldap    = lookup(v, "enable_ldap", local.lldap.enable_ldap)
-      ldap_from_dns  = merge(local.lldap.ldap_from_dns, lookup(v, "ldap_from_dns", {}))
-      ldap_groups    = lookup(v, "ldap_groups", [])
-      ldap_providers = lookup(v, "ldap_providers", [])
-      name           = "${local.name_prefix.ldap}${v.name}${local.name_suffix.ldap}"
-      nested_group_search_depth = lookup(
-        v, "nested_group_search_depth", local.lldap.nested_group_search_depth
-      )
-      organization      = var.organization
-      search_parameters = merge(local.lldap.search_parameters, lookup(v, "search_parameters", {}))
-      tags              = lookup(v, "tags", var.tags)
-      user_search_precedence = lookup(
-        v, "user_search_precedence", local.lldap.user_search_precedence
-      )
-    }
+        domain = v.base_settings.domain
+      })
+      binding_parameters = merge(local.lldap.binding_parameters, lookup(v, "binding_parameters", {}))
+      ldap_from_dns      = merge(local.lldap.ldap_from_dns, lookup(v, "ldap_from_dns", {}))
+      ldap_groups        = lookup(v, "ldap_groups", [])
+      ldap_providers     = lookup(v, "ldap_providers", [])
+      name               = "${local.name_prefix.ldap}${v.name}${local.name_suffix.ldap}"
+      organization       = var.organization
+      search_parameters  = merge(local.lldap.search_parameters, lookup(v, "search_parameters", {}))
+      tags               = lookup(v, "tags", var.tags)
+    })
   }
   ldap_groups = { for i in flatten([
     for key, value in local.ldap : [
       for v in value.ldap_groups : {
-        domain        = lookup(v, "domain", "")
+        domain        = value.base_settings.domain
         base_settings = value.base_settings
         ldap_policy   = key
         name          = v.name
@@ -827,10 +814,8 @@ locals {
       persistent_memory_type = lookup(
         v, "persistent_memory_type", local.lpmem.persistent_memory_type
       )
-      persistent_passphrase = var.persistent_passphrase
-      retain_namespaces     = lookup(v, "retain_namespaces", local.lpmem.retain_namespaces)
-      secure_passphrase     = var.persistent_passphrase != "" ? true : false
-      tags                  = lookup(v, "tags", var.tags)
+      retain_namespaces = lookup(v, "retain_namespaces", local.lpmem.retain_namespaces)
+      tags              = lookup(v, "tags", var.tags)
     }
   }
 
@@ -1461,22 +1446,21 @@ locals {
   # GUI Location: Configure > Policies > Create Policy > SNMP
   #_________________________________________________________________________
   snmp = {
-    for v in lookup(local.policies, "snmp", []) : v.name => {
-      access_community_string = lookup(v, "access_community_string", 0)
-      description             = lookup(v, "description", "")
-      enable_snmp             = lookup(v, "enable_snmp", local.lsnmp.enable_snmp)
-      name                    = "${local.name_prefix.snmp}${v.name}${local.name_suffix.snmp}"
-      organization            = var.organization
-      snmp_community_access   = lookup(v, "snmp_community_access", local.lsnmp.snmp_community_access)
-      snmp_engine_input_id    = lookup(v, "snmp_engine_input_id", local.lsnmp.snmp_engine_input_id)
-      snmp_port               = lookup(v, "snmp_port", local.lsnmp.snmp_port)
-      snmp_trap_destinations  = lookup(v, "snmp_trap_destinations", [])
-      snmp_users              = lookup(v, "snmp_users", [])
-      system_contact          = lookup(v, "system_contact", local.lsnmp.system_contact)
-      system_location         = lookup(v, "system_location", local.lsnmp.system_location)
-      tags                    = lookup(v, "tags", var.tags)
-      trap_community_string   = lookup(v, "trap_community_string", 0)
-    }
+    for v in lookup(local.policies, "snmp", []) : v.name => merge(local.lsnmp, v, {
+      name         = "${local.name_prefix.snmp}${v.name}${local.name_suffix.snmp}"
+      organization = var.organization
+      snmp_trap_destinations = [
+        for e in lookup(v, "snmp_trap_destinations", []) : merge(local.lsnmp.snmp_trap_destinations, e)
+      ]
+      snmp_users = [for e in lookup(v, "snmp_users", []) : merge(local.lsnmp.snmp_users, e)]
+      v2_enabled = compact(flatten([[
+        for k in keys(var.snmp.access_community_string) : var.snmp.access_community_string[k] if length(
+        var.snmp.access_community_string[k]) > 0], [
+        for k in keys(var.snmp.trap_community_string) : var.snmp.trap_community_string[k] if length(
+        var.snmp.trap_community_string[k]) > 0
+      ]]))
+      tags = lookup(v, "tags", var.tags)
+    })
   }
 
   #_________________________________________________________________________
@@ -1596,18 +1580,14 @@ locals {
   # GUI Location: Configure > Policies > Create Policy > Virtual Media
   #_________________________________________________________________________
   virtual_media = {
-    for v in lookup(local.policies, "virtual_media", []) : v.name => {
-      add_virtual_media    = lookup(v, "add_virtual_media", [])
-      description          = lookup(v, "description", "")
-      enable_low_power_usb = lookup(v, "enable_low_power_usb", local.vmedia.enable_low_power_usb)
-      enable_virtual_media = lookup(v, "enable_virtual_media", local.vmedia.enable_virtual_media)
-      enable_virtual_media_encryption = lookup(
-        v, "enable_virtual_media_encryption", local.vmedia.enable_virtual_media_encryption
-      )
+    for v in lookup(local.policies, "virtual_media", []) : v.name => merge(local.vmedia, v, {
+      add_virtual_media = [
+        for e in lookup(v, "add_virtual_media", {}) : merge(local.vmedia.add_virtual_media, e)
+      ]
       name         = "${local.name_prefix.virtual_media}${v.name}${local.name_suffix.virtual_media}"
       organization = var.organization
       tags         = lookup(v, "tags", var.tags)
-    }
+    })
   }
 
   #_________________________________________________________________________

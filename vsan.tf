@@ -4,9 +4,9 @@
 # GUI Location: Policies > Create Policy > VSAN
 #__________________________________________________________________
 
-resource "intersight_fabric_fc_network_policy" "vsan" {
+resource "intersight_fabric_fc_network_policy" "map" {
   for_each        = local.vsan
-  description     = lookup(each.value, "description", "${each.value.name} VSAN Policy.")
+  description     = coalesce(each.value.description, "${each.value.name} VSAN Policy.")
   enable_trunking = each.value.uplink_trunking
   name            = each.value.name
   organization {
@@ -28,9 +28,9 @@ resource "intersight_fabric_fc_network_policy" "vsan" {
 # GUI Location: Policies > Create Policy > VSAN > Add VSAN
 #__________________________________________________________________
 
-resource "intersight_fabric_vsan" "vsans" {
+resource "intersight_fabric_vsan" "map" {
   depends_on = [
-    intersight_fabric_fc_network_policy.vsan
+    intersight_fabric_fc_network_policy.map
   ]
   for_each       = local.vsans
   default_zoning = each.value.default_zoning
@@ -47,6 +47,6 @@ resource "intersight_fabric_vsan" "vsans" {
   vsan_id    = each.value.vsan_id
   vsan_scope = each.value.vsan_scope
   fc_network_policy {
-    moid = intersight_fabric_fc_network_policy.vsan[each.value.vsan_policy].moid
+    moid = intersight_fabric_fc_network_policy.map[each.value.vsan_policy].moid
   }
 }
