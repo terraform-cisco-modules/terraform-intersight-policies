@@ -27,12 +27,12 @@ resource "intersight_vmedia_policy" "map" {
       mount_options           = mappings.value.mount_options
       mount_protocol          = mappings.value.protocol
       object_type             = "vmedia.Mapping"
-      password                = length(compact([mappings.value.username])
+      password = length(compact([mappings.value.username])
       ) > 0 ? var.virtual_media.password[mappings.value.password] : ""
-      remote_file             = ""
-      remote_path             = ""
-      username                = mappings.value.username
-      volume_name             = mappings.value.name
+      remote_file = ""
+      remote_path = ""
+      username    = mappings.value.username
+      volume_name = mappings.value.name
     }
   }
   dynamic "tags" {

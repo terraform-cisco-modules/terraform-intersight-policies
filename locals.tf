@@ -14,7 +14,7 @@ locals {
     for v in local.port_role_ethernet_uplinks : v.ethernet_network_group_policy.name if v.ethernet_network_group_policy.name != "UNUSED"], [
     for v in local.vnics : v.ethernet_network_group_policy.name if v.ethernet_network_group_policy.name != "UNUSED"]
   )))
-  eng = local.defaults.ethernet_network_group
+  eng      = local.defaults.ethernet_network_group
   fc_adapt = local.defaults.fibre_channel_adapter
   fcn      = local.defaults.fibre_channel_network
   flow_ctrl = distinct(compact(concat([
