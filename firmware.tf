@@ -15,7 +15,8 @@ data "intersight_iam_account" "account" {
 #}
 
 resource "intersight_softwarerepository_authorization" "map" {
-  for_each        = { for v in [lookup(local.policies, "firmware_authenticate", {})] : "cco_auth" => merge(local.fw, v) }
+  for_each = { for v in [lookup(local.policies, "firmware_authenticate", {})] : "cco_auth" => merge(local.fw, v
+  ) if length(lookup(local.policies, "firmware_authenticate", {})) > 0 }
   password        = local.ps.firmware.cco_password[each.value.cco_password]
   repository_type = "Cisco"
   user_id         = local.ps.firmware.cco_user[each.value.cco_user]
