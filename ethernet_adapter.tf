@@ -103,7 +103,7 @@ resource "intersight_vnic_eth_adapter_policy" "map" {
   tx_queue_settings {
     nr_count = length(regexall(true, each.value.enable_geneve_offload)) > 0 ? 1 : length(
       regexall("EMPTY", each.value.adapter_template)
-    ) == 0 ? lookup(local.eth_settings[each.value.adapter_template], "rx_queue_count", 4) : each.value.transmit.queue_count
+    ) == 0 ? lookup(local.eth_settings[each.value.adapter_template], "tx_queue_count", 4) : each.value.transmit.queue_count
     ring_size = length(regexall(true, each.value.enable_geneve_offload)) > 0 ? 4096 : length(
       regexall("(Win-AzureStack)", each.value.adapter_template)
     ) > 0 ? 1024 : each.value.transmit.ring_size

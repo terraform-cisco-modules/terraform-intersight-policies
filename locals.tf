@@ -220,7 +220,7 @@ locals {
       comp_count  = 8, int_count = 12, tx_queue_count = 4
     }
     VMware = { description = "Recommended adapter settings for VMware."
-      comp_count = 2, int_count = 4
+      comp_count = 2, int_count = 4, tx_queue_count = 1
     }
     Win-AzureStack = {
       description = "Recommended adapter settings for Azure Stack."
