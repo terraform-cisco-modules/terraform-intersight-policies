@@ -5,7 +5,14 @@
 #__________________________________________________________________
 
 resource "intersight_vmedia_policy" "map" {
-  for_each      = local.virtual_media
+  for_each = {
+    for v in lookup(local.policies, "virtual_media", []) : v.name => merge(local.vmedia, v, {
+      add_virtual_media = [for e in lookup(v, "add_virtual_media", {}) : merge(local.vmedia.add_virtual_media, e)]
+      name              = "${local.npfx.virtual_media}${v.name}${local.nsfx.virtual_media}"
+      organization      = local.organization
+      tags              = lookup(v, "tags", var.policies.global_settings.tags)
+    })
+  }
   description   = coalesce(each.value.description, "${each.value.name} Virtual Media Policy.")
   enabled       = each.value.enable_virtual_media
   encryption    = each.value.enable_virtual_media_encryption
@@ -28,7 +35,7 @@ resource "intersight_vmedia_policy" "map" {
       mount_protocol          = mappings.value.protocol
       object_type             = "vmedia.Mapping"
       password = length(compact([mappings.value.username])
-      ) > 0 ? var.virtual_media.password[mappings.value.password] : ""
+      ) > 0 ? local.ps.virtual_media.password[mappings.value.password] : ""
       remote_file = ""
       remote_path = ""
       username    = mappings.value.username

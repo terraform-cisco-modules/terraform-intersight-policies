@@ -5,7 +5,13 @@
 #__________________________________________________________________
 
 resource "intersight_ntp_policy" "map" {
-  for_each    = local.ntp
+  for_each = {
+    for v in lookup(local.policies, "ntp", []) : v.name => merge(local.defaults.ntp, v, {
+      name         = "${local.npfx.ntp}${v.name}${local.nsfx.ntp}"
+      organization = local.organization
+      tags         = lookup(v, "tags", var.policies.global_settings.tags)
+    })
+  }
   description = coalesce(each.value.description, "${each.value.name} NTP Policy.")
   enabled     = each.value.enabled
   name        = each.value.name

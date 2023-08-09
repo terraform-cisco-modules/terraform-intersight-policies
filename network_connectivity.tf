@@ -5,7 +5,14 @@
 #__________________________________________________________________
 
 resource "intersight_networkconfig_policy" "map" {
-  for_each                 = local.network_connectivity
+  for_each = {
+    for v in lookup(
+      local.policies, "network_connectivity", []) : v.name => merge(local.defaults.network_connectivity, v, {
+        name         = "${local.npfx.network_connectivity}${v.name}${local.nsfx.network_connectivity}"
+        organization = local.organization
+        tags         = lookup(v, "tags", var.policies.global_settings.tags)
+    })
+  }
   alternate_ipv4dns_server = length(each.value.dns_servers_v4) > 1 ? each.value.dns_servers_v4[1] : "0.0.0.0"
   alternate_ipv6dns_server = length(each.value.dns_servers_v6) > 1 ? each.value.dns_servers_v6[1] : "::"
   description              = coalesce(each.value.description, "${each.value.name} Network Connectivity Policy.")

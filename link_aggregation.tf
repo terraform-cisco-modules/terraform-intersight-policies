@@ -7,14 +7,14 @@
 resource "intersight_fabric_link_aggregation_policy" "map" {
   for_each = { for v in lookup(local.policies, "link_aggregation", []) : v.name => merge(local.defaults.link_aggregation, v, {
     name = "${local.name_prefix.link_aggregation}${v.name}${local.name_suffix.link_aggregation}"
-    tags = lookup(v, "tags", var.tags)
+    tags = lookup(v, "tags", var.policies.global_settings.tags)
   }) }
   description        = coalesce(each.value.description, "${each.value.name} Link Aggregation Policy.")
   lacp_rate          = each.value.lacp_rate
   name               = each.value.name
   suspend_individual = each.value.suspend_individual
   organization {
-    moid        = local.orgs[var.organization]
+    moid        = local.orgs[local.organization]
     object_type = "organization.Organization"
   }
   dynamic "tags" {

@@ -7,13 +7,13 @@
 resource "intersight_vnic_eth_network_policy" "map" {
   for_each = { for v in lookup(local.policies, "ethernet_network", []) : v.name => merge(local.defaults.ethernet_network, v, {
     name = "${local.name_prefix.ethernet_network}${v.name}${local.name_suffix.ethernet_network}"
-    tags = lookup(v, "tags", var.tags)
+    tags = lookup(v, "tags", var.policies.global_settings.tags)
     }
   ) }
   description = coalesce(each.value.description, "${each.value.name} Ethernet Network Policy.")
   name        = each.value.name
   organization {
-    moid        = local.orgs[var.organization]
+    moid        = local.orgs[local.organization]
     object_type = "organization.Organization"
   }
   vlan_settings {

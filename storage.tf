@@ -18,7 +18,7 @@ resource "intersight_storage_storage_policy" "map" {
     object_type = "organization.Organization"
   }
   dynamic "m2_virtual_drive" {
-    for_each = each.value.m2_raid_configuration
+    for_each = { for v in each.value.m2_raid_configuration : v.slot => v if length(each.value.m2_raid_configuration) > 0 }
     content {
       controller_slot = m2_virtual_drive.value.slot
       enable          = true
@@ -66,7 +66,7 @@ resource "intersight_storage_drive_group" "map" {
     # object_type = "organization.Organization"
   }
   dynamic "automatic_drive_group" {
-    for_each = { for k, v in each.value.automatic_drive_group : k => merge(local.ldga, v) }
+    for_each = { for k, v in each.value.automatic_drive_group : k => merge(local.dga, v) }
     content {
       class_id = "storage.ManualDriveGroup"
       drives_per_span = lookup(
@@ -89,7 +89,7 @@ resource "intersight_storage_drive_group" "map" {
     }
   }
   dynamic "manual_drive_group" {
-    for_each = { for k, v in each.value.manual_drive_group : k => merge(local.ldgm, v) }
+    for_each = { for k, v in each.value.manual_drive_group : k => merge(local.dgm, v) }
     content {
       class_id             = "storage.ManualDriveGroup"
       dedicated_hot_spares = manual_drive_group.value.dedicated_hot_spares
@@ -112,8 +112,8 @@ resource "intersight_storage_drive_group" "map" {
     }
   }
   dynamic "virtual_drives" {
-    for_each = { for v in each.value.virtual_drives : v.name => merge(local.ldgv, v, {
-      virtual_drive_policy = merge(local.ldgv.virtual_drive_policy, lookup(v, "virtual_drive_policy", {}))
+    for_each = { for v in each.value.virtual_drives : v.name => merge(local.dgv, v, {
+      virtual_drive_policy = merge(local.dgv.virtual_drive_policy, lookup(v, "virtual_drive_policy", {}))
     }) }
     content {
       additional_properties = ""

@@ -8,7 +8,7 @@ resource "intersight_access_policy" "map" {
   depends_on = [
     data.intersight_search_search_item.ip
   ]
-  for_each    = { for k, v in local.imc_access : k => v }
+  for_each    = local.imc_access
   description = coalesce(each.value.description, "${each.value.name} IMC Access Policy.")
   inband_vlan = each.value.inband_vlan_id
   name        = each.value.name
@@ -32,7 +32,7 @@ resource "intersight_access_policy" "map" {
       for v in [each.value.inband_ip_pool.name] : v => v if each.value.inband_ip_pool.name != "UNUSED"
     }
     content {
-      moid = length(regexall(false, var.moids_pools)) > 0 ? var.pools[each.value.inband_ip_pool.org].ip[
+      moid = length(regexall(false, local.moids_pools)) > 0 ? local.pools[each.value.inband_ip_pool.org].ip[
         each.value.inband_ip_pool.name
         ] : [for i in data.intersight_search_search_item.ip[0].results : i.moid if jsondecode(
           i.additional_properties).Organization.Moid == local.orgs[each.value.inband_ip_pool.org
@@ -45,7 +45,7 @@ resource "intersight_access_policy" "map" {
       ] : v => v if each.value.out_of_band_ip_pool.name != "UNUSED"
     }
     content {
-      moid = length(regexall(false, var.moids_pools)) > 0 ? var.pools[each.value.out_of_band_ip_pool.org].ip[
+      moid = length(regexall(false, local.moids_pools)) > 0 ? local.pools[each.value.out_of_band_ip_pool.org].ip[
         each.value.out_of_band_ip_pool.name
         ] : [for i in data.intersight_search_search_item.ip[0].results : i.moid if jsondecode(
           i.additional_properties).Organization.Moid == local.orgs[each.value.out_of_band_ip_pool.org

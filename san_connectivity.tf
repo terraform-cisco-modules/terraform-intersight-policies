@@ -29,7 +29,7 @@ resource "intersight_vnic_san_connectivity_policy" "map" {
   dynamic "wwnn_pool" {
     for_each = { for v in [each.value.wwnn_pool.name] : v => v if each.value.wwnn_pool.name != "UNUSED" }
     content {
-      moid = length(regexall(false, var.moids_pools)) > 0 ? var.pools[each.value.wwnn_pool.org].wwnn[
+      moid = length(regexall(false, local.moids_pools)) > 0 ? local.pools[each.value.wwnn_pool.org].wwnn[
         each.value.wwnn_pool.name
         ] : [for i in data.intersight_search_search_item.wwnn[0].results : i.moid if jsondecode(
           i.additional_properties).Organization.Moid == local.orgs[each.value.wwnn_pool.org
@@ -111,7 +111,7 @@ resource "intersight_vnic_fc_if" "map" {
   dynamic "wwpn_pool" {
     for_each = { for v in [each.value.wwpn_pool.name] : v => v if each.value.wwpn_pool.name != "UNUSED" }
     content {
-      moid = length(regexall(false, var.moids_pools)) > 0 ? var.pools[each.value.wwpn_pool.org].wwpn[
+      moid = length(regexall(false, local.moids_pools)) > 0 ? local.pools[each.value.wwpn_pool.org].wwpn[
         each.value.wwpn_pool.name
         ] : [for i in data.intersight_search_search_item.wwpn[0].results : i.moid if jsondecode(
           i.additional_properties).Organization.Moid == local.orgs[each.value.wwpn_pool.org

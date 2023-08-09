@@ -20,7 +20,7 @@ resource "intersight_vnic_iscsi_boot_policy" "map" {
       class_id              = "vnic.IscsiAuthProfile"
       is_password_set       = null
       object_type           = "vnic.IscsiAuthProfile"
-      password              = var.iscsi_boot.password[each.value.password]
+      password              = local.ps.iscsi_boot.password[each.value.password]
       user_id               = each.value.username
     }
     ] : each.value.target_source_type == "Static" ? [
@@ -54,7 +54,7 @@ resource "intersight_vnic_iscsi_boot_policy" "map" {
       class_id              = "vnic.IscsiAuthProfile"
       is_password_set       = null
       object_type           = "vnic.IscsiAuthProfile"
-      password              = var.iscsi_boot.password[each.value.password]
+      password              = local.ps.iscsi_boot.password[each.value.password]
       user_id               = each.value.username
     }
     ] : each.value.target_source_type == "Static" ? [
@@ -78,7 +78,7 @@ resource "intersight_vnic_iscsi_boot_policy" "map" {
       for v in [each.value.initiator_ip_pool.name] : v => v if each.value.initiator_ip_pool.name != "UNUSED"
     }
     content {
-      moid = length(regexall(false, var.moids_pools)) > 0 ? var.pools[each.value.initiator_ip_pool.org].ip[
+      moid = length(regexall(false, local.moids_pools)) > 0 ? local.pools[each.value.initiator_ip_pool.org].ip[
         each.value.initiator_ip_pool.name
         ] : [for i in data.intersight_search_search_item.ip[0].results : i.moid if jsondecode(
           i.additional_properties).Organization.Moid == local.orgs[each.value.initiator_ip_pool.org

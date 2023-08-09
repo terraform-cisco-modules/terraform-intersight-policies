@@ -1,5 +1,11 @@
 resource "intersight_bios_policy" "map" {
-  for_each    = local.bios
+  for_each = {
+    for v in lookup(local.policies, "bios", []) : v.name => merge(local.defaults.bios, v, {
+      name         = "${local.npfx.bios}${v.name}${local.nsfx.bios}"
+      organization = local.organization
+      tags         = lookup(v, "tags", var.policies.global_settings.tags)
+    })
+  }
   description = coalesce(each.value.description, "${each.value.name} BIOS Policy.")
   name        = each.value.name
   #+++++++++++++++++++++++++++++++

@@ -5,7 +5,13 @@
 #__________________________________________________________________
 
 resource "intersight_fabric_switch_control_policy" "map" {
-  for_each                = local.switch_control
+  for_each = {
+    for v in lookup(local.policies, "switch_control", []) : v.name => merge(local.defaults.switch_control, v, {
+      name         = "${local.npfx.switch_control}${v.name}${local.nsfx.switch_control}"
+      organization = local.organization
+      tags         = lookup(v, "tags", var.policies.global_settings.tags)
+    })
+  }
   description             = coalesce(each.value.description, "${each.value.name} Switch Control Policy.")
   ethernet_switching_mode = each.value.ethernet_switching_mode
   fc_switching_mode       = each.value.fc_switching_mode

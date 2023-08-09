@@ -19,7 +19,7 @@ resource "intersight_iam_ldap_policy" "map" {
     # Binding Parameters
     bind_method = each.value.binding_parameters.bind_method
     bind_dn     = each.value.binding_parameters.bind_dn
-    password    = var.ldap.password[each.value.binding_parameters.password]
+    password    = local.ps.ldap.password[each.value.binding_parameters.password]
     # Search Parameters
     attribute       = each.value.search_parameters.attribute
     filter          = each.value.search_parameters.filter

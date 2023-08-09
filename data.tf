@@ -4,27 +4,27 @@
 #__________________________________________________________________
 
 data "intersight_search_search_item" "ip" {
-  for_each              = { for v in [0] : v => v if length(local.ip_pools) > 0 && var.moids_pools == true }
+  for_each              = { for v in [0] : v => v if length(local.pp.ip_pool) > 0 && local.moids_pools == true }
   additional_properties = jsonencode({ "ObjectType" = "ippool.Pool" })
 }
 
 data "intersight_search_search_item" "iqn" {
-  for_each              = { for v in [0] : v => v if length(local.iqn_pools) > 0 && var.moids_pools == true }
+  for_each              = { for v in [0] : v => v if length(local.pp.iqn_pool) > 0 && local.moids_pools == true }
   additional_properties = jsonencode({ "ObjectType" = "iqnpool.Pool" })
 }
 
 data "intersight_search_search_item" "mac" {
-  for_each              = { for v in [0] : v => v if length(local.mac_pools) > 0 && var.moids_pools == true }
+  for_each              = { for v in [0] : v => v if length(local.pp.mac_pool) > 0 && local.moids_pools == true }
   additional_properties = jsonencode({ "ObjectType" = "macpool.Pool" })
 }
 
 data "intersight_search_search_item" "wwnn" {
-  for_each              = { for v in [0] : v => v if length(local.wwnn_pools) > 0 && var.moids_pools == true }
+  for_each              = { for v in [0] : v => v if length(local.pp.wwnn_pool) > 0 && local.moids_pools == true }
   additional_properties = jsonencode({ "ObjectType" = "fcpool.Pool" })
 }
 
 data "intersight_search_search_item" "wwpn" {
-  for_each              = { for v in [0] : v => v if length(local.wwpn_pools) > 0 && var.moids_pools == true }
+  for_each              = { for v in [0] : v => v if length(local.pp.wwpn_pool) > 0 && local.moids_pools == true }
   additional_properties = jsonencode({ "ObjectType" = "fcpool.Pool" })
 }
 
@@ -39,27 +39,31 @@ data "intersight_search_search_item" "wwpn" {
 #________________________________________
 
 data "intersight_search_search_item" "ethernet_adapter" {
-  for_each              = { for v in [0] : v => v if length(local.lcp_eth_adtr) > 0 && var.moids_policies == true }
+  for_each = { for v in [0] : v => v if length(local.pp.ethernet_adapter) > 0 && local.moids_policies == true }
+  #
   additional_properties = jsonencode({ "ObjectType" = "vnic.EthAdapterPolicy" })
 }
 
 data "intersight_search_search_item" "ethernet_network_control" {
-  for_each              = { for v in [0] : v => v if length(local.eth_ntwk_ctrl) > 0 && var.moids_policies == true }
+  for_each = { for v in [0] : v => v if length(local.pp.ethernet_network_control) > 0 && local.moids_policies == true }
+  #
   additional_properties = jsonencode({ "ObjectType" = "fabric.EthNetworkControlPolicy" })
 }
 
 data "intersight_search_search_item" "ethernet_network_group" {
-  for_each              = { for v in [0] : v => v if length(local.eth_ntwk_grp) > 0 && var.moids_policies == true }
+  for_each = { for v in [0] : v => v if length(local.pp.ethernet_network_group) > 0 && local.moids_policies == true }
+  #
   additional_properties = jsonencode({ "ObjectType" = "fabric.EthNetworkGroupPolicy" })
 }
 
 data "intersight_search_search_item" "ethernet_network" {
-  for_each              = { for v in [0] : v => v if length(local.lcp_eth_ntwk) > 0 && var.moids_policies == true }
+  for_each = { for v in [0] : v => v if length(local.pp.ethernet_network) > 0 && local.moids_policies == true }
+  #
   additional_properties = jsonencode({ "ObjectType" = "vnic.EthNetworkPolicy" })
 }
 
 data "intersight_search_search_item" "ethernet_qos" {
-  for_each              = { for v in [0] : v => v if length(local.lcp_eth_qos) > 0 && var.moids_policies == true }
+  for_each              = { for v in [0] : v => v if length(local.pp.ethernet_qos) > 0 && local.moids_policies == true }
   additional_properties = jsonencode({ "ObjectType" = "vnic.EthQosPolicy" })
 }
 
@@ -69,22 +73,22 @@ data "intersight_search_search_item" "ethernet_qos" {
 #________________________________________
 
 data "intersight_search_search_item" "fibre_channel_adapter" {
-  for_each              = { for v in [0] : v => v if length(local.scp_fc_adtr) > 0 && var.moids_policies == true }
+  for_each              = { for v in [0] : v => v if length(local.pp.fc_adapter) > 0 && local.moids_policies == true }
   additional_properties = jsonencode({ "ObjectType" = "vnic.FcAdapterPolicy" })
 }
 
 data "intersight_search_search_item" "fibre_channel_network" {
-  for_each              = { for v in [0] : v => v if length(local.scp_fc_ntwk) > 0 && var.moids_policies == true }
+  for_each              = { for v in [0] : v => v if length(local.pp.fc_network) > 0 && local.moids_policies == true }
   additional_properties = jsonencode({ "ObjectType" = "vnic.FcNetworkPolicy" })
 }
 
 data "intersight_search_search_item" "fibre_channel_qos" {
-  for_each              = { for v in [0] : v => v if length(local.scp_fc_qos) > 0 && var.moids_policies == true }
+  for_each              = { for v in [0] : v => v if length(local.pp.fc_qos) > 0 && local.moids_policies == true }
   additional_properties = jsonencode({ "ObjectType" = "vnic.FcQosPolicy" })
 }
 
 data "intersight_search_search_item" "fc_zone" {
-  for_each              = { for v in [0] : v => v if length(local.scp_fc_zone) > 0 && var.moids_policies == true }
+  for_each              = { for v in [0] : v => v if length(local.pp.fc_zone) > 0 && local.moids_policies == true }
   additional_properties = jsonencode({ "ObjectType" = "fabric.FcZonePolicy" })
 }
 
@@ -94,17 +98,18 @@ data "intersight_search_search_item" "fc_zone" {
 #________________________________________
 
 data "intersight_search_search_item" "iscsi_adapter" {
-  for_each              = { for v in [0] : v => v if length(local.iadapter) > 0 && var.moids_policies == true }
+  for_each              = { for v in [0] : v => v if length(local.pp.iscsi_adapter) > 0 && local.moids_policies == true }
   additional_properties = jsonencode({ "ObjectType" = "vnic.IscsiAdapterPolicy" })
 }
 
 data "intersight_search_search_item" "iscsi_boot" {
-  for_each              = { for v in [0] : v => v if length(local.lcp_iboot) > 0 && var.moids_policies == true }
+  for_each              = { for v in [0] : v => v if length(local.pp.iscsi_boot) > 0 && local.moids_policies == true }
   additional_properties = jsonencode({ "ObjectType" = "vnic.IscsiBootPolicy" })
 }
 
 data "intersight_search_search_item" "iscsi_static_target" {
-  for_each              = { for v in [0] : v => v if length(local.itarget) > 0 && var.moids_policies == true }
+  for_each = { for v in [0] : v => v if length(local.pp.iscsi_static_target) > 0 && local.moids_policies == true }
+  #
   additional_properties = jsonencode({ "ObjectType" = "vnic.IscsiStaticTargetPolicy" })
 }
 
@@ -114,17 +119,18 @@ data "intersight_search_search_item" "iscsi_static_target" {
 #________________________________________
 
 data "intersight_search_search_item" "flow_control" {
-  for_each              = { for v in [0] : v => v if length(local.flow_ctrl) > 0 && var.moids_policies == true }
+  for_each              = { for v in [0] : v => v if length(local.pp.flow_control) > 0 && local.moids_policies == true }
   additional_properties = jsonencode({ "ObjectType" = "fabric.FlowControlPolicy" })
 }
 
 data "intersight_search_search_item" "link_aggregation" {
-  for_each              = { for v in [0] : v => v if length(local.link_agg) > 0 && var.moids_policies == true }
+  for_each = { for v in [0] : v => v if length(local.pp.link_aggregation) > 0 && local.moids_policies == true }
+  #
   additional_properties = jsonencode({ "ObjectType" = "fabric.LinkAggregationPolicy" })
 }
 
 data "intersight_search_search_item" "link_control" {
-  for_each              = { for v in [0] : v => v if length(local.link_ctrl) > 0 && var.moids_policies == true }
+  for_each              = { for v in [0] : v => v if length(local.pp.link_control) > 0 && local.moids_policies == true }
   additional_properties = jsonencode({ "ObjectType" = "fabric.LinkControlPolicy" })
 }
 
@@ -134,6 +140,6 @@ data "intersight_search_search_item" "link_control" {
 #________________________________________
 
 data "intersight_search_search_item" "multicast" {
-  for_each              = { for v in [0] : v => v if length(local.mcast) > 0 && var.moids_policies == true }
+  for_each              = { for v in [0] : v => v if length(local.pp.multicast) > 0 && local.moids_policies == true }
   additional_properties = jsonencode({ "ObjectType" = "fabric.MulticastPolicy" })
 }

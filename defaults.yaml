@@ -480,7 +480,7 @@ policies:
       interface_source: name # Used only by boot.Pxe. Options are name, mac, port
       ip_type: IPv4 # Used only by boot.Pxe.  Options are None, IPv4, IPv6
       lun: 0 # Used by the following: boot.PchStorage, boot.San, boot.SdCard
-      mac_ddress: '' # Used by boot.Pxe if Interface_Source is mac
+      mac_address: '' # Used by boot.Pxe if Interface_Source is mac
       name: '**REQUIRED**'
       object_type: '**REQUIRED**' # Options are boot.Iscsi, boot.LocalCdd, boot.LocalDisk, boot.Nvme, boot.PchStorage, boot.Pxe, boot.San, boot.SdCard, boot.UefiShell, boot.Usb, boot.VirtualMedia
       port: -1 # boot.Iscsi can be 0-255.  boot.Pxe is the Port ID of the adapter and values can be between -1 (not defined) and 255.
@@ -692,9 +692,9 @@ policies:
     cco_user: 1
     description: ''
     name: '**REQUIRED**'
-    models:
+    model_bundle_version:
       firmware_version: '4.2(3d)'
-      server_model: 'UCSX-210C-M7'
+      server_models: []
     tags:
       key: ''
       value: ''
@@ -784,9 +784,9 @@ policies:
       cdn_values: []
       enable_failover: false
       ethernet_adapter_policy: ''
-      ethernet_network_control_policy: ''
+      ethernet_network_control_policy: UNUSED
       ethernet_network_group_policies: []
-      ethernet_network_policy: ''
+      ethernet_network_policy: UNUSED
       ethernet_qos_policy: ''
       iscsi_boot_policies: []
       mac_address_allocation_type: POOL
@@ -1073,6 +1073,7 @@ policies:
     port_modes:
       custom_mode: FibreChannel
       port_list: [1, 4]
+      slot_id: 1
     port_role_appliances:
       admin_speed: Auto
       breakout_port_id: 0
@@ -1146,9 +1147,9 @@ policies:
     vhba_placement_mode: custom
     vhbas:
       fc_zone_policies: []
-      fibre_channel_adapter_policy: ''
+      fibre_channel_adapter_policy: UNUSED
       fibre_channel_network_policies: []
-      fibre_channel_qos_policy: ''
+      fibre_channel_qos_policy: UNUSED
       names: [] # Required
       persistent_lun_bindings: false
       placement:
@@ -1452,6 +1453,7 @@ policies:
       multicast_policy: ''
       native_vlan: false
       name: ''
+      primary_vlan_id: 0
       sharing_type: None
       vlan_list: '**REQUIRED**'
   vsan:

@@ -7,13 +7,13 @@
 resource "intersight_deviceconnector_policy" "map" {
   for_each = { for v in lookup(local.policies, "device_connector", []) : v.name => merge(local.defaults.device_connector, v, {
     name = "${local.name_prefix.device_connector}${v.name}${local.name_suffix.device_connector}"
-    tags = lookup(v, "tags", var.tags
+    tags = lookup(v, "tags", var.policies.global_settings.tags
   ) }) }
   description     = coalesce(each.value.description, "${each.value.name} Device Connector Policy.")
   lockout_enabled = each.value.configuration_lockout
   name            = each.value.name
   organization {
-    moid        = local.orgs[var.organization]
+    moid        = local.orgs[local.organization]
     object_type = "organization.Organization"
   }
   dynamic "tags" {

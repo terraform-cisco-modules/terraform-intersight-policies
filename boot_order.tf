@@ -21,7 +21,7 @@ resource "intersight_boot_precision_policy" "map" {
   dynamic "boot_devices" {
     for_each = { for v in each.value.boot_devices : v.name => v }
     content {
-      additional_properties = boot_devices.value.additional_properties != "" ? boot_devices.value.additional_properties : ""
+      additional_properties = boot_devices.value.additional_properties
       enabled               = boot_devices.value.enabled
       object_type           = boot_devices.value.object_type
       name                  = boot_devices.value.name

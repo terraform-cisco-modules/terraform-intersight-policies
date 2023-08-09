@@ -7,13 +7,13 @@
 resource "intersight_fabric_fc_zone_policy" "map" {
   for_each = { for v in lookup(local.policies, "fc_zone", []) : v.name => merge(local.defaults.fc_zone, v, {
     name = "${local.name_prefix.fc_zone}${v.name}${local.name_suffix.fc_zone}"
-    tags = lookup(v, "tags", var.tags)
+    tags = lookup(v, "tags", var.policies.global_settings.tags)
   }) }
   description           = coalesce(each.value.description, "${each.value.name} FC Zone Policy.")
   fc_target_zoning_type = each.value.fc_target_zoning_type
   name                  = each.value.name
   organization {
-    moid        = local.orgs[var.organization]
+    moid        = local.orgs[local.organization]
     object_type = "organization.Organization"
   }
   dynamic "fc_target_members" {

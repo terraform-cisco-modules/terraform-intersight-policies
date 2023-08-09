@@ -8,7 +8,7 @@ resource "intersight_fabric_eth_network_control_policy" "map" {
   for_each = { for v in lookup(
     local.policies, "ethernet_network_control", []) : v.name => merge(local.defaults.ethernet_network_control, v, {
       name = "${local.name_prefix.ethernet_network_control}${v.name}${local.name_suffix.ethernet_network_control}"
-      tags = lookup(v, "tags", var.tags)
+      tags = lookup(v, "tags", var.policies.global_settings.tags)
     })
   }
   cdp_enabled           = each.value.cdp_enable
@@ -23,7 +23,7 @@ resource "intersight_fabric_eth_network_control_policy" "map" {
     transmit_enabled = each.value.lldp_enable_transmit
   }
   organization {
-    moid        = local.orgs[var.organization]
+    moid        = local.orgs[local.organization]
     object_type = "organization.Organization"
   }
   dynamic "tags" {

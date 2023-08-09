@@ -7,7 +7,7 @@
 resource "intersight_fabric_multicast_policy" "map" {
   for_each = { for v in lookup(local.policies, "multicast", []) : v.name => merge(local.defaults.multicast, v, {
     name = "${local.name_prefix.multicast}${v.name}${local.name_suffix.multicast}"
-    tags = lookup(v, "tags", var.tags)
+    tags = lookup(v, "tags", var.policies.global_settings.tags)
   }) }
   description             = coalesce(each.value.description, "${each.value.name} Multicast Policy.")
   name                    = each.value.name
@@ -17,7 +17,7 @@ resource "intersight_fabric_multicast_policy" "map" {
   snooping_state          = each.value.snooping_state
   src_ip_proxy            = each.value.source_ip_proxy_state
   organization {
-    moid        = local.orgs[var.organization]
+    moid        = local.orgs[local.organization]
     object_type = "organization.Organization"
   }
   dynamic "tags" {

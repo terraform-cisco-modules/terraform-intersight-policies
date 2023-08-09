@@ -5,7 +5,15 @@
 #__________________________________________________________________
 
 resource "intersight_memory_persistent_memory_policy" "map" {
-  for_each          = local.persistent_memory
+  for_each = {
+    for v in lookup(local.policies, "persistent_memory", []) : v.name => merge(local.defaults.persistent_memory, v, {
+      name = "${local.npfx.persistent_memory}${v.name}${local.nsfx.persistent_memory}"
+      namespaces = [for e in lookup(v, "namespaces", []) : merge(local.defaults.persistent_memory.namespaces, e)
+      ]
+      organization = local.organization
+      tags         = lookup(v, "tags", var.policies.global_settings.tags)
+    })
+  }
   description       = coalesce(each.value.description, "${each.value.name} Persistent Memory Policy.")
   management_mode   = each.value.management_mode
   name              = each.value.name
@@ -23,12 +31,12 @@ resource "intersight_memory_persistent_memory_policy" "map" {
   dynamic "local_security" {
     for_each = {
       for v in compact([each.value.name]
-      ) : each.value.name => v if length(var.persistent_memory.passphrase[each.value.passphrase]) > 0
+      ) : each.value.name => v if length(local.ps.persistent_memory.passphrase[each.value.passphrase]) > 0
     }
     content {
       object_type       = "memory.PersistentMemoryLocalSecurity"
-      enabled           = length(var.persistent_memory.passphrase[each.value.passphrase]) > 0 ? true : false
-      secure_passphrase = var.persistent_memory.passphrase[each.value.passphrase]
+      enabled           = length(local.ps.persistent_memory.passphrase[each.value.passphrase]) > 0 ? true : false
+      secure_passphrase = local.ps.persistent_memory.passphrase[each.value.passphrase]
     }
   }
   dynamic "logical_namespaces" {

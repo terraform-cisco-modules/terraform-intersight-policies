@@ -54,7 +54,7 @@ resource "intersight_iam_end_point_user_role" "map" {
   ]
   for_each = local.users
   enabled  = each.value.enabled
-  password = var.local_user.password[each.value.password]
+  password = local.ps.local_user.password[each.value.password]
   end_point_role {
     moid        = data.intersight_iam_end_point_role.map[each.value.role].results[0].moid
     object_type = "iam.EndPointRole"

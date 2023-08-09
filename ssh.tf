@@ -7,7 +7,7 @@
 resource "intersight_ssh_policy" "map" {
   for_each = { for v in lookup(local.policies, "ssh", []) : v.name => merge(local.defaults.ssh, v, {
     name = "${local.name_prefix.ssh}${v.name}${local.name_suffix.ssh}"
-    tags = lookup(v, "tags", var.tags)
+    tags = lookup(v, "tags", var.policies.global_settings.tags)
   }) }
   description = coalesce(each.value.description, "${each.value.name} SSH Policy.")
   enabled     = each.value.enable_ssh
@@ -15,7 +15,7 @@ resource "intersight_ssh_policy" "map" {
   port        = each.value.ssh_port
   timeout     = each.value.ssh_timeout
   organization {
-    moid        = local.orgs[var.organization]
+    moid        = local.orgs[local.organization]
     object_type = "organization.Organization"
   }
   dynamic "tags" {
