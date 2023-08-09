@@ -111,8 +111,6 @@ locals {
   # Intersight Boot Order Policy
   # GUI Location: Policies > Create Policy > Boot Order
   #__________________________________________________________________
-  lboot = local.defaults.boot_order
-  bd    = local.lboot.boot_devices
   boot_loader = {
     ClassId    = "boot.Bootloader", Description = "", Name = "BOOTx64.EFI",
     ObjectType = "boot.Bootloader", Path = "\\EFI\\BOOT\\"

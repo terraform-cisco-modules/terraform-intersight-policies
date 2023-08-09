@@ -63,7 +63,6 @@ A Terraform module to configure Intersight Infrastructure Policies.
 | <a name="output_virtual_media"></a> [virtual\_media](#output\_virtual\_media) | Moid's of the Virtual Media Policies. |
 | <a name="output_vlan"></a> [vlan](#output\_vlan) | Moid's of the VLAN Policies. |
 | <a name="output_vsan"></a> [vsan](#output\_vsan) | Moid's of the VSAN Policies. |
-| <a name="output_xorder"></a> [xorder](#output\_xorder) | n/a |
 ## Resources
 
 | Name | Type |
