@@ -16,11 +16,11 @@ resource "intersight_fabric_eth_network_group_policy" "map" {
     object_type = "organization.Organization"
   }
   vlan_settings {
-    native_vlan   = lookup(each.value, "native_vlan", null)
+    native_vlan   = each.value.native_vlan
     allowed_vlans = each.value.allowed_vlans
   }
   dynamic "tags" {
-    for_each = { for v in lookup(each.value, "tags", var.policies.global_settings.tags) : v.key => v }
+    for_each = each.value.tags
     content {
       key   = tags.value.key
       value = tags.value.value

@@ -114,120 +114,49 @@ locals {
   lboot = local.defaults.boot_order
   bd    = local.lboot.boot_devices
   boot_loader = {
-    ClassId     = "boot.Bootloader"
-    Description = ""
-    Name        = "BOOTx64.EFI"
-    ObjectType  = "boot.Bootloader"
-    Path        = "\\EFI\\BOOT\\"
+    ClassId    = "boot.Bootloader", Description = "", Name = "BOOTx64.EFI",
+    ObjectType = "boot.Bootloader", Path = "\\EFI\\BOOT\\"
   }
   boot_type = {
-    Iscsi      = ["InterfaceName:interface_name:", "Port:port:0", "Slot:slot:MLOM"]
-    LocalDisk  = ["Slot:slot:MSTOR-RAID"]
+    Iscsi      = ["InterfaceName:interface_name", "Port:port", "Slot:slot"]
+    LocalDisk  = ["Slot:slot"]
     Nvme       = []
-    PchStorage = ["Lun:lun:0"]
-    Pxe = ["InterfaceName:interface_name:", "InterfaceSource:interface_source:name", "IpType:ip_type:IPv4",
-      "MacAddress:mac_address:", "Port:port:-1", "Slot:slot:MLOM"
+    PchStorage = ["Lun:lun"]
+    Pxe = ["InterfaceName:interface_name", "InterfaceSource:interface_source", "IpType:ip_type",
+      "MacAddress:mac_address", "Port:port", "Slot:slot"
     ]
-    San          = ["InterfaceName:interface_name:", "Lun:lun:0", "Slot:slot:MLOM", "Wwpn:wwpn:"]
-    VirtualMedia = ["Subtype:sub_type:None"]
+    San          = ["InterfaceName:interface_name", "Lun:lun", "Slot:slot", "Wwpn:wwpn"]
+    VirtualMedia = ["Subtype:sub_type"]
+  }
+  boot_var = {
+    Iscsi        = { interface_name = "", port = 0, slot = "MLOM" }
+    LocalDisk    = { slot = "MSTOR-RAID" }
+    PchStorage   = { lun = 0 }
+    Pxe          = { interface_name = "", interface_source = "name", ip_type = "IPv4", mac_address = "", port = -1, slot = "MLOM" }
+    San          = { interface_name = "", lun = 0, slot = "MLOM", wwpn = "" }
+    VirtualMedia = { sub_type = "None" }
   }
   boot_order = {
-    for i in lookup(local.policies, "boot_order", []) : i.name => merge(local.lboot, i, {
-      boot_devices = [for v in lookup(i, "boot_devices", []) : {
-        additional_properties = length(regexall("Uefi", i.boot_mode)) > 0 && length(
-          regexall("boot.Iscsi", v.object_type)) > 0 ? jsonencode(
-          {
-            Bootloader    = merge(local.boot_loader, lookup(v, "bootloader", {}))
-            InterfaceName = lookup(v, "interface_name", null)
-            Port          = lookup(v, "port", 0)
-            Slot          = lookup(v, "slot", "MLOM")
-          }) : v.object_type == "boot.Iscsi" ? jsonencode(
-          {
-            InterfaceName = lookup(v, "interface_name", null)
-            Port          = lookup(v, "port", 0)
-            Slot          = lookup(v, "slot", "MLOM")
-          }) : length(regexall("Uefi", i.boot_mode)) > 0 && length(
-          regexall("boot.LocalDisk", v.object_type)) > 0 ? jsonencode(
-          {
-            Bootloader = merge(local.boot_loader, lookup(v, "bootloader", {}))
-            Slot       = v.slot
-          }) : v.object_type == "boot.LocalDisk" ? jsonencode(
-          { Slot = v.slot }) : length(regexall("Uefi", i.boot_mode)) > 0 && length(
-          regexall("boot.Nvme", v.object_type)) > 0 ? jsonencode(
-          { Bootloader = merge(local.boot_loader, lookup(v, "bootloader", {})) }
-          ) : length(regexall("Uefi", i.boot_mode)) > 0 && length(
-          regexall("boot.PchStorage", v.object_type)) > 0 ? jsonencode(
-          {
-            Bootloader = merge(local.boot_loader, lookup(v, "bootloader", {}))
-            Lun        = lookup(v, "lun", 0)
-          }) : v.object_type == "boot.PchStorage" ? jsonencode(
-          { Lun = lookup(v, "lun", 0) }) : v.object_type == "boot.Pxe" ? jsonencode(
-          {
-            InterfaceName   = lookup(v, "interface_name", null)
-            InterfaceSource = lookup(v, "interface_source", "name")
-            IpType          = lookup(v, "ip_type", "IPv4")
-            MacAddress      = lookup(v, "mac_address", "")
-            Port            = lookup(v, "port", -1)
-            Slot            = lookup(v, "slot", "MLOM")
-          }) : length(regexall("Uefi", i.boot_mode)) > 0 && length(
-          regexall("boot.San", v.object_type)) > 0 ? jsonencode(
-          {
-            Bootloader    = merge(local.boot_loader, lookup(v, "bootloader", {}))
-            InterfaceName = lookup(v, "interface_name", null)
-            Lun           = lookup(v, "lun", 0)
-            Slot          = lookup(v, "slot", "MLOM")
-            Wwpn          = lookup(v, "wwpn", "")
-          }) : v.object_type == "boot.San" ? jsonencode(
-          {
-            InterfaceName = lookup(v, "interface_name", null)
-            Lun           = lookup(v, "lun", 0)
-            Slot          = lookup(v, "slot", "MLOM")
-            Wwpn          = lookup(v, "wwpn", "")
-          }) : length(regexall("Uefi", i.boot_mode)) > 0 && length(
-          regexall("boot.SdCard", v.object_type)) > 0 ? jsonencode(
-          {
-            Bootloader = merge(local.boot_loader, lookup(v, "bootloader", {}))
-            Lun        = lookup(v, "lun", 0)
-            Subtype    = lookup(v, "sub_type", "None")
-          }) : v.object_type == "boot.SdCard" ? jsonencode(
-          {
-            Lun     = lookup(v, "lun", 0)
-            Subtype = lookup(v, "sub_type", "None")
-          }) : v.object_type == "boot.Usb" ? jsonencode(
-          { Subtype = lookup(v, "sub_type", "None") }
-          ) : v.object_type == "boot.VirtualMedia" ? jsonencode(
-          { Subtype = lookup(v, "sub_type", "None") }
-        ) : ""
-        enabled     = lookup(v, "enabled", true)
-        name        = v.name
-        object_type = v.object_type
-      }]
+    for i in lookup(local.policies, "boot_order", []) : i.name => merge(local.defaults.boot_order, i, {
+      boot_devices = [
+        for v in lookup(i, "boot_devices", []) : {
+          additional_properties = i.boot_mode == "Uefi" && length(regexall("^boot.(Pxe|Usb|VirtualMedia)", v.object_type)
+            ) == 0 ? jsonencode(merge({ Bootloader = merge(local.boot_loader, lookup(v, "boot_loader", {})) },
+              { for e in local.boot_type[element(split(".", v.object_type), 1)] : element(split(":", e), 0
+                ) => lookup(v, element(split(":", e), 1), local.boot_var[element(split(".", v.object_type), 1)]
+                [element(split(":", e), 1)]) })) : jsonencode({ for e in local.boot_type[element(split(".", v.object_type), 1)
+                ] : element(split(":", e), 0) => lookup(v, element(split(":", e), 1
+          ), local.boot_var[element(split(".", v.object_type), 1)][element(split(":", e), 1)]) })
+          enabled     = lookup(v, "enabled", true)
+          name        = v.name
+          object_type = v.object_type
+        }
+      ]
       name         = "${local.npfx.boot_order}${i.name}${local.nsfx.boot_order}"
       organization = lookup(i, "organization", local.organization)
       tags         = lookup(i, "tags", var.policies.global_settings.tags)
     })
   }
-  #boot_order = {
-  #  for i in lookup(local.policies, "boot_order", []) : i.name => merge(local.defaults.boot_order, i, {
-  #    boot_devices = [
-  #      for v in lookup(i, "boot_devices", []) : {
-  #        additional_properties = i.boot_mode == "Uefi" && length(regexall("^boot.(Pxe|Usb|VirtualMedia)", v.object_type)
-  #          ) == 0 ? jsonencode(merge(
-  #            { Bootloader = merge(local.boot_loader, lookup(v, "boot_loader", {})) },
-  #            { for e in local.boot_type[element(split(".", v.object_type), 1)] : element(split(":", e), 0) => lookup(
-  #              v, element(split(":", e), 1), element(split(":", e), 2)) })) : jsonencode({ for e in local.boot_type[
-  #              element(split(".", v.object_type), 1)] : element(split(":", e), 0) => lookup(v, element(split(":", e), 1
-  #        ), element(split(":", e), 2)) })
-  #        enabled     = lookup(v, "enabled", true)
-  #        name        = v.name
-  #        object_type = v.object_type
-  #      }
-  #    ]
-  #    name         = "${local.npfx.boot_order}${i.name}${local.nsfx.boot_order}"
-  #    organization = lookup(i, "organization", local.organization)
-  #    tags         = lookup(i, "tags", var.policies.global_settings.tags)
-  #  })
-  #}
 
   #__________________________________________________________________
   #
@@ -255,6 +184,61 @@ locals {
       tcp_offload   = merge(local.eadapt.tcp_offload, lookup(v, "tcp_offload", {}))
       transmit      = merge(local.eadapt.transmit, lookup(v, "transmit", {}))
     })
+  }
+  eth_settings = {
+    EMPTY = {}
+    Linux-NVMe-RoCE = {
+      description = "Recommended adapter settings for NVMe using RDMA."
+      comp_count  = 2, int_count = 256, rx_queue_count = 1
+    }
+    Linux = {
+      description = "Recommended adapter settings for linux."
+      comp_count  = 2, int_count = 4, rx_queue_count = 1
+    }
+    MQ-SMBd = {
+      description = "Recommended adapter settings for MultiQueue with RDMA."
+      comp_count  = 576, int_count = 512, rx_queue_count = 512, tx_queue_count = 64
+    }
+    MQ = {
+      description = "Recommended adapter settings for VM Multi Queue Connection with no RDMA."
+      comp_count  = 576, int_count = 256, rx_queue_count = 512, tx_queue_count = 64
+    }
+    SMBClient = { description = "Recommended adapter settings for SMB Client.", comp_count = 2 }
+    SMBServer = { description = "Recommended adapter settings for SMB server." }
+    Solaris   = { description = "Recommended adapter settings for Solaris.", comp_count = 2, int_count = 4 }
+    SRIOV = {
+      description = "Recommended adapter settings for Win8 SRIOV-VMFEX PF.", int_count = 32
+    }
+    usNICOracleRAC = {
+      description = "Recommended adapter settings for usNIC Oracle RAC Connection."
+      comp_count  = 2000, int_count = 1024, rx_queue_count = 1000, tx_queue_count = 1000
+    }
+    usNIC = {
+      description = "Recommended adapter settings for usNIC Connection."
+      comp_count  = 12, rx_count = 6, tx_queue_count = 6
+    }
+    VMwarePassThru = {
+      description = "Recommended adapter settings for VMware pass-thru."
+      comp_count  = 8, int_count = 12, tx_queue_count = 4
+    }
+    VMware = { description = "Recommended adapter settings for VMware."
+      comp_count = 2, int_count = 4
+    }
+    Win-AzureStack = {
+      description = "Recommended adapter settings for Azure Stack."
+      comp_count  = 11, rx_queue_count = 8, tx_queue_count = 3
+    }
+    Win-HPN-SMBd = {
+      description = "Recommended adapter settings for Windows high performance and networking with RoCE V2."
+      int_count   = 512, int_count = 256
+    }
+    Win-HPN = {
+      description = "Recommended adapter settings for Windows high performance and networking."
+      int_count   = 512
+    }
+    Windows = {
+      description = "Recommended adapter settings for Windows."
+    }
   }
 
   #__________________________________________________________________

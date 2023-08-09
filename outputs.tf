@@ -334,7 +334,3 @@ output "vsan" {
   description = "Moid's of the VSAN Policies."
   value       = { for v in sort(keys(intersight_fabric_fc_network_policy.map)) : v => intersight_fabric_fc_network_policy.map[v].moid }
 }
-
-output "xxboot" {
-  value = local.boot_order
-}
