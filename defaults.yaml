@@ -1035,25 +1035,25 @@ policies:
     name: '**REQUIRED**'
     port_channel_appliances:
       admin_speed: Auto
-      ethernet_network_control_policy: ''
-      ethernet_network_group_policy: ''
+      ethernet_network_control_policy: UNUSED
+      ethernet_network_group_policy: UNUSED
       interfaces:
         breakout_port_id: 0
         port_id: '**REQUIRED**'
         slot_id: 1
-      link_aggregation_policy: ''
+      link_aggregation_policy: UNUSED
       mode: trunk
       priority: Best Effort
     port_channel_ethernet_uplinks:
       admin_speed: Auto
-      ethernet_network_group_policy: ''
+      ethernet_network_group_policy: UNUSED
       interfaces:
         breakout_port_id: 0
         port_id: '**REQUIRED**'
         slot_id: 1
-      flow_control_policy: ''
-      link_aggregation_policy: ''
-      link_control_policy: ''
+      flow_control_policy: UNUSED
+      link_aggregation_policy: UNUSED
+      link_control_policy: UNUSED
     port_channel_fc_uplinks:
       admin_speed: 32Gbps
       fill_pattern: Idle
@@ -1068,8 +1068,8 @@ policies:
         breakout_port_id: 0
         port_id: '**REQUIRED**'
         slot_id: 1
-      link_aggregation_policy: ''
-      link_control_policy: ''
+      link_aggregation_policy: UNUSED
+      link_control_policy: UNUSED
     port_modes:
       custom_mode: FibreChannel
       port_list: [1, 4]
@@ -1077,8 +1077,8 @@ policies:
     port_role_appliances:
       admin_speed: Auto
       breakout_port_id: 0
-      ethernet_network_control_policy: ''
-      ethernet_network_group_policy: ''
+      ethernet_network_control_policy: UNUSED
+      ethernet_network_group_policy: UNUSED
       fec: Auto
       mode: trunk
       port_list: '**REQUIRED**'
@@ -1087,10 +1087,10 @@ policies:
     port_role_ethernet_uplinks:
       admin_speed: Auto
       breakout_port_id: 0
-      ethernet_network_group_policy: ''
+      ethernet_network_group_policy: UNUSED
       fec: Auto
-      flow_control_policy: ''
-      link_control_policy: ''
+      flow_control_policy: UNUSED
+      link_control_policy: UNUSED
       port_list: '**REQUIRED**'
       slot_id: 1
     port_role_fc_storage:
@@ -1109,7 +1109,7 @@ policies:
       admin_speed: Auto
       breakout_port_id: 0
       fec: Auto
-      link_control_policy: ''
+      link_control_policy: UNUSED
       port_list: '**REQUIRED**'
       slot_id: 1
     port_role_servers:
