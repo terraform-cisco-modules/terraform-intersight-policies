@@ -54,7 +54,7 @@ resource "intersight_firmware_policy" "map" {
     ]
     ) ? compact(concat([
       length(regexall(true, e.exclude_drives)) > 0 ? "local-disk" : ""], [
-      length(regexall(true, e.exclude_drives_except_boot_drives)) > 0 ? "local-disk" : ""], [
+      length(regexall(true, e.exclude_drives_except_boot_drives)) > 0 ? "drives-except-boot-drives" : ""], [
       length(regexall(true, e.exclude_storage_controllers)) > 0 ? "storage-controller" : ""], [
       length(regexall(true, e.exclude_storage_sas_expander)) > 0 ? "storage-sasexpander" : ""], [
       length(regexall(true, e.exclude_storage_u2)) > 0 ? "storage-u2" : ""

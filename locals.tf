@@ -843,8 +843,10 @@ locals {
   qos = local.defaults.system_qos
   system_qos = {
     for v in lookup(local.policies, "system_qos", []) : v.name => merge(local.qos, v, {
-      classes = length(regexall(true, lookup(v, "use_recommendations", local.qos.use_recommendations))
-        ) > 0 ? local.qos.recommended_classes : length(compact(lookup(v, "classes", []))
+      classes = length(regexall(true, lookup(v, "configure_default_classes", local.qos.configure_default_classes))
+        ) > 0 ? { for v in local.qos.classes_default : v.priority => v } : length(
+        regexall(true, lookup(v, "configure_recommended_classes", local.qos.configure_recommended_classes))
+        ) > 0 ? { for v in local.qos.classes_recommended : v.priority => v } : length(compact(lookup(v, "classes", []))
       ) == 0 ? local.qos.classes : { for v in v.classes : v.priority => v }
       name         = "${local.npfx.system_qos}${v.name}${local.nsfx.system_qos}"
       organization = local.organization
