@@ -322,6 +322,7 @@ policies:
     cbs_cmnc_tdp_ctl: platform-default
     cpu_perf_enhancement: platform-default
     llc_alloc: platform-default
+    optimized_power_mode: platform-default
     upi_link_enablement: platform-default
     upi_power_management: platform-default
     virtual_numa: platform-default
@@ -381,6 +382,7 @@ policies:
     package_cstate_limit: platform-default
     patrol_scrub: platform-default
     patrol_scrub_duration: platform-default
+    prmrr_size: platform-default
     processor_c1e: platform-default
     processor_c3report: platform-default
     processor_c6report: platform-default
@@ -469,6 +471,188 @@ policies:
     usb_port_sd_card: platform-default
     usb_port_vmedia: platform-default
     usb_xhci_support: platform-default
+  bios_templates:
+    M5-amd-virtual:
+      cpu_power_management: custom
+      nvmdimm_perform_config: Balanced Profile
+      pcie_slots_cdn_enable: enabled
+      processor_c1e: disabled
+      processor_c3report: disabled
+      processor_c6report: disabled
+      processor_cstate: disabled
+    M5-intel-virtual:
+      cpu_power_management: custom
+      nvmdimm_perform_config: Balanced Profile
+      pcie_slots_cdn_enable: enabled
+      processor_c1e: disabled
+      processor_c3report: disabled
+      processor_c6report: disabled
+      processor_cstate: disabled
+    M5-intel-dss:
+      cpu_power_management: custom
+      intel_vt_for_directed_io: disabled
+      processor_c1e: disabled
+      processor_c3report: disabled
+      processor_c6report: disabled
+      processor_cstate: disabled
+    M5-intel-hpc:
+      cpu_power_management: custom
+      intel_hyper_threading_tech: disabled
+      intel_virtualization_technology: disabled
+      intel_vt_for_directed_io: disabled
+      work_load_config: Balanced
+    M5-intel-java:
+      cpu_power_management: custom
+      intel_virtualization_technology: disabled
+      intel_vt_for_directed_io: disabled
+      processor_c1e: disabled
+      processor_c3report: disabled
+      processor_c6report: disabled
+      processor_cstate: disabled
+    M5-intel-oltp:
+      cpu_power_management: custom
+      processor_c1e: disabled
+      processor_c3report: disabled
+      processor_c6report: disabled
+      processor_cstate: disabled
+      
+    M6-amd-virtual:
+      cbs_cmn_fixed_soc_pstate: P0
+      cbs_df_cmn_acpi_srat_l3numa: enabled
+      cbs_df_cmn_dram_nps: NPS4
+      pcie_slots_cdn_enable: enabled
+    M6-intel-analytical-db:
+      cpu_perf_enhancement: Auto
+      EnergyEfficientTurbo: enabled
+      intel_virtualization_technology: disabled
+      intel_vt_for_directed_io: disabled
+      memory_refresh_rate: 1x
+      nvmdimm_perform_config: Balanced Profile
+      patrol_scrub: enabled
+      pcie_slots_cdn_enable: enabled
+      processor_c6report: enabled
+      work_load_config: Balanced
+    M6-intel-azure:
+      # Boot Options
+      ipv4http: disabled
+      ipv4pxe: enabled
+      ipv6http: disabled
+      ipv6pxe: enabled
+      pop_support: disabled
+      # Intel Direct IO
+      intel_vt_for_directed_io: enabled
+      intel_vtd_coherency_support: disabled
+      intel_vtdats_support: enabled
+      # Main
+      pcie_slots_cdn_enable: enabled
+      # Power and Performance
+      c1auto_demotion: enabled
+      c1auto_un_demotion: enabled
+      cpu_perf_enhancement: disabled
+      llc_alloc: enabled
+      upi_link_enablement: Auto
+      upi_power_management: disabled
+      virtual_numa: disabled
+      xpt_remote_prefetch: Auto
+      # Processor
+      adjacent_cache_line_prefetch: enabled
+      autonumous_cstate_enable: disabled
+      boot_performance_mode: Max Performance
+      cmci_enable: enabled
+      config_tdp_level: Normal
+      core_multi_processing: all
+      cpu_energy_performance: balanced-performance
+      cpu_performance: custom
+      energy_efficient_turbo: disabled
+      enhanced_intel_speed_step_tech: enabled
+      epp_enable: Balanced Performance
+      extended_apic: disabled
+      hardware_prefetch: enabled
+      hwpm_enable: disabled
+      intel_dynamic_speed_select: disabled
+      intel_hyper_threading_tech: enabled
+      intel_speed_select: Base
+      intel_turbo_boost_tech: enabled
+      intel_virtualization_technology: enabled
+      ip_prefetch: enabled
+      kti_prefetch: enabled
+      llc_prefetch: disabled
+      package_cstate_limit: C0 C1 State
+      patrol_scrub: enabled
+      processor_c1e: disabled
+      processor_c6report: disabled
+      pstate_coord_type: HW ALL
+      pwr_perf_tuning: os
+      qpi_link_frequency: auto
+      snc: disabled
+      streamer_prefetch: enabled
+      ufs_disable: enabled
+      work_load_config: I/O Sensitive
+      x2apic_opt_out: disabled
+      xpt_prefetch: enabled
+      # Trusted Platform
+      cpu_pa_limit: enabled
+      dma_ctrl_opt_in: enabled
+      enable_mktme: disabled
+      enable_sgx: disabled
+      enable_tme: enabled
+      epoch_update: Manual User Defined Owner EPOCHs
+      sgx_auto_registration_agent: disabled
+      sgx_epoch0: "0"
+      sgx_epoch1: "0"
+      sgx_factory_reset: disabled
+      sgx_le_pub_key_hash0: "0"
+      sgx_le_pub_key_hash1: "0"
+      sgx_le_pub_key_hash2: "0"
+      sgx_le_pub_key_hash3: "0"
+      sgx_le_wr: enabled
+      sgx_package_info_in_band_access: disabled
+      sgx_qos: enabled
+      sha256pcr_bank: enabled
+      txt_support: enabled
+    M6-intel-hpc:
+      cpu_perf_enhancement: Auto
+      intel_virtualization_technology: disabled
+      intel_vt_for_directed_io: disabled
+      llc_alloc: disabled
+      llc_prefetch: disabled
+      memory_inter_leave: 1 Way Node Interleave
+      memory_refresh_rate: 1x
+      nvmdimm_perform_config: Balanced Profile
+      patrol_scrub: enabled
+      pcie_slots_cdn_enable: enabled
+      snc: enabled
+      upi_power_management: enabled
+      work_load_config: Balanced
+      xpt_prefetch: enabled
+    M6-intel-relational-DB:
+      cpu_perf_enhancement: Auto
+      llc_alloc: disabled
+      llc_prefetch: disabled
+      memory_inter_leave: 1 Way Node Interleave
+      memory_refresh_rate: 1x
+      nvmdimm_perform_config: Balanced Profile
+      patrol_scrub: enabled
+      pcie_slots_cdn_enable: enabled
+      processor_c6report: enabled
+      snc: enabled
+      upi_power_management: enabled
+      xpt_prefetch: enabled
+    M6-intel-virtual:
+      cpu_perf_enhancement: Auto
+      EnergyEfficientTurbo: enabled
+      nvmdimm_perform_config: Balanced Profile
+      pcie_slots_cdn_enable: enabled
+      processor_c1e: enabled
+      processor_c6report: enabled
+    tpm:
+      sha1pcr_bank: disabled
+      tpm_control: enabled
+      tpm_ppi_required: enabled
+      tpm_support: enabled
+    tpm_disabled:
+      tpm_control: disabled
+      tpm_support: disabled
   boot_order:
     boot_devices: # Optional List of Map
       bootloader:

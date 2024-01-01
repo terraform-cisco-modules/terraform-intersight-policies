@@ -47,7 +47,7 @@ locals {
         for k, v in local.iscsi_boot : lookup(lookup(v, "${e}_target_policy", {}), "name", "")]]
       ]))), ["UNUSED"])
       mac_pool  = setsubtract(distinct(compact([for v in local.vnics : v.mac_address_pool.name])), ["UNUSED"])
-      multicast = setsubtract(distinct(compact([for v in local.vlan_list : v.multicast_policy.name])), ["UNUSED"])
+      multicast = setsubtract(distinct(compact([for v in local.vlans : v.multicast_policy.name])), ["UNUSED"])
       wwnn_pool = setsubtract(distinct(compact([for v in local.san_connectivity : v.wwnn_pool.name])), ["UNUSED"])
       wwpn_pool = setsubtract(distinct(compact([for v in local.vhbas : v.wwpn_pool.name])), ["UNUSED"])
   })
@@ -105,7 +105,6 @@ locals {
       tags         = lookup(value, "tags", var.policies.global_settings.tags)
     }
   }
-
   #__________________________________________________________________
   #
   # Intersight Boot Order Policy
@@ -893,64 +892,20 @@ locals {
       }
     ]
   ])
-  vlan_list_1 = flatten([
-    for v in local.vlans_loop : [
-      for s in v.vlan_list : {
-        auto_allow_on_uplinks = v.auto_allow_on_uplinks
-        multicast_policy      = { name = v.multicast_policy, org = local.organization }
-        name                  = v.name
-        name_prefix           = v.name_prefix
-        native_vlan           = v.native_vlan
-        organization          = v.organization
-        primary_vlan_id       = v.primary_vlan_id
-        sharing_type          = v.sharing_type
-        vlan_id               = s
-        vlan_policy           = v.vlan_policy
-        vlan_policy_moid      = intersight_fabric_eth_network_policy.map[v.vlan_policy].moid
-      }
-    ]
-  ])
-  vlan_list = [for e in local.vlan_list_1 : merge(e, {
-    name = length(compact([e.name])
-      ) > 0 && e.name_prefix == false ? e.name : length(regexall("^[0-9]{4}$", e.vlan_id)
-      ) > 0 ? join("-vl", [e.name, e.vlan_id]) : length(regexall("^[0-9]{3}$", e.vlan_id)
-      ) > 0 ? join("-vl0", [e.name, e.vlan_id]) : length(regexall("^[0-9]{2}$", e.vlan_id)
-      ) > 0 ? join("-vl00", [e.name, e.vlan_id]) : join("-vl000", [e.name, e.vlan_id]
-    )
-    sharing_type = length(regexall(tostring(e.vlan_id), tostring(e.primary_vlan_id))
-    ) > 0 ? "Primary" : e.primary_vlan_id > 0 ? e.sharing_type : "None"
-  })]
-  multicast_policies = distinct([for e in local.vlan_list : e.multicast_policy])
-  multicast_policy_moids = { for e in local.multicast_policies : "${e.org}:${e.name}" => {
-    name = e.name
-    moid = length(regexall(e.org, local.organization)) > 0 ? intersight_fabric_multicast_policy.map[
-      e.name].moid : [for i in data.intersight_search_search_item.multicast[0].results : i.moid if jsondecode(
-        i.additional_properties).Organization.Moid == local.orgs[e.org] && jsondecode(i.additional_properties
-    ).Name == e.name][0]
+  vlans = { for i in flatten([for v in local.vlans_loop : [
+    for s in v.vlan_list : {
+      auto_allow_on_uplinks = v.auto_allow_on_uplinks
+      multicast_policy      = { name = v.multicast_policy, org = local.organization }
+      name                  = v.name
+      name_prefix           = v.name_prefix
+      native_vlan           = v.native_vlan
+      organization          = v.organization
+      primary_vlan_id       = v.primary_vlan_id
+      sharing_type          = v.sharing_type
+      vlan_id               = s
+      vlan_policy           = v.vlan_policy
     }
-  }
-  vlan_policy_moid_list = [for k, v in local.vlan : intersight_fabric_eth_network_policy.map[k].moid]
-  vlan_policy_moids     = { for k, v in local.vlan : intersight_fabric_eth_network_policy.map[k].moid => k }
-  vlan_data_list        = [for e in data.intersight_fabric_vlan.list.results : e if contains(local.vlan_policy_moid_list, e.eth_network_policy[0].moid)]
-  vlan_data_map = { for k, v in local.vlan : k => {
-    for e in local.vlan_data_list : e.vlan_id => merge(e, {
-      multicast_policy = length(e.multicast_policy) > 0 ? e.multicast_policy[0].moid : "@EMPTY"
-    }) if local.vlan_policy_moids[e.eth_network_policy[0].moid] == k
-  } }
-  data_vlan_list = flatten([for k, v in local.vlan_data_map : [for d, e in v : "${k}:${d}"]])
-  vlans = [
-    for e in local.vlan_list : merge(e, {
-      multicast_policy = local.multicast_policy_moids["${e.multicast_policy.org}:${e.multicast_policy.name}"]
-      }) if lookup(lookup(lookup(local.vlan_data_map, e.vlan_policy, {}), e.vlan_id, {}), "auto_allow_on_uplinks", "@dummy") != e.auto_allow_on_uplinks && lookup(
-      lookup(lookup(local.vlan_data_map, e.vlan_policy, {}), e.vlan_id, {}), "is_native", "@dummy") != e.native_vlan && lookup(
-      lookup(lookup(local.vlan_data_map, e.vlan_policy, {}), e.vlan_id, {}), "name", "@dummy") != e.name && lookup(
-      lookup(lookup(local.vlan_data_map, e.vlan_policy, {}), e.vlan_id, {}), "primary_vlan_id", 5006) != e.primary_vlan_id && lookup(
-      lookup(lookup(local.vlan_data_map, e.vlan_policy, {}), e.vlan_id, {}), "sharing_type", "@dummy") != e.sharing_type && lookup(
-      lookup(lookup(local.vlan_data_map, e.vlan_policy, {}), e.vlan_id, {}), "multicast_policy", "@dummy"
-    ) != local.multicast_policy_moids["${e.multicast_policy.org}:${e.multicast_policy.name}"]
-  ]
-  bulk_vlans = length(local.vlans) > 100 ? chunklist(local.vlans, 100) : chunklist(local.vlans, (length(local.vlans) - length(local.vlans) % 2)/2)
-
+  ]]) : "${i.vlan_policy}:${i.vlan_id}" => i }
   #_________________________________________________________________________
   #
   # Intersight VSAN Policy
