@@ -6,15 +6,15 @@
 
 resource "intersight_fabric_port_policy" "map" {
   depends_on = [
-    data.intersight_search_search_item.ethernet_network_control,
-    data.intersight_search_search_item.ethernet_network_group,
-    data.intersight_search_search_item.flow_control,
-    data.intersight_search_search_item.link_aggregation,
-    data.intersight_search_search_item.link_control,
+    intersight_fabric_eth_network_control_policy.data,
     intersight_fabric_eth_network_control_policy.map,
+    intersight_fabric_eth_network_group_policy.data,
     intersight_fabric_eth_network_group_policy.map,
+    intersight_fabric_flow_control_policy.data,
     intersight_fabric_flow_control_policy.map,
+    intersight_fabric_link_aggregation_policy.data,
     intersight_fabric_link_aggregation_policy.map,
+    intersight_fabric_link_control_policy.data,
     intersight_fabric_link_control_policy.map
   ]
   for_each     = local.port
@@ -51,33 +51,24 @@ resource "intersight_fabric_appliance_pc_role" "map" {
   pc_id    = each.value.pc_id
   priority = each.value.priority
   eth_network_control_policy {
-    moid = length(regexall(each.value.ethernet_network_control_policy.org, each.value.organization)
-      ) > 0 ? intersight_fabric_eth_network_control_policy.map[each.value.ethernet_network_control_policy.name
-      ].moid : [for i in data.intersight_search_search_item.ethernet_network_control[0].results : i.moid if jsondecode(
-        i.additional_properties).Organization.Moid == local.orgs[each.value.ethernet_network_control_policy.org
-    ] && jsondecode(i.additional_properties).Name == each.value.ethernet_network_control_policy.name][0]
+    moid = lookup(local.ethernet_network_control, each.value.ethernet_network_control_policy.name, "#NOEXIST"
+      ) != "#NOEXIST" ? intersight_fabric_eth_network_control_policy.map[each.value.ethernet_network_control_policy.name
+    ].moid : intersight_fabric_eth_network_control_policy.data["${each.value.ethernet_network_control_policy.org}:${each.value.ethernet_network_control_policy.name}"].moid
   }
   eth_network_group_policy {
-    moid = length(regexall(each.value.ethernet_network_group_policy.org, each.value.organization)
-      ) > 0 ? intersight_fabric_eth_network_group_policy.map[each.value.ethernet_network_group_policy.name
-      ].moid : [for i in data.intersight_search_search_item.ethernet_network_group[0].results : i.moid if jsondecode(
-        i.additional_properties).Organization.Moid == local.orgs[each.value.ethernet_network_group_policy.org
-    ] && jsondecode(i.additional_properties).Name == each.value.ethernet_network_group_policy.name][0]
+    moid = lookup(local.ethernet_network_group, each.value.ethernet_network_group_policy.name, "#NOEXIST"
+      ) != "#NOEXIST" ? intersight_fabric_eth_network_group_policy.map[each.value.ethernet_network_group_policy.name
+    ].moid : intersight_fabric_eth_network_group_policy.data["${each.value.ethernet_network_group_policy.org}:${each.value.ethernet_network_group_policy.name}"].moid
   }
   port_policy {
     moid = intersight_fabric_port_policy.map[each.value.port_policy].moid
   }
   dynamic "link_aggregation_policy" {
-    for_each = {
-      for v in [each.value.link_aggregation_policy.name
-      ] : v => v if each.value.link_aggregation_policy.name != "UNUSED"
-    }
+    for_each = { for v in [each.value.link_aggregation_policy] : v.name => v if v.name != "UNUSED" }
     content {
-      moid = length(regexall(each.value.link_aggregation_policy.org, each.value.organization)
-        ) > 0 ? intersight_fabric_link_aggregation_policy.map[each.value.link_aggregation_policy.name
-        ].moid : [for i in data.intersight_search_search_item.link_aggregation[0].results : i.moid if jsondecode(
-          i.additional_properties).Organization.Moid == local.orgs[each.value.link_aggregation_policy.org
-      ] && jsondecode(i.additional_properties).Name == each.value.link_aggregation_policy.name][0]
+      moid = lookup(local.link_aggregation, link_aggregation_policy.value.name, "#NOEXIST"
+        ) != "#NOEXIST" ? intersight_fabric_link_aggregation_policy.map[link_aggregation_policy.value.name
+      ].moid : intersight_fabric_link_aggregation_policy.data["${link_aggregation_policy.value.org}:${link_aggregation_policy.value.name}"].moid
     }
   }
   dynamic "ports" {
@@ -115,55 +106,35 @@ resource "intersight_fabric_uplink_pc_role" "map" {
     moid = intersight_fabric_port_policy.map[each.value.port_policy].moid
   }
   dynamic "eth_network_group_policy" {
-    for_each = {
-      for v in [each.value.ethernet_network_group_policy.name
-      ] : v => v if each.value.ethernet_network_group_policy.name != "UNUSED"
-    }
+    for_each = { for v in [each.value.ethernet_network_group_policy] : v.name => v if v.name != "UNUSED" }
     content {
-      moid = length(regexall(each.value.ethernet_network_group_policy.org, each.value.organization)
-        ) > 0 ? intersight_fabric_eth_network_group_policy.map[each.value.ethernet_network_group_policy.name
-        ].moid : [for i in data.intersight_search_search_item.ethernet_network_group[0].results : i.moid if jsondecode(
-          i.additional_properties).Organization.Moid == local.orgs[each.value.ethernet_network_group_policy.org
-      ] && jsondecode(i.additional_properties).Name == each.value.ethernet_network_group_policy.name][0]
+      moid = lookup(local.ethernet_network_group, eth_network_group_policy.value.name, "#NOEXIST"
+        ) != "#NOEXIST" ? intersight_fabric_eth_network_group_policy.map[eth_network_group_policy.value.name
+      ].moid : intersight_fabric_eth_network_group_policy.data["${eth_network_group_policy.value.org}:${eth_network_group_policy.value.name}"].moid
     }
   }
   dynamic "flow_control_policy" {
-    for_each = {
-      for v in [each.value.flow_control_policy.name
-      ] : v => v if each.value.flow_control_policy.name != "UNUSED"
-    }
+    for_each = { for v in [each.value.flow_control_policy] : v.name => v if v.name != "UNUSED" }
     content {
-      moid = length(regexall(each.value.flow_control_policy.org, each.value.organization)
-        ) > 0 ? intersight_fabric_flow_control_policy.map[each.value.flow_control_policy.name
-        ].moid : [for i in data.intersight_search_search_item.flow_control[0].results : i.moid if jsondecode(
-          i.additional_properties).Organization.Moid == local.orgs[each.value.flow_control_policy.org
-      ] && jsondecode(i.additional_properties).Name == each.value.flow_control_policy.name][0]
+      moid = lookup(local.flow_control, flow_control_policy.value.name, "#NOEXIST"
+        ) != "#NOEXIST" ? intersight_fabric_flow_control_policy.map[flow_control_policy.value.name
+      ].moid : intersight_fabric_flow_control_policy.data["${flow_control_policy.value.org}:${flow_control_policy.value.name}"].moid
     }
   }
   dynamic "link_aggregation_policy" {
-    for_each = {
-      for v in [each.value.link_aggregation_policy.name
-      ] : v => v if each.value.link_aggregation_policy.name != "UNUSED"
-    }
+    for_each = { for v in [each.value.link_aggregation_policy] : v.name => v if v.name != "UNUSED" }
     content {
-      moid = length(regexall(each.value.link_aggregation_policy.org, each.value.organization)
-        ) > 0 ? intersight_fabric_link_aggregation_policy.map[each.value.link_aggregation_policy.name
-        ].moid : [for i in data.intersight_search_search_item.link_aggregation[0].results : i.moid if jsondecode(
-          i.additional_properties).Organization.Moid == local.orgs[each.value.link_aggregation_policy.org
-      ] && jsondecode(i.additional_properties).Name == each.value.link_aggregation_policy.name][0]
+      moid = lookup(local.link_aggregation, link_aggregation_policy.value.name, "#NOEXIST"
+        ) != "#NOEXIST" ? intersight_fabric_link_aggregation_policy.map[link_aggregation_policy.value.name
+      ].moid : intersight_fabric_link_aggregation_policy.data["${link_aggregation_policy.value.org}:${link_aggregation_policy.value.name}"].moid
     }
   }
   dynamic "link_control_policy" {
-    for_each = {
-      for v in [each.value.link_control_policy.name
-      ] : v => v if each.value.link_control_policy.name != "UNUSED"
-    }
+    for_each = { for v in [each.value.link_control_policy] : v.name => v if v.name != "UNUSED" }
     content {
-      moid = length(regexall(each.value.link_control_policy.org, each.value.organization)
-        ) > 0 ? intersight_fabric_link_control_policy.map[each.value.link_control_policy.name
-        ].moid : [for i in data.intersight_search_search_item.link_control[0].results : i.moid if jsondecode(
-          i.additional_properties).Organization.Moid == local.orgs[each.value.link_control_policy.org
-      ] && jsondecode(i.additional_properties).Name == each.value.link_control_policy.name][0]
+      moid = lookup(local.link_control, link_control_policy.value.name, "#NOEXIST"
+        ) != "#NOEXIST" ? intersight_fabric_link_control_policy.map[link_control_policy.value.name
+      ].moid : intersight_fabric_link_control_policy.data["${link_control_policy.value.org}:${link_control_policy.value.name}"].moid
     }
   }
   dynamic "ports" {
@@ -238,29 +209,19 @@ resource "intersight_fabric_fcoe_uplink_pc_role" "map" {
     moid = intersight_fabric_port_policy.map[each.value.port_policy].moid
   }
   dynamic "link_aggregation_policy" {
-    for_each = {
-      for v in [each.value.link_aggregation_policy.name
-      ] : v => v if each.value.link_aggregation_policy.name != "UNUSED"
-    }
+    for_each = { for v in [each.value.link_aggregation_policy] : v.name => v if v.name != "UNUSED" }
     content {
-      moid = length(regexall(each.value.link_aggregation_policy.org, each.value.organization)
-        ) > 0 ? intersight_fabric_link_aggregation_policy.map[each.value.link_aggregation_policy.name
-        ].moid : [for i in data.intersight_search_search_item.link_aggregation[0].results : i.moid if jsondecode(
-          i.additional_properties).Organization.Moid == local.orgs[each.value.link_aggregation_policy.org
-      ] && jsondecode(i.additional_properties).Name == each.value.link_aggregation_policy.name][0]
+      moid = lookup(local.link_aggregation, link_aggregation_policy.value.name, "#NOEXIST"
+        ) != "#NOEXIST" ? intersight_fabric_link_aggregation_policy.map[link_aggregation_policy.value.name
+      ].moid : intersight_fabric_link_aggregation_policy.data["${link_aggregation_policy.value.org}:${link_aggregation_policy.value.name}"].moid
     }
   }
   dynamic "link_control_policy" {
-    for_each = {
-      for v in [each.value.link_control_policy.name
-      ] : v => v if each.value.link_control_policy.name != "UNUSED"
-    }
+    for_each = { for v in [each.value.link_control_policy] : v.name => v if v.name != "UNUSED" }
     content {
-      moid = length(regexall(each.value.link_control_policy.org, each.value.organization)
-        ) > 0 ? intersight_fabric_link_control_policy.map[each.value.link_control_policy.name
-        ].moid : [for i in data.intersight_search_search_item.link_control[0].results : i.moid if jsondecode(
-          i.additional_properties).Organization.Moid == local.orgs[each.value.link_control_policy.org
-      ] && jsondecode(i.additional_properties).Name == each.value.link_control_policy.name][0]
+      moid = lookup(local.link_control, link_control_policy.value.name, "#NOEXIST"
+        ) != "#NOEXIST" ? intersight_fabric_link_control_policy.map[link_control_policy.value.name
+      ].moid : intersight_fabric_link_control_policy.data["${link_control_policy.value.org}:${link_control_policy.value.name}"].moid
     }
   }
   dynamic "ports" {
@@ -331,18 +292,14 @@ resource "intersight_fabric_appliance_role" "map" {
     moid = intersight_fabric_port_policy.map[each.value.port_policy].moid
   }
   eth_network_control_policy {
-    moid = length(regexall(each.value.ethernet_network_control_policy.org, each.value.organization)
-      ) > 0 ? intersight_fabric_eth_network_control_policy.map[each.value.ethernet_network_control_policy.name
-      ].moid : [for i in data.intersight_search_search_item.ethernet_network_control[0].results : i.moid if jsondecode(
-        i.additional_properties).Organization.Moid == local.orgs[each.value.ethernet_network_control_policy.org
-    ] && jsondecode(i.additional_properties).Name == each.value.ethernet_network_control_policy.name][0]
+    moid = lookup(local.ethernet_network_control, each.value.ethernet_network_control_policy.name, "#NOEXIST"
+      ) != "#NOEXIST" ? intersight_fabric_eth_network_control_policy.map[each.value.ethernet_network_control_policy.name
+    ].moid : intersight_fabric_eth_network_control_policy.data["${each.value.ethernet_network_control_policy.org}:${each.value.ethernet_network_control_policy.name}"].moid
   }
   eth_network_group_policy {
-    moid = length(regexall(each.value.ethernet_network_group_policy.org, each.value.organization)
-      ) > 0 ? intersight_fabric_eth_network_group_policy.map[each.value.ethernet_network_group_policy.name
-      ].moid : [for i in data.intersight_search_search_item.ethernet_network_group[0].results : i.moid if jsondecode(
-        i.additional_properties).Organization.Moid == local.orgs[each.value.ethernet_network_group_policy.org
-    ] && jsondecode(i.additional_properties).Name == each.value.ethernet_network_group_policy.name][0]
+    moid = lookup(local.ethernet_network_group, each.value.ethernet_network_group_policy.name, "#NOEXIST"
+      ) != "#NOEXIST" ? intersight_fabric_eth_network_group_policy.map[each.value.ethernet_network_group_policy.name
+    ].moid : intersight_fabric_eth_network_group_policy.data["${each.value.ethernet_network_group_policy.org}:${each.value.ethernet_network_group_policy.name}"].moid
   }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
@@ -373,42 +330,27 @@ resource "intersight_fabric_uplink_role" "map" {
     moid = intersight_fabric_port_policy.map[each.value.port_policy].moid
   }
   dynamic "eth_network_group_policy" {
-    for_each = {
-      for v in [each.value.ethernet_network_group_policy.name
-      ] : v => v if each.value.ethernet_network_group_policy.name != "UNUSED"
-    }
+    for_each = { for v in [each.value.ethernet_network_group_policy] : v.name => v if v.name != "UNUSED" }
     content {
-      moid = length(regexall(each.value.ethernet_network_group_policy.org, each.value.organization)
-        ) > 0 ? intersight_fabric_eth_network_group_policy.map[each.value.ethernet_network_group_policy.name
-        ].moid : [for i in data.intersight_search_search_item.ethernet_network_group[0].results : i.moid if jsondecode(
-          i.additional_properties).Organization.Moid == local.orgs[each.value.ethernet_network_group_policy.org
-      ] && jsondecode(i.additional_properties).Name == each.value.ethernet_network_group_policy.name][0]
+      moid = lookup(local.ethernet_network_group, eth_network_group_policy.value.name, "#NOEXIST"
+        ) != "#NOEXIST" ? intersight_fabric_eth_network_group_policy.map[eth_network_group_policy.value.name
+      ].moid : intersight_fabric_eth_network_group_policy.data["${eth_network_group_policy.value.org}:${eth_network_group_policy.value.name}"].moid
     }
   }
   dynamic "flow_control_policy" {
-    for_each = {
-      for v in [each.value.flow_control_policy.name
-      ] : v => v if each.value.flow_control_policy.name != "UNUSED"
-    }
+    for_each = { for v in [each.value.flow_control_policy] : v.name => v if v.name != "UNUSED" }
     content {
-      moid = length(regexall(each.value.flow_control_policy.org, each.value.organization)
-        ) > 0 ? intersight_fabric_flow_control_policy.map[each.value.flow_control_policy.name
-        ].moid : [for i in data.intersight_search_search_item.flow_control[0].results : i.moid if jsondecode(
-          i.additional_properties).Organization.Moid == local.orgs[each.value.flow_control_policy.org
-      ] && jsondecode(i.additional_properties).Name == each.value.flow_control_policy.name][0]
+      moid = lookup(local.flow_control, flow_control_policy.value.name, "#NOEXIST"
+        ) != "#NOEXIST" ? intersight_fabric_flow_control_policy.map[flow_control_policy.value.name
+      ].moid : intersight_fabric_flow_control_policy.data["${flow_control_policy.value.org}:${flow_control_policy.value.name}"].moid
     }
   }
   dynamic "link_control_policy" {
-    for_each = {
-      for v in [each.value.link_control_policy.name
-      ] : v => v if each.value.link_control_policy.name != "UNUSED"
-    }
+    for_each = { for v in [each.value.link_control_policy] : v.name => v if v.name != "UNUSED" }
     content {
-      moid = length(regexall(each.value.link_control_policy.org, each.value.organization)
-        ) > 0 ? intersight_fabric_link_control_policy.map[each.value.link_control_policy.name
-        ].moid : [for i in data.intersight_search_search_item.link_control[0].results : i.moid if jsondecode(
-          i.additional_properties).Organization.Moid == local.orgs[each.value.link_control_policy.org
-      ] && jsondecode(i.additional_properties).Name == each.value.link_control_policy.name][0]
+      moid = lookup(local.link_control, link_control_policy.value.name, "#NOEXIST"
+        ) != "#NOEXIST" ? intersight_fabric_link_control_policy.map[link_control_policy.value.name
+      ].moid : intersight_fabric_link_control_policy.data["${link_control_policy.value.org}:${link_control_policy.value.name}"].moid
     }
   }
   dynamic "tags" {
@@ -502,16 +444,11 @@ resource "intersight_fabric_fcoe_uplink_role" "map" {
     moid = intersight_fabric_port_policy.map[each.value.port_policy].moid
   }
   dynamic "link_control_policy" {
-    for_each = {
-      for v in [each.value.link_control_policy.name
-      ] : v => v if each.value.link_control_policy.name != "UNUSED"
-    }
+    for_each = { for v in [each.value.link_control_policy] : v.name => v if v.name != "UNUSED" }
     content {
-      moid = length(regexall(each.value.link_control_policy.org, each.value.organization)
-        ) > 0 ? intersight_fabric_link_control_policy.map[each.value.link_control_policy.name
-        ].moid : [for i in data.intersight_search_search_item.link_control[0].results : i.moid if jsondecode(
-          i.additional_properties).Organization.Moid == local.orgs[each.value.link_control_policy.org
-      ] && jsondecode(i.additional_properties).Name == each.value.link_control_policy.name][0]
+      moid = lookup(local.link_control, link_control_policy.value.name, "#NOEXIST"
+        ) != "#NOEXIST" ? intersight_fabric_link_control_policy.map[link_control_policy.value.name
+      ].moid : intersight_fabric_link_control_policy.data["${link_control_policy.value.org}:${link_control_policy.value.name}"].moid
     }
   }
   dynamic "tags" {

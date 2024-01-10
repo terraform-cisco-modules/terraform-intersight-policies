@@ -5,10 +5,7 @@
 #__________________________________________________________________
 
 resource "intersight_fabric_fc_zone_policy" "map" {
-  for_each = { for v in lookup(local.policies, "fc_zone", []) : v.name => merge(local.defaults.fc_zone, v, {
-    name = "${local.name_prefix.fc_zone}${v.name}${local.name_suffix.fc_zone}"
-    tags = lookup(v, "tags", var.policies.global_settings.tags)
-  }) }
+  for_each              = local.fc_zone
   description           = coalesce(each.value.description, "${each.value.name} FC Zone Policy.")
   fc_target_zoning_type = each.value.fc_target_zoning_type
   name                  = each.value.name
@@ -31,5 +28,23 @@ resource "intersight_fabric_fc_zone_policy" "map" {
       key   = tags.value.key
       value = tags.value.value
     }
+  }
+}
+
+resource "intersight_fabric_fc_zone_policy" "data" {
+  depends_on = [intersight_fabric_fc_zone_policy.map]
+  for_each = {
+    for v in local.pp.fc_zone : v => v if lookup(local.fc_zone, element(split(":", v), 1), "#NOEXIST") == "#NOEXIST"
+  }
+  name = element(split(":", each.value), 1)
+  organization {
+    moid = local.orgs[element(split(":", each.value), 0)]
+  }
+  lifecycle {
+    ignore_changes = [
+      account_moid, additional_properties, ancestors, create_time, description, domain_group_moid, fc_target_zoning_type,
+      fc_target_members, mod_time, owners, parent, permission_resources, shared_scope, tags, version_context
+    ]
+    prevent_destroy = true
   }
 }

@@ -5,10 +5,7 @@
 #__________________________________________________________________
 
 resource "intersight_vnic_iscsi_adapter_policy" "map" {
-  for_each = { for v in lookup(local.policies, "iscsi_adapter", []) : v.name => merge(local.defaults.iscsi_adapter, v, {
-    name = "${local.name_prefix.iscsi_adapter}${v.name}${local.name_suffix.iscsi_adapter}"
-    tags = lookup(v, "tags", var.policies.global_settings.tags)
-  }) }
+  for_each             = local.iscsi_adapter
   connection_time_out  = each.value.tcp_connection_timeout
   description          = coalesce(each.value.description, "${each.value.name} iSCSI Adapter Policy.")
   dhcp_timeout         = each.value.dhcp_timeout
@@ -24,5 +21,23 @@ resource "intersight_vnic_iscsi_adapter_policy" "map" {
       key   = tags.value.key
       value = tags.value.value
     }
+  }
+}
+
+resource "intersight_vnic_iscsi_adapter_policy" "data" {
+  depends_on = [intersight_vnic_iscsi_adapter_policy.map]
+  for_each = {
+    for v in local.pp.iscsi_adapter : v => v if lookup(local.iscsi_adapter, element(split(":", v), 1), "#NOEXIST") == "#NOEXIST"
+  }
+  name = element(split(":", each.value), 1)
+  organization {
+    moid = local.orgs[element(split(":", each.value), 0)]
+  }
+  lifecycle {
+    ignore_changes = [
+      account_moid, additional_properties, ancestors, create_time, description, domain_group_moid, mod_time, owners,
+      parent, permission_resources, shared_scope, tags, version_context
+    ]
+    prevent_destroy = true
   }
 }

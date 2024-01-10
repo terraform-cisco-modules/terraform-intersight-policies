@@ -5,10 +5,7 @@
 #__________________________________________________________________
 
 resource "intersight_fabric_link_aggregation_policy" "map" {
-  for_each = { for v in lookup(local.policies, "link_aggregation", []) : v.name => merge(local.defaults.link_aggregation, v, {
-    name = "${local.name_prefix.link_aggregation}${v.name}${local.name_suffix.link_aggregation}"
-    tags = lookup(v, "tags", var.policies.global_settings.tags)
-  }) }
+  for_each           = local.link_aggregation
   description        = coalesce(each.value.description, "${each.value.name} Link Aggregation Policy.")
   lacp_rate          = each.value.lacp_rate
   name               = each.value.name
@@ -23,5 +20,23 @@ resource "intersight_fabric_link_aggregation_policy" "map" {
       key   = tags.value.key
       value = tags.value.value
     }
+  }
+}
+
+resource "intersight_fabric_link_aggregation_policy" "data" {
+  depends_on = [intersight_fabric_link_aggregation_policy.map]
+  for_each = {
+    for v in local.pp.link_aggregation : v => v if lookup(local.link_aggregation, element(split(":", v), 1), "#NOEXIST") == "#NOEXIST"
+  }
+  name = element(split(":", each.value), 1)
+  organization {
+    moid = local.orgs[element(split(":", each.value), 0)]
+  }
+  lifecycle {
+    ignore_changes = [
+      account_moid, additional_properties, ancestors, create_time, description, domain_group_moid, lacp_rate,
+      mod_time, owners, parent, permission_resources, shared_scope, suspend_individual, tags, version_context
+    ]
+    prevent_destroy = true
   }
 }

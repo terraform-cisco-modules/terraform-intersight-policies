@@ -5,10 +5,7 @@
 #__________________________________________________________________
 
 resource "intersight_vnic_fc_qos_policy" "map" {
-  for_each = { for v in lookup(local.policies, "fibre_channel_qos", []) : v.name => merge(local.defaults.fibre_channel_qos, v, {
-    name = "${local.name_prefix.fibre_channel_qos}${v.name}${local.name_suffix.fibre_channel_qos}"
-    tags = lookup(v, "tags", var.policies.global_settings.tags)
-  }) }
+  for_each            = local.fibre_channel_qos
   burst               = each.value.burst # FI-Attached
   cos                 = each.value.cos   # Standalone
   description         = coalesce(each.value.description, "${each.value.name} Fibre-Channel QoS Policy.")
@@ -25,5 +22,23 @@ resource "intersight_vnic_fc_qos_policy" "map" {
       key   = tags.value.key
       value = tags.value.value
     }
+  }
+}
+
+resource "intersight_vnic_fc_qos_policy" "data" {
+  depends_on = [intersight_vnic_fc_qos_policy.map]
+  for_each = {
+    for v in local.pp.fc_qos : v => v if lookup(local.fibre_channel_qos, element(split(":", v), 1), "#NOEXIST") == "#NOEXIST"
+  }
+  name = element(split(":", each.value), 1)
+  organization {
+    moid = local.orgs[element(split(":", each.value), 0)]
+  }
+  lifecycle {
+    ignore_changes = [
+      account_moid, additional_properties, ancestors, burst, cos, create_time, description, domain_group_moid, max_data_field_size,
+      mod_time, owners, parent, permission_resources, rate_limit, shared_scope, tags, version_context
+    ]
+    prevent_destroy = true
   }
 }

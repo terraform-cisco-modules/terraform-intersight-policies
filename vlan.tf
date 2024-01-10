@@ -29,9 +29,9 @@ resource "intersight_fabric_eth_network_policy" "map" {
 
 resource "intersight_fabric_vlan" "map" {
   depends_on = [
-    data.intersight_search_search_item.multicast,
-    intersight_fabric_multicast_policy.map,
-    intersight_fabric_eth_network_policy.map
+    intersight_fabric_eth_network_policy.map,
+    intersight_fabric_multicast_policy.data,
+    intersight_fabric_multicast_policy.map
   ]
   for_each              = { for k, v in local.vlans : k => v if v.vlan_id > 0 && v.vlan_id < 4094 }
   auto_allow_on_uplinks = each.value.auto_allow_on_uplinks
@@ -49,10 +49,8 @@ resource "intersight_fabric_vlan" "map" {
   vlan_id = each.value.vlan_id
   eth_network_policy { moid = intersight_fabric_eth_network_policy.map[each.value.vlan_policy].moid }
   multicast_policy {
-    moid = length(regexall(each.value.multicast_policy.org, each.value.organization)
-      ) > 0 ? intersight_fabric_multicast_policy.map[each.value.multicast_policy.name
-      ].moid : [for i in data.intersight_search_search_item.multicast[0].results : i.moid if jsondecode(
-        i.additional_properties).Organization.Moid == local.orgs[each.value.multicast_policy.org
-    ] && jsondecode(i.additional_properties).Name == each.value.multicast_policy.name][0]
+    moid = lookup(local.multicast, each.value.multicast_policy.name, "#NOEXIST"
+      ) != "#NOEXIST" ? intersight_fabric_multicast_policy.map[each.value.multicast_policy.name
+    ].moid : intersight_fabric_multicast_policy.data["${each.value.multicast_policy.org}:${each.value.multicast_policy.name}"].moid
   }
 }

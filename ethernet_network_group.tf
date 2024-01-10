@@ -5,10 +5,7 @@
 #__________________________________________________________________
 
 resource "intersight_fabric_eth_network_group_policy" "map" {
-  for_each = { for v in lookup(local.policies, "ethernet_network_group", []) : v.name => merge(local.eng, v, {
-    name = "${local.name_prefix.ethernet_network_group}${v.name}${local.name_suffix.ethernet_network_group}"
-    tags = lookup(v, "tags", var.policies.global_settings.tags)
-  }) }
+  for_each    = local.ethernet_network_group
   description = coalesce(each.value.description, "${each.value.name} Ethernet Network Group Policy.")
   name        = each.value.name
   organization {
@@ -25,5 +22,23 @@ resource "intersight_fabric_eth_network_group_policy" "map" {
       key   = tags.value.key
       value = tags.value.value
     }
+  }
+}
+
+resource "intersight_fabric_eth_network_group_policy" "data" {
+  depends_on = [intersight_fabric_eth_network_group_policy.map]
+  for_each = {
+    for v in local.pp.ethernet_network_group : v => v if lookup(local.ethernet_network_group, element(split(":", v), 1), "#NOEXIST") == "#NOEXIST"
+  }
+  name = element(split(":", each.value), 1)
+  organization {
+    moid = local.orgs[element(split(":", each.value), 0)]
+  }
+  lifecycle {
+    ignore_changes = [
+      account_moid, additional_properties, ancestors, create_time, description, domain_group_moid, mod_time, owners,
+      parent, permission_resources, shared_scope, tags, version_context, vlan_settings
+    ]
+    prevent_destroy = true
   }
 }

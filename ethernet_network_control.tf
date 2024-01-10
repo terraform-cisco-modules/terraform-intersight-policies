@@ -5,12 +5,7 @@
 #__________________________________________________________________
 
 resource "intersight_fabric_eth_network_control_policy" "map" {
-  for_each = { for v in lookup(
-    local.policies, "ethernet_network_control", []) : v.name => merge(local.defaults.ethernet_network_control, v, {
-      name = "${local.name_prefix.ethernet_network_control}${v.name}${local.name_suffix.ethernet_network_control}"
-      tags = lookup(v, "tags", var.policies.global_settings.tags)
-    })
-  }
+  for_each              = local.ethernet_network_control
   cdp_enabled           = each.value.cdp_enable
   description           = coalesce(each.value.description, "${each.value.name} Ethernet Network Control Policy.")
   forge_mac             = each.value.mac_security_forge
@@ -32,5 +27,23 @@ resource "intersight_fabric_eth_network_control_policy" "map" {
       key   = tags.value.key
       value = tags.value.value
     }
+  }
+}
+
+resource "intersight_fabric_eth_network_control_policy" "data" {
+  depends_on = [intersight_fabric_eth_network_control_policy.map]
+  for_each = {
+    for v in local.pp.ethernet_network_control : v => v if lookup(local.ethernet_network_control, element(split(":", v), 1), "#NOEXIST") == "#NOEXIST"
+  }
+  name = element(split(":", each.value), 1)
+  organization {
+    moid = local.orgs[element(split(":", each.value), 0)]
+  }
+  lifecycle {
+    ignore_changes = [
+      account_moid, additional_properties, ancestors, cdp_enabled, create_time, description, domain_group_moid, forge_mac, lldp_settings,
+      mac_registration_mode, mod_time, owners, parent, permission_resources, shared_scope, tags, uplink_fail_action, version_context
+    ]
+    prevent_destroy = true
   }
 }

@@ -25,11 +25,11 @@ output "bios" {
 # Boot Order Policy Outputs
 #__________________________________________________________
 
-output "boot_order" {
-  description = "Moid's of the Boot Order Policies."
-  value = { for v in sort(keys(intersight_boot_precision_policy.map)
-  ) : v => intersight_boot_precision_policy.map[v].moid }
-}
+#output "boot_order" {
+#  description = "Moid's of the Boot Order Policies."
+#  value = { for v in sort(keys(intersight_boot_precision_policy.map)
+#  ) : v => intersight_boot_precision_policy.map[v].moid }
+#}
 
 
 #__________________________________________________________
@@ -93,11 +93,11 @@ output "ipmi_over_lan" {
 # LAN Connectivity Policy Outputs
 #__________________________________________________________
 
-output "lan_connectivity" {
-  description = "Moid's of the LAN Connectivity Policies."
-  value = { for v in sort(keys(intersight_vnic_lan_connectivity_policy.map)
-  ) : v => intersight_vnic_lan_connectivity_policy.map[v].moid }
-}
+#output "lan_connectivity" {
+#  description = "Moid's of the LAN Connectivity Policies."
+#  value = { for v in sort(keys(intersight_vnic_lan_connectivity_policy.map)
+#  ) : v => intersight_vnic_lan_connectivity_policy.map[v].moid }
+#}
 
 #__________________________________________________________
 #
@@ -183,11 +183,11 @@ output "power" {
 # SAN Connectivity Policy Outputs
 #__________________________________________________________
 
-output "san_connectivity" {
-  description = "Moid's of the SAN Connectivity Policies."
-  value = { for v in sort(keys(intersight_vnic_san_connectivity_policy.map)
-  ) : v => intersight_vnic_san_connectivity_policy.map[v].moid }
-}
+#output "san_connectivity" {
+#  description = "Moid's of the SAN Connectivity Policies."
+#  value = { for v in sort(keys(intersight_vnic_san_connectivity_policy.map)
+#  ) : v => intersight_vnic_san_connectivity_policy.map[v].moid }
+#}
 
 
 #__________________________________________________________
@@ -318,11 +318,11 @@ output "virtual_media" {
 # VLAN Policy Outputs
 #__________________________________________________________
 
-output "vlan" {
-  description = "Moid's of the VLAN Policies."
-  value = { for v in sort(keys(intersight_fabric_eth_network_policy.map)
-  ) : v => intersight_fabric_eth_network_policy.map[v].moid }
-}
+#output "vlan" {
+#  description = "Moid's of the VLAN Policies."
+#  value = { for v in sort(keys(intersight_fabric_eth_network_policy.map)
+#  ) : v => intersight_fabric_eth_network_policy.map[v].moid }
+#}
 
 
 #__________________________________________________________

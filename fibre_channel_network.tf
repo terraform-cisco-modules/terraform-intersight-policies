@@ -5,10 +5,7 @@
 #__________________________________________________________________
 
 resource "intersight_vnic_fc_network_policy" "map" {
-  for_each = { for v in lookup(local.policies, "fibre_channel_network", []) : v.name => merge(local.fcn, v, {
-    name = "${local.name_prefix.fibre_channel_network}${v.name}${local.name_suffix.fibre_channel_network}"
-    tags = lookup(v, "tags", var.policies.global_settings.tags)
-  }) }
+  for_each    = local.fibre_channel_network
   description = coalesce(each.value.description, "${each.value.name} Fibre-Channel Network Policy.")
   name        = each.value.name
   organization {
@@ -25,5 +22,23 @@ resource "intersight_vnic_fc_network_policy" "map" {
       key   = tags.value.key
       value = tags.value.value
     }
+  }
+}
+
+resource "intersight_vnic_fc_network_policy" "data" {
+  depends_on = [intersight_vnic_fc_network_policy.map]
+  for_each = {
+    for v in local.pp.fc_network : v => v if lookup(local.fibre_channel_network, element(split(":", v), 1), "#NOEXIST") == "#NOEXIST"
+  }
+  name = element(split(":", each.value), 1)
+  organization {
+    moid = local.orgs[element(split(":", each.value), 0)]
+  }
+  lifecycle {
+    ignore_changes = [
+      account_moid, additional_properties, ancestors, create_time, description, domain_group_moid, mod_time, owners,
+      parent, permission_resources, shared_scope, tags, version_context, vsan_settings
+    ]
+    prevent_destroy = true
   }
 }

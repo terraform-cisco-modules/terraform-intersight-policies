@@ -6,10 +6,10 @@
 
 resource "intersight_vnic_iscsi_boot_policy" "map" {
   depends_on = [
-    data.intersight_search_search_item.ip,
-    data.intersight_search_search_item.iscsi_adapter,
-    data.intersight_search_search_item.iscsi_static_target,
+    intersight_ippool_pool.data,
+    intersight_vnic_iscsi_adapter_policy.data,
     intersight_vnic_iscsi_adapter_policy.map,
+    intersight_vnic_iscsi_static_target_policy.data,
     intersight_vnic_iscsi_static_target_policy.map
   ]
   for_each               = { for k, v in local.iscsi_boot : k => v }
@@ -74,55 +74,36 @@ resource "intersight_vnic_iscsi_boot_policy" "map" {
     object_type = "organization.Organization"
   }
   dynamic "initiator_ip_pool" {
-    for_each = {
-      for v in [each.value.initiator_ip_pool.name] : v => v if each.value.initiator_ip_pool.name != "UNUSED"
-    }
+    for_each = { for v in [each.value.initiator_ip_pool] : v.name => v if v.name != "UNUSED" }
     content {
-      moid = length(regexall(false, local.moids_pools)) > 0 ? local.pools[each.value.initiator_ip_pool.org].ip[
-        each.value.initiator_ip_pool.name
-        ] : [for i in data.intersight_search_search_item.ip[0].results : i.moid if jsondecode(
-          i.additional_properties).Organization.Moid == local.orgs[each.value.initiator_ip_pool.org
-      ] && jsondecode(i.additional_properties).Name == each.value.initiator_ip_pool.name][0]
+      moid = length(regexall("#EXIST", lookup(lookup(lookup(local.pools, initiator_ip_pool.value.org, {}), "ip", {}), initiator_ip_pool.value.name, "#EXIST"))
+        ) == 0 ? local.pools[initiator_ip_pool.value.org].ip[initiator_ip_pool.value.name
+      ] : intersight_ippool_pool.data["${initiator_ip_pool.value.org}:${initiator_ip_pool.value.name}"].moid
       object_type = "ippool.Pool"
     }
   }
   dynamic "iscsi_adapter_policy" {
-    for_each = {
-      for v in [each.value.iscsi_adapter_policy.name
-      ] : v => v if each.value.iscsi_adapter_policy.name != "UNUSED"
-    }
+    for_each = { for v in [each.value.iscsi_adapter_policy] : v => v }
     content {
-      moid = length(regexall(each.value.iscsi_adapter_policy.org, each.value.organization)
-        ) > 0 ? intersight_vnic_iscsi_adapter_policy.map[each.value.iscsi_adapter_policy.name
-        ].moid : [for i in data.intersight_search_search_item.iscsi_adapter[0].results : i.moid if jsondecode(
-          i.additional_properties).Organization.Moid == local.orgs[each.value.iscsi_adapter_policy.org
-      ] && jsondecode(i.additional_properties).Name == each.value.iscsi_adapter_policy.name][0]
+      moid = lookup(local.iscsi_adapter, iscsi_adapter_policy.value.name, "#NOEXIST"
+        ) != "#NOEXIST" ? intersight_vnic_iscsi_adapter_policy.map[iscsi_adapter_policy.value.name
+      ].moid : intersight_vnic_iscsi_adapter_policy.data["${iscsi_adapter_policy.value.org}:${iscsi_adapter_policy.value.name}"].moid
     }
   }
   dynamic "primary_target_policy" {
-    for_each = {
-      for v in [each.value.primary_target_policy.name
-      ] : v => v if each.value.primary_target_policy.name != "UNUSED"
-    }
+    for_each = { for v in [each.value.primary_target_policy] : v.name => v }
     content {
-      moid = length(regexall(each.value.primary_target_policy.org, each.value.organization)
-        ) > 0 ? intersight_vnic_iscsi_static_target_policy.map[each.value.primary_target_policy.name
-        ].moid : [for i in data.intersight_search_search_item.iscsi_static_target[0].results : i.moid if jsondecode(
-          i.additional_properties).Organization.Moid == local.orgs[each.value.primary_target_policy.org
-      ] && jsondecode(i.additional_properties).Name == each.value.primary_target_policy.name][0]
+      moid = lookup(local.iscsi_static_target, primary_target_policy.value.name, "#NOEXIST"
+        ) != "#NOEXIST" ? intersight_vnic_iscsi_static_target_policy.map[primary_target_policy.value.name
+      ].moid : intersight_vnic_iscsi_static_target_policy.data["${primary_target_policy.value.org}:${primary_target_policy.value.name}"].moid
     }
   }
   dynamic "secondary_target_policy" {
-    for_each = {
-      for v in [each.value.secondary_target_policy.name
-      ] : v => v if each.value.secondary_target_policy.name != "UNUSED"
-    }
+    for_each = { for v in [each.value.secondary_target_policy] : v.name => v }
     content {
-      moid = length(regexall(each.value.secondary_target_policy.org, each.value.organization)
-        ) > 0 ? intersight_vnic_iscsi_static_target_policy.map[each.value.secondary_target_policy.name
-        ].moid : [for i in data.intersight_search_search_item.iscsi_static_target[0].results : i.moid if jsondecode(
-          i.additional_properties).Organization.Moid == local.orgs[each.value.secondary_target_policy.org
-      ] && jsondecode(i.additional_properties).Name == each.value.secondary_target_policy.name][0]
+      moid = lookup(local.iscsi_static_target, secondary_target_policy.value.name, "#NOEXIST"
+        ) != "#NOEXIST" ? intersight_vnic_iscsi_static_target_policy.map[secondary_target_policy.value.name
+      ].moid : intersight_vnic_iscsi_static_target_policy.data["${secondary_target_policy.value.org}:${secondary_target_policy.value.name}"].moid
     }
   }
   dynamic "tags" {
@@ -131,5 +112,25 @@ resource "intersight_vnic_iscsi_boot_policy" "map" {
       key   = tags.value.key
       value = tags.value.value
     }
+  }
+}
+
+resource "intersight_vnic_iscsi_boot_policy" "data" {
+  depends_on = [intersight_vnic_iscsi_boot_policy.map]
+  for_each = {
+    for v in local.pp.iscsi_boot : v => v if lookup(local.iscsi_boot, element(split(":", v), 1), "#NOEXIST") == "#NOEXIST"
+  }
+  name = element(split(":", each.value), 1)
+  organization {
+    moid = local.orgs[element(split(":", each.value), 0)]
+  }
+  lifecycle {
+    ignore_changes = [
+      account_moid, additional_properties, ancestors, auto_targetvendor_name, chap, create_time, description, domain_group_moid,
+      initiator_ip_pool, initiator_ip_source, initiator_static_ip_v4_address, initiator_static_ip_v4_config, iscsi_adapter_policy,
+      mod_time, mutual_chap, owners, parent, permission_resources, primary_target_policy, secondary_target_policy, shared_scope,
+      tags, target_source_type, version_context
+    ]
+    prevent_destroy = true
   }
 }

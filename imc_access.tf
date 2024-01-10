@@ -6,7 +6,7 @@
 
 resource "intersight_access_policy" "map" {
   depends_on = [
-    data.intersight_search_search_item.ip
+    intersight_ippool_pool.data
   ]
   for_each    = local.imc_access
   description = coalesce(each.value.description, "${each.value.name} IMC Access Policy.")
@@ -18,38 +18,28 @@ resource "intersight_access_policy" "map" {
     object_type  = "access.AddressType"
   }
   configuration_type {
-    configure_inband = length(regexall("UNUSED", each.value.inband_ip_pool.name)
-    ) > 0 ? false : true
-    configure_out_of_band = length(regexall("UNUSED", each.value.out_of_band_ip_pool.name)
-    ) > 0 ? false : true
+    configure_inband      = length(regexall("UNUSED", each.value.inband_ip_pool.name)) > 0 ? false : true
+    configure_out_of_band = length(regexall("UNUSED", each.value.out_of_band_ip_pool.name)) > 0 ? false : true
   }
   organization {
     moid        = local.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "inband_ip_pool" {
-    for_each = {
-      for v in [each.value.inband_ip_pool.name] : v => v if each.value.inband_ip_pool.name != "UNUSED"
-    }
+    for_each = { for v in [each.value.inband_ip_pool] : v.name => v if v.name != "UNUSED" }
     content {
-      moid = length(regexall(false, local.moids_pools)) > 0 ? local.pools[each.value.inband_ip_pool.org].ip[
-        each.value.inband_ip_pool.name
-        ] : [for i in data.intersight_search_search_item.ip[0].results : i.moid if jsondecode(
-          i.additional_properties).Organization.Moid == local.orgs[each.value.inband_ip_pool.org
-      ] && jsondecode(i.additional_properties).Name == each.value.inband_ip_pool.name][0]
+      moid = length(regexall("#EXIST", lookup(lookup(lookup(local.pools, inband_ip_pool.value.org, {}), "ip", {}), inband_ip_pool.value.name, "#EXIST"))
+        ) == 0 ? local.pools[inband_ip_pool.value.org].ip[inband_ip_pool.value.name
+      ] : intersight_ippool_pool.data["${inband_ip_pool.value.org}:${inband_ip_pool.value.name}"].moid
       object_type = "ippool.Pool"
     }
   }
   dynamic "out_of_band_ip_pool" {
-    for_each = { for v in [each.value.out_of_band_ip_pool.name
-      ] : v => v if each.value.out_of_band_ip_pool.name != "UNUSED"
-    }
+    for_each = { for v in [each.value.out_of_band_ip_pool] : v.name => v if v.name != "UNUSED" }
     content {
-      moid = length(regexall(false, local.moids_pools)) > 0 ? local.pools[each.value.out_of_band_ip_pool.org].ip[
-        each.value.out_of_band_ip_pool.name
-        ] : [for i in data.intersight_search_search_item.ip[0].results : i.moid if jsondecode(
-          i.additional_properties).Organization.Moid == local.orgs[each.value.out_of_band_ip_pool.org
-      ] && jsondecode(i.additional_properties).Name == each.value.out_of_band_ip_pool.name][0]
+      moid = length(regexall("#EXIST", lookup(lookup(lookup(local.pools, out_of_band_ip_pool.value.org, {}), "ip", {}), out_of_band_ip_pool.value.name, "#EXIST"))
+        ) == 0 ? local.pools[out_of_band_ip_pool.value.org].ip[out_of_band_ip_pool.value.name
+      ] : intersight_ippool_pool.data["${out_of_band_ip_pool.value.org}:${out_of_band_ip_pool.value.name}"].moid
       object_type = "ippool.Pool"
     }
   }
