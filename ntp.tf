@@ -5,20 +5,14 @@
 #__________________________________________________________________
 
 resource "intersight_ntp_policy" "map" {
-  for_each = {
-    for v in lookup(local.policies, "ntp", []) : v.name => merge(local.defaults.ntp, v, {
-      name         = "${local.npfx.ntp}${v.name}${local.nsfx.ntp}"
-      organization = local.organization
-      tags         = lookup(v, "tags", var.policies.global_settings.tags)
-    })
-  }
+  for_each    = local.ntp
   description = coalesce(each.value.description, "${each.value.name} NTP Policy.")
   enabled     = each.value.enabled
   name        = each.value.name
   ntp_servers = each.value.ntp_servers
   timezone    = each.value.timezone
   organization {
-    moid        = local.orgs[each.value.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "authenticated_ntp_servers" {

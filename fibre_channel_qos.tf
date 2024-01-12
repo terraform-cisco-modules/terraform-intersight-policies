@@ -13,7 +13,7 @@ resource "intersight_vnic_fc_qos_policy" "map" {
   name                = each.value.name
   rate_limit          = each.value.rate_limit
   organization {
-    moid        = local.orgs[local.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "tags" {
@@ -32,7 +32,7 @@ resource "intersight_vnic_fc_qos_policy" "data" {
   }
   name = element(split(":", each.value), 1)
   organization {
-    moid = local.orgs[element(split(":", each.value), 0)]
+    moid = var.orgs[element(split(":", each.value), 0)]
   }
   lifecycle {
     ignore_changes = [

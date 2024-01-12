@@ -12,7 +12,7 @@ resource "intersight_fabric_flow_control_policy" "map" {
   receive_direction          = each.value.receive
   send_direction             = each.value.send
   organization {
-    moid        = local.orgs[local.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "tags" {
@@ -31,7 +31,7 @@ resource "intersight_fabric_flow_control_policy" "data" {
   }
   name = element(split(":", each.value), 1)
   organization {
-    moid = local.orgs[element(split(":", each.value), 0)]
+    moid = var.orgs[element(split(":", each.value), 0)]
   }
   lifecycle {
     ignore_changes = [

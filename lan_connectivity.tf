@@ -15,14 +15,14 @@ resource "intersight_vnic_lan_connectivity_policy" "map" {
   static_iqn_name     = each.value.iqn_static_identifier
   target_platform     = each.value.target_platform
   organization {
-    moid        = local.orgs[each.value.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "iqn_pool" {
     for_each = { for v in [each.value.iqn_pool] : v.name => v if v.name != "UNUSED" }
     content {
-      moid = length(regexall("#EXIST", lookup(lookup(lookup(local.pools, iqn_pool.value.org, {}), "iqn", {}), iqn_pool.value.name, "#EXIST"))
-        ) == 0 ? local.pools[iqn_pool.value.org].ip[iqn_pool.value.name
+      moid = length(regexall("#EXIST", lookup(lookup(lookup(var.pools, iqn_pool.value.org, {}), "iqn", {}), iqn_pool.value.name, "#EXIST"))
+        ) == 0 ? var.pools[iqn_pool.value.org].ip[iqn_pool.value.name
       ] : intersight_iqnpool_pool.data["${iqn_pool.value.org}:${iqn_pool.value.name}"].moid
       object_type = "iqnpool.Pool"
     }
@@ -142,8 +142,8 @@ resource "intersight_vnic_eth_if" "map" {
       for v in [each.value.mac_address_pool] : v.name => v if v.name != "UNUSED"
     }
     content {
-      moid = length(regexall("#EXIST", lookup(lookup(lookup(local.pools, mac_pool.value.org, {}), "mac", {}), mac_pool.value.name, "#EXIST"))
-      ) == 0 ? local.pools[mac_pool.value.org].mac[mac_pool.value.name] : intersight_macpool_pool.data["${mac_pool.value.org}:${mac_pool.value.name}"].moid
+      moid = length(regexall("#EXIST", lookup(lookup(lookup(var.pools, mac_pool.value.org, {}), "mac", {}), mac_pool.value.name, "#EXIST"))
+      ) == 0 ? var.pools[mac_pool.value.org].mac[mac_pool.value.name] : intersight_macpool_pool.data["${mac_pool.value.org}:${mac_pool.value.name}"].moid
     }
   }
   dynamic "tags" {

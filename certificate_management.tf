@@ -5,18 +5,11 @@
 #__________________________________________________________________
 
 resource "intersight_certificatemanagement_policy" "map" {
-  for_each = {
-    for v in lookup(local.policies, "certificate_management", []) : v.name => merge(local.cert_mgmt, v, {
-      certificates = [for e in lookup(v, "certificates", []) : merge(local.cert_mgmt.certificates, e)]
-      name         = "${local.npfx.certificate_management}${v.name}${local.nsfx.certificate_management}"
-      organization = local.organization
-      tags         = lookup(v, "tags", var.policies.global_settings.tags)
-    }) if lookup(v, "assigned_sensitive_data", false) == true
-  }
+  for_each    = local.certificate_management
   description = coalesce(each.value.description, "${each.value.name} Certificate Management Policy.")
   name        = each.value.name
   organization {
-    moid        = local.orgs[local.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "certificates" {

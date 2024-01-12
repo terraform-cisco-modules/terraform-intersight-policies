@@ -5,10 +5,7 @@
 #__________________________________________________________________
 
 resource "intersight_power_policy" "map" {
-  for_each = { for v in lookup(local.policies, "power", []) : v.name => merge(local.defaults.power, v, {
-    name = "${local.name_prefix.power}${v.name}${local.name_suffix.power}"
-    tags = lookup(v, "tags", var.policies.global_settings.tags)
-  }) }
+  for_each                = local.power
   allocated_budget        = each.value.power_allocation
   description             = coalesce(each.value.description, "${each.value.name} Power Policy.")
   dynamic_rebalancing     = each.value.dynamic_power_rebalancing
@@ -20,7 +17,7 @@ resource "intersight_power_policy" "map" {
   power_save_mode         = each.value.power_save_mode
   redundancy_mode         = each.value.power_redundancy
   organization {
-    moid        = local.orgs[local.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "tags" {

@@ -14,7 +14,7 @@ resource "intersight_storage_storage_policy" "map" {
   use_jbod_for_vd_creation = each.value.use_jbod_for_vd_creation
   # retain_policy_virtual_drives = each.value.retain_policy
   organization {
-    moid        = local.orgs[each.value.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "m2_virtual_drive" {

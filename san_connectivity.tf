@@ -14,7 +14,7 @@ resource "intersight_vnic_san_connectivity_policy" "map" {
   target_platform     = each.value.target_platform
   wwnn_address_type   = each.value.wwnn_allocation_type
   organization {
-    moid        = local.orgs[each.value.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "tags" {
@@ -27,8 +27,8 @@ resource "intersight_vnic_san_connectivity_policy" "map" {
   dynamic "wwnn_pool" {
     for_each = { for v in [each.value.wwnn_pool] : v.name => v if v.name != "UNUSED" }
     content {
-      moid = length(regexall("#EXIST", lookup(lookup(lookup(local.pools, wwnn_pool.value.org, {}), "wwnn", {}), wwnn_pool.value.name, "#EXIST"))
-      ) == 0 ? local.pools[mac_pool.value.org].wwnn[wwnn_pool.value.name] : intersight_macpool_pool.data["${wwnn_pool.value.org}:${wwnn_pool.value.name}"].moid
+      moid = length(regexall("#EXIST", lookup(lookup(lookup(var.pools, wwnn_pool.value.org, {}), "wwnn", {}), wwnn_pool.value.name, "#EXIST"))
+      ) == 0 ? var.pools[mac_pool.value.org].wwnn[wwnn_pool.value.name] : intersight_macpool_pool.data["${wwnn_pool.value.org}:${wwnn_pool.value.name}"].moid
       object_type = "fcpool.Pool"
     }
   }
@@ -95,8 +95,8 @@ resource "intersight_vnic_fc_if" "map" {
   dynamic "wwpn_pool" {
     for_each = { for v in [each.value.wwpn_pool] : v.name => v if v.name != "UNUSED" }
     content {
-      moid = length(regexall("#EXIST", lookup(lookup(lookup(local.pools, wwpn_pool.value.org, {}), "wwpn", {}), wwpn_pool.value.name, "#EXIST"))
-      ) == 0 ? local.pools[mac_pool.value.org].wwpn[wwpn_pool.value.name] : intersight_macpool_pool.data["${wwpn_pool.value.org}:${wwpn_pool.value.name}"].moid
+      moid = length(regexall("#EXIST", lookup(lookup(lookup(var.pools, wwpn_pool.value.org, {}), "wwpn", {}), wwpn_pool.value.name, "#EXIST"))
+      ) == 0 ? var.pools[mac_pool.value.org].wwpn[wwpn_pool.value.name] : intersight_macpool_pool.data["${wwpn_pool.value.org}:${wwpn_pool.value.name}"].moid
     }
   }
 }

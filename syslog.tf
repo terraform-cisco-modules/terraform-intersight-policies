@@ -5,14 +5,7 @@
 #__________________________________________________________________
 
 resource "intersight_syslog_policy" "map" {
-  for_each = {
-    for v in lookup(local.policies, "syslog", []) : v.name => merge(local.defaults.syslog, v, {
-      name           = "${local.npfx.syslog}${v.name}${local.nsfx.syslog}"
-      organization   = local.organization
-      remote_logging = lookup(v, "remote_logging", [])
-      tags           = lookup(v, "tags", var.policies.global_settings.tags)
-    })
-  }
+  for_each    = local.syslog
   description = coalesce(each.value.description, "${each.value.name} Syslog Policy.")
   name        = each.value.name
   local_clients {
@@ -20,7 +13,7 @@ resource "intersight_syslog_policy" "map" {
     object_type  = "syslog.LocalFileLoggingClient"
   }
   organization {
-    moid        = local.orgs[each.value.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "remote_clients" {

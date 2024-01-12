@@ -5,21 +5,14 @@
 #__________________________________________________________________
 
 resource "intersight_vmedia_policy" "map" {
-  for_each = {
-    for v in lookup(local.policies, "virtual_media", []) : v.name => merge(local.vmedia, v, {
-      add_virtual_media = [for e in lookup(v, "add_virtual_media", {}) : merge(local.vmedia.add_virtual_media, e)]
-      name              = "${local.npfx.virtual_media}${v.name}${local.nsfx.virtual_media}"
-      organization      = local.organization
-      tags              = lookup(v, "tags", var.policies.global_settings.tags)
-    })
-  }
+  for_each      = local.virtual_media
   description   = coalesce(each.value.description, "${each.value.name} Virtual Media Policy.")
   enabled       = each.value.enable_virtual_media
   encryption    = each.value.enable_virtual_media_encryption
   low_power_usb = each.value.enable_low_power_usb
   name          = each.value.name
   organization {
-    moid        = local.orgs[each.value.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "mappings" {

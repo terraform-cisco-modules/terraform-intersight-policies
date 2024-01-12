@@ -14,7 +14,7 @@ resource "intersight_fabric_multicast_policy" "map" {
   snooping_state          = each.value.snooping_state
   src_ip_proxy            = each.value.source_ip_proxy_state
   organization {
-    moid        = local.orgs[local.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "tags" {
@@ -33,7 +33,7 @@ resource "intersight_fabric_multicast_policy" "data" {
   }
   name = element(split(":", each.value), 1)
   organization {
-    moid = local.orgs[element(split(":", each.value), 0)]
+    moid = var.orgs[element(split(":", each.value), 0)]
   }
   lifecycle {
     ignore_changes = [

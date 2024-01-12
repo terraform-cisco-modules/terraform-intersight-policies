@@ -9,7 +9,7 @@ resource "intersight_fabric_link_control_policy" "map" {
   description = coalesce(each.value.description, "${each.value.name} Link Control Policy.")
   name        = each.value.name
   organization {
-    moid        = local.orgs[local.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   udld_settings {
@@ -32,7 +32,7 @@ resource "intersight_fabric_link_control_policy" "data" {
   }
   name = element(split(":", each.value), 1)
   organization {
-    moid = local.orgs[element(split(":", each.value), 0)]
+    moid = var.orgs[element(split(":", each.value), 0)]
   }
   lifecycle {
     ignore_changes = [

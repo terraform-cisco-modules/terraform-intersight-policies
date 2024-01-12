@@ -5,17 +5,14 @@
 #__________________________________________________________________
 
 resource "intersight_vnic_iscsi_static_target_policy" "map" {
-  for_each = { for v in lookup(local.policies, "iscsi_static_target", []) : v.name => merge(local.defaults.iscsi_static_target, v, {
-    name = "${local.name_prefix.iscsi_static_target}${v.name}${local.name_suffix.iscsi_static_target}"
-    tags = lookup(v, "tags", var.policies.global_settings.tags)
-  }) }
+  for_each    = local.iscsi_static_target
   description = coalesce(each.value.description, "${each.value.name} iSCSI Static Target Policy.")
   ip_address  = each.value.ip_address
   name        = each.value.name
   port        = each.value.port
   target_name = each.value.target_name
   organization {
-    moid        = local.orgs[local.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "lun" {
@@ -43,7 +40,7 @@ resource "intersight_vnic_iscsi_static_target_policy" "data" {
   }
   name = element(split(":", each.value), 1)
   organization {
-    moid = local.orgs[element(split(":", each.value), 0)]
+    moid = var.orgs[element(split(":", each.value), 0)]
   }
   lifecycle {
     ignore_changes = [

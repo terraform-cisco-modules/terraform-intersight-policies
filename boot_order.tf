@@ -15,7 +15,7 @@ resource "intersight_boot_precision_policy" "map" {
   enforce_uefi_secure_boot = each.value.enable_secure_boot
   name                     = each.value.name
   organization {
-    moid        = local.orgs[each.value.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "boot_devices" {

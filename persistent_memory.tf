@@ -5,15 +5,7 @@
 #__________________________________________________________________
 
 resource "intersight_memory_persistent_memory_policy" "map" {
-  for_each = {
-    for v in lookup(local.policies, "persistent_memory", []) : v.name => merge(local.defaults.persistent_memory, v, {
-      name = "${local.npfx.persistent_memory}${v.name}${local.nsfx.persistent_memory}"
-      namespaces = [for e in lookup(v, "namespaces", []) : merge(local.defaults.persistent_memory.namespaces, e)
-      ]
-      organization = local.organization
-      tags         = lookup(v, "tags", var.policies.global_settings.tags)
-    })
-  }
+  for_each          = local.persistent_memory
   description       = coalesce(each.value.description, "${each.value.name} Persistent Memory Policy.")
   management_mode   = each.value.management_mode
   name              = each.value.name
@@ -25,7 +17,7 @@ resource "intersight_memory_persistent_memory_policy" "map" {
     socket_id              = "All Sockets"
   }
   organization {
-    moid        = local.orgs[each.value.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "local_security" {

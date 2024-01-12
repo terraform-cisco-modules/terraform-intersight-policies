@@ -5,15 +5,7 @@
 #__________________________________________________________________
 
 resource "intersight_storage_drive_security_policy" "map" {
-  for_each = {
-    for v in lookup(local.policies, "drive_security", []) : v.name => merge(local.lds, v, {
-      name             = "${local.npfx.drive_security}${v.name}${local.nsfx.drive_security}"
-      organization     = local.organization
-      primary_server   = merge(local.lds.primary_server, lookup(v, "primary_server", {}))
-      secondary_server = merge(local.lds.secondary_server, lookup(v, "secondary_server", {}))
-      tags             = lookup(v, "tags", var.policies.global_settings.tags)
-    }) if lookup(v, "assigned_sensitive_data", local.lds.assigned_sensitive_data) == true
-  }
+  for_each    = local.drive_security
   description = coalesce(each.value.description, "${each.value.name} Drive Security Policy.")
   key_setting {
     object_type = ""
@@ -41,7 +33,7 @@ resource "intersight_storage_drive_security_policy" "map" {
   }
   name = each.value.name
   organization {
-    moid        = local.orgs[local.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "tags" {

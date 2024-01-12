@@ -15,8 +15,7 @@ data "intersight_iam_account" "account" {
 #}
 
 resource "intersight_softwarerepository_authorization" "map" {
-  for_each = { for v in [lookup(local.policies, "firmware_authenticate", {})] : "cco_auth" => merge(local.fw, v
-  ) if length(lookup(local.policies, "firmware_authenticate", {})) > 0 }
+  for_each        = local.firmware_authenticate
   password        = local.ps.firmware.cco_password[each.value.cco_password]
   repository_type = "Cisco"
   user_id         = local.ps.firmware.cco_user[each.value.cco_user]
@@ -27,22 +26,7 @@ resource "intersight_softwarerepository_authorization" "map" {
 }
 
 resource "intersight_firmware_policy" "map" {
-  for_each = {
-    for v in lookup(local.policies, "firmware", []) : v.name => merge(local.fw, v, {
-      advanced_mode = merge(local.fw.advanced_mode, lookup(v, "advanced_mode", {}))
-      name          = "${local.name_prefix.firmware}${v.name}${local.name_suffix.firmware}"
-      model_bundle_versions = { for i in flatten([
-        for e in lookup(v, "model_bundle_version", []) : [
-          for m in e.server_models : {
-            model   = m
-            version = e.firmware_version
-          }
-        ]
-      ]) : "${i.version}:${i.model}" => i }
-      organization = local.organization
-      tags         = lookup(v, "tags", var.policies.global_settings.tags)
-    })
-  }
+  for_each    = local.firmware
   description = coalesce(each.value.description, "${each.value.name} Firmware Policy.")
   exclude_component_list = [for e in [each.value.advanced_mode] : anytrue(
     [
@@ -62,7 +46,7 @@ resource "intersight_firmware_policy" "map" {
   name            = each.value.name
   target_platform = lookup(each.value, "target_platform", local.fw.target_platform)
   organization {
-    moid        = local.orgs[each.value.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "model_bundle_combo" {

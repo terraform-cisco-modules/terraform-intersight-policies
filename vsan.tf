@@ -10,7 +10,7 @@ resource "intersight_fabric_fc_network_policy" "map" {
   enable_trunking = each.value.uplink_trunking
   name            = each.value.name
   organization {
-    moid        = local.orgs[each.value.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "tags" {

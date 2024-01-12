@@ -5,13 +5,7 @@
 #__________________________________________________________________
 
 resource "intersight_fabric_switch_control_policy" "map" {
-  for_each = {
-    for v in lookup(local.policies, "switch_control", []) : v.name => merge(local.defaults.switch_control, v, {
-      name         = "${local.npfx.switch_control}${v.name}${local.nsfx.switch_control}"
-      organization = local.organization
-      tags         = lookup(v, "tags", var.policies.global_settings.tags)
-    })
-  }
+  for_each                = local.switch_control
   description             = coalesce(each.value.description, "${each.value.name} Switch Control Policy.")
   ethernet_switching_mode = each.value.ethernet_switching_mode
   fc_switching_mode       = each.value.fc_switching_mode
@@ -24,7 +18,7 @@ resource "intersight_fabric_switch_control_policy" "map" {
     mac_aging_time   = each.value.mac_address_table_aging == "Custom" ? each.value.mac_aging_time : null
   }
   organization {
-    moid        = local.orgs[each.value.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   udld_settings {

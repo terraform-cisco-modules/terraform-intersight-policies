@@ -34,7 +34,7 @@ resource "intersight_vnic_fc_adapter_policy" "map" {
     mode = each.value.interrupt_settings.mode
   }
   organization {
-    moid        = local.orgs[each.value.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   plogi_settings {
@@ -69,7 +69,7 @@ resource "intersight_vnic_fc_adapter_policy" "data" {
   }
   name = element(split(":", each.value), 1)
   organization {
-    moid = local.orgs[element(split(":", each.value), 0)]
+    moid = var.orgs[element(split(":", each.value), 0)]
   }
   lifecycle {
     ignore_changes = [

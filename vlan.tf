@@ -9,7 +9,7 @@ resource "intersight_fabric_eth_network_policy" "map" {
   description = coalesce(each.value.description, "${each.value.name} VLAN Policy.")
   name        = each.value.name
   organization {
-    moid        = local.orgs[each.value.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "tags" {

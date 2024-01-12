@@ -46,7 +46,7 @@ resource "intersight_vnic_eth_adapter_policy" "map" {
     enabled = length(regexall("EMPTY", each.value.adapter_template)) == 0 ? false : each.value.enable_nvgre_offload
   }
   organization {
-    moid        = local.orgs[each.value.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   roce_settings {
@@ -128,7 +128,7 @@ resource "intersight_vnic_eth_adapter_policy" "data" {
   }
   name = element(split(":", each.value), 1)
   organization {
-    moid = local.orgs[element(split(":", each.value), 0)]
+    moid = var.orgs[element(split(":", each.value), 0)]
   }
   lifecycle {
     ignore_changes = [

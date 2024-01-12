@@ -5,10 +5,7 @@
 #__________________________________________________________________
 
 resource "intersight_ipmioverlan_policy" "map" {
-  for_each = { for v in lookup(local.policies, "ipmi_over_lan", []) : v.name => merge(local.ipmi, v, {
-    name = "${local.name_prefix.ipmi_over_lan}${v.name}${local.name_suffix.ipmi_over_lan}"
-    tags = lookup(v, "tags", var.policies.global_settings.tags)
-  }) }
+  for_each    = local.ipmi_over_lan
   description = coalesce(each.value.description, "${each.value.name} IPMI over LAN Policy.")
   enabled     = each.value.enabled
   encryption_key = length(local.ps.ipmi_over_lan.encryption_key[each.value.encryption_key]
@@ -16,7 +13,7 @@ resource "intersight_ipmioverlan_policy" "map" {
   name      = each.value.name
   privilege = each.value.privilege
   organization {
-    moid        = local.orgs[local.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "tags" {

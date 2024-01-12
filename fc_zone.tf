@@ -10,7 +10,7 @@ resource "intersight_fabric_fc_zone_policy" "map" {
   fc_target_zoning_type = each.value.fc_target_zoning_type
   name                  = each.value.name
   organization {
-    moid        = local.orgs[local.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "fc_target_members" {
@@ -38,7 +38,7 @@ resource "intersight_fabric_fc_zone_policy" "data" {
   }
   name = element(split(":", each.value), 1)
   organization {
-    moid = local.orgs[element(split(":", each.value), 0)]
+    moid = var.orgs[element(split(":", each.value), 0)]
   }
   lifecycle {
     ignore_changes = [

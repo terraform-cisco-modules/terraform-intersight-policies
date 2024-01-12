@@ -14,45 +14,45 @@ locals {
     "switch_control", "syslog", "system_qos", "thermal", "virtual_kvm", "virtual_media", "vlan", "vsan"
   ]
   pp = merge({ for i in local.network_policies : i => distinct(compact(concat(
-    flatten([for v in local.port_channel_appliances : [for e in lookup(v, "${i}_policy", { name = "UNUSED", org = "UNUSED" }) : "${e.org}:${e.name}" if e.name != "UNUSED"]]),
-    flatten([for v in local.port_channel_ethernet_uplinks : [for e in [lookup(v, "${i}_policy", { name = "UNUSED", org = "UNUSED" })] : "${e.org}:${e.name}" if e.name != "UNUSED"]]),
-    flatten([for v in local.port_channel_fcoe_uplinks : [for e in [lookup(v, "${i}_policy", { name = "UNUSED", org = "UNUSED" })] : "${e.org}:${e.name}" if e.name != "UNUSED"]]),
-    flatten([for v in local.port_role_appliances : [for e in [lookup(v, "${i}_policy", { name = "UNUSED", org = "UNUSED" })] : "${e.org}:${e.name}" if e.name != "UNUSED"]]),
-    flatten([for v in local.port_role_ethernet_uplinks : [for e in [lookup(v, "${i}_policy", { name = "UNUSED", org = "UNUSED" })] : "${e.org}:${e.name}" if e.name != "UNUSED"]]),
-    flatten([for v in local.port_role_fcoe_uplinks : [for e in [lookup(v, "${i}_policy", { name = "UNUSED", org = "UNUSED" })] : "${e.org}:${e.name}" if e.name != "UNUSED"]]),
-    flatten([for v in local.vnics : [for e in [lookup(v, "${i}_policy", { name = "UNUSED", org = "UNUSED" })] : "${e.org}:${e.name}" if e.name != "UNUSED"]])
+    flatten([for v in local.port_channel_appliances : [for e in lookup(v, "${i}_policy", { name = "UNUSED", org = "UNUSED" }) : "${e.org}/${e.name}" if e.name != "UNUSED"]]),
+    flatten([for v in local.port_channel_ethernet_uplinks : [for e in [lookup(v, "${i}_policy", { name = "UNUSED", org = "UNUSED" })] : "${e.org}/${e.name}" if e.name != "UNUSED"]]),
+    flatten([for v in local.port_channel_fcoe_uplinks : [for e in [lookup(v, "${i}_policy", { name = "UNUSED", org = "UNUSED" })] : "${e.org}/${e.name}" if e.name != "UNUSED"]]),
+    flatten([for v in local.port_role_appliances : [for e in [lookup(v, "${i}_policy", { name = "UNUSED", org = "UNUSED" })] : "${e.org}/${e.name}" if e.name != "UNUSED"]]),
+    flatten([for v in local.port_role_ethernet_uplinks : [for e in [lookup(v, "${i}_policy", { name = "UNUSED", org = "UNUSED" })] : "${e.org}/${e.name}" if e.name != "UNUSED"]]),
+    flatten([for v in local.port_role_fcoe_uplinks : [for e in [lookup(v, "${i}_policy", { name = "UNUSED", org = "UNUSED" })] : "${e.org}/${e.name}" if e.name != "UNUSED"]]),
+    flatten([for v in local.vnics : [for e in [lookup(v, "${i}_policy", { name = "UNUSED", org = "UNUSED" })] : "${e.org}/${e.name}" if e.name != "UNUSED"]])
     )))
     }, {
     ethernet_adapter = distinct(compact(concat(
-      flatten([for v in local.vnics : [for e in [v.ethernet_adapter_policy] : "${e.org}:${e.name}" if e.name != "UNUSED"]]),
+      flatten([for v in local.vnics : [for e in [v.ethernet_adapter_policy] : "${e.org}/${e.name}" if e.name != "UNUSED"]]),
       flatten([for v in local.vnics : [for s in [v.usnic_settings] : [
-        for e in [lookup(s, "usnic_adapter_policy", { name = "UNUSED", org = "UNUSED" })] : "${e.org}:${e.name}" if e.name != "UNUSED"]]]
+        for e in [lookup(s, "usnic_adapter_policy", { name = "UNUSED", org = "UNUSED" })] : "${e.org}/${e.name}" if e.name != "UNUSED"]]]
       ),
       flatten([for v in local.vnics : [for s in [v.usnic_settings] : [
-        for e in [lookup(s, "vmmq_adapter_policy", { name = "UNUSED", org = "UNUSED" })] : "${e.org}:${e.name}" if e.name != "UNUSED"]]]
+        for e in [lookup(s, "vmmq_adapter_policy", { name = "UNUSED", org = "UNUSED" })] : "${e.org}/${e.name}" if e.name != "UNUSED"]]]
       )
     )))
-    ethernet_network = distinct(compact(flatten([for v in local.vnics : [for e in [v.ethernet_network_policy] : "${e.org}:${e.name}" if e.name != "UNUSED"]])))
-    ethernet_qos     = distinct(compact(flatten([for v in local.vnics : [for e in [v.ethernet_qos_policy] : "${e.org}:${e.name}" if e.name != "UNUSED"]])))
-    fc_adapter       = distinct(compact(flatten([for v in local.vhbas : [for e in [v.fibre_channel_adapter_policy] : "${e.org}:${e.name}" if e.name != "UNUSED"]])))
-    fc_network       = distinct(compact(flatten([for v in local.vhbas : [for e in [v.fibre_channel_network_policy] : "${e.org}:${e.name}" if e.name != "UNUSED"]])))
-    fc_qos           = distinct(compact(flatten([for v in local.vhbas : [for e in [v.fibre_channel_qos_policy] : "${e.org}:${e.name}" if e.name != "UNUSED"]])))
-    fc_zone          = distinct(compact(flatten([for v in local.vhbas : [for e in v.fc_zone_policies : "${e.org}:${e.name}" if e.name != "UNUSED"]])))
+    ethernet_network = distinct(compact(flatten([for v in local.vnics : [for e in [v.ethernet_network_policy] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
+    ethernet_qos     = distinct(compact(flatten([for v in local.vnics : [for e in [v.ethernet_qos_policy] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
+    fc_adapter       = distinct(compact(flatten([for v in local.vhbas : [for e in [v.fibre_channel_adapter_policy] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
+    fc_network       = distinct(compact(flatten([for v in local.vhbas : [for e in [v.fibre_channel_network_policy] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
+    fc_qos           = distinct(compact(flatten([for v in local.vhbas : [for e in [v.fibre_channel_qos_policy] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
+    fc_zone          = distinct(compact(flatten([for v in local.vhbas : [for e in v.fc_zone_policies : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
     ip_pool = distinct(compact(concat(
-      flatten([for v in local.imc_access : [for e in [v.inband_ip_pool] : "${e.org}:${e.name}" if e.name != "UNUSED"]]),
-      flatten([for v in local.imc_access : [for e in [v.out_of_band_ip_pool] : "${e.org}:${e.name}" if e.name != "UNUSED"]]),
-      flatten([for v in local.iscsi_boot : [for e in [v.initiator_ip_pool] : "${e.org}:${e.name}" if e.name != "UNUSED"]])
+      flatten([for v in local.imc_access : [for e in [v.inband_ip_pool] : "${e.org}/${e.name}" if e.name != "UNUSED"]]),
+      flatten([for v in local.imc_access : [for e in [v.out_of_band_ip_pool] : "${e.org}/${e.name}" if e.name != "UNUSED"]]),
+      flatten([for v in local.iscsi_boot : [for e in [v.initiator_ip_pool] : "${e.org}/${e.name}" if e.name != "UNUSED"]])
     )))
-    iqn_pool      = distinct(compact(flatten([for v in local.lan_connectivity : [for e in [v.iqn_pool] : "${e.org}:${e.name}" if e.name != "UNUSED"]])))
-    iscsi_adapter = distinct(compact(flatten([for v in local.iscsi_boot : [for e in [v.iscsi_adapter_policy] : "${e.org}:${e.name}" if e.name != "UNUSED"]])))
-    iscsi_boot    = distinct(compact(flatten([for v in local.vnics : [for e in [v.iscsi_boot_policy] : "${e.org}:${e.name}" if e.name != "UNUSED"]])))
+    iqn_pool      = distinct(compact(flatten([for v in local.lan_connectivity : [for e in [v.iqn_pool] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
+    iscsi_adapter = distinct(compact(flatten([for v in local.iscsi_boot : [for e in [v.iscsi_adapter_policy] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
+    iscsi_boot    = distinct(compact(flatten([for v in local.vnics : [for e in [v.iscsi_boot_policy] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
     iscsi_static_target = distinct(compact(flatten([[for s in ["primary", "secondary"] : [
-      for k, v in local.iscsi_boot : [for e in [lookup(v, "${s}_target_policy", { name = "UNUSED", org = "UNUSED" })] : "${e.org}:${e.name}" if e.name != "UNUSED"]]
+      for k, v in local.iscsi_boot : [for e in [lookup(v, "${s}_target_policy", { name = "UNUSED", org = "UNUSED" })] : "${e.org}/${e.name}" if e.name != "UNUSED"]]
     ]])))
-    mac_pool  = distinct(compact(flatten([for v in local.vnics : [for e in [v.mac_address_pool] : "${e.org}:${e.name}" if e.name != "UNUSED"]])))
-    multicast = distinct(compact(flatten([for v in local.vlans : [for e in [v.multicast_policy] : "${e.org}:${e.name}" if e.name != "UNUSED"]])))
-    wwnn_pool = distinct(compact(flatten([for v in local.san_connectivity : [for e in [v.wwnn_pool] : "${e.org}:${e.name}" if e.name != "UNUSED"]])))
-    wwpn_pool = distinct(compact(flatten([for v in local.vhbas : [for e in [v.wwpn_pool] : "${e.org}:${e.name}" if e.name != "UNUSED"]])))
+    mac_pool  = distinct(compact(flatten([for v in local.vnics : [for e in [v.mac_address_pool] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
+    multicast = distinct(compact(flatten([for v in local.vlans : [for e in [v.multicast_policy] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
+    wwnn_pool = distinct(compact(flatten([for v in local.san_connectivity : [for e in [v.wwnn_pool] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
+    wwpn_pool = distinct(compact(flatten([for v in local.vhbas : [for e in [v.wwpn_pool] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
   })
   #
   # Local Defaults, no local loop
@@ -60,24 +60,24 @@ locals {
   eng       = local.defaults.ethernet_network_group
   fcn       = local.defaults.fibre_channel_network
   fw        = local.defaults.firmware
-  ipmi      = local.defaults.ipmi_over_lan
   lds       = local.defaults.drive_security
   vmedia    = local.defaults.virtual_media
   #
   # Global Settings
-  organization   = var.policies.organization
-  orgs           = var.policies.orgs
-  policies       = var.policies
-  pools          = var.policies.pools
-  ps             = var.policies_sensitive
+  pools = lookup(var.pools, "map", {})
+  ps    = var.policies_sensitive
   #
   # Naming Prefixes and Suffixes
-  name_prefix = merge(local.defaults.name_prefix, lookup(local.defaults, "name_prefix", {}))
-  name_suffix = merge(local.defaults.name_suffix, lookup(local.defaults, "name_suffix", {}))
-  npfx = { for e in local.policy_names : e => length(local.name_prefix[e]
-  ) > 0 ? local.name_prefix[e] : local.name_prefix.default }
-  nsfx = { for e in local.policy_names : e => length(local.name_suffix[e]
-  ) > 0 ? local.name_suffix[e] : local.name_suffix.default }
+  name_prefix = local.defaults.name_prefix
+  name_suffix = local.defaults.name_suffix
+  npfx = { for org in sort(keys(var.model)) : org => merge(
+    { for e in local.policy_names : e => lookup(lookup(var.model[org], "name_prefix", local.name_prefix), e, local.name_prefix[e]) },
+    { organization = org })
+  }
+  nsfx = { for org in sort(keys(var.model)) : org => merge(
+    { for e in local.policy_names : e => lookup(lookup(var.model[org], "name_suffix", local.name_suffix), e, local.name_suffix[e]) },
+    { organization = org })
+  }
 
   #_________________________________________________________________
   #
@@ -87,25 +87,48 @@ locals {
   ladapter = local.defaults.adapter_configuration
   laddvic  = local.ladapter.add_vic_adapter_configuration
   fecmode  = local.laddvic.dce_interface_settings.dce_interface_fec_modes
-  adapter_configuration = {
-    for value in lookup(local.policies, "adapter_configuration", {}) : value.name => {
+  adapter_configuration = { for i in flatten([for org in sort(keys(var.model)) : [
+    for value in lookup(lookup(var.model[org], "policies", {}), "adapter_configuration", []) : {
       add_vic_adapter_configuration = [for v in value.add_vic_adapter_configuration : merge(local.laddvic, v, {
         dce_interface_settings = [
-          for i in range(4) : {
+          for int in range(4) : {
             additional_properties = "", class_id = "adapter.DceInterfaceSettings"
             fec_mode = length(lookup(lookup(v, "dce_interface_settings", {}), "dce_interface_fec_modes", local.fecmode)
-              ) == 4 ? element(lookup(lookup(v, "dce_interface_settings", {}), "dce_interface_fec_modes", local.fecmode), i
+              ) == 4 ? element(lookup(lookup(v, "dce_interface_settings", {}), "dce_interface_fec_modes", local.fecmode), int
             ) : element(lookup(lookup(v, "dce_interface_settings", {}), "dce_interface_fec_modes", local.fecmode), 0)
-            interface_id = i, object_type = "adapter.DceInterfaceSettings"
+            interface_id = int, object_type = "adapter.DceInterfaceSettings"
           }
         ]
       })]
       description  = lookup(value, "description", "")
-      name         = "${local.npfx.adapter_configuration}${value.name}${local.nsfx.adapter_configuration}"
-      organization = local.organization
-      tags         = lookup(value, "tags", var.policies.global_settings.tags)
+      name         = "${local.npfx[org].adapter_configuration}${value.name}${local.nsfx[org].adapter_configuration}"
+      organization = org
+      tags         = lookup(value, "tags", var.global_settings.tags)
     }
-  }
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "adapter_configuration", [])) > 0]) : "${i.organization}/${i.name}" => i }
+
+  #__________________________________________________________________
+  #
+  # Intersight BIOS Policy
+  # GUI Location: Policies > Create Policy > BIOS
+  #__________________________________________________________________
+  bios = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "bios", []) : lookup(v, "bios_template", "UNUSED") != "UNUSED" ? merge(
+      local.defaults.bios, local.defaults.bios_templates[replace(v.bios_template, "-tpm", "")],
+      local.defaults.bios_templates[length(regexall("-tpm$", v.bios_template)) > 0 ? "tpm" : "tpm_disabled"], v, {
+        name         = "${local.npfx[org].bios}${v.name}${local.nsfx[org].bios}"
+        organization = org
+        tags         = lookup(v, "tags", var.global_settings.tags)
+      }
+      ) : merge(
+      local.defaults.bios, v, {
+        name         = "${local.npfx[org].bios}${v.name}${local.nsfx[org].bios}"
+        organization = org
+        tags         = lookup(v, "tags", var.global_settings.tags)
+      }
+    )
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "bios", [])) > 0]) : "${i.organization}/${i.name}" => i }
+
   #__________________________________________________________________
   #
   # Intersight Boot Order Policy
@@ -135,27 +158,68 @@ locals {
     San          = { interface_name = "", lun = 0, slot = "MLOM", wwpn = "" }
     VirtualMedia = { sub_type = "None" }
   }
-  boot_order = {
-    for i in lookup(local.policies, "boot_order", []) : i.name => merge(local.defaults.boot_order, i, {
+  boot_order = { for i in flatten([for org in sort(keys(var.model)) : [
+    for e in lookup(lookup(var.model[org], "policies", {}), "boot_order", []) : merge(local.defaults.boot_order, e, {
       boot_devices = [
-        for v in lookup(i, "boot_devices", []) : {
-          additional_properties = i.boot_mode == "Uefi" && length(regexall("^boot.(Pxe|Usb|VirtualMedia)", v.object_type)
+        for v in lookup(e, "boot_devices", []) : {
+          additional_properties = e.boot_mode == "Uefi" && length(regexall("^boot.(Pxe|Usb|VirtualMedia)", v.object_type)
             ) == 0 ? jsonencode(merge({ Bootloader = merge(local.boot_loader, lookup(v, "boot_loader", {})) },
-              { for e in local.boot_type[element(split(".", v.object_type), 1)] : element(split(":", e), 0
-                ) => lookup(v, element(split(":", e), 1), local.boot_var[element(split(".", v.object_type), 1)]
-                [element(split(":", e), 1)]) })) : jsonencode({ for e in local.boot_type[element(split(".", v.object_type), 1)
-                ] : element(split(":", e), 0) => lookup(v, element(split(":", e), 1
-          ), local.boot_var[element(split(".", v.object_type), 1)][element(split(":", e), 1)]) })
+              { for s in local.boot_type[element(split(".", v.object_type), 1)] : element(split(":", s), 0
+                ) => lookup(v, element(split(":", s), 1), local.boot_var[element(split(".", v.object_type), 1)]
+                [element(split(":", s), 1)]) })) : jsonencode({ for s in local.boot_type[element(split(".", v.object_type), 1)
+                ] : element(split(":", s), 0) => lookup(v, element(split(":", s), 1
+          ), local.boot_var[element(split(".", v.object_type), 1)][element(split(":", s), 1)]) })
           enabled     = lookup(v, "enabled", true)
           name        = v.name
           object_type = v.object_type
         }
       ]
-      name         = "${local.npfx.boot_order}${i.name}${local.nsfx.boot_order}"
-      organization = lookup(i, "organization", local.organization)
-      tags         = lookup(i, "tags", var.policies.global_settings.tags)
+      name         = "${local.npfx[org].boot_order}${e.name}${local.nsfx[org].boot_order}"
+      organization = org
+      tags         = lookup(e, "tags", var.global_settings.tags)
     })
-  }
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "boot_order", [])) > 0]) : "${i.organization}/${i.name}" => i }
+
+  #__________________________________________________________________
+  #
+  # Intersight Certificate Management Policy
+  # GUI Location: Policies > Create Policy > Certificate Management
+  #__________________________________________________________________
+  certificate_management = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "certificate_management", []) : merge(local.cert_mgmt, v, {
+      certificates = [for e in lookup(v, "certificates", []) : merge(local.cert_mgmt.certificates, e)]
+      name         = "${local.npfx[org].certificate_management}${v.name}${local.nsfx[org].certificate_management}"
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
+    }) if lookup(v, "assigned_sensitive_data", false) == true
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "certificate_management", [])) > 0]) : "${i.organization}/${i.name}" => i }
+
+  #__________________________________________________________________
+  #
+  # Intersight Device Connector Policy
+  # GUI Location: Policies > Create Policy > Device Connector
+  #__________________________________________________________________
+  device_connector = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "device_connector", []) : merge(local.defaults.device_connector, v, {
+      name = "${local.npfx[org].device_connector}${v.name}${local.nsfx[org].device_connector}"
+      tags = lookup(v, "tags", var.global_settings.tags)
+    })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "device_connector", [])) > 0]) : "${i.organization}/${i.name}" => i }
+
+  #__________________________________________________________________
+  #
+  # Intersight Drive Security Policy
+  # GUI Location: Policies > Create Policy > Drive Security
+  #__________________________________________________________________
+  drive_security = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "drive_security", []) : merge(local.lds, v, {
+      name             = "${local.npfx[org].drive_security}${v.name}${local.nsfx[org].drive_security}"
+      organization     = org
+      primary_server   = merge(local.lds.primary_server, lookup(v, "primary_server", {}))
+      secondary_server = merge(local.lds.secondary_server, lookup(v, "secondary_server", {}))
+      tags             = lookup(v, "tags", var.global_settings.tags)
+    }) if lookup(v, "assigned_sensitive_data", local.lds.assigned_sensitive_data) == true
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "drive_security", [])) > 0]) : "${i.organization}/${i.name}" => i }
 
   #__________________________________________________________________
   #
@@ -165,13 +229,13 @@ locals {
   eadapt = local.defaults.ethernet_adapter
   earss  = local.eadapt.receive_side_scaling
   earsse = local.eadapt.receive_side_scaling_enable
-  ethernet_adapter = {
-    for v in lookup(local.policies, "ethernet_adapter", []) : v.name => merge(local.eadapt, v, {
+  ethernet_adapter = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "ethernet_adapter", []) : merge(local.eadapt, v, {
       interrupt_settings = merge(local.eadapt.interrupt_settings,
         lookup(v, "interrupt_settings", {})
       )
-      name         = "${local.npfx.ethernet_adapter}${v.name}${local.nsfx.ethernet_adapter}"
-      organization = local.organization
+      name         = "${local.npfx[org].ethernet_adapter}${v.name}${local.nsfx[org].ethernet_adapter}"
+      organization = org
       receive      = merge(local.eadapt.receive, lookup(v, "receive", {}))
       rss = length(regexall("EMPTY", lookup(v, "adapter_template", "EMPTY"))
       ) == 0 ? false : lookup(v, "receive_side_scaling_enable", local.earsse)
@@ -179,11 +243,11 @@ locals {
       receive_side_scaling_enable = length(regexall("EMPTY", lookup(v, "adapter_template", "EMPTY"))
       ) == 0 ? false : lookup(v, "receive_side_scaling_enable", local.earsse)
       roce_settings = merge(local.eadapt.roce_settings, lookup(v, "roce_settings", {}))
-      tags          = lookup(v, "tags", var.policies.global_settings.tags)
+      tags          = lookup(v, "tags", var.global_settings.tags)
       tcp_offload   = merge(local.eadapt.tcp_offload, lookup(v, "tcp_offload", {}))
       transmit      = merge(local.eadapt.transmit, lookup(v, "transmit", {}))
     })
-  }
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "ethernet_adapter", [])) > 0]) : "${i.organization}/${i.name}" => i }
   eth_settings = {
     EMPTY = {}
     Linux-NVMe-RoCE = {
@@ -246,53 +310,65 @@ locals {
   # Intersight Ethernet Network Policy
   # GUI Location: Policies > Create Policy > Ethernet Network
   #__________________________________________________________________
-  ethernet_network = { for v in lookup(local.policies, "ethernet_network", []) : v.name => merge(local.defaults.ethernet_network, v, {
-    name = "${local.name_prefix.ethernet_network}${v.name}${local.name_suffix.ethernet_network}"
-    tags = lookup(v, "tags", var.policies.global_settings.tags)
-    }
-  ) }
+  ethernet_network = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "ethernet_network", []) : merge(local.defaults.ethernet_network, v, {
+      name         = "${local.npfx[org].ethernet_network}${v.name}${local.nsfx[org].ethernet_network}"
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
+    })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "ethernet_network", [])) > 0]) : "${i.organization}/${i.name}" => i }
 
   #__________________________________________________________________
   #
   # Intersight Ethernet Network Control Policy
   # GUI Location: Policies > Create Policy > Ethernet Network Control
   #__________________________________________________________________
-  ethernet_network_control = { for v in lookup(
-    local.policies, "ethernet_network_control", []) : v.name => merge(local.defaults.ethernet_network_control, v, {
-      name = "${local.name_prefix.ethernet_network_control}${v.name}${local.name_suffix.ethernet_network_control}"
-      tags = lookup(v, "tags", var.policies.global_settings.tags)
+  ethernet_network_control = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "ethernet_network_control", []) : merge(local.defaults.ethernet_network_control, v, {
+      name         = "${local.npfx[org].ethernet_network_control}${v.name}${local.nsfx[org].ethernet_network_control}"
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
     })
-  }
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "ethernet_network_control", [])) > 0]) : "${i.organization}/${i.name}" => i }
 
   #__________________________________________________________________
   #
   # Intersight Ethernet Network Group Policy
   # GUI Location: Policies > Create Policy > Ethernet Network Group
   #__________________________________________________________________
-  ethernet_network_group = { for v in lookup(local.policies, "ethernet_network_group", []) : v.name => merge(local.eng, v, {
-    name = "${local.name_prefix.ethernet_network_group}${v.name}${local.name_suffix.ethernet_network_group}"
-    tags = lookup(v, "tags", var.policies.global_settings.tags)
-  }) }
+  ethernet_network_group = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "ethernet_network_group", []) : merge(local.eng, v, {
+      name         = "${local.npfx[org].ethernet_network_group}${v.name}${local.nsfx[org].ethernet_network_group}"
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
+    })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "ethernet_network_group", [])) > 0]) : "${i.organization}/${i.name}" => i }
 
   #__________________________________________________________________
   #
   # Intersight Ethernet QoS Policy
   # GUI Location: Policies > Create Policy > Ethernet QoS
   #__________________________________________________________________
-  ethernet_qos = { for v in lookup(local.policies, "ethernet_qos", []) : v.name => merge(local.defaults.ethernet_qos, v, {
-    name = "${local.name_prefix.ethernet_qos}${v.name}${local.name_suffix.ethernet_qos}"
-    tags = lookup(v, "tags", var.policies.global_settings.tags)
-  }) }
+  ethernet_qos = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "ethernet_qos", []) : merge(local.defaults.ethernet_qos, v, {
+      name         = "${local.npfx[org].ethernet_qos}${v.name}${local.nsfx[org].ethernet_qos}"
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
+    })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "ethernet_qos", [])) > 0]) : "${i.organization}/${i.name}" => i }
 
   #__________________________________________________________________
   #
   # Intersight FC Zone Policy
   # GUI Location: Policies > Create Policy > FC Zone
   #__________________________________________________________________
-  fc_zone = { for v in lookup(local.policies, "fc_zone", []) : v.name => merge(local.defaults.fc_zone, v, {
-    name = "${local.name_prefix.fc_zone}${v.name}${local.name_suffix.fc_zone}"
-    tags = lookup(v, "tags", var.policies.global_settings.tags)
-  }) }
+  fc_zone = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "fc_zone", []) : merge(local.defaults.fc_zone, v, {
+      name         = "${local.npfx[org].fc_zone}${v.name}${local.nsfx[org].fc_zone}"
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
+    })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "fc_zone", [])) > 0]) : "${i.organization}/${i.name}" => i }
 
   #__________________________________________________________________
   #
@@ -301,76 +377,131 @@ locals {
   #__________________________________________________________________
 
   fca = local.defaults.fibre_channel_adapter
-  fibre_channel_adapter = {
-    for v in lookup(local.policies, "fibre_channel_adapter", []) : v.name => merge(local.fca, v, {
+  fibre_channel_adapter = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "fibre_channel_adapter", []) : merge(local.fca, v, {
       error_recovery     = merge(local.fca.error_recovery, lookup(v, "error_recovery", {}))
       flogi              = merge(local.fca.flogi, lookup(v, "flogi", {}))
       interrupt_settings = merge(local.fca.interrupt_settings, lookup(v, "interrupt_settings", {}))
-      name               = "${local.npfx.fibre_channel_adapter}${v.name}${local.nsfx.fibre_channel_adapter}"
-      organization       = local.organization
+      name               = "${local.npfx[org].fibre_channel_adapter}${v.name}${local.nsfx[org].fibre_channel_adapter}"
+      organization       = org
       plogi              = merge(local.fca.plogi, lookup(v, "plogi", {}))
       receive            = merge(local.fca.receive, lookup(v, "receive", {}))
       scsi_io            = merge(local.fca.scsi_io, lookup(v, "scsi_io", {}))
-      tags               = lookup(v, "tags", var.policies.global_settings.tags)
+      tags               = lookup(v, "tags", var.global_settings.tags)
       transmit           = merge(local.fca.transmit, lookup(v, "transmit", {}))
     })
-  }
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "fibre_channel_adapter", [])) > 0]) : "${i.organization}/${i.name}" => i }
 
   #__________________________________________________________________
   #
   # Intersight Fibre Channel Network Policy
   # GUI Location: Policies > Create Policy > Fibre Channel Network
   #__________________________________________________________________
-  fibre_channel_network = { for v in lookup(local.policies, "fibre_channel_network", []) : v.name => merge(local.fcn, v, {
-    name = "${local.name_prefix.fibre_channel_network}${v.name}${local.name_suffix.fibre_channel_network}"
-    tags = lookup(v, "tags", var.policies.global_settings.tags)
-  }) }
+  fibre_channel_network = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "fibre_channel_network", []) : merge(local.fcn, v, {
+      name         = "${local.npfx[org].fibre_channel_network}${v.name}${local.nsfx[org].fibre_channel_network}"
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
+    })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "fibre_channel_network", [])) > 0]) : "${i.organization}/${i.name}" => i }
 
   #__________________________________________________________________
   #
   # Intersight Fibre Channel QoS Policy
   # GUI Location: Policies > Create Policy > Fibre Channel QoS
   #__________________________________________________________________
-  fibre_channel_qos = { for v in lookup(local.policies, "fibre_channel_qos", []) : v.name => merge(local.defaults.fibre_channel_qos, v, {
-    name = "${local.name_prefix.fibre_channel_qos}${v.name}${local.name_suffix.fibre_channel_qos}"
-    tags = lookup(v, "tags", var.policies.global_settings.tags)
-  }) }
+  fibre_channel_qos = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "fibre_channel_qos", []) : merge(local.defaults.fibre_channel_qos, v, {
+      name         = "${local.npfx[org].fibre_channel_qos}${v.name}${local.nsfx[org].fibre_channel_qos}"
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
+    })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "fibre_channel_qos", [])) > 0]) : "${i.organization}/${i.name}" => i }
+
+  #__________________________________________________________________
+  #
+  # Intersight Firmware Policy
+  # GUI Location: Policies > Create Policy > Firmware
+  #__________________________________________________________________
+  firmware = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "firmware", []) : merge(local.fw, v, {
+      advanced_mode = merge(local.fw.advanced_mode, lookup(v, "advanced_mode", {}))
+      name          = "${local.npfx[org].firmware}${v.name}${local.nsfx[org].firmware}"
+      model_bundle_versions = { for i in flatten([
+        for e in lookup(v, "model_bundle_version", []) : [
+          for m in e.server_models : {
+            model   = m
+            version = e.firmware_version
+          }
+        ]
+      ]) : "${i.version}:${i.model}" => i }
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
+    })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "firmware", [])) > 0]) : "${i.organization}/${i.name}" => i }
+  firmware_authenticate = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "firmware", []) : merge(local.fw, v)
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "firmware_authenticate", [])) > 0]) : "${i.organization}/${i.name}" => i }
 
   #__________________________________________________________________
   #
   # Intersight Flow Control Policy
   # GUI Location: Policies > Create Policy > Flow Control
   #__________________________________________________________________
-  flow_control = { for v in lookup(local.policies, "flow_control", []) : v.name => merge(local.defaults.flow_control, v, {
-    name = "${local.name_prefix.flow_control}${v.name}${local.name_suffix.flow_control}"
-    tags = lookup(v, "tags", var.policies.global_settings.tags)
-  }) }
+  flow_control = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "flow_control", []) : merge(local.defaults.flow_control, v, {
+      name         = "${local.npfx[org].flow_control}${v.name}${local.nsfx[org].flow_control}"
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
+    })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "flow_control", [])) > 0]) : "${i.organization}/${i.name}" => i }
 
   #__________________________________________________________________
   #
   # Intersight IMC Access Policy
   # GUI Location: Policies > Create Policy > IMC Access
   #__________________________________________________________________
-
-  imc_access = {
-    for v in lookup(local.policies, "imc_access", {}) : v.name => merge(local.defaults.imc_access, v, {
-      name                = "${local.npfx.imc_access}${v.name}${local.nsfx.imc_access}"
-      inband_ip_pool      = { name = lookup(v, "inband_ip_pool", "UNUSED"), org = local.organization }
-      organization        = local.organization
-      out_of_band_ip_pool = { name = lookup(v, "out_of_band_ip_pool", "UNUSED"), org = local.organization }
-      tags                = lookup(v, "tags", var.policies.global_settings.tags)
+  imc_access = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "imc_access", []) : merge(local.defaults.imc_access, v, {
+      name = "${local.npfx[org].imc_access}${v.name}${local.nsfx[org].imc_access}"
+      inband_ip_pool = {
+        name = length(regexall("/", lookup(v, "inband_ip_pool", "UNUSED"))) > 0 ? element(split("/", v.inband_ip_pool), 1) : lookup(v, "inband_ip_pool", "UNUSED")
+        org  = length(regexall("/", lookup(v, "inband_ip_pool", "UNUSED"))) > 0 ? element(split("/", v.inband_ip_pool), 0) : org
+      }
+      organization = org
+      out_of_band_ip_pool = {
+        name = length(regexall("/", lookup(v, "out_of_band_ip_pool", "UNUSED"))) > 0 ? element(split("/", v.inband_ip_pool), 1) : lookup(v, "out_of_band_ip_pool", "UNUSED")
+        org  = length(regexall("/", lookup(v, "out_of_band_ip_pool", "UNUSED"))) > 0 ? element(split("/", v.inband_ip_pool), 0) : org
+      }
+      tags = lookup(v, "tags", var.global_settings.tags)
     })
-  }
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "imc_access", [])) > 0]) : "${i.organization}/${i.name}" => i }
+
+  #__________________________________________________________________
+  #
+  # Intersight IPMI over LAN Policy
+  # GUI Location: Policies > Create Policy > IPMI over LAN
+  #__________________________________________________________________
+  ipmi_over_lan = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "ipmi_over_lan", []) : merge(local.defaults.ipmi_over_lan, v, {
+      name         = "${local.npfx[org].ipmi_over_lan}${v.name}${local.nsfx[org].ipmi_over_lan}"
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
+    })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "ipmi_over_lan", [])) > 0]) : "${i.organization}/${i.name}" => i }
 
   #__________________________________________________________________
   #
   # Intersight iSCSI Adapter Policy
   # GUI Location: Policies > Create Policy > iSCSI Adapter
   #__________________________________________________________________
-  iscsi_adapter = { for v in lookup(local.policies, "iscsi_adapter", []) : v.name => merge(local.defaults.iscsi_adapter, v, {
-    name = "${local.name_prefix.iscsi_adapter}${v.name}${local.name_suffix.iscsi_adapter}"
-    tags = lookup(v, "tags", var.policies.global_settings.tags)
-  }) }
+  iscsi_adapter = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "iscsi_adapter", []) : merge(local.defaults.iscsi_adapter, v, {
+      name         = "${local.npfx[org].iscsi_adapter}${v.name}${local.nsfx[org].iscsi_adapter}"
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
+    })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "iscsi_adapter", [])) > 0]) : "${i.organization}/${i.name}" => i }
 
   #__________________________________________________________________
   #
@@ -379,25 +510,29 @@ locals {
   #__________________________________________________________________
   iboot             = local.defaults.iscsi_boot
   lookup_iscsi_boot = ["initiator_ip_pool", "iscsi_adapter_policy", "primary_target_policy", "secondary_target_policy"]
-  iscsi_boot = {
-    for v in lookup(local.policies, "iscsi_boot", {}) : v.name => merge(local.iboot, v, {
+  iscsi_boot = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "iscsi_boot", []) : merge(local.iboot, v, {
       initiator_static_ipv4_config = merge(
       local.iboot.initiator_static_ipv4_config, lookup(v, "initiator_static_ipv4_config", {}))
-      name         = "${local.npfx.iscsi_boot}${v.name}${local.nsfx.iscsi_boot}"
-      organization = local.organization
-      tags         = lookup(v, "tags", var.policies.global_settings.tags)
-    }, { for e in local.lookup_iscsi_boot : e => { name = lookup(v, e, "UNUSED"), org = local.organization } })
-  }
+      name         = "${local.npfx[org].iscsi_boot}${v.name}${local.nsfx[org].iscsi_boot}"
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
+      }, { for e in local.lookup_iscsi_boot : e => { name = lookup(v, e, "UNUSED"), org = org }
+    })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "iscsi_boot", [])) > 0]) : "${i.organization}/${i.name}" => i }
 
   #__________________________________________________________________
   #
   # Intersight iSCSI Static Target Policy
   # GUI Location: Policies > Create Policy > iSCSI Static Target
   #__________________________________________________________________
-  iscsi_static_target = { for v in lookup(local.policies, "iscsi_static_target", []) : v.name => merge(local.defaults.iscsi_static_target, v, {
-    name = "${local.name_prefix.iscsi_static_target}${v.name}${local.name_suffix.iscsi_static_target}"
-    tags = lookup(v, "tags", var.policies.global_settings.tags)
-  }) }
+  iscsi_static_target = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "iscsi_static_target", []) : merge(local.defaults.iscsi_static_target, v, {
+      name         = "${local.npfx[org].iscsi_static_target}${v.name}${local.nsfx[org].iscsi_static_target}"
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
+    })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "iscsi_static_target", [])) > 0]) : "${i.organization}/${i.name}" => i }
 
   #_________________________________________________________________________
   #
@@ -405,16 +540,16 @@ locals {
   # GUI Location: Configure > Policies > Create Policy > LAN Connectivity
   #_________________________________________________________________________
   lcp = local.defaults.lan_connectivity
-  lan_connectivity = {
-    for v in lookup(local.policies, "lan_connectivity", {}) : v.name => merge(local.lcp, v, {
+  lan_connectivity = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "lan_connectivity", []) : merge(local.lcp, v, {
       iqn_pool = {
         name = length(regexall("/", lookup(v, "iqn_pool", "UNUSED"))) > 0 ? element(split("/", lookup(v, "iqn_pool", "UNUSED")), 1) : lookup(v, "iqn_pool", "UNUSED")
-        org  = length(regexall("/", lookup(v, "iqn_pool", "UNUSED"))) > 0 ? element(split("/", lookup(v, "iqn_pool", "UNUSED")), 0) : local.organization
+        org  = length(regexall("/", lookup(v, "iqn_pool", "UNUSED"))) > 0 ? element(split("/", lookup(v, "iqn_pool", "UNUSED")), 0) : org
       }
       iqn_static_identifier = lookup(v, "iqn_static_identifier", "")
-      name                  = "${local.npfx.lan_connectivity}${v.name}${local.nsfx.lan_connectivity}"
-      organization          = local.organization
-      tags                  = lookup(v, "tags", var.policies.global_settings.tags)
+      name                  = "${local.npfx[org].lan_connectivity}${v.name}${local.nsfx[org].lan_connectivity}"
+      organization          = org
+      tags                  = lookup(v, "tags", var.global_settings.tags)
       vnics = [
         for e in lookup(v, "vnics", []) : merge(local.lcp.vnics, e, {
           mac_addresses_static = lookup(e, "mac_addresses_static", [])
@@ -425,7 +560,7 @@ locals {
         })
       ]
     })
-  }
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "lan_connectivity", [])) > 0]) : "${i.organization}/${i.name}" => i }
   vnics = { for i in flatten([
     for key, value in local.lan_connectivity : [
       for v in value.vnics : [
@@ -508,8 +643,8 @@ locals {
   # GUI Location: Policies > Create Policy > LDAP
   #__________________________________________________________________
   lldap = local.defaults.ldap
-  ldap = {
-    for v in lookup(local.policies, "ldap", []) : v.name => merge(local.lldap, v, {
+  ldap = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "ldap", []) : merge(local.lldap, v, {
       base_settings = merge(local.lldap.base_settings, lookup(v, "base_settings", {}), {
         base_dn = length(compact([lookup(v.base_settings, "base_dn", "")])
         ) == 0 ? "DC=${join(",DC=", split(".", v.base_settings.domain))}" : v.base_settings.base_dn
@@ -519,12 +654,12 @@ locals {
       ldap_from_dns      = merge(local.lldap.ldap_from_dns, lookup(v, "ldap_from_dns", {}))
       ldap_groups        = lookup(v, "ldap_groups", [])
       ldap_providers     = lookup(v, "ldap_providers", [])
-      name               = "${local.npfx.ldap}${v.name}${local.nsfx.ldap}"
-      organization       = local.organization
+      name               = "${local.npfx[org].ldap}${v.name}${local.nsfx[org].ldap}"
+      organization       = org
       search_parameters  = merge(local.lldap.search_parameters, lookup(v, "search_parameters", {}))
-      tags               = lookup(v, "tags", var.policies.global_settings.tags)
+      tags               = lookup(v, "tags", var.global_settings.tags)
     })
-  }
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "ldap", [])) > 0]) : "${i.organization}/${i.name}" => i }
   ldap_groups = { for i in flatten([
     for key, value in local.ldap : [
       for v in value.ldap_groups : {
@@ -555,35 +690,41 @@ locals {
   # Intersight Link Aggregation Policy
   # GUI Location: Policies > Create Policy > Link Aggregation
   #__________________________________________________________________
-  link_aggregation = { for v in lookup(local.policies, "link_aggregation", []) : v.name => merge(local.defaults.link_aggregation, v, {
-    name = "${local.name_prefix.link_aggregation}${v.name}${local.name_suffix.link_aggregation}"
-    tags = lookup(v, "tags", var.policies.global_settings.tags)
-  }) }
+  link_aggregation = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "link_aggregation", []) : merge(local.defaults.link_aggregation, v, {
+      name         = "${local.npfx[org].link_aggregation}${v.name}${local.nsfx[org].link_aggregation}"
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
+    })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "link_aggregation", [])) > 0]) : "${i.organization}/${i.name}" => i }
 
   #__________________________________________________________________
   #
   # Intersight Link Control Policy
   # GUI Location: Policies > Create Policy > Link Control
   #__________________________________________________________________
-  link_control = { for v in lookup(local.policies, "link_control", []) : v.name => merge(local.defaults.link_control, v, {
-    name = "${local.name_prefix.link_control}${v.name}${local.name_suffix.link_control}"
-    tags = lookup(v, "tags", var.policies.global_settings.tags)
-  }) }
+  link_control = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "link_control", []) : merge(local.defaults.link_control, v, {
+      name         = "${local.npfx[org].link_control}${v.name}${local.nsfx[org].link_control}"
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
+    })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "link_control", [])) > 0]) : "${i.organization}/${i.name}" => i }
 
   #__________________________________________________________________
   #
   # Intersight Local User Policy
   # GUI Location: Policies > Create Policy > Local User
   #__________________________________________________________________
-  local_user = {
-    for v in lookup(local.policies, "local_user", []) : v.name => merge(local.defaults.local_user, v, {
+  local_user = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "local_user", []) : merge(local.defaults.local_user, v, {
       password_properties = merge(local.defaults.local_user.password_properties, lookup(v, "password_properties", {}))
-      name                = "${local.npfx.local_user}${v.name}${local.nsfx.local_user}"
-      organization        = local.organization
-      tags                = lookup(v, "tags", var.policies.global_settings.tags)
+      name                = "${local.npfx[org].local_user}${v.name}${local.nsfx[org].local_user}"
+      organization        = org
+      tags                = lookup(v, "tags", var.global_settings.tags)
       users               = lookup(v, "users", [])
     })
-  }
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "local_user", [])) > 0]) : "${i.organization}/${i.name}" => i }
   users = { for i in flatten([
     for key, value in local.local_user : [
       for v in value.users : merge(local.defaults.local_user.users, v, {
@@ -600,10 +741,54 @@ locals {
   # Intersight Multicast Policy
   # GUI Location: Policies > Create Policy > Multicast
   #__________________________________________________________________
-  multicast = { for v in lookup(local.policies, "multicast", []) : v.name => merge(local.defaults.multicast, v, {
-    name = "${local.name_prefix.multicast}${v.name}${local.name_suffix.multicast}"
-    tags = lookup(v, "tags", var.policies.global_settings.tags)
-  }) }
+  multicast = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "multicast", []) : merge(local.defaults.multicast, v, {
+      name         = "${local.npfx[org].multicast}${v.name}${local.nsfx[org].multicast}"
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
+    })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "multicast", [])) > 0]) : "${i.organization}/${i.name}" => i }
+
+  #__________________________________________________________________
+  #
+  # Intersight Network Connectivity Policy
+  # GUI Location: Policies > Create Policy > Network Connectivity
+  #__________________________________________________________________
+  network_connectivity = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "network_connectivity", []) : merge(local.defaults.network_connectivity, v, {
+      name         = "${local.npfx[org].network_connectivity}${v.name}${local.nsfx[org].network_connectivity}"
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
+    })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "network_connectivity", [])) > 0]) : "${i.organization}/${i.name}" => i }
+
+  #__________________________________________________________________
+  #
+  # Intersight NTP Policy
+  # GUI Location: Policies > Create Policy > NTP
+  #__________________________________________________________________
+  ntp = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "ntp", []) : merge(local.defaults.ntp, v, {
+      name         = "${local.npfx[org].ntp}${v.name}${local.nsfx[org].ntp}"
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
+    })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "ntp", [])) > 0]) : "${i.organization}/${i.name}" => i }
+
+  #__________________________________________________________________
+  #
+  # Intersight Persistent Memory Policy
+  # GUI Location: Policies > Create Policy > Persistent Memory
+  #__________________________________________________________________
+  persistent_memory = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "persistent_memory", []) : merge(local.defaults.persistent_memory, v, {
+      name = "${local.npfx[org].persistent_memory}${v.name}${local.nsfx[org].persistent_memory}"
+      namespaces = [for e in lookup(v, "namespaces", []) : merge(local.defaults.persistent_memory.namespaces, e)
+      ]
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
+    })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "persistent_memory", [])) > 0]) : "${i.organization}/${i.name}" => i }
 
   #__________________________________________________________________
   #
@@ -611,12 +796,12 @@ locals {
   # GUI Location: Policies > Create Policy > Port
   #__________________________________________________________________
   lport = local.defaults.port
-  port = { for s in flatten([
-    for value in lookup(local.policies, "port", []) : [
+  port = { for s in flatten([for org in sort(keys(var.model)) : [
+    for value in lookup(lookup(var.model[org], "policies", {}), "port", []) : [
       for i in range(length(value.names)) : merge(local.defaults.port, value, {
         key          = element(value.names, i)
-        name         = "${local.npfx.port}${element(value.names, i)}${local.nsfx.port}"
-        organization = local.organization
+        name         = "${local.npfx[org].port}${element(value.names, i)}${local.nsfx[org].port}"
+        organization = org
         port_channel_appliances = [
           for v in lookup(value, "port_channel_appliances", []) : merge(local.lport.port_channel_appliances, v, {
             interfaces = lookup(v, "interfaces", [])
@@ -680,28 +865,29 @@ locals {
             port_list = v.port_list
           })
         ]
-        tags = lookup(value, "tags", var.policies.global_settings.tags)
+        tags = lookup(value, "tags", var.global_settings.tags)
       })
     ]
-  ]) : s.key => s }
+    #]]) : "${s.organization}/${s.key}" => s }
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "port", [])) > 0]) : "${s.organization}/${s.name}" => s }
   port_channel_appliances = { for i in flatten([for key, value in local.port : [
     for v in value.port_channel_appliances : merge(v, {
       ethernet_network_control_policy = {
         name = length(regexall("/", lookup(v, "ethernet_network_control_policy", "UNUSED"))
         ) > 0 ? element(split("/", lookup(v, "ethernet_network_control_policy", "UNUSED")), 1) : lookup(v, "ethernet_network_control_policy", "UNUSED")
         org = length(regexall("/", lookup(v, "ethernet_network_control_policy", "UNUSED"))
-        ) > 0 ? element(split("/", lookup(v, "ethernet_network_control_policy", "UNUSED")), 0) : local.organization
+        ) > 0 ? element(split("/", lookup(v, "ethernet_network_control_policy", "UNUSED")), 0) : value.organization
       }
       ethernet_network_group_policy = {
         name = length(regexall("/", lookup(v, "ethernet_network_group_policy", "UNUSED"))
         ) > 0 ? element(split("/", lookup(v, "ethernet_network_group_policy", "UNUSED")), 1) : lookup(v, "ethernet_network_group_policy", "UNUSED")
         org = length(regexall("/", lookup(v, "ethernet_network_group_policy", "UNUSED"))
-        ) > 0 ? element(split("/", lookup(v, "ethernet_network_group_policy", "UNUSED")), 0) : local.organization
+        ) > 0 ? element(split("/", lookup(v, "ethernet_network_group_policy", "UNUSED")), 0) : value.organization
       }
       link_aggregation_policy = {
         name = length(regexall("/", lookup(v, "link_aggregation_policy", "UNUSED"))
         ) > 0 ? element(split("/", lookup(v, "link_aggregation_policy", "UNUSED")), 1) : lookup(v, "link_aggregation_policy", "UNUSED")
-        org = length(regexall("/", lookup(v, "link_aggregation_policy", "UNUSED"))) > 0 ? element(split("/", lookup(v, "link_aggregation_policy", "UNUSED")), 0) : local.organization
+        org = length(regexall("/", lookup(v, "link_aggregation_policy", "UNUSED"))) > 0 ? element(split("/", lookup(v, "link_aggregation_policy", "UNUSED")), 0) : value.organization
       }
       organization = value.organization,
       port_policy  = key
@@ -714,22 +900,22 @@ locals {
         name = length(regexall("/", lookup(v, "ethernet_network_group_policy", "UNUSED"))
         ) > 0 ? element(split("/", lookup(v, "ethernet_network_group_policy", "UNUSED")), 1) : lookup(v, "ethernet_network_group_policy", "UNUSED")
         org = length(regexall("/", lookup(v, "ethernet_network_group_policy", "UNUSED"))
-        ) > 0 ? element(split("/", lookup(v, "ethernet_network_group_policy", "UNUSED")), 0) : local.organization
+        ) > 0 ? element(split("/", lookup(v, "ethernet_network_group_policy", "UNUSED")), 0) : value.organization
       }
       flow_control_policy = {
         name = length(regexall("/", lookup(v, "flow_control_policy", "UNUSED"))
         ) > 0 ? element(split("/", lookup(v, "flow_control_policy", "UNUSED")), 1) : lookup(v, "flow_control_policy", "UNUSED")
-        org = length(regexall("/", lookup(v, "flow_control_policy", "UNUSED"))) > 0 ? element(split("/", lookup(v, "flow_control_policy", "UNUSED")), 0) : local.organization
+        org = length(regexall("/", lookup(v, "flow_control_policy", "UNUSED"))) > 0 ? element(split("/", lookup(v, "flow_control_policy", "UNUSED")), 0) : value.organization
       }
       link_aggregation_policy = {
         name = length(regexall("/", lookup(v, "link_aggregation_policy", "UNUSED"))
         ) > 0 ? element(split("/", lookup(v, "link_aggregation_policy", "UNUSED")), 1) : lookup(v, "link_aggregation_policy", "UNUSED")
-        org = length(regexall("/", lookup(v, "link_aggregation_policy", "UNUSED"))) > 0 ? element(split("/", lookup(v, "link_aggregation_policy", "UNUSED")), 0) : local.organization
+        org = length(regexall("/", lookup(v, "link_aggregation_policy", "UNUSED"))) > 0 ? element(split("/", lookup(v, "link_aggregation_policy", "UNUSED")), 0) : value.organization
       }
       link_control_policy = {
         name = length(regexall("/", lookup(v, "link_control_policy", "UNUSED"))
         ) > 0 ? element(split("/", lookup(v, "link_control_policy", "UNUSED")), 1) : lookup(v, "link_control_policy", "UNUSED")
-        org = length(regexall("/", lookup(v, "link_control_policy", "UNUSED"))) > 0 ? element(split("/", lookup(v, "link_control_policy", "UNUSED")), 0) : local.organization
+        org = length(regexall("/", lookup(v, "link_control_policy", "UNUSED"))) > 0 ? element(split("/", lookup(v, "link_control_policy", "UNUSED")), 0) : value.organization
       }
       organization = value.organization
       port_policy  = key
@@ -746,12 +932,12 @@ locals {
       link_aggregation_policy = {
         name = length(regexall("/", lookup(v, "link_aggregation_policy", "UNUSED"))
         ) > 0 ? element(split("/", lookup(v, "link_aggregation_policy", "UNUSED")), 0) : lookup(v, "link_aggregation_policy", "UNUSED")
-        org = length(regexall("/", lookup(v, "link_aggregation_policy", "UNUSED"))) > 0 ? element(split("/", lookup(v, "link_aggregation_policy", "UNUSED")), 0) : local.organization
+        org = length(regexall("/", lookup(v, "link_aggregation_policy", "UNUSED"))) > 0 ? element(split("/", lookup(v, "link_aggregation_policy", "UNUSED")), 0) : value.organization
       }
       link_control_policy = {
         name = length(regexall("/", lookup(v, "link_control_policy", "UNUSED"))
         ) > 0 ? element(split("/", lookup(v, "link_control_policy", "UNUSED")), 0) : lookup(v, "link_control_policy", "UNUSED")
-        org = length(regexall("/", lookup(v, "link_control_policy", "UNUSED"))) > 0 ? element(split("/", lookup(v, "link_control_policy", "UNUSED")), 0) : local.organization
+        org = length(regexall("/", lookup(v, "link_control_policy", "UNUSED"))) > 0 ? element(split("/", lookup(v, "link_control_policy", "UNUSED")), 0) : value.organization
       }
       organization = value.organization
       port_policy  = key
@@ -791,13 +977,13 @@ locals {
         name = length(regexall("/", lookup(v, "ethernet_network_control_policy", "UNUSED"))
         ) > 0 ? element(split("/", lookup(v, "ethernet_network_control_policy", "UNUSED")), 1) : lookup(v, "ethernet_network_control_policy", "UNUSED")
         org = length(regexall("/", lookup(v, "ethernet_network_control_policy", "UNUSED"))
-        ) > 0 ? element(split("/", lookup(v, "ethernet_network_control_policy", "UNUSED")), 0) : local.organization
+        ) > 0 ? element(split("/", lookup(v, "ethernet_network_control_policy", "UNUSED")), 0) : v.organization
       }
       ethernet_network_group_policy = {
         name = length(regexall("/", lookup(v, "ethernet_network_group_policy", "UNUSED"))
         ) > 0 ? element(split("/", lookup(v, "ethernet_network_group_policy", "UNUSED")), 1) : lookup(v, "ethernet_network_group_policy", "UNUSED")
         org = length(regexall("/", lookup(v, "ethernet_network_group_policy", "UNUSED"))
-        ) > 0 ? element(split("/", lookup(v, "ethernet_network_group_policy", "UNUSED")), 0) : local.organization
+        ) > 0 ? element(split("/", lookup(v, "ethernet_network_group_policy", "UNUSED")), 0) : v.organization
       }
       port_id = s
     })]
@@ -826,17 +1012,17 @@ locals {
           name = length(regexall("/", lookup(v, "ethernet_network_group_policy", "UNUSED"))
           ) > 0 ? element(split("/", lookup(v, "ethernet_network_group_policy", "UNUSED")), 1) : lookup(v, "ethernet_network_group_policy", "UNUSED")
           org = length(regexall("/", lookup(v, "ethernet_network_group_policy", "UNUSED"))
-          ) > 0 ? element(split("/", lookup(v, "ethernet_network_group_policy", "UNUSED")), 0) : local.organization
+          ) > 0 ? element(split("/", lookup(v, "ethernet_network_group_policy", "UNUSED")), 0) : v.organization
         }
         flow_control_policy = {
           name = length(regexall("/", lookup(v, "flow_control_policy", "UNUSED"))
           ) > 0 ? element(split("/", lookup(v, "flow_control_policy", "UNUSED")), 1) : lookup(v, "flow_control_policy", "UNUSED")
-          org = length(regexall("/", lookup(v, "flow_control_policy", "UNUSED"))) > 0 ? element(split("/", lookup(v, "flow_control_policy", "UNUSED")), 0) : local.organization
+          org = length(regexall("/", lookup(v, "flow_control_policy", "UNUSED"))) > 0 ? element(split("/", lookup(v, "flow_control_policy", "UNUSED")), 0) : v.organization
         }
         link_control_policy = {
           name = length(regexall("/", lookup(v, "link_control_policy", "UNUSED"))
           ) > 0 ? element(split("/", lookup(v, "link_control_policy", "UNUSED")), 1) : lookup(v, "link_control_policy", "UNUSED")
-          org = length(regexall("/", lookup(v, "link_control_policy", "UNUSED"))) > 0 ? element(split("/", lookup(v, "link_control_policy", "UNUSED")), 0) : local.organization
+          org = length(regexall("/", lookup(v, "link_control_policy", "UNUSED"))) > 0 ? element(split("/", lookup(v, "link_control_policy", "UNUSED")), 0) : v.organization
         }
         port_id = s
       })
@@ -901,7 +1087,7 @@ locals {
     for s in v.port_list : merge(v, {
       link_control_policy = {
         name = length(regexall("/", lookup(v, "link_control_policy", "UNUSED"))) > 0 ? element(split("/", lookup(v, "link_control_policy", "UNUSED")), 1) : lookup(v, "link_control_policy", "UNUSED")
-        org  = length(regexall("/", lookup(v, "link_control_policy", "UNUSED"))) > 0 ? element(split("/", lookup(v, "link_control_policy", "UNUSED")), 0) : local.organization
+        org  = length(regexall("/", lookup(v, "link_control_policy", "UNUSED"))) > 0 ? element(split("/", lookup(v, "link_control_policy", "UNUSED")), 0) : v.organization
       }
       port_id = s
   })]]) : "${i.port_policy}:${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
@@ -933,28 +1119,42 @@ locals {
     for s in v.port_list : merge(v, { port_id = s })
   ]]) : "${i.port_policy}:${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
 
+  #__________________________________________________________________
+  #
+  # Intersight Power Policy
+  # GUI Location: Policies > Create Policy > Power
+  #__________________________________________________________________
+  power = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "power", []) : merge(local.defaults.power, v, {
+      name         = "${local.npfx[org].power}${v.name}${local.nsfx[org].power}"
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
+    })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "power", [])) > 0]) : "${i.organization}/${i.name}" => i }
+
   #_________________________________________________________________________
   #
   # Intersight SAN Connectivity
   # GUI Location: Configure > Policies > Create Policy > SAN Connectivity
   #_________________________________________________________________________
   scp = local.defaults.san_connectivity
-  san_connectivity = { for v in lookup(local.policies, "san_connectivity", []) : v.name => merge(local.scp, v, {
-    name         = "${local.npfx.san_connectivity}${v.name}${local.nsfx.san_connectivity}"
-    organization = local.organization
-    tags         = lookup(v, "tags", var.policies.global_settings.tags)
-    wwnn_pool = {
-      name = length(regexall("/", lookup(v, "wwnn_pool", "UNUSED"))) > 0 ? element(split("/", lookup(v, "wwnn_pool", "UNUSED")), 1) : lookup(v, "wwnn_pool", "UNUSED")
-      org  = length(regexall("/", lookup(v, "wwnn_pool", "UNUSED"))) > 0 ? element(split("/", lookup(v, "wwnn_pool", "UNUSED")), 0) : local.organization
-    }
-    vhbas = [
-      for e in lookup(v, "vhbas", []) : merge(local.scp.vhbas, e, {
-        names     = e.names
-        placement = merge(local.scp.vhbas.placement, lookup(v, "placement", {}))
-      })
-    ]
+  san_connectivity = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "san_connectivity", []) : merge(local.scp, v, {
+      name         = "${local.npfx[org].san_connectivity}${v.name}${local.nsfx[org].san_connectivity}"
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
+      wwnn_pool = {
+        name = length(regexall("/", lookup(v, "wwnn_pool", "UNUSED"))) > 0 ? element(split("/", lookup(v, "wwnn_pool", "UNUSED")), 1) : lookup(v, "wwnn_pool", "UNUSED")
+        org  = length(regexall("/", lookup(v, "wwnn_pool", "UNUSED"))) > 0 ? element(split("/", lookup(v, "wwnn_pool", "UNUSED")), 0) : org
+      }
+      vhbas = [
+        for e in lookup(v, "vhbas", []) : merge(local.scp.vhbas, e, {
+          names     = e.names
+          placement = merge(local.scp.vhbas.placement, lookup(v, "placement", {}))
+        })
+      ]
     })
-  }
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "san_connectivity", [])) > 0]) : "${i.organization}/${i.name}" => i }
   vhbas = { for i in flatten([
     for key, value in local.san_connectivity : [
       for v in value.vhbas : [
@@ -962,22 +1162,22 @@ locals {
           fc_zone_policies = length(v.fc_zone_policies) > 0 ? element(chunklist(v.fc_zone_policies, 2), s) : []
           fibre_channel_adapter_policy = {
             name = length(regexall("/", v.fibre_channel_adapter_policy)) > 0 ? element(split("/", v.fibre_channel_adapter_policy), 1) : v.fibre_channel_adapter_policy
-            org  = length(regexall("/", v.fibre_channel_adapter_policy)) > 0 ? element(split("/", v.fibre_channel_adapter_policy), 0) : local.organization
+            org  = length(regexall("/", v.fibre_channel_adapter_policy)) > 0 ? element(split("/", v.fibre_channel_adapter_policy), 0) : value.organization
           }
           fibre_channel_network_policy = length(v.fibre_channel_network_policies) == 2 ? {
             name = length(regexall("/", element(v.fibre_channel_network_policies, s))
             ) > 0 ? element(split("/", element(v.fibre_channel_network_policies, s)), 1) : element(v.fibre_channel_network_policies, s)
             org = length(regexall("/", element(v.fibre_channel_network_policies, s))
-            ) > 0 ? element(split("/", element(v.fibre_channel_network_policies, s)), 0) : local.organization
+            ) > 0 ? element(split("/", element(v.fibre_channel_network_policies, s)), 0) : value.organization
             } : length(v.fibre_channel_network_policies) == 1 ? {
             name = length(regexall("/", element(v.fibre_channel_network_policies, 0))
             ) > 0 ? element(split("/", element(v.fibre_channel_network_policies, 0)), 1) : element(v.fibre_channel_network_policies, 0)
             org = length(regexall("/", element(v.fibre_channel_network_policies, 0))
-            ) > 0 ? element(split("/", element(v.fibre_channel_network_policies, 0)), 0) : local.organization
+            ) > 0 ? element(split("/", element(v.fibre_channel_network_policies, 0)), 0) : value.organization
           } : { name = "UNUSED", org = value.organization }
           fibre_channel_qos_policy = {
             name = length(regexall("/", v.fibre_channel_qos_policy)) > 0 ? element(split("/", v.fibre_channel_qos_policy), 1) : v.fibre_channel_qos_policy
-            org  = length(regexall("/", v.fibre_channel_qos_policy)) > 0 ? element(split("/", v.fibre_channel_qos_policy), 0) : local.organization
+            org  = length(regexall("/", v.fibre_channel_qos_policy)) > 0 ? element(split("/", v.fibre_channel_qos_policy), 0) : value.organization
           }
           name         = element(v.names, s)
           organization = value.organization
@@ -991,10 +1191,10 @@ locals {
           san_connectivity = key
           wwpn_pool = length(v.wwpn_pools) == 2 ? {
             name = length(regexall("/", element(v.wwpn_pools, s))) > 0 ? element(split("/", element(v.wwpn_pools, s)), 1) : element(v.wwpn_pools, s)
-            org  = length(regexall("/", element(v.wwpn_pools, s))) > 0 ? element(split("/", element(v.wwpn_pools, s)), 0) : local.organization
+            org  = length(regexall("/", element(v.wwpn_pools, s))) > 0 ? element(split("/", element(v.wwpn_pools, s)), 0) : value.organization
             } : length(v.wwpn_pools) == 1 ? {
             name = length(regexall("/", element(v.wwpn_pools, 0))) > 0 ? element(split("/", element(v.wwpn_pools, 0)), 1) : element(v.wwpn_pools, s)
-            org  = length(regexall("/", element(v.wwpn_pools, 0))) > 0 ? element(split("/", element(v.wwpn_pools, 0)), 0) : local.organization
+            org  = length(regexall("/", element(v.wwpn_pools, 0))) > 0 ? element(split("/", element(v.wwpn_pools, 0)), 0) : value.organization
           } : { name = "UNUSED", org = "UNUSED" }
           wwpn_static_address = length(v.wwpn_static_addresses) > 0 ? element(v.wwpn_static_addresses, s) : ""
         })
@@ -1002,16 +1202,55 @@ locals {
     ]
   ]) : "${i.san_connectivity}:${i.name}" => i }
 
+  #__________________________________________________________________
+  #
+  # Intersight SD Card Policy
+  # GUI Location: Policies > Create Policy > SD Card
+  #__________________________________________________________________
+  sd_card = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "sd_card", []) : merge(local.defaults.sd_card, v, {
+      name         = "${local.npfx[org].sd_card}${v.name}${local.nsfx[org].sd_card}"
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
+    })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "sd_card", [])) > 0]) : "${i.organization}/${i.name}" => i }
+
+  #__________________________________________________________________
+  #
+  # Intersight Serial over LAN Policy
+  # GUI Location: Policies > Create Policy > Serial over LAN
+  #__________________________________________________________________
+  serial_over_lan = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "serial_over_lan", []) : merge(local.defaults.serial_over_lan, v, {
+      name         = "${local.npfx[org].serial_over_lan}${v.name}${local.nsfx[org].serial_over_lan}"
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
+    })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "serial_over_lan", [])) > 0]) : "${i.organization}/${i.name}" => i }
+
+  #__________________________________________________________________
+  #
+  # Intersight SMTP Policy
+  # GUI Location: Policies > Create Policy > SMTP
+  #__________________________________________________________________
+  smtp = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "smtp", []) : merge(local.defaults.smtp, v, {
+      name         = "${local.npfx[org].smtp}${v.name}${local.nsfx[org].smtp}"
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
+    })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "smtp", [])) > 0]) : "${i.organization}/${i.name}" => i }
+
   #_________________________________________________________________________
   #
   # Intersight SNNMP Policy
   # GUI Location: Configure > Policies > Create Policy > SNMP
   #_________________________________________________________________________
   lsnmp = local.defaults.snmp
-  snmp = {
-    for v in lookup(local.policies, "snmp", []) : v.name => merge(local.lsnmp, v, {
-      name         = "${local.npfx.snmp}${v.name}${local.nsfx.snmp}"
-      organization = local.organization
+  snmp = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "snmp", []) : merge(local.lsnmp, v, {
+      name         = "${local.npfx[org].snmp}${v.name}${local.nsfx[org].snmp}"
+      organization = org
       snmp_trap_destinations = [
         for e in lookup(v, "snmp_trap_destinations", []) : merge(local.lsnmp.snmp_trap_destinations, e)
       ]
@@ -1022,9 +1261,22 @@ locals {
         for k in keys(local.ps.snmp.trap_community_string) : local.ps.snmp.trap_community_string[k] if length(
         local.ps.snmp.trap_community_string[k]) > 0
       ]]))
-      tags = lookup(v, "tags", var.policies.global_settings.tags)
+      tags = lookup(v, "tags", var.global_settings.tags)
     })
-  }
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "snmp", [])) > 0]) : "${i.organization}/${i.name}" => i }
+
+  #__________________________________________________________________
+  #
+  # Intersight SSH Policy
+  # GUI Location: Policies > Create Policy > SSH
+  #__________________________________________________________________
+  ssh = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "ssh", []) : merge(local.defaults.ssh, v, {
+      name         = "${local.npfx[org].ssh}${v.name}${local.nsfx[org].ssh}"
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
+    })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "ssh", [])) > 0]) : "${i.organization}/${i.name}" => i }
 
   #_________________________________________________________________________
   #
@@ -1035,19 +1287,19 @@ locals {
   dgm = local.defaults.storage.drive_groups.manual_drive_group
   dgv = local.defaults.storage.drive_groups.virtual_drives
   sdr = local.defaults.storage.single_drive_raid0_configuration
-  storage = {
-    for v in lookup(local.policies, "storage", []) : v.name => merge(local.defaults.storage, v, {
+  storage = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "storage", []) : merge(local.defaults.storage, v, {
       drive_groups = lookup(v, "drive_groups", [])
       m2_raid_configuration = length(lookup(v, "m2_raid_configuration", {})
       ) > 0 ? [lookup(v, "m2_raid_configuration", {})] : []
-      name         = "${local.npfx.storage}${v.name}${local.nsfx.storage}"
-      organization = local.organization
+      name         = "${local.npfx[org].storage}${v.name}${local.nsfx[org].storage}"
+      organization = org
       single_drive_raid0_configuration = [
         for e in lookup(v, "single_drive_raid0_configuration", {}) : merge(local.sdr, e)
       ]
-      tags = lookup(v, "tags", var.policies.global_settings.tags)
+      tags = lookup(v, "tags", var.global_settings.tags)
     })
-  }
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "storage", [])) > 0]) : "${i.organization}/${i.name}" => i }
   drive_groups = { for i in flatten([
     for key, value in local.storage : [
       for v in value.drive_groups : {
@@ -1065,6 +1317,32 @@ locals {
     ]) : "${i.storage_policy}:${i.name}" => i
   }
 
+  #__________________________________________________________________
+  #
+  # Intersight Switch Control Policy
+  # GUI Location: Policies > Create Policy > Switch Control
+  #__________________________________________________________________
+  switch_control = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "switch_control", []) : merge(local.defaults.switch_control, v, {
+      name         = "${local.npfx[org].switch_control}${v.name}${local.nsfx[org].switch_control}"
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
+    })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "switch_control", [])) > 0]) : "${i.organization}/${i.name}" => i }
+
+  #__________________________________________________________________
+  #
+  # Intersight Syslog Policy
+  # GUI Location: Policies > Create Policy > Syslog
+  #__________________________________________________________________
+  syslog = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "syslog", []) : merge(local.defaults.syslog, v, {
+      name           = "${local.npfx[org].syslog}${v.name}${local.nsfx[org].syslog}"
+      organization   = org
+      remote_logging = lookup(v, "remote_logging", [])
+      tags           = lookup(v, "tags", var.global_settings.tags)
+    })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "syslog", [])) > 0]) : "${i.organization}/${i.name}" => i }
 
   #_________________________________________________________________________
   #
@@ -1072,34 +1350,74 @@ locals {
   # GUI Location: Configure > Policies > Create Policy > System QoS
   #_________________________________________________________________________
   qos = local.defaults.system_qos
-  system_qos_loop_1 = {
-    for v in lookup(local.policies, "system_qos", []) : v.name => merge(local.qos, v, {
+  system_qos_loop_1 = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "system_qos", []) : merge(local.qos, v, {
       classes = length(regexall(true, lookup(v, "configure_default_classes", local.qos.configure_default_classes))
         ) > 0 ? { for v in local.qos.classes_default : v.priority => v } : length(
         regexall(true, lookup(v, "configure_recommended_classes", local.qos.configure_recommended_classes))
         ) > 0 ? { for v in local.qos.classes_recommended : v.priority => v } : length(lookup(v, "classes", [])
       ) == 0 ? local.qos.classes : { for v in v.classes : v.priority => v }
-      name         = "${local.npfx.system_qos}${v.name}${local.nsfx.system_qos}"
-      organization = local.organization
-      tags         = lookup(v, "tags", var.policies.global_settings.tags)
+      name         = "${local.npfx[org].system_qos}${v.name}${local.nsfx[org].system_qos}"
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
     })
-  }
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "system_qos", [])) > 0]) : "${i.organization}/${i.name}" => i }
   system_qos = {
     for k, v in local.system_qos_loop_1 : k => merge(v,
       { bandwidth_total = sum([for e in v.classes : e.weight if e.state == "Enabled"]) }
     )
   }
 
+  #__________________________________________________________________
+  #
+  # Intersight Thermal Policy
+  # GUI Location: Policies > Create Policy > Thermal
+  #__________________________________________________________________
+  thermal = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "thermal", []) : merge(local.defaults.thermal, v, {
+      name         = "${local.npfx[org].thermal}${v.name}${local.nsfx[org].thermal}"
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
+    })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "thermal", [])) > 0]) : "${i.organization}/${i.name}" => i }
+
+  #__________________________________________________________________
+  #
+  # Intersight Virtual KVM Policy
+  # GUI Location: Policies > Create Policy > Virtual KVM
+  #__________________________________________________________________
+  virtual_kvm = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "virtual_kvm", []) : merge(local.defaults.virtual_kvm, v, {
+      name         = "${local.npfx[org].virtual_kvm}${v.name}${local.nsfx[org].virtual_kvm}"
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
+    })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "virtual_kvm", [])) > 0]) : "${i.organization}/${i.name}" => i }
+
+  #__________________________________________________________________
+  #
+  # Intersight Virtual Media Policy
+  # GUI Location: Policies > Create Policy > Virtual Media
+  #__________________________________________________________________
+  virtual_media = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "virtual_media", []) : merge(local.vmedia, v, {
+      add_virtual_media = [for e in lookup(v, "add_virtual_media", {}) : merge(local.vmedia.add_virtual_media, e)]
+      name              = "${local.npfx[org].virtual_media}${v.name}${local.nsfx[org].virtual_media}"
+      organization      = org
+      tags              = lookup(v, "tags", var.global_settings.tags)
+    })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "virtual_media", [])) > 0]) : "${i.organization}/${i.name}" => i }
+
   #_________________________________________________________________________
   #
   # Intersight VLAN Policy
   # GUI Location: Configure > Policies > Create Policy > VLAN
   #_________________________________________________________________________
-  vlan = {
-    for v in lookup(local.policies, "vlan", []) : v.name => merge(local.defaults.vlan, v, {
-      name         = "${local.npfx.vlan}${v.name}${local.nsfx.vlan}"
-      organization = local.organization
-      tags         = lookup(v, "tags", var.policies.global_settings.tags)
+  vlan = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "vlan", []) : merge(local.defaults.vlan, v, {
+      name         = "${local.npfx[org].vlan}${v.name}${local.nsfx[org].vlan}"
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
       vlans = [
         for e in lookup(v, "vlans", []) : merge(local.defaults.vlan.vlans, e, {
           multicast_policy = e.multicast_policy
@@ -1107,7 +1425,7 @@ locals {
         })
       ]
     })
-  }
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "vlan", [])) > 0]) : "${i.organization}/${i.name}" => i }
   vlans_loop = flatten([
     for key, value in local.vlan : [
       for v in value.vlans : {
@@ -1131,7 +1449,7 @@ locals {
   vlans = { for i in flatten([for v in local.vlans_loop : [
     for s in v.vlan_list : {
       auto_allow_on_uplinks = v.auto_allow_on_uplinks
-      multicast_policy      = { name = v.multicast_policy, org = local.organization }
+      multicast_policy      = { name = v.multicast_policy, org = v.organization }
       name                  = v.name
       name_prefix           = v.name_prefix
       native_vlan           = v.native_vlan
@@ -1147,14 +1465,14 @@ locals {
   # Intersight VSAN Policy
   # GUI Location: Configure > Policies > Create Policy > VSAN
   #_________________________________________________________________________
-  vsan = {
-    for v in lookup(local.policies, "vsan", []) : v.name => merge(local.defaults.vsan, v, {
-      name         = "${local.npfx.vsan}${v.name}${local.nsfx.vsan}"
-      organization = local.organization
-      tags         = lookup(v, "tags", var.policies.global_settings.tags)
+  vsan = { for i in flatten([for org in sort(keys(var.model)) : [
+    for v in lookup(lookup(var.model[org], "policies", {}), "vsan", []) : merge(local.defaults.vsan, v, {
+      name         = "${local.npfx[org].vsan}${v.name}${local.nsfx[org].vsan}"
+      organization = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
       vsans        = lookup(v, "vsans", [])
     })
-  }
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "vsan", [])) > 0]) : "${i.organization}/${i.name}" => i }
   vsans = { for i in flatten([for key, value in local.vsan : [
     for v in value.vsans : merge(local.defaults.vsan.vsans, v, {
       fcoe_vlan_id = lookup(v, "fcoe_vlan_id", v.vsan_id)

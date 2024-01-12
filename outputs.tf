@@ -1,336 +1,331 @@
 #__________________________________________________________
 #
-# Adapter Configuration Policy Outputs
+# Policy Outputs
 #__________________________________________________________
-
 output "adapter_configuration" {
   description = "Moid's of the Adapter Configuration Policies."
   value       = { for v in sort(keys(intersight_adapter_config_policy.map)) : v => intersight_adapter_config_policy.map[v].moid }
 }
-
-
-#__________________________________________________________
-#
-# BIOS Policy Outputs
-#__________________________________________________________
 
 output "bios" {
   description = "Moid's of the BIOS Policies."
   value       = { for v in sort(keys(intersight_bios_policy.map)) : v => intersight_bios_policy.map[v].moid }
 }
 
-
-#__________________________________________________________
-#
-# Boot Order Policy Outputs
-#__________________________________________________________
-
-#output "boot_order" {
-#  description = "Moid's of the Boot Order Policies."
-#  value = { for v in sort(keys(intersight_boot_precision_policy.map)
-#  ) : v => intersight_boot_precision_policy.map[v].moid }
-#}
-
-
-#__________________________________________________________
-#
-# Certificate Management Policy Outputs
-#__________________________________________________________
+output "boot_order" {
+  description = "Moid's of the Boot Order Policies."
+  value       = { for v in sort(keys(intersight_boot_precision_policy.map)) : v => intersight_boot_precision_policy.map[v].moid }
+}
 
 output "certificate_management" {
   description = "Moid's of the Certificate Management Policies."
-  value = { for v in sort(keys(intersight_certificatemanagement_policy.map)
-  ) : v => intersight_certificatemanagement_policy.map[v].moid }
+  value       = { for v in sort(keys(intersight_certificatemanagement_policy.map)) : v => intersight_certificatemanagement_policy.map[v].moid }
 }
-
-
-#__________________________________________________________
-#
-# Device Connector Policy Outputs
-#__________________________________________________________
 
 output "device_connector" {
   description = "Moid's of the Device Connector Policies."
   value       = { for v in sort(keys(intersight_deviceconnector_policy.map)) : v => intersight_deviceconnector_policy.map[v].moid }
 }
 
+output "drive_security" {
+  description = "Moid's of the Drive Security Policies."
+  value       = { for v in sort(keys(intersight_storage_drive_security_policy.map)) : v => intersight_storage_drive_security_policy.map[v].moid }
+}
 
-#__________________________________________________________
-#
-# Firmware Policy Outputs
-#__________________________________________________________
+output "ethernet_adapter" {
+  description = "Moid's of the Ethernet Adapter Policies."
+  value       = { for v in sort(keys(intersight_vnic_eth_adapter_policy.map)) : v => intersight_vnic_eth_adapter_policy.map[v].moid }
+}
+
+output "ethernet_network" {
+  description = "Moid's of the Ethernet Network Policies."
+  value       = { for v in sort(keys(intersight_vnic_eth_network_policy.map)) : v => intersight_vnic_eth_network_policy.map[v].moid }
+}
+
+output "ethernet_network_control" {
+  description = "Moid's of the Ethernet Network Control Policies."
+  value = {
+    for v in sort(keys(intersight_fabric_eth_network_control_policy.map)) : v => intersight_fabric_eth_network_control_policy.map[v].moid
+  }
+}
+
+output "ethernet_network_group" {
+  description = "Moid's of the Ethernet Network Group Policies."
+  value = {
+    for v in sort(keys(intersight_fabric_eth_network_group_policy.map)) : v => intersight_fabric_eth_network_group_policy.map[v].moid
+  }
+}
+
+output "ethernet_qos" {
+  description = "Moid's of the Ethernet QoS Policies."
+  value       = { for v in sort(keys(intersight_vnic_eth_qos_policy.map)) : v => intersight_vnic_eth_qos_policy.map[v].moid }
+}
+
+output "fc_zone" {
+  description = "Moid's of the FC Zone Policies."
+  value       = { for v in sort(keys(intersight_fabric_fc_zone_policy.map)) : v => intersight_fabric_fc_zone_policy.map[v].moid }
+}
+
+output "fibre_channel_adapter" {
+  description = "Moid's of the Fibre Channel Adapter Policies."
+  value       = { for v in sort(keys(intersight_vnic_fc_adapter_policy.map)) : v => intersight_vnic_fc_adapter_policy.map[v].moid }
+}
+
+output "fibre_channel_network" {
+  description = "Moid's of the Fibre Channel Network Policies."
+  value       = { for v in sort(keys(intersight_vnic_fc_network_policy.map)) : v => intersight_vnic_fc_network_policy.map[v].moid }
+}
+
+output "fibre_channel_qos" {
+  description = "Moid's of the Fibre Channel QoS Policies."
+  value       = { for v in sort(keys(intersight_vnic_eth_qos_policy.map)) : v => intersight_vnic_eth_qos_policy.map[v].moid }
+}
+
+output "flow_control" {
+  description = "Moid's of the Flow Control Policies."
+  value       = { for v in sort(keys(intersight_fabric_flow_control_policy.map)) : v => intersight_fabric_flow_control_policy.map[v].moid }
+}
 
 output "firmware" {
   description = "Moid's of the Firmware Policies."
   value       = { for v in sort(keys(intersight_firmware_policy.map)) : v => intersight_firmware_policy.map[v].moid }
 }
 
-
-#__________________________________________________________
-#
-# IMC Access Policy Outputs
-#__________________________________________________________
-
 output "imc_access" {
   description = "Moid's of the IMC Access Policies."
   value       = { for v in sort(keys(intersight_access_policy.map)) : v => intersight_access_policy.map[v].moid }
 }
-
-
-#__________________________________________________________
-#
-# IPMI over LAN Policy Outputs
-#__________________________________________________________
 
 output "ipmi_over_lan" {
   description = "Moid's of the IPMI over LAN Policies."
   value       = { for v in sort(keys(intersight_ipmioverlan_policy.map)) : v => intersight_ipmioverlan_policy.map[v].moid }
 }
 
+output "iscsi_adapter" {
+  description = "Moid's of the iSCSI Adapter Policies."
+  value       = { for v in sort(keys(intersight_vnic_iscsi_adapter_policy.map)) : v => intersight_vnic_iscsi_adapter_policy.map[v].moid }
+}
 
-#__________________________________________________________
-#
-# LAN Connectivity Policy Outputs
-#__________________________________________________________
+output "iscsi_boot" {
+  description = "Moid's of the iSCSI Boot Policies."
+  value       = { for v in sort(keys(intersight_vnic_iscsi_boot_policy.map)) : v => intersight_vnic_iscsi_boot_policy.map[v].moid }
+}
 
-#output "lan_connectivity" {
-#  description = "Moid's of the LAN Connectivity Policies."
-#  value = { for v in sort(keys(intersight_vnic_lan_connectivity_policy.map)
-#  ) : v => intersight_vnic_lan_connectivity_policy.map[v].moid }
-#}
+output "iscsi_static_target" {
+  description = "Moid's of the iSCSI Static Target Policies."
+  value       = { for v in sort(keys(intersight_vnic_iscsi_static_target_policy.map)) : v => intersight_vnic_iscsi_static_target_policy.map[v].moid }
+}
 
-#__________________________________________________________
-#
-# LDAP Policy Outputs
-#__________________________________________________________
+output "lan_connectivity" {
+  description = "Moid's of the LAN Connectivity Policies."
+  value       = { for v in sort(keys(intersight_vnic_lan_connectivity_policy.map)) : v => intersight_vnic_lan_connectivity_policy.map[v].moid }
+}
+
+output "lan_connectivity_vnics" {
+  description = "Moid's of the LAN Connectivity - VNICs Policies."
+  value       = { for v in sort(keys(intersight_vnic_eth_if.map)) : v => intersight_vnic_eth_if.map[v].moid }
+}
+
+output "link_aggregation" {
+  description = "Moid's of the Link Control Policies."
+  value       = { for v in sort(keys(intersight_fabric_link_aggregation_policy.map)) : v => intersight_fabric_link_aggregation_policy.map[v].moid }
+}
+
+output "link_control" {
+  description = "Moid's of the Link Control Policies."
+  value       = { for v in sort(keys(intersight_fabric_link_control_policy.map)) : v => intersight_fabric_link_control_policy.map[v].moid }
+}
 
 output "ldap" {
   description = "Moid's of the LDAP Policies."
   value       = { for v in sort(keys(intersight_iam_ldap_policy.map)) : v => intersight_iam_ldap_policy.map[v].moid }
 }
 
-
-#__________________________________________________________
-#
-# Local User Policy Outputs
-#__________________________________________________________
-
 output "local_user" {
   description = "Moid's of the Local User Policies."
-  value = { for v in sort(keys(intersight_iam_end_point_user_policy.map)
-  ) : v => intersight_iam_end_point_user_policy.map[v].moid }
+  value       = { for v in sort(keys(intersight_iam_end_point_user_policy.map)) : v => intersight_iam_end_point_user_policy.map[v].moid }
 }
 
-
-#__________________________________________________________
-#
-# Network Connectivity Policy Outputs
-#__________________________________________________________
+output "locals" {
+  value = {
+    #adapter_configuration = concat(
+    #  [for k, v in local.adapter_configuration : k],
+    #  [for v in local.pp.adapter_configuration : v if contains(sort(keys(local.adapter_configuration)), v) == false]
+    #)
+    adapter_configuration  = [for k, v in local.adapter_configuration : k]
+    bios                   = [for k, v in local.bios : k]
+    boot_order             = [for k, v in local.boot_order : k]
+    certificate_management = [for k, v in local.certificate_management : k]
+    device_connector       = [for k, v in local.device_connector : k]
+    drive_security         = [for k, v in local.drive_security : k]
+    firmware               = [for k, v in local.firmware : k]
+    imc_access             = [for k, v in local.imc_access : k]
+    ipmi_over_lan          = [for k, v in local.ipmi_over_lan : k]
+    lan_connectivity       = [for k, v in local.lan_connectivity : k]
+    ldap                   = [for k, v in local.ldap : k]
+    local_user             = [for k, v in local.local_user : k]
+    network_connectivity   = [for k, v in local.network_connectivity : k]
+    ntp                    = [for k, v in local.ntp : k]
+    persistent_memory      = [for k, v in local.persistent_memory : k]
+    port                   = [for k, v in local.port : k]
+    power                  = [for k, v in local.power : k]
+    san_connectivity       = [for k, v in local.san_connectivity : k]
+    sd_card                = [for k, v in local.sd_card : k]
+    serial_over_lan        = [for k, v in local.serial_over_lan : k]
+    smtp                   = [for k, v in local.smtp : k]
+    snmp                   = [for k, v in local.snmp : k]
+    ssh                    = [for k, v in local.ssh : k]
+    storage                = [for k, v in local.storage : k]
+    switch_control         = [for k, v in local.switch_control : k]
+    syslog                 = [for k, v in local.syslog : k]
+    system_qos             = [for k, v in local.system_qos : k]
+    thermal                = [for k, v in local.thermal : k]
+    virtual_kvm            = [for k, v in local.virtual_kvm : k]
+    virtual_media          = [for k, v in local.virtual_media : k]
+    vlan                   = [for k, v in local.vlan : k]
+    vsan                   = [for k, v in local.vsan : k]
+  }
+}
+output "multicast" {
+  description = "Moid's of the Multicast Policies."
+  value       = { for v in sort(keys(intersight_fabric_multicast_policy.map)) : v => intersight_fabric_multicast_policy.map[v].moid }
+}
 
 output "network_connectivity" {
   description = "Moid's of the Network Connectivity Policies."
   value       = { for v in sort(keys(intersight_networkconfig_policy.map)) : v => intersight_networkconfig_policy.map[v].moid }
 }
 
-
-#__________________________________________________________
-#
-# NTP Policy Outputs
-#__________________________________________________________
-
 output "ntp" {
   description = "Moid's of the NTP Policies."
   value       = { for v in sort(keys(intersight_ntp_policy.map)) : v => intersight_ntp_policy.map[v].moid }
 }
 
-
-#__________________________________________________________
-#
-# Persistent Memory Policy Outputs
-#__________________________________________________________
-
 output "persistent_memory" {
   description = "Moid's of the Persistent Memory Policies."
-  value = { for v in sort(keys(intersight_memory_persistent_memory_policy.map)
-  ) : v => intersight_memory_persistent_memory_policy.map[v].moid }
+  value       = { for v in sort(keys(intersight_memory_persistent_memory_policy.map)) : v => intersight_memory_persistent_memory_policy.map[v].moid }
 }
-
-
-#__________________________________________________________
-#
-# Port Policy Outputs
-#__________________________________________________________
 
 output "port" {
   description = "Moid's of the Port Policies."
   value       = { for v in sort(keys(intersight_fabric_port_policy.map)) : v => intersight_fabric_port_policy.map[v].moid }
 }
 
-
-#__________________________________________________________
-#
-# Power Policy Outputs
-#__________________________________________________________
-
 output "power" {
   description = "Moid's of the Power Policies."
   value       = { for v in sort(keys(intersight_power_policy.map)) : v => intersight_power_policy.map[v].moid }
 }
 
+output "san_connectivity" {
+  description = "Moid's of the SAN Connectivity Policies."
+  value       = { for v in sort(keys(intersight_vnic_san_connectivity_policy.map)) : v => intersight_vnic_san_connectivity_policy.map[v].moid }
+}
 
-#__________________________________________________________
-#
-# SAN Connectivity Policy Outputs
-#__________________________________________________________
-
-#output "san_connectivity" {
-#  description = "Moid's of the SAN Connectivity Policies."
-#  value = { for v in sort(keys(intersight_vnic_san_connectivity_policy.map)
-#  ) : v => intersight_vnic_san_connectivity_policy.map[v].moid }
-#}
-
-
-#__________________________________________________________
-#
-# Serial over LAN Policy Outputs
-#__________________________________________________________
+output "san_connectivity_vhbas" {
+  description = "Moid's of the SAN Connectivity - VHBAs Policies."
+  value       = { for v in sort(keys(intersight_vnic_fc_if.map)) : v => intersight_vnic_fc_if.map[v].moid }
+}
 
 output "serial_over_lan" {
   description = "Moid's of the Serial over LAN Policies."
   value       = { for v in sort(keys(intersight_sol_policy.map)) : v => intersight_sol_policy.map[v].moid }
 }
 
-
-#__________________________________________________________
-#
-# SMTP Policy Outputs
-#__________________________________________________________
-
 output "smtp" {
   description = "Moid's of the SMTP Policies."
   value       = { for v in sort(keys(intersight_smtp_policy.map)) : v => intersight_smtp_policy.map[v].moid }
 }
-
-
-#__________________________________________________________
-#
-# SNMP Policy Outputs
-#__________________________________________________________
 
 output "snmp" {
   description = "Moid's of the SNMP Policies."
   value       = { for v in sort(keys(intersight_snmp_policy.map)) : v => intersight_snmp_policy.map[v].moid }
 }
 
-
-#__________________________________________________________
-#
-# SSH Policy Outputs
-#__________________________________________________________
-
 output "ssh" {
   description = "Moid's of the SSH Policies."
   value       = { for v in sort(keys(intersight_ssh_policy.map)) : v => intersight_ssh_policy.map[v].moid }
 }
-
-
-#__________________________________________________________
-#
-# Storage Policy Outputs
-#__________________________________________________________
 
 output "storage" {
   description = "Moid's of the Storage Policies."
   value       = { for v in sort(keys(intersight_storage_storage_policy.map)) : v => intersight_storage_storage_policy.map[v].moid }
 }
 
-
-#__________________________________________________________
-#
-# Switch Control Policy Outputs
-#__________________________________________________________
-
 output "switch_control" {
   description = "Moid's of the Switch Control Policies."
-  value = { for v in sort(keys(intersight_fabric_switch_control_policy.map)
-  ) : v => intersight_fabric_switch_control_policy.map[v].moid }
+  value       = { for v in sort(keys(intersight_fabric_switch_control_policy.map)) : v => intersight_fabric_switch_control_policy.map[v].moid }
 }
-
-
-#__________________________________________________________
-#
-# Syslog Policy Outputs
-#__________________________________________________________
 
 output "syslog" {
   description = "Moid's of the Syslog Policies."
   value       = { for v in sort(keys(intersight_syslog_policy.map)) : v => intersight_syslog_policy.map[v].moid }
 }
 
-
-#__________________________________________________________
-#
-# System QoS Policy Outputs
-#__________________________________________________________
-
 output "system_qos" {
   description = "Moid's of the System QoS Policies."
-  value = { for v in sort(keys(intersight_fabric_system_qos_policy.map)
-  ) : v => intersight_fabric_system_qos_policy.map[v].moid }
+  value       = { for v in sort(keys(intersight_fabric_system_qos_policy.map)) : v => intersight_fabric_system_qos_policy.map[v].moid }
 }
-
-
-#__________________________________________________________
-#
-# Thermal Policy Outputs
-#__________________________________________________________
 
 output "thermal" {
   description = "Moid's of the Thermal Policies."
   value       = { for v in sort(keys(intersight_thermal_policy.map)) : v => intersight_thermal_policy.map[v].moid }
 }
 
-
-#__________________________________________________________
-#
-# Virtual KVM Policy Outputs
-#__________________________________________________________
-
 output "virtual_kvm" {
   description = "Moid's of the Virtual KVM Policies."
   value       = { for v in sort(keys(intersight_kvm_policy.map)) : v => intersight_kvm_policy.map[v].moid }
 }
-
-
-#__________________________________________________________
-#
-# Virtual Media Policy Outputs
-#__________________________________________________________
 
 output "virtual_media" {
   description = "Moid's of the Virtual Media Policies."
   value       = { for v in sort(keys(intersight_vmedia_policy.map)) : v => intersight_vmedia_policy.map[v].moid }
 }
 
-
-#__________________________________________________________
-#
-# VLAN Policy Outputs
-#__________________________________________________________
-
-#output "vlan" {
-#  description = "Moid's of the VLAN Policies."
-#  value = { for v in sort(keys(intersight_fabric_eth_network_policy.map)
-#  ) : v => intersight_fabric_eth_network_policy.map[v].moid }
-#}
-
-
-#__________________________________________________________
-#
-# VSAN Policy Outputs
-#__________________________________________________________
+output "vlan" {
+  description = "Moid's of the VLAN Policies."
+  value       = { for v in sort(keys(intersight_fabric_eth_network_policy.map)) : v => intersight_fabric_eth_network_policy.map[v].moid }
+}
 
 output "vsan" {
   description = "Moid's of the VSAN Policies."
   value       = { for v in sort(keys(intersight_fabric_fc_network_policy.map)) : v => intersight_fabric_fc_network_policy.map[v].moid }
+}
+
+output "z_moids_of_pools_and_policies_that_were_referenced_in_policies_but_not_already_created" {
+  description = "moids of Pools that were referenced in server profiles but not defined"
+  value = lookup(var.global_settings, "debugging", false) == true ? {
+    ethernet_adapter = { for v in sort(keys(intersight_vnic_eth_adapter_policy.data)) : v => intersight_vnic_eth_adapter_policy.data[v].moid }
+    ethernet_network = { for v in sort(keys(intersight_vnic_eth_network_policy.data)) : v => intersight_vnic_eth_network_policy.data[v].moid }
+    ethernet_network_control = {
+      for v in sort(keys(intersight_fabric_eth_network_control_policy.data)) : v => intersight_fabric_eth_network_control_policy.data[v].moid
+    }
+    ethernet_network_group = {
+      for v in sort(keys(intersight_fabric_eth_network_group_policy.data)) : v => intersight_fabric_eth_network_group_policy.data[v].moid
+    }
+    ethernet_qos          = { for v in sort(keys(intersight_vnic_eth_qos_policy.data)) : v => intersight_vnic_eth_qos_policy.data[v].moid }
+    fc_zone               = { for v in sort(keys(intersight_fabric_fc_zone_policy.map)) : v => intersight_fabric_fc_zone_policy.map[v].moid }
+    fibre_channel_adapter = { for v in sort(keys(intersight_vnic_fc_adapter_policy.data)) : v => intersight_vnic_fc_adapter_policy.data[v].moid }
+    fibre_channel_network = { for v in sort(keys(intersight_vnic_fc_network_policy.data)) : v => intersight_vnic_fc_network_policy.data[v].moid }
+    fibre_channel_qos     = { for v in sort(keys(intersight_vnic_eth_qos_policy.data)) : v => intersight_vnic_eth_qos_policy.data[v].moid }
+    flow_control = {
+      for v in sort(keys(intersight_fabric_flow_control_policy.data)) : v => intersight_fabric_flow_control_policy.data[v].moid
+    }
+    ip  = { for v in sort(keys(intersight_ippool_pool.data)) : v => intersight_ippool_pool.data[v].moid }
+    iqn = { for v in sort(keys(intersight_iqnpool_pool.data)) : v => intersight_iqnpool_pool.data[v].moid }
+    iscsi_adapter = {
+      for v in sort(keys(intersight_vnic_iscsi_adapter_policy.data)) : v => intersight_vnic_iscsi_adapter_policy.data[v].moid
+    }
+    iscsi_boot = { for v in sort(keys(intersight_vnic_iscsi_boot_policy.data)) : v => intersight_vnic_iscsi_boot_policy.data[v].moid }
+    iscsi_static_target = {
+      for v in sort(keys(intersight_vnic_iscsi_static_target_policy.data)) : v => intersight_vnic_iscsi_static_target_policy.data[v].moid
+    }
+    link_aggregation = {
+      for v in sort(keys(intersight_fabric_link_aggregation_policy.data)) : v => intersight_fabric_link_aggregation_policy.data[v].moid
+    }
+    link_control = { for v in sort(keys(intersight_fabric_link_control_policy.data)) : v => intersight_fabric_link_control_policy.data[v].moid }
+    mac          = { for v in sort(keys(intersight_macpool_pool.data)) : v => intersight_macpool_pool.data[v].moid }
+    multicast    = { for v in sort(keys(intersight_fabric_multicast_policy.data)) : v => intersight_fabric_multicast_policy.data[v].moid }
+    wwnn         = { for v in sort(keys(intersight_fcpool_pool.wwnn)) : v => intersight_fcpool_pool.wwnn[v].moid }
+    wwpn         = { for v in sort(keys(intersight_fcpool_pool.wwpn)) : v => intersight_fcpool_pool.wwpn[v].moid }
+  } : {}
 }

@@ -9,7 +9,7 @@ resource "intersight_adapter_config_policy" "map" {
   description = coalesce(each.value.description, "${each.value.name} Adapter Configuration Policy.")
   name        = each.value.name
   organization {
-    moid        = local.orgs[each.value.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "settings" {

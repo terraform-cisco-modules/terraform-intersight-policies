@@ -515,7 +515,6 @@ policies:
       processor_c3report: disabled
       processor_c6report: disabled
       processor_cstate: disabled
-      
     M6-amd-virtual:
       cbs_cmn_fixed_soc_pstate: P0
       cbs_df_cmn_acpi_srat_l3numa: enabled
@@ -523,7 +522,7 @@ policies:
       pcie_slots_cdn_enable: enabled
     M6-intel-analytical-db:
       cpu_perf_enhancement: Auto
-      EnergyEfficientTurbo: enabled
+      energy_efficient_turbo: enabled
       intel_virtualization_technology: disabled
       intel_vt_for_directed_io: disabled
       memory_refresh_rate: 1x
@@ -640,7 +639,7 @@ policies:
       xpt_prefetch: enabled
     M6-intel-virtual:
       cpu_perf_enhancement: Auto
-      EnergyEfficientTurbo: enabled
+      energy_efficient_turbo: enabled
       nvmdimm_perform_config: Balanced Profile
       pcie_slots_cdn_enable: enabled
       processor_c1e: enabled

@@ -4,13 +4,9 @@
 #__________________________________________________________________
 
 resource "intersight_ippool_pool" "data" {
-  for_each = {
-    for v in local.pp.ip_pool : v => v if lookup(lookup(lookup(local.pools, element(split(":", v), 0), {}), "ip", {}), element(split(":", v), 0), "#NOEXIST") == "#NOEXIST"
-  }
-  name = element(split(":", each.value), 1)
-  organization {
-    moid = local.orgs[element(split(":", each.value), 0)]
-  }
+  for_each = { for v in local.pp.ip_pool : v => v if contains(lookup(lookup(local.pools, "locals", {}), "ip", []), v) == false }
+  name     = element(split("/", each.value), 1)
+  organization { moid = var.orgs[element(split("/", each.value), 0)] }
   lifecycle {
     ignore_changes = [
       account_moid, additional_properties, ancestors, assigned, assignment_order, create_time, description, domain_group_moid,
@@ -23,11 +19,11 @@ resource "intersight_ippool_pool" "data" {
 
 resource "intersight_iqnpool_pool" "data" {
   for_each = {
-    for v in local.pp.iqn_pool : v => v if lookup(lookup(lookup(local.pools, element(split(":", v), 0), {}), "iqn", {}), element(split(":", v), 0), "#NOEXIST") == "#NOEXIST"
+    for v in local.pp.iqn_pool : v => v if contains(lookup(lookup(local.pools, "locals", {}), "iqn", []), v) == false
   }
-  name = element(split(":", each.value), 1)
+  name = element(split("/", each.value), 1)
   organization {
-    moid = local.orgs[element(split(":", each.value), 0)]
+    moid = var.orgs[element(split("/", each.value), 0)]
   }
   lifecycle {
     ignore_changes = [
@@ -40,11 +36,11 @@ resource "intersight_iqnpool_pool" "data" {
 
 resource "intersight_macpool_pool" "data" {
   for_each = {
-    for v in local.pp.mac_pool : v => v if lookup(lookup(lookup(local.pools, element(split(":", v), 0), {}), "mac", {}), element(split(":", v), 0), "#NOEXIST") == "#NOEXIST"
+    for v in local.pp.mac_pool : v => v if contains(lookup(lookup(local.pools, "locals", {}), "mac", []), v) == false
   }
-  name = element(split(":", each.value), 1)
+  name = element(split("/", each.value), 1)
   organization {
-    moid = local.orgs[element(split(":", each.value), 0)]
+    moid = var.orgs[element(split("/", each.value), 0)]
   }
   lifecycle {
     ignore_changes = [
@@ -57,11 +53,11 @@ resource "intersight_macpool_pool" "data" {
 
 resource "intersight_fcpool_pool" "wwnn" {
   for_each = {
-    for v in local.pp.wwnn_pool : v => v if lookup(lookup(lookup(local.pools, element(split(":", v), 0), {}), "wwnn", {}), element(split(":", v), 0), "#NOEXIST") == "#NOEXIST"
+    for v in local.pp.wwnn_pool : v => v if contains(lookup(lookup(local.pools, "locals", {}), "wwnn", []), v) == false
   }
-  name = element(split(":", each.value), 1)
+  name = element(split("/", each.value), 1)
   organization {
-    moid = local.orgs[element(split(":", each.value), 0)]
+    moid = var.orgs[element(split("/", each.value), 0)]
   }
   pool_purpose = "WWNN"
   lifecycle {
@@ -75,11 +71,11 @@ resource "intersight_fcpool_pool" "wwnn" {
 
 resource "intersight_fcpool_pool" "wwpn" {
   for_each = {
-    for v in local.pp.wwpn_pool : v => v if lookup(lookup(lookup(local.pools, element(split(":", v), 0), {}), "wwpn", {}), element(split(":", v), 0), "#NOEXIST") == "#NOEXIST"
+    for v in local.pp.wwpn_pool : v => v if contains(lookup(lookup(local.pools, "locals", {}), "wwpn", []), v) == false
   }
-  name = element(split(":", each.value), 1)
+  name = element(split("/", each.value), 1)
   organization {
-    moid = local.orgs[element(split(":", each.value), 0)]
+    moid = var.orgs[element(split("/", each.value), 0)]
   }
   pool_purpose = "WWPN"
   lifecycle {

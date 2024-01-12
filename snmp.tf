@@ -19,7 +19,7 @@ resource "intersight_snmp_policy" "map" {
   v2_enabled              = length(each.value.v2_enabled) > 0 ? true : false
   v3_enabled              = length(each.value.snmp_users) > 0 ? true : false
   organization {
-    moid        = local.orgs[each.value.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "snmp_traps" {

@@ -12,7 +12,7 @@ resource "intersight_vnic_iscsi_adapter_policy" "map" {
   lun_busy_retry_count = each.value.lun_busy_retry_count
   name                 = each.value.name
   organization {
-    moid        = local.orgs[local.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "tags" {
@@ -31,7 +31,7 @@ resource "intersight_vnic_iscsi_adapter_policy" "data" {
   }
   name = element(split(":", each.value), 1)
   organization {
-    moid = local.orgs[element(split(":", each.value), 0)]
+    moid = var.orgs[element(split(":", each.value), 0)]
   }
   lifecycle {
     ignore_changes = [

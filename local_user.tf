@@ -18,7 +18,7 @@ resource "intersight_iam_end_point_user_policy" "map" {
     password_history         = each.value.password_properties.password_history
   }
   organization {
-    moid        = local.orgs[each.value.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "tags" {
@@ -42,7 +42,7 @@ resource "intersight_iam_end_point_user" "map" {
   for_each = local.users
   name     = each.value.name
   organization {
-    moid        = local.orgs[each.value.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
 }

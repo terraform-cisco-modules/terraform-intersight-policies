@@ -12,7 +12,7 @@ resource "intersight_vnic_iscsi_boot_policy" "map" {
     intersight_vnic_iscsi_static_target_policy.data,
     intersight_vnic_iscsi_static_target_policy.map
   ]
-  for_each               = { for k, v in local.iscsi_boot : k => v }
+  for_each               = local.iscsi_boot
   auto_targetvendor_name = each.value.dhcp_vendor_id_iqn
   chap = each.value.authentication == "chap" && each.value.target_source_type == "Static" ? [
     {
@@ -70,14 +70,14 @@ resource "intersight_vnic_iscsi_boot_policy" "map" {
   name               = each.value.name
   target_source_type = each.value.target_source_type
   organization {
-    moid        = local.orgs[each.value.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "initiator_ip_pool" {
     for_each = { for v in [each.value.initiator_ip_pool] : v.name => v if v.name != "UNUSED" }
     content {
-      moid = length(regexall("#EXIST", lookup(lookup(lookup(local.pools, initiator_ip_pool.value.org, {}), "ip", {}), initiator_ip_pool.value.name, "#EXIST"))
-        ) == 0 ? local.pools[initiator_ip_pool.value.org].ip[initiator_ip_pool.value.name
+      moid = length(regexall("#EXIST", lookup(lookup(lookup(var.pools, initiator_ip_pool.value.org, {}), "ip", {}), initiator_ip_pool.value.name, "#EXIST"))
+        ) == 0 ? var.pools[initiator_ip_pool.value.org].ip[initiator_ip_pool.value.name
       ] : intersight_ippool_pool.data["${initiator_ip_pool.value.org}:${initiator_ip_pool.value.name}"].moid
       object_type = "ippool.Pool"
     }
@@ -122,7 +122,7 @@ resource "intersight_vnic_iscsi_boot_policy" "data" {
   }
   name = element(split(":", each.value), 1)
   organization {
-    moid = local.orgs[element(split(":", each.value), 0)]
+    moid = var.orgs[element(split(":", each.value), 0)]
   }
   lifecycle {
     ignore_changes = [

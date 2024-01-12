@@ -38,7 +38,7 @@ resource "intersight_iam_ldap_policy" "map" {
   }
   user_search_precedence = each.value.user_search_precedence
   organization {
-    moid        = local.orgs[each.value.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "tags" {

@@ -18,7 +18,7 @@ resource "intersight_fabric_eth_network_control_policy" "map" {
     transmit_enabled = each.value.lldp_enable_transmit
   }
   organization {
-    moid        = local.orgs[local.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "tags" {
@@ -37,7 +37,7 @@ resource "intersight_fabric_eth_network_control_policy" "data" {
   }
   name = element(split(":", each.value), 1)
   organization {
-    moid = local.orgs[element(split(":", each.value), 0)]
+    moid = var.orgs[element(split(":", each.value), 0)]
   }
   lifecycle {
     ignore_changes = [

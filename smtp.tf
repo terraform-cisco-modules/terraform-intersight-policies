@@ -5,10 +5,7 @@
 #__________________________________________________________________
 
 resource "intersight_smtp_policy" "map" {
-  for_each = { for v in lookup(local.policies, "smtp", []) : v.name => merge(local.defaults.smtp, v, {
-    name = "${local.name_prefix.smtp}${v.name}${local.name_suffix.smtp}"
-    tags = lookup(v, "tags", var.policies.global_settings.tags)
-  }) }
+  for_each        = local.smtp
   description     = coalesce(each.value.description, "${each.value.name} SMTP Policy.")
   enabled         = each.value.enable_smtp
   min_severity    = each.value.minimum_severity
@@ -18,7 +15,7 @@ resource "intersight_smtp_policy" "map" {
   smtp_recipients = each.value.mail_alert_recipients
   smtp_server     = each.value.smtp_server_address
   organization {
-    moid        = local.orgs[local.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "tags" {

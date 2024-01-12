@@ -15,7 +15,7 @@ resource "intersight_vnic_eth_qos_policy" "map" {
   rate_limit     = each.value.rate_limit
   trust_host_cos = each.value.enable_trust_host_cos
   organization {
-    moid        = local.orgs[local.organization]
+    moid        = var.orgs[each.value.organization]
     object_type = "organization.Organization"
   }
   dynamic "tags" {
@@ -34,7 +34,7 @@ resource "intersight_vnic_eth_qos_policy" "data" {
   }
   name = element(split(":", each.value), 1)
   organization {
-    moid = local.orgs[element(split(":", each.value), 0)]
+    moid = var.orgs[element(split(":", each.value), 0)]
   }
   lifecycle {
     ignore_changes = [
