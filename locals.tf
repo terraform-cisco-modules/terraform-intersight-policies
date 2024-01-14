@@ -162,7 +162,7 @@ locals {
     for e in lookup(lookup(var.model[org], "policies", {}), "boot_order", []) : merge(local.defaults.boot_order, e, {
       boot_devices = [
         for v in lookup(e, "boot_devices", []) : {
-          additional_properties = e.boot_mode == "Uefi" && length(regexall("^boot.(Pxe|Usb|VirtualMedia)", v.object_type)
+          additional_properties = e.boot_mode == "Uefi" && length(regexall("^boot.(Pxe|UefiShell|Usb|VirtualMedia)$", v.object_type)
             ) == 0 ? jsonencode(merge({ Bootloader = merge(local.boot_loader, lookup(v, "boot_loader", {})) },
               { for s in local.boot_type[element(split(".", v.object_type), 1)] : element(split(":", s), 0
                 ) => lookup(v, element(split(":", s), 1), local.boot_var[element(split(".", v.object_type), 1)]
@@ -434,7 +434,7 @@ locals {
             version = e.firmware_version
           }
         ]
-      ]) : "${i.version}:${i.model}" => i }
+      ]) : "${i.version}/${i.model}" => i }
       organization = org
       tags         = lookup(v, "tags", var.global_settings.tags)
     })
@@ -635,7 +635,7 @@ locals {
         })
       ]
     ]
-  ]) : "${i.lan_connectivity}:${i.name}" => i }
+  ]) : "${i.lan_connectivity}/${i.name}" => i }
 
   #__________________________________________________________________
   #
@@ -670,7 +670,7 @@ locals {
         role          = v.role
       }
     ]
-  ]) : "${i.ldap_policy}:${i.name}" => i }
+  ]) : "${i.ldap_policy}/${i.name}" => i }
   ldap_providers = { for i in flatten([
     for key, value in local.ldap : [
       for v in value.ldap_providers : {
@@ -679,7 +679,7 @@ locals {
         server      = v.server
       }
     ]
-  ]) : "${i.ldap_policy}:${i.server}" => i }
+  ]) : "${i.ldap_policy}/${i.server}" => i }
   roles = distinct(concat(
     [for v in local.ldap_groups : v.role],
     [for v in local.users : v.role],
@@ -725,16 +725,14 @@ locals {
       users               = lookup(v, "users", [])
     })
   ] if length(lookup(lookup(var.model[org], "policies", {}), "local_user", [])) > 0]) : "${i.organization}/${i.name}" => i }
-  users = { for i in flatten([
-    for key, value in local.local_user : [
-      for v in value.users : merge(local.defaults.local_user.users, v, {
-        local_user   = key
-        name         = v.username
-        organization = value.organization
-        tags         = value.tags
-      })
-    ]
-  ]) : "${i.local_user}:${i.name}" => i }
+  users = { for i in flatten([for key, value in local.local_user : [
+    for v in value.users : merge(local.defaults.local_user.users, v, {
+      local_user   = key
+      name         = v.username
+      organization = value.organization
+      tags         = value.tags
+    })
+  ]]) : "${i.local_user}/${i.name}" => i }
 
   #__________________________________________________________________
   #
@@ -893,7 +891,7 @@ locals {
       port_policy  = key
       tags         = value.tags
     })]
-  ]) : "${i.port_policy}:${i.pc_id}" => i }
+  ]) : "${i.port_policy}/${i.pc_id}" => i }
   port_channel_ethernet_uplinks = { for i in flatten([for key, value in local.port : [
     for v in value.port_channel_ethernet_uplinks : merge(v, {
       ethernet_network_group_policy = {
@@ -921,12 +919,12 @@ locals {
       port_policy  = key
       tags         = value.tags
     })]
-  ]) : "${i.port_policy}:${i.pc_id}" => i }
+  ]) : "${i.port_policy}/${i.pc_id}" => i }
   port_channel_fc_uplinks = { for i in flatten([
     for key, value in local.port : [
       for v in value.port_channel_fc_uplinks : merge(v, { port_policy = key, tags = value.tags })
     ]
-  ]) : "${i.port_policy}:${i.pc_id}" => i }
+  ]) : "${i.port_policy}/${i.pc_id}" => i }
   port_channel_fcoe_uplinks = { for i in flatten([for key, value in local.port : [
     for v in value.port_channel_fcoe_uplinks : merge(v, {
       link_aggregation_policy = {
@@ -943,13 +941,13 @@ locals {
       port_policy  = key
       tags         = value.tags
     })]
-  ]) : "${i.port_policy}:${i.pc_id}" => i }
+  ]) : "${i.port_policy}/${i.pc_id}" => i }
 
   port_modes = { for i in flatten([for key, value in local.port : [for v in value.port_modes : merge(local.lport.port_modes, v, {
     port_policy = key
     tags        = value.tags
     })]
-  ]) : "${i.port_policy}:${i.slot_id}-${element(i.port_list, 0)}" => i }
+  ]) : "${i.port_policy}/${i.slot_id}-${element(i.port_list, 0)}" => i }
 
   /*
   Loop 1 is to determine if the port_list is:
@@ -987,7 +985,7 @@ locals {
       }
       port_id = s
     })]
-  ]) : "${i.port_policy}:${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
+  ]) : "${i.port_policy}/${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
   #_________________________________________________________________
   #
   # Port Policy > Port Roles > Ethernet Uplinks Section - Locals
@@ -1027,7 +1025,7 @@ locals {
         port_id = s
       })
     ]
-  ]) : "${i.port_policy}:${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
+  ]) : "${i.port_policy}/${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
   #______________________________________________________________________
   #
   # Port Policy > Port Roles > Fibre-Channel Storage Section - Locals
@@ -1046,7 +1044,7 @@ locals {
   # Loop 2 will take the port_list created in Loop 1 and expand this out to a list of port_id's.
   port_role_fc_storage = { for i in flatten([for v in local.port_role_fc_storage_loop : [
     for s in v.port_list : merge(v, { port_id = s })
-  ]]) : "${i.port_policy}:${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
+  ]]) : "${i.port_policy}/${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
   #______________________________________________________________________
   #
   # Port Policy > Port Roles > Fibre-Channel Uplinks Section - Locals
@@ -1065,7 +1063,7 @@ locals {
   # Loop 2 will take the port_list created in Loop 1 and expand this out to a list of port_id's.
   port_role_fc_uplinks = { for i in flatten([for v in local.port_role_fc_uplinks_loop : [
     for s in v.port_list : merge(v, { port_id = s })
-  ]]) : "${i.port_policy}:${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
+  ]]) : "${i.port_policy}/${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
   #_________________________________________________________________
   #
   # Port Policy > Port Roles > FCoE Uplinks Section - Locals
@@ -1090,7 +1088,7 @@ locals {
         org  = length(regexall("/", lookup(v, "link_control_policy", "UNUSED"))) > 0 ? element(split("/", lookup(v, "link_control_policy", "UNUSED")), 0) : v.organization
       }
       port_id = s
-  })]]) : "${i.port_policy}:${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
+  })]]) : "${i.port_policy}/${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
   #_________________________________________________________________
   #
   # Port Policy > Port Roles > FCoE Uplinks Section - Locals
@@ -1117,7 +1115,7 @@ locals {
   # Loop 2 will take the port_list created in Loop 1 and expand this out to a list of port_id's.
   port_role_servers = { for i in flatten([for v in local.port_role_servers_loop : [
     for s in v.port_list : merge(v, { port_id = s })
-  ]]) : "${i.port_policy}:${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
+  ]]) : "${i.port_policy}/${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
 
   #__________________________________________________________________
   #
@@ -1200,7 +1198,7 @@ locals {
         })
       ]
     ]
-  ]) : "${i.san_connectivity}:${i.name}" => i }
+  ]) : "${i.san_connectivity}/${i.name}" => i }
 
   #__________________________________________________________________
   #
@@ -1314,7 +1312,7 @@ locals {
         virtual_drives = lookup(v, "virtual_drives", [])
       }
     ]
-    ]) : "${i.storage_policy}:${i.name}" => i
+    ]) : "${i.storage_policy}/${i.name}" => i
   }
 
   #__________________________________________________________________
@@ -1367,6 +1365,14 @@ locals {
       { bandwidth_total = sum([for e in v.classes : e.weight if e.state == "Enabled"]) }
     )
   }
+  #system_qos = {
+  #  for k, v in local.system_qos_loop_2 : k => merge(v,
+  #    { classes = { for x, y in v.classes : x => merge(y, {
+  #      bandwidth_percent = length(regexall("Enabled", lookup(y, "state", local.qos.classes[x].weight))
+  #      ) > 0 ?tonumber(format("%.0f", tonumber((tonumber(lookup(y, "weight", local.qos.classes[x].weight)) / v.bandwidth_total) * 100))) : 0
+  #    }) } }
+  #  )
+  #}
 
   #__________________________________________________________________
   #
@@ -1449,17 +1455,20 @@ locals {
   vlans = { for i in flatten([for v in local.vlans_loop : [
     for s in v.vlan_list : {
       auto_allow_on_uplinks = v.auto_allow_on_uplinks
-      multicast_policy      = { name = v.multicast_policy, org = v.organization }
-      name                  = v.name
-      name_prefix           = v.name_prefix
-      native_vlan           = v.native_vlan
-      organization          = v.organization
-      primary_vlan_id       = v.primary_vlan_id
-      sharing_type          = v.sharing_type
-      vlan_id               = s
-      vlan_policy           = v.vlan_policy
+      multicast_policy = {
+        name = length(regexall("/", v.multicast_policy)) > 0 ? element(split("/", v.multicast_policy), 1) : v.multicast_policy,
+        org  = length(regexall("/", v.multicast_policy)) > 0 ? element(split("/", v.multicast_policy), 0) : v.organization
+      }
+      name            = v.name
+      name_prefix     = v.name_prefix
+      native_vlan     = v.native_vlan
+      organization    = v.organization
+      primary_vlan_id = v.primary_vlan_id
+      sharing_type    = v.sharing_type
+      vlan_id         = s
+      vlan_policy     = v.vlan_policy
     }
-  ]]) : "${i.vlan_policy}:${i.vlan_id}" => i }
+  ]]) : "${i.vlan_policy}/${i.vlan_id}" => i }
   #_________________________________________________________________________
   #
   # Intersight VSAN Policy
@@ -1479,5 +1488,5 @@ locals {
       organization = value.organization
       vsan_policy  = key
     })
-  ]]) : "${i.vsan_policy}:${i.vsan_id}" => i }
+  ]]) : "${i.vsan_policy}/${i.vsan_id}" => i }
 }

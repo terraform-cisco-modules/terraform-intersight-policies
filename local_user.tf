@@ -41,10 +41,7 @@ resource "intersight_iam_end_point_user" "map" {
   ]
   for_each = local.users
   name     = each.value.name
-  organization {
-    moid        = var.orgs[each.value.organization]
-    object_type = "organization.Organization"
-  }
+  organization { moid = var.orgs[each.value.organization] }
 }
 
 resource "intersight_iam_end_point_user_role" "map" {

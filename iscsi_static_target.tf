@@ -11,10 +11,7 @@ resource "intersight_vnic_iscsi_static_target_policy" "map" {
   name        = each.value.name
   port        = each.value.port
   target_name = each.value.target_name
-  organization {
-    moid        = var.orgs[each.value.organization]
-    object_type = "organization.Organization"
-  }
+  organization { moid = var.orgs[each.value.organization] }
   dynamic "lun" {
     for_each = { for v in [lookup(each.value, "lun_id", 0)] : v => v }
     content {
@@ -39,9 +36,7 @@ resource "intersight_vnic_iscsi_static_target_policy" "data" {
     for v in local.pp.iscsi_static_target : v => v if lookup(local.iscsi_static_target, element(split(":", v), 1), "#NOEXIST") == "#NOEXIST"
   }
   name = element(split(":", each.value), 1)
-  organization {
-    moid = var.orgs[element(split(":", each.value), 0)]
-  }
+  organization { moid = var.orgs[element(split(":", each.value), 0)] }
   lifecycle {
     ignore_changes = [
       account_moid, additional_properties, ancestors, create_time, description, domain_group_moid, mod_time, owners,

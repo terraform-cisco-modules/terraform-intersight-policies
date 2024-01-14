@@ -22,7 +22,7 @@ resource "intersight_vmedia_policy" "map" {
       authentication_protocol = mappings.value.authentication_protocol
       class_id                = "vmedia.Mapping"
       device_type             = mappings.value.device_type
-      file_location           = mappings.value.file_location
+      file_location           = trimprefix(trimprefix(mappings.value.file_location, "nfs://"), "cifs://")
       host_name               = ""
       mount_options           = mappings.value.mount_options
       mount_protocol          = mappings.value.protocol

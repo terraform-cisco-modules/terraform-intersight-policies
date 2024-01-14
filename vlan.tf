@@ -8,10 +8,7 @@ resource "intersight_fabric_eth_network_policy" "map" {
   for_each    = local.vlan
   description = coalesce(each.value.description, "${each.value.name} VLAN Policy.")
   name        = each.value.name
-  organization {
-    moid        = var.orgs[each.value.organization]
-    object_type = "organization.Organization"
-  }
+  organization { moid = var.orgs[each.value.organization] }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
     content {
@@ -49,8 +46,8 @@ resource "intersight_fabric_vlan" "map" {
   vlan_id = each.value.vlan_id
   eth_network_policy { moid = intersight_fabric_eth_network_policy.map[each.value.vlan_policy].moid }
   multicast_policy {
-    moid = lookup(local.multicast, each.value.multicast_policy.name, "#NOEXIST"
-      ) != "#NOEXIST" ? intersight_fabric_multicast_policy.map[each.value.multicast_policy.name
-    ].moid : intersight_fabric_multicast_policy.data["${each.value.multicast_policy.org}:${each.value.multicast_policy.name}"].moid
+    moid = contains(keys(local.multicast), "${each.value.multicast_policy.org}/${each.value.multicast_policy.name}"
+      ) == true ? intersight_fabric_multicast_policy.map["${each.value.multicast_policy.org}/${each.value.multicast_policy.name}"
+    ].moid : intersight_fabric_multicast_policy.data["${each.value.multicast_policy.org}/${each.value.multicast_policy.name}"].moid
   }
 }

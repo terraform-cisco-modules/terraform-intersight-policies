@@ -11,10 +11,7 @@ resource "intersight_vnic_iscsi_adapter_policy" "map" {
   dhcp_timeout         = each.value.dhcp_timeout
   lun_busy_retry_count = each.value.lun_busy_retry_count
   name                 = each.value.name
-  organization {
-    moid        = var.orgs[each.value.organization]
-    object_type = "organization.Organization"
-  }
+  organization { moid = var.orgs[each.value.organization] }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
     content {
@@ -30,9 +27,7 @@ resource "intersight_vnic_iscsi_adapter_policy" "data" {
     for v in local.pp.iscsi_adapter : v => v if lookup(local.iscsi_adapter, element(split(":", v), 1), "#NOEXIST") == "#NOEXIST"
   }
   name = element(split(":", each.value), 1)
-  organization {
-    moid = var.orgs[element(split(":", each.value), 0)]
-  }
+  organization { moid = var.orgs[element(split(":", each.value), 0)] }
   lifecycle {
     ignore_changes = [
       account_moid, additional_properties, ancestors, create_time, description, domain_group_moid, mod_time, owners,
