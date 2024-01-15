@@ -71,7 +71,7 @@ resource "intersight_vnic_iscsi_boot_policy" "map" {
   target_source_type = each.value.target_source_type
   organization { moid = var.orgs[each.value.organization] }
   dynamic "initiator_ip_pool" {
-    for_each = { for v in [each.value.initiator_ip_pool] : v.name => v if v.name != "UNUSED" }
+    for_each = { for v in [each.value.initiator_ip_pool] : "${v.org}/${v.name}" => v if v.name != "UNUSED" }
     content {
       moid = lookup(lookup(local.pools, "ip", {}), "${initiator_ip_pool.value.org}/${initiator_ip_pool.value.name}", "#NOEXIST"
         ) != "#NOEXIST" ? local.pools.ip["${initiator_ip_pool.value.org}/${initiator_ip_pool.value.name}"
@@ -80,7 +80,7 @@ resource "intersight_vnic_iscsi_boot_policy" "map" {
     }
   }
   dynamic "iscsi_adapter_policy" {
-    for_each = { for v in [each.value.iscsi_adapter_policy] : v => v }
+    for_each = { for v in [each.value.iscsi_adapter_policy] : "${v.org}/${v.name}" => v if v.name != "UNUSED" }
     content {
       moid = contains(keys(local.iscsi_adapter), "${iscsi_adapter_policy.value.org}/${iscsi_adapter_policy.value.name}"
         ) == true ? intersight_vnic_iscsi_adapter_policy.map["${iscsi_adapter_policy.value.org}/${iscsi_adapter_policy.value.name}"
@@ -88,7 +88,7 @@ resource "intersight_vnic_iscsi_boot_policy" "map" {
     }
   }
   dynamic "primary_target_policy" {
-    for_each = { for v in [each.value.primary_target_policy] : v.name => v }
+    for_each = { for v in [each.value.primary_target_policy] : "${v.org}/${v.name}" => v if v.name != "UNUSED" }
     content {
       moid = contains(keys(local.iscsi_static_target), "${primary_target_policy.value.org}/${primary_target_policy.value.name}"
         ) == true ? intersight_vnic_iscsi_static_target_policy.map["${primary_target_policy.value.org}/${primary_target_policy.value.name}"
@@ -96,7 +96,7 @@ resource "intersight_vnic_iscsi_boot_policy" "map" {
     }
   }
   dynamic "secondary_target_policy" {
-    for_each = { for v in [each.value.secondary_target_policy] : v.name => v }
+    for_each = { for v in [each.value.secondary_target_policy] : "${v.org}/${v.name}" => v if v.name != "UNUSED" }
     content {
       moid = contains(keys(local.iscsi_static_target), "${secondary_target_policy.value.org}/${secondary_target_policy.value.name}"
         ) == true ? intersight_vnic_iscsi_static_target_policy.map["${secondary_target_policy.value.org}/${secondary_target_policy.value.name}"
@@ -114,11 +114,9 @@ resource "intersight_vnic_iscsi_boot_policy" "map" {
 
 resource "intersight_vnic_iscsi_boot_policy" "data" {
   depends_on = [intersight_vnic_iscsi_boot_policy.map]
-  for_each = {
-    for v in local.pp.iscsi_boot : v => v if lookup(local.iscsi_boot, element(split(":", v), 1), "#NOEXIST") == "#NOEXIST"
-  }
-  name = element(split(":", each.value), 1)
-  organization { moid = var.orgs[element(split(":", each.value), 0)] }
+  for_each   = { for v in local.pp.iscsi_boot : v => v if lookup(local.iscsi_boot, v, "#NOEXIST") == "#NOEXIST" }
+  name       = element(split("/", each.value), 1)
+  organization { moid = var.orgs[element(split("/", each.value), 0)] }
   lifecycle {
     ignore_changes = [
       account_moid, additional_properties, ancestors, auto_targetvendor_name, chap, create_time, description, domain_group_moid,

@@ -9,10 +9,7 @@ resource "intersight_thermal_policy" "map" {
   description      = coalesce(each.value.description, "${each.value.name} Thermal Policy.")
   fan_control_mode = each.value.fan_control_mode
   name             = each.value.name
-  organization {
-    moid        = var.orgs[each.value.organization]
-    object_type = "organization.Organization"
-  }
+  organization { moid = var.orgs[each.value.organization] }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
     content {

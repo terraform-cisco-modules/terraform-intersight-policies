@@ -45,10 +45,7 @@ resource "intersight_firmware_policy" "map" {
   ])) : ["none"]][0]
   name            = each.value.name
   target_platform = lookup(each.value, "target_platform", local.fw.target_platform)
-  organization {
-    moid        = var.orgs[each.value.organization]
-    object_type = "organization.Organization"
-  }
+  organization { moid = var.orgs[each.value.organization] }
   dynamic "model_bundle_combo" {
     for_each = each.value.model_bundle_versions
     content {

@@ -16,10 +16,7 @@ resource "intersight_memory_persistent_memory_policy" "map" {
     persistent_memory_type = each.value.persistent_memory_type
     socket_id              = "All Sockets"
   }
-  organization {
-    moid        = var.orgs[each.value.organization]
-    object_type = "organization.Organization"
-  }
+  organization { moid = var.orgs[each.value.organization] }
   dynamic "local_security" {
     for_each = {
       for v in compact([each.value.name]

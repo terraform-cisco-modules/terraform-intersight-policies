@@ -14,10 +14,7 @@ resource "intersight_smtp_policy" "map" {
   smtp_port       = each.value.smtp_port
   smtp_recipients = each.value.mail_alert_recipients
   smtp_server     = each.value.smtp_server_address
-  organization {
-    moid        = var.orgs[each.value.organization]
-    object_type = "organization.Organization"
-  }
+  organization { moid = var.orgs[each.value.organization] }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
     content {

@@ -12,10 +12,7 @@ resource "intersight_sol_policy" "map" {
   enabled     = each.value.enabled
   name        = each.value.name
   ssh_port    = each.value.ssh_port
-  organization {
-    moid        = var.orgs[each.value.organization]
-    object_type = "organization.Organization"
-  }
+  organization { moid = var.orgs[each.value.organization] }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
     content {

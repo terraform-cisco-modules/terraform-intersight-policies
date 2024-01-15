@@ -12,10 +12,7 @@ resource "intersight_vnic_fc_qos_policy" "map" {
   max_data_field_size = each.value.max_data_field_size
   name                = each.value.name
   rate_limit          = each.value.rate_limit
-  organization {
-    moid        = var.orgs[each.value.organization]
-    object_type = "organization.Organization"
-  }
+  organization { moid = var.orgs[each.value.organization] }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
     content {
@@ -27,13 +24,9 @@ resource "intersight_vnic_fc_qos_policy" "map" {
 
 resource "intersight_vnic_fc_qos_policy" "data" {
   depends_on = [intersight_vnic_fc_qos_policy.map]
-  for_each = {
-    for v in local.pp.fc_qos : v => v if lookup(local.fibre_channel_qos, element(split(":", v), 1), "#NOEXIST") == "#NOEXIST"
-  }
-  name = element(split(":", each.value), 1)
-  organization {
-    moid = var.orgs[element(split(":", each.value), 0)]
-  }
+  for_each   = { for v in local.pp.fc_qos : v => v if lookup(local.fibre_channel_qos, v, "#NOEXIST") == "#NOEXIST" }
+  name       = element(split("/", each.value), 1)
+  organization { moid = var.orgs[element(split("/", each.value), 0)] }
   lifecycle {
     ignore_changes = [
       account_moid, additional_properties, ancestors, burst, cos, create_time, description, domain_group_moid, max_data_field_size,

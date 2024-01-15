@@ -8,10 +8,7 @@ resource "intersight_vnic_fc_network_policy" "map" {
   for_each    = local.fibre_channel_network
   description = coalesce(each.value.description, "${each.value.name} Fibre-Channel Network Policy.")
   name        = each.value.name
-  organization {
-    moid        = var.orgs[each.value.organization]
-    object_type = "organization.Organization"
-  }
+  organization { moid = var.orgs[each.value.organization] }
   vsan_settings {
     default_vlan_id = each.value.default_vlan_id
     id              = each.value.vsan_id
@@ -27,13 +24,9 @@ resource "intersight_vnic_fc_network_policy" "map" {
 
 resource "intersight_vnic_fc_network_policy" "data" {
   depends_on = [intersight_vnic_fc_network_policy.map]
-  for_each = {
-    for v in local.pp.fc_network : v => v if lookup(local.fibre_channel_network, element(split(":", v), 1), "#NOEXIST") == "#NOEXIST"
-  }
-  name = element(split(":", each.value), 1)
-  organization {
-    moid = var.orgs[element(split(":", each.value), 0)]
-  }
+  for_each   = { for v in local.pp.fc_network : v => v if lookup(local.fibre_channel_network, v, "#NOEXIST") == "#NOEXIST" }
+  name       = element(split("/", each.value), 1)
+  organization { moid = var.orgs[element(split("/", each.value), 0)] }
   lifecycle {
     ignore_changes = [
       account_moid, additional_properties, ancestors, create_time, description, domain_group_moid, mod_time, owners,

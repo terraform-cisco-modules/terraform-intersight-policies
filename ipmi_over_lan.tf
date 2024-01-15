@@ -12,10 +12,7 @@ resource "intersight_ipmioverlan_policy" "map" {
   ) > 1 ? local.ps.ipmi_over_lan.encryption_key[each.value.encryption_key] : null
   name      = each.value.name
   privilege = each.value.privilege
-  organization {
-    moid        = var.orgs[each.value.organization]
-    object_type = "organization.Organization"
-  }
+  organization { moid = var.orgs[each.value.organization] }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
     content {

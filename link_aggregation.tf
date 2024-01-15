@@ -10,10 +10,7 @@ resource "intersight_fabric_link_aggregation_policy" "map" {
   lacp_rate          = each.value.lacp_rate
   name               = each.value.name
   suspend_individual = each.value.suspend_individual
-  organization {
-    moid        = var.orgs[each.value.organization]
-    object_type = "organization.Organization"
-  }
+  organization { moid = var.orgs[each.value.organization] }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
     content {
@@ -25,13 +22,9 @@ resource "intersight_fabric_link_aggregation_policy" "map" {
 
 resource "intersight_fabric_link_aggregation_policy" "data" {
   depends_on = [intersight_fabric_link_aggregation_policy.map]
-  for_each = {
-    for v in local.pp.link_aggregation : v => v if lookup(local.link_aggregation, element(split(":", v), 1), "#NOEXIST") == "#NOEXIST"
-  }
-  name = element(split(":", each.value), 1)
-  organization {
-    moid = var.orgs[element(split(":", each.value), 0)]
-  }
+  for_each   = { for v in local.pp.link_aggregation : v => v if lookup(local.link_aggregation, v, "#NOEXIST") == "#NOEXIST" }
+  name       = element(split("/", each.value), 1)
+  organization { moid = var.orgs[element(split("/", each.value), 0)] }
   lifecycle {
     ignore_changes = [
       account_moid, additional_properties, ancestors, create_time, description, domain_group_moid, lacp_rate,

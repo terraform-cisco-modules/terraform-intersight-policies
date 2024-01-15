@@ -11,10 +11,7 @@ resource "intersight_ntp_policy" "map" {
   name        = each.value.name
   ntp_servers = each.value.ntp_servers
   timezone    = each.value.timezone
-  organization {
-    moid        = var.orgs[each.value.organization]
-    object_type = "organization.Organization"
-  }
+  organization { moid = var.orgs[each.value.organization] }
   dynamic "authenticated_ntp_servers" {
     for_each = lookup(each.value, "authenticated_ntp_servers", [])
     content {

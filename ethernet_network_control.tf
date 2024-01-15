@@ -17,10 +17,7 @@ resource "intersight_fabric_eth_network_control_policy" "map" {
     receive_enabled  = each.value.lldp_enable_receive
     transmit_enabled = each.value.lldp_enable_transmit
   }
-  organization {
-    moid        = var.orgs[each.value.organization]
-    object_type = "organization.Organization"
-  }
+  organization { moid = var.orgs[each.value.organization] }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
     content {
@@ -32,13 +29,9 @@ resource "intersight_fabric_eth_network_control_policy" "map" {
 
 resource "intersight_fabric_eth_network_control_policy" "data" {
   depends_on = [intersight_fabric_eth_network_control_policy.map]
-  for_each = {
-    for v in local.pp.ethernet_network_control : v => v if lookup(local.ethernet_network_control, element(split(":", v), 1), "#NOEXIST") == "#NOEXIST"
-  }
-  name = element(split(":", each.value), 1)
-  organization {
-    moid = var.orgs[element(split(":", each.value), 0)]
-  }
+  for_each   = { for v in local.pp.ethernet_network_control : v => v if lookup(local.ethernet_network_control, v, "#NOEXIST") == "#NOEXIST" }
+  name       = element(split("/", each.value), 1)
+  organization { moid = var.orgs[element(split("/", each.value), 0)] }
   lifecycle {
     ignore_changes = [
       account_moid, additional_properties, ancestors, cdp_enabled, create_time, description, domain_group_moid, forge_mac, lldp_settings,

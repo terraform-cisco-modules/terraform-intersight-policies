@@ -303,7 +303,7 @@ output "z_moids_of_pools_and_policies_that_were_referenced_in_policies_but_not_a
       for v in sort(keys(intersight_fabric_eth_network_group_policy.data)) : v => intersight_fabric_eth_network_group_policy.data[v].moid
     }
     ethernet_qos          = { for v in sort(keys(intersight_vnic_eth_qos_policy.data)) : v => intersight_vnic_eth_qos_policy.data[v].moid }
-    fc_zone               = { for v in sort(keys(intersight_fabric_fc_zone_policy.map)) : v => intersight_fabric_fc_zone_policy.map[v].moid }
+    fc_zone               = { for v in sort(keys(intersight_fabric_fc_zone_policy.data)) : v => intersight_fabric_fc_zone_policy.data[v].moid }
     fibre_channel_adapter = { for v in sort(keys(intersight_vnic_fc_adapter_policy.data)) : v => intersight_vnic_fc_adapter_policy.data[v].moid }
     fibre_channel_network = { for v in sort(keys(intersight_vnic_fc_network_policy.data)) : v => intersight_vnic_fc_network_policy.data[v].moid }
     fibre_channel_qos     = { for v in sort(keys(intersight_vnic_eth_qos_policy.data)) : v => intersight_vnic_eth_qos_policy.data[v].moid }

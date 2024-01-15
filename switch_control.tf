@@ -17,10 +17,7 @@ resource "intersight_fabric_switch_control_policy" "map" {
     mac_aging_option = each.value.mac_address_table_aging
     mac_aging_time   = each.value.mac_address_table_aging == "Custom" ? each.value.mac_aging_time : null
   }
-  organization {
-    moid        = var.orgs[each.value.organization]
-    object_type = "organization.Organization"
-  }
+  organization { moid = var.orgs[each.value.organization] }
   udld_settings {
     message_interval = each.value.udld_global_settings.message_interval
     recovery_action  = each.value.udld_global_settings.recovery_action

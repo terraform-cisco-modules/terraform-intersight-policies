@@ -30,13 +30,8 @@ resource "intersight_vnic_fc_adapter_policy" "map" {
     retries = each.value.flogi.retries
     timeout = each.value.flogi.timeout
   }
-  interrupt_settings {
-    mode = each.value.interrupt_settings.mode
-  }
-  organization {
-    moid        = var.orgs[each.value.organization]
-    object_type = "organization.Organization"
-  }
+  interrupt_settings { mode = each.value.interrupt_settings.mode }
+  organization { moid = var.orgs[each.value.organization] }
   plogi_settings {
     retries = each.value.plogi.retries
     timeout = each.value.plogi.timeout
@@ -50,9 +45,7 @@ resource "intersight_vnic_fc_adapter_policy" "map" {
     ) > 0 ? 1 : each.value.scsi_io.queue_count
     ring_size = each.value.scsi_io.ring_size
   }
-  tx_queue_settings {
-    ring_size = each.value.transmit.ring_size
-  }
+  tx_queue_settings { ring_size = each.value.transmit.ring_size }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
     content {
@@ -64,13 +57,9 @@ resource "intersight_vnic_fc_adapter_policy" "map" {
 
 resource "intersight_vnic_fc_adapter_policy" "data" {
   depends_on = [intersight_vnic_fc_adapter_policy.map]
-  for_each = {
-    for v in local.pp.fc_adapter : v => v if lookup(local.fibre_channel_adapter, element(split(":", v), 1), "#NOEXIST") == "#NOEXIST"
-  }
-  name = element(split(":", each.value), 1)
-  organization {
-    moid = var.orgs[element(split(":", each.value), 0)]
-  }
+  for_each   = { for v in local.pp.fc_adapter : v => v if lookup(local.fibre_channel_adapter, v, "#NOEXIST") == "#NOEXIST" }
+  name       = element(split("/", each.value), 1)
+  organization { moid = var.orgs[element(split("/", each.value), 0)] }
   lifecycle {
     ignore_changes = [
       account_moid, additional_properties, ancestors, create_time, description, domain_group_moid, error_detection_timeout,

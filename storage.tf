@@ -13,10 +13,7 @@ resource "intersight_storage_storage_policy" "map" {
   unused_disks_state       = each.value.unused_disks_state
   use_jbod_for_vd_creation = each.value.use_jbod_for_vd_creation
   # retain_policy_virtual_drives = each.value.retain_policy
-  organization {
-    moid        = var.orgs[each.value.organization]
-    object_type = "organization.Organization"
-  }
+  organization { moid = var.orgs[each.value.organization] }
   dynamic "m2_virtual_drive" {
     for_each = { for v in each.value.m2_raid_configuration : v.slot => v if length(each.value.m2_raid_configuration) > 0 }
     content {

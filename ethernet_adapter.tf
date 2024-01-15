@@ -45,10 +45,7 @@ resource "intersight_vnic_eth_adapter_policy" "map" {
   nvgre_settings {
     enabled = length(regexall("EMPTY", each.value.adapter_template)) == 0 ? false : each.value.enable_nvgre_offload
   }
-  organization {
-    moid        = var.orgs[each.value.organization]
-    object_type = "organization.Organization"
-  }
+  organization { moid = var.orgs[each.value.organization] }
   roce_settings {
     class_of_service = each.value.roce_settings.cos
     enabled = length(regexall(true, each.value.enable_geneve_offload)) > 0 ? false : length(
@@ -123,13 +120,9 @@ resource "intersight_vnic_eth_adapter_policy" "map" {
 
 resource "intersight_vnic_eth_adapter_policy" "data" {
   depends_on = [intersight_vnic_eth_adapter_policy.map]
-  for_each = {
-    for v in local.pp.ethernet_adapter : v => v if lookup(local.ethernet_adapter, element(split(":", v), 1), "#NOEXIST") == "#NOEXIST"
-  }
-  name = element(split(":", each.value), 1)
-  organization {
-    moid = var.orgs[element(split(":", each.value), 0)]
-  }
+  for_each   = { for v in local.pp.ethernet_adapter : v => v if lookup(local.ethernet_adapter, v, "#NOEXIST") == "#NOEXIST" }
+  name       = element(split("/", each.value), 1)
+  organization { moid = var.orgs[element(split("/", each.value), 0)] }
   lifecycle {
     ignore_changes = [
       account_moid, additional_properties, advanced_filter, ancestors, arfs_settings, create_time, completion_queue_settings, description, domain_group_moid, geneve_enabled,

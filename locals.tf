@@ -101,7 +101,7 @@ locals {
         ]
       })]
       description  = lookup(value, "description", "")
-      key          = v.name
+      key          = value.name
       name         = "${local.npfx[org].adapter_configuration}${value.name}${local.nsfx[org].adapter_configuration}"
       organization = org
       tags         = lookup(value, "tags", var.global_settings.tags)
@@ -177,7 +177,7 @@ locals {
           object_type = v.object_type
         }
       ]
-      key          = v.name
+      key          = e.name
       name         = "${local.npfx[org].boot_order}${e.name}${local.nsfx[org].boot_order}"
       organization = org
       tags         = lookup(e, "tags", var.global_settings.tags)
@@ -458,8 +458,8 @@ locals {
     })
   ] if length(lookup(lookup(var.model[org], "policies", {}), "firmware", [])) > 0]) : "${i.organization}/${i.key}" => i }
   firmware_authenticate = { for i in flatten([for org in sort(keys(var.model)) : [
-    for v in lookup(lookup(var.model[org], "policies", {}), "firmware", []) : merge(local.fw, v)
-  ] if length(lookup(lookup(var.model[org], "policies", {}), "firmware_authenticate", [])) > 0]) : "${i.organization}/${i.key}" => i }
+    for v in lookup(lookup(var.model[org], "policies", {}), "firmware", []) : merge(local.fw, v, { organization = org })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "firmware_authenticate", [])) > 0]) : "${i.organization}/${i.name}" => i }
 
   #__________________________________________________________________
   #

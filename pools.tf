@@ -22,9 +22,7 @@ resource "intersight_iqnpool_pool" "data" {
     for v in local.pp.iqn_pool : v => v if contains(lookup(lookup(local.pools, "locals", {}), "iqn", []), v) == false
   }
   name = element(split("/", each.value), 1)
-  organization {
-    moid = var.orgs[element(split("/", each.value), 0)]
-  }
+  organization { moid = var.orgs[element(split("/", each.value), 0)] }
   lifecycle {
     ignore_changes = [
       account_moid, additional_properties, ancestors, assigned, assignment_order, block_heads, create_time, description, domain_group_moid,
@@ -39,9 +37,7 @@ resource "intersight_macpool_pool" "data" {
     for v in local.pp.mac_pool : v => v if contains(lookup(lookup(local.pools, "locals", {}), "mac", []), v) == false
   }
   name = element(split("/", each.value), 1)
-  organization {
-    moid = var.orgs[element(split("/", each.value), 0)]
-  }
+  organization { moid = var.orgs[element(split("/", each.value), 0)] }
   lifecycle {
     ignore_changes = [
       account_moid, additional_properties, ancestors, assigned, assignment_order, block_heads, create_time, description, domain_group_moid,
@@ -56,9 +52,7 @@ resource "intersight_fcpool_pool" "wwnn" {
     for v in local.pp.wwnn_pool : v => v if contains(lookup(lookup(local.pools, "locals", {}), "wwnn", []), v) == false
   }
   name = element(split("/", each.value), 1)
-  organization {
-    moid = var.orgs[element(split("/", each.value), 0)]
-  }
+  organization { moid = var.orgs[element(split("/", each.value), 0)] }
   pool_purpose = "WWNN"
   lifecycle {
     ignore_changes = [
@@ -74,9 +68,7 @@ resource "intersight_fcpool_pool" "wwpn" {
     for v in local.pp.wwpn_pool : v => v if contains(lookup(lookup(local.pools, "locals", {}), "wwpn", []), v) == false
   }
   name = element(split("/", each.value), 1)
-  organization {
-    moid = var.orgs[element(split("/", each.value), 0)]
-  }
+  organization { moid = var.orgs[element(split("/", each.value), 0)] }
   pool_purpose = "WWPN"
   lifecycle {
     ignore_changes = [

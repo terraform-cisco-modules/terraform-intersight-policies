@@ -8,10 +8,7 @@ resource "intersight_fabric_link_control_policy" "map" {
   for_each    = local.link_control
   description = coalesce(each.value.description, "${each.value.name} Link Control Policy.")
   name        = each.value.name
-  organization {
-    moid        = var.orgs[each.value.organization]
-    object_type = "organization.Organization"
-  }
+  organization { moid = var.orgs[each.value.organization] }
   udld_settings {
     admin_state = each.value.admin_state
     mode        = each.value.mode
@@ -27,13 +24,9 @@ resource "intersight_fabric_link_control_policy" "map" {
 
 resource "intersight_fabric_link_control_policy" "data" {
   depends_on = [intersight_fabric_link_aggregation_policy.map]
-  for_each = {
-    for v in local.pp.link_control : v => v if lookup(local.link_control, element(split(":", v), 1), "#NOEXIST") == "#NOEXIST"
-  }
-  name = element(split(":", each.value), 1)
-  organization {
-    moid = var.orgs[element(split(":", each.value), 0)]
-  }
+  for_each   = { for v in local.pp.link_control : v => v if lookup(local.link_control, v, "#NOEXIST") == "#NOEXIST" }
+  name       = element(split("/", each.value), 1)
+  organization { moid = var.orgs[element(split("/", each.value), 0)] }
   lifecycle {
     ignore_changes = [
       account_moid, additional_properties, ancestors, create_time, description, domain_group_moid,

@@ -8,10 +8,7 @@ resource "intersight_fabric_eth_network_group_policy" "map" {
   for_each    = local.ethernet_network_group
   description = coalesce(each.value.description, "${each.value.name} Ethernet Network Group Policy.")
   name        = each.value.name
-  organization {
-    moid        = var.orgs[each.value.organization]
-    object_type = "organization.Organization"
-  }
+  organization { moid = var.orgs[each.value.organization] }
   vlan_settings {
     native_vlan   = each.value.native_vlan
     allowed_vlans = each.value.allowed_vlans
@@ -27,13 +24,9 @@ resource "intersight_fabric_eth_network_group_policy" "map" {
 
 resource "intersight_fabric_eth_network_group_policy" "data" {
   depends_on = [intersight_fabric_eth_network_group_policy.map]
-  for_each = {
-    for v in local.pp.ethernet_network_group : v => v if lookup(local.ethernet_network_group, element(split(":", v), 1), "#NOEXIST") == "#NOEXIST"
-  }
-  name = element(split(":", each.value), 1)
-  organization {
-    moid = var.orgs[element(split(":", each.value), 0)]
-  }
+  for_each   = { for v in local.pp.ethernet_network_group : v => v if lookup(local.ethernet_network_group, v, "#NOEXIST") == "#NOEXIST" }
+  name       = element(split("/", each.value), 1)
+  organization { moid = var.orgs[element(split("/", each.value), 0)] }
   lifecycle {
     ignore_changes = [
       account_moid, additional_properties, ancestors, create_time, description, domain_group_moid, mod_time, owners,
