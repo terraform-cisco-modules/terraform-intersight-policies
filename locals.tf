@@ -490,8 +490,8 @@ locals {
       name         = "${local.npfx[org].imc_access}${v.name}${local.nsfx[org].imc_access}"
       organization = org
       out_of_band_ip_pool = {
-        name = length(regexall("/", lookup(v, "out_of_band_ip_pool", "UNUSED"))) > 0 ? element(split("/", v.inband_ip_pool), 1) : lookup(v, "out_of_band_ip_pool", "UNUSED")
-        org  = length(regexall("/", lookup(v, "out_of_band_ip_pool", "UNUSED"))) > 0 ? element(split("/", v.inband_ip_pool), 0) : org
+        name = length(regexall("/", lookup(v, "out_of_band_ip_pool", "UNUSED"))) > 0 ? element(split("/", v.out_of_band_ip_pool), 1) : lookup(v, "out_of_band_ip_pool", "UNUSED")
+        org  = length(regexall("/", lookup(v, "out_of_band_ip_pool", "UNUSED"))) > 0 ? element(split("/", v.out_of_band_ip_pool), 0) : org
       }
       tags = lookup(v, "tags", var.global_settings.tags)
     })
