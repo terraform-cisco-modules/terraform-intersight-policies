@@ -15,7 +15,7 @@ data "intersight_iam_account" "account" {
 #}
 
 resource "intersight_softwarerepository_authorization" "map" {
-  for_each        = local.firmware_authenticate
+  for_each        = { for v in local.firmware_authenticate: "auth" => v }
   password        = local.ps.firmware.cco_password[each.value.cco_password]
   repository_type = "Cisco"
   user_id         = local.ps.firmware.cco_user[each.value.cco_user]

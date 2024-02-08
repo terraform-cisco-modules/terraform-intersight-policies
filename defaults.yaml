@@ -1668,6 +1668,7 @@ policies:
       multicast_policy: ''
       native_vlan: false
       name: ''
+      name_prefix: true
       primary_vlan_id: 0
       sharing_type: None
       vlan_list: '**REQUIRED**'

@@ -36,9 +36,9 @@ resource "intersight_fabric_vlan" "map" {
   name = length(
     compact([each.value.name])
     ) > 0 && each.value.name_prefix == false ? each.value.name : length(regexall("^[0-9]{4}$", each.value.vlan_id)
-    ) > 0 ? join("-vl", [each.value.name, each.value.vlan_id]) : length(regexall("^[0-9]{3}$", each.value.vlan_id)
-    ) > 0 ? join("-vl0", [each.value.name, each.value.vlan_id]) : length(regexall("^[0-9]{2}$", each.value.vlan_id)
-    ) > 0 ? join("-vl00", [each.value.name, each.value.vlan_id]) : join("-vl000", [each.value.name, each.value.vlan_id]
+    ) > 0 ? join("", [each.value.name, each.value.vlan_id]) : length(regexall("^[0-9]{3}$", each.value.vlan_id)
+    ) > 0 ? join("0", [each.value.name, each.value.vlan_id]) : length(regexall("^[0-9]{2}$", each.value.vlan_id)
+    ) > 0 ? join("00", [each.value.name, each.value.vlan_id]) : join("000", [each.value.name, each.value.vlan_id]
   )
   primary_vlan_id = each.value.primary_vlan_id
   sharing_type = length(regexall(tostring(each.value.vlan_id), tostring(each.value.primary_vlan_id))

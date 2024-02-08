@@ -457,9 +457,8 @@ locals {
       tags         = lookup(v, "tags", var.global_settings.tags)
     })
   ] if length(lookup(lookup(var.model[org], "policies", {}), "firmware", [])) > 0]) : "${i.organization}/${i.key}" => i }
-  firmware_authenticate = { for i in flatten([for org in sort(keys(var.model)) : [
-    for v in lookup(lookup(var.model[org], "policies", {}), "firmware", []) : merge(local.fw, v, { organization = org })
-  ] if length(lookup(lookup(var.model[org], "policies", {}), "firmware_authenticate", [])) > 0]) : "${i.organization}/${i.name}" => i }
+  firmware_authenticate = flatten([for org in sort(keys(var.model)) : [lookup(lookup(var.model[org], "policies", {}), "firmware_authenticate", [])
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "firmware_authenticate", [])) > 0])
 
   #__________________________________________________________________
   #
@@ -1478,7 +1477,7 @@ locals {
         auto_allow_on_uplinks = v.auto_allow_on_uplinks
         multicast_policy      = v.multicast_policy
         name                  = v.name
-        name_prefix           = length(regexall("(,|-)", jsonencode(v.vlan_list))) > 0 ? true : false
+        name_prefix           = length(regexall("(,|-)", jsonencode(v.vlan_list))) > 0 && v.name_prefix == true ? true : false
         native_vlan           = v.native_vlan
         organization          = value.organization
         primary_vlan_id       = v.primary_vlan_id
