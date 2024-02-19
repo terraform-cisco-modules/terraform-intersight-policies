@@ -27,7 +27,6 @@ resource "intersight_fabric_eth_network_policy" "map" {
 resource "intersight_fabric_vlan" "map" {
   depends_on = [
     intersight_fabric_eth_network_policy.map,
-    intersight_fabric_multicast_policy.data,
     intersight_fabric_multicast_policy.map
   ]
   for_each              = { for k, v in local.vlans : k => v if v.vlan_id > 0 && v.vlan_id < 4094 }
@@ -48,6 +47,8 @@ resource "intersight_fabric_vlan" "map" {
   multicast_policy {
     moid = contains(keys(local.multicast), "${each.value.multicast_policy.org}/${each.value.multicast_policy.name}"
       ) == true ? intersight_fabric_multicast_policy.map["${each.value.multicast_policy.org}/${each.value.multicast_policy.name}"
-    ].moid : intersight_fabric_multicast_policy.data["${each.value.multicast_policy.org}/${each.value.multicast_policy.name}"].moid
+      ].moid : [for i in data.intersight_search_search_item.policies["multicast"
+        ].results : i.moid if jsondecode(i.additional_properties).Name == each.value.multicast_policy.name && jsondecode(i.additional_properties
+    ).Organization.Moid == var.orgs[each.value.multicast_policy.org]][0]
   }
 }

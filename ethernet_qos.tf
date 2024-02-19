@@ -23,17 +23,3 @@ resource "intersight_vnic_eth_qos_policy" "map" {
     }
   }
 }
-
-resource "intersight_vnic_eth_qos_policy" "data" {
-  depends_on = [intersight_vnic_eth_qos_policy.map]
-  for_each   = { for v in local.pp.ethernet_qos : v => v if lookup(local.ethernet_qos, v, "#NOEXIST") == "#NOEXIST" }
-  name       = element(split("/", each.value), 1)
-  organization { moid = var.orgs[element(split("/", each.value), 0)] }
-  lifecycle {
-    ignore_changes = [
-      account_moid, additional_properties, ancestors, burst, cos, create_time, description, domain_group_moid, mod_time,
-      priority, owners, parent, permission_resources, rate_limit, shared_scope, tags, trust_host_cos, version_context
-    ]
-    prevent_destroy = true
-  }
-}

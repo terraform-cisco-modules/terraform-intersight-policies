@@ -6,15 +6,10 @@
 
 resource "intersight_fabric_port_policy" "map" {
   depends_on = [
-    intersight_fabric_eth_network_control_policy.data,
     intersight_fabric_eth_network_control_policy.map,
-    intersight_fabric_eth_network_group_policy.data,
     intersight_fabric_eth_network_group_policy.map,
-    intersight_fabric_flow_control_policy.data,
     intersight_fabric_flow_control_policy.map,
-    intersight_fabric_link_aggregation_policy.data,
     intersight_fabric_link_aggregation_policy.map,
-    intersight_fabric_link_control_policy.data,
     intersight_fabric_link_control_policy.map
   ]
   for_each     = local.port
@@ -48,12 +43,16 @@ resource "intersight_fabric_appliance_pc_role" "map" {
   eth_network_control_policy {
     moid = contains(keys(local.ethernet_network_control), "${each.value.ethernet_network_control_policy.org}/${each.value.ethernet_network_control_policy.name}"
       ) == true ? intersight_fabric_eth_network_control_policy.map["${each.value.ethernet_network_control_policy.org}/${each.value.ethernet_network_control_policy.name}"
-    ].moid : intersight_fabric_eth_network_control_policy.data["${each.value.ethernet_network_control_policy.org}/${each.value.ethernet_network_control_policy.name}"].moid
+      ].moid : [for i in data.intersight_search_search_item.policies["ethernet_network_control"
+        ].results : i.moid if jsondecode(i.additional_properties).Name == each.value.ethernet_network_control_policy.name && jsondecode(i.additional_properties
+    ).Organization.Moid == var.orgs[each.value.ethernet_network_control_policy.org]][0]
   }
   eth_network_group_policy {
     moid = contains(keys(local.ethernet_network_group), "${each.value.ethernet_network_group_policy.org}/${each.value.ethernet_network_group_policy.name}"
       ) == true ? intersight_fabric_eth_network_group_policy.map["${each.value.ethernet_network_group_policy.org}/${each.value.ethernet_network_group_policy.name}"
-    ].moid : intersight_fabric_eth_network_group_policy.data["${each.value.ethernet_network_group_policy.org}/${each.value.ethernet_network_group_policy.name}"].moid
+      ].moid : [for i in data.intersight_search_search_item.policies["ethernet_network_group"
+        ].results : i.moid if jsondecode(i.additional_properties).Name == each.value.ethernet_network_group_policy.name && jsondecode(i.additional_properties
+    ).Organization.Moid == var.orgs[each.value.ethernet_network_group_policy.org]][0]
   }
   port_policy { moid = intersight_fabric_port_policy.map[each.value.port_policy].moid }
   dynamic "link_aggregation_policy" {
@@ -61,7 +60,9 @@ resource "intersight_fabric_appliance_pc_role" "map" {
     content {
       moid = contains(keys(local.link_aggregation), "${link_aggregation_policy.value.org}/${link_aggregation_policy.value.name}"
         ) == true ? intersight_fabric_link_aggregation_policy.map["${link_aggregation_policy.value.org}/${link_aggregation_policy.value.name}"
-      ].moid : intersight_fabric_link_aggregation_policy.data["${link_aggregation_policy.value.org}/${link_aggregation_policy.value.name}"].moid
+        ].moid : [for i in data.intersight_search_search_item.policies["link_aggregation"
+          ].results : i.moid if jsondecode(i.additional_properties).Name == link_aggregation_policy.value.name && jsondecode(i.additional_properties
+      ).Organization.Moid == var.orgs[link_aggregation_policy.value.org]][0]
     }
   }
   dynamic "ports" {
@@ -99,7 +100,9 @@ resource "intersight_fabric_uplink_pc_role" "map" {
     content {
       moid = contains(keys(local.ethernet_network_group), "${eth_network_group_policy.value.org}/${eth_network_group_policy.value.name}"
         ) == true ? intersight_fabric_eth_network_group_policy.map["${eth_network_group_policy.value.org}/${eth_network_group_policy.value.name}"
-      ].moid : intersight_fabric_eth_network_group_policy.data["${eth_network_group_policy.value.org}/${eth_network_group_policy.value.name}"].moid
+        ].moid : [for i in data.intersight_search_search_item.policies["ethernet_network_group"
+          ].results : i.moid if jsondecode(i.additional_properties).Name == eth_network_group_policy.value.name && jsondecode(i.additional_properties
+      ).Organization.Moid == var.orgs[eth_network_group_policy.value.org]][0]
     }
   }
   dynamic "flow_control_policy" {
@@ -107,7 +110,9 @@ resource "intersight_fabric_uplink_pc_role" "map" {
     content {
       moid = contains(keys(local.flow_control), "${flow_control_policy.value.org}/${flow_control_policy.value.name}"
         ) == true ? intersight_fabric_flow_control_policy.map["${flow_control_policy.value.org}/${flow_control_policy.value.name}"
-      ].moid : intersight_fabric_flow_control_policy.data["${flow_control_policy.value.org}/${flow_control_policy.value.name}"].moid
+        ].moid : [for i in data.intersight_search_search_item.policies["link_aggregation"
+          ].results : i.moid if jsondecode(i.additional_properties).Name == flow_control_policy.value.name && jsondecode(i.additional_properties
+      ).Organization.Moid == var.orgs[flow_control_policy.value.org]][0]
     }
   }
   dynamic "link_aggregation_policy" {
@@ -115,7 +120,9 @@ resource "intersight_fabric_uplink_pc_role" "map" {
     content {
       moid = contains(keys(local.link_aggregation), "${link_aggregation_policy.value.org}/${link_aggregation_policy.value.name}"
         ) == true ? intersight_fabric_link_aggregation_policy.map["${link_aggregation_policy.value.org}/${link_aggregation_policy.value.name}"
-      ].moid : intersight_fabric_link_aggregation_policy.data["${link_aggregation_policy.value.org}/${link_aggregation_policy.value.name}"].moid
+        ].moid : [for i in data.intersight_search_search_item.policies["link_aggregation"
+          ].results : i.moid if jsondecode(i.additional_properties).Name == link_aggregation_policy.value.name && jsondecode(i.additional_properties
+      ).Organization.Moid == var.orgs[link_aggregation_policy.value.org]][0]
     }
   }
   dynamic "link_control_policy" {
@@ -123,7 +130,9 @@ resource "intersight_fabric_uplink_pc_role" "map" {
     content {
       moid = contains(keys(local.link_control), "${link_control_policy.value.org}/${link_control_policy.value.name}"
         ) == true ? intersight_fabric_link_control_policy.map["${link_control_policy.value.org}/${link_control_policy.value.name}"
-      ].moid : intersight_fabric_link_control_policy.data["${link_control_policy.value.org}/${link_control_policy.value.name}"].moid
+        ].moid : [for i in data.intersight_search_search_item.policies["link_control"
+          ].results : i.moid if jsondecode(i.additional_properties).Name == link_control_policy.value.name && jsondecode(i.additional_properties
+      ).Organization.Moid == var.orgs[link_control_policy.value.org]][0]
     }
   }
   dynamic "ports" {
@@ -196,7 +205,9 @@ resource "intersight_fabric_fcoe_uplink_pc_role" "map" {
     content {
       moid = contains(keys(local.link_aggregation), "${link_aggregation_policy.value.org}/${link_aggregation_policy.value.name}"
         ) == true ? intersight_fabric_link_aggregation_policy.map["${link_aggregation_policy.value.org}/${link_aggregation_policy.value.name}"
-      ].moid : intersight_fabric_link_aggregation_policy.data["${link_aggregation_policy.value.org}/${link_aggregation_policy.value.name}"].moid
+        ].moid : [for i in data.intersight_search_search_item.policies["link_aggregation"
+          ].results : i.moid if jsondecode(i.additional_properties).Name == link_aggregation_policy.value.name && jsondecode(i.additional_properties
+      ).Organization.Moid == var.orgs[link_aggregation_policy.value.org]][0]
     }
   }
   dynamic "link_control_policy" {
@@ -204,7 +215,9 @@ resource "intersight_fabric_fcoe_uplink_pc_role" "map" {
     content {
       moid = contains(keys(local.link_control), "${link_control_policy.value.org}/${link_control_policy.value.name}"
         ) == true ? intersight_fabric_link_control_policy.map["${link_control_policy.value.org}/${link_control_policy.value.name}"
-      ].moid : intersight_fabric_link_control_policy.data["${link_control_policy.value.org}/${link_control_policy.value.name}"].moid
+        ].moid : [for i in data.intersight_search_search_item.policies["link_control"
+          ].results : i.moid if jsondecode(i.additional_properties).Name == link_control_policy.value.name && jsondecode(i.additional_properties
+      ).Organization.Moid == var.orgs[link_control_policy.value.org]][0]
     }
   }
   dynamic "ports" {
@@ -269,12 +282,16 @@ resource "intersight_fabric_appliance_role" "map" {
   eth_network_control_policy {
     moid = contains(keys(local.ethernet_network_control), "${each.value.ethernet_network_control_policy.org}/${each.value.ethernet_network_control_policy.name}"
       ) == true ? intersight_fabric_eth_network_control_policy.map["${each.value.ethernet_network_control_policy.org}/${each.value.ethernet_network_control_policy.name}"
-    ].moid : intersight_fabric_eth_network_control_policy.data["${each.value.ethernet_network_control_policy.org}/${each.value.ethernet_network_control_policy.name}"].moid
+      ].moid : [for i in data.intersight_search_search_item.policies["ethernet_network_control"
+        ].results : i.moid if jsondecode(i.additional_properties).Name == each.value.ethernet_network_control_policy.name && jsondecode(i.additional_properties
+    ).Organization.Moid == var.orgs[each.value.ethernet_network_control_policy.org]][0]
   }
   eth_network_group_policy {
     moid = contains(keys(local.ethernet_network_group), "${each.value.ethernet_network_group_policy.org}/${each.value.ethernet_network_group_policy.name}"
       ) == true ? intersight_fabric_eth_network_group_policy.map["${each.value.ethernet_network_group_policy.org}/${each.value.ethernet_network_group_policy.name}"
-    ].moid : intersight_fabric_eth_network_group_policy.data["${each.value.ethernet_network_group_policy.org}/${each.value.ethernet_network_group_policy.name}"].moid
+      ].moid : [for i in data.intersight_search_search_item.policies["ethernet_network_group"
+        ].results : i.moid if jsondecode(i.additional_properties).Name == each.value.ethernet_network_group_policy.name && jsondecode(i.additional_properties
+    ).Organization.Moid == var.orgs[each.value.ethernet_network_group_policy.org]][0]
   }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
@@ -305,7 +322,9 @@ resource "intersight_fabric_uplink_role" "map" {
     content {
       moid = contains(keys(local.ethernet_network_group), "${eth_network_group_policy.value.org}/${eth_network_group_policy.value.name}"
         ) == true ? intersight_fabric_eth_network_group_policy.map["${eth_network_group_policy.value.org}/${eth_network_group_policy.value.name}"
-      ].moid : intersight_fabric_eth_network_group_policy.data["${eth_network_group_policy.value.org}/${eth_network_group_policy.value.name}"].moid
+        ].moid : [for i in data.intersight_search_search_item.policies["ethernet_network_group"
+          ].results : i.moid if jsondecode(i.additional_properties).Name == eth_network_group_policy.value.name && jsondecode(i.additional_properties
+      ).Organization.Moid == var.orgs[eth_network_group_policy.value.org]][0]
     }
   }
   dynamic "flow_control_policy" {
@@ -313,7 +332,9 @@ resource "intersight_fabric_uplink_role" "map" {
     content {
       moid = contains(keys(local.flow_control), "${flow_control_policy.value.org}/${flow_control_policy.value.name}"
         ) == true ? intersight_fabric_flow_control_policy.map["${flow_control_policy.value.org}/${flow_control_policy.value.name}"
-      ].moid : intersight_fabric_flow_control_policy.data["${flow_control_policy.value.org}/${flow_control_policy.value.name}"].moid
+        ].moid : [for i in data.intersight_search_search_item.policies["link_aggregation"
+          ].results : i.moid if jsondecode(i.additional_properties).Name == flow_control_policy.value.name && jsondecode(i.additional_properties
+      ).Organization.Moid == var.orgs[flow_control_policy.value.org]][0]
     }
   }
   dynamic "link_control_policy" {
@@ -321,7 +342,9 @@ resource "intersight_fabric_uplink_role" "map" {
     content {
       moid = contains(keys(local.link_control), "${link_control_policy.value.org}/${link_control_policy.value.name}"
         ) == true ? intersight_fabric_link_control_policy.map["${link_control_policy.value.org}/${link_control_policy.value.name}"
-      ].moid : intersight_fabric_link_control_policy.data["${link_control_policy.value.org}/${link_control_policy.value.name}"].moid
+        ].moid : [for i in data.intersight_search_search_item.policies["link_control"
+          ].results : i.moid if jsondecode(i.additional_properties).Name == link_control_policy.value.name && jsondecode(i.additional_properties
+      ).Organization.Moid == var.orgs[link_control_policy.value.org]][0]
     }
   }
   dynamic "tags" {
@@ -411,7 +434,9 @@ resource "intersight_fabric_fcoe_uplink_role" "map" {
     content {
       moid = contains(keys(local.link_control), "${link_control_policy.value.org}/${link_control_policy.value.name}"
         ) == true ? intersight_fabric_link_control_policy.map["${link_control_policy.value.org}/${link_control_policy.value.name}"
-      ].moid : intersight_fabric_link_control_policy.data["${link_control_policy.value.org}/${link_control_policy.value.name}"].moid
+        ].moid : [for i in data.intersight_search_search_item.policies["link_control"
+          ].results : i.moid if jsondecode(i.additional_properties).Name == link_control_policy.value.name && jsondecode(i.additional_properties
+      ).Organization.Moid == var.orgs[link_control_policy.value.org]][0]
     }
   }
   dynamic "tags" {

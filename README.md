@@ -36,6 +36,8 @@ A Terraform module to configure Intersight Infrastructure Policies.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_data_policies"></a> [data\_policies](#output\_data\_policies) | n/a |
+| <a name="output_data_pools"></a> [data\_pools](#output\_data\_pools) | n/a |
 | <a name="output_adapter_configuration"></a> [adapter\_configuration](#output\_adapter\_configuration) | Moid's of the Adapter Configuration Policies. |
 | <a name="output_bios"></a> [bios](#output\_bios) | Moid's of the BIOS Policies. |
 | <a name="output_boot_order"></a> [boot\_order](#output\_boot\_order) | Moid's of the Boot Order Policies. |
@@ -64,7 +66,6 @@ A Terraform module to configure Intersight Infrastructure Policies.
 | <a name="output_link_control"></a> [link\_control](#output\_link\_control) | Moid's of the Link Control Policies. |
 | <a name="output_ldap"></a> [ldap](#output\_ldap) | Moid's of the LDAP Policies. |
 | <a name="output_local_user"></a> [local\_user](#output\_local\_user) | Moid's of the Local User Policies. |
-| <a name="output_locals"></a> [locals](#output\_locals) | n/a |
 | <a name="output_multicast"></a> [multicast](#output\_multicast) | Moid's of the Multicast Policies. |
 | <a name="output_network_connectivity"></a> [network\_connectivity](#output\_network\_connectivity) | Moid's of the Network Connectivity Policies. |
 | <a name="output_ntp"></a> [ntp](#output\_ntp) | Moid's of the NTP Policies. |
@@ -73,6 +74,7 @@ A Terraform module to configure Intersight Infrastructure Policies.
 | <a name="output_power"></a> [power](#output\_power) | Moid's of the Power Policies. |
 | <a name="output_san_connectivity"></a> [san\_connectivity](#output\_san\_connectivity) | Moid's of the SAN Connectivity Policies. |
 | <a name="output_san_connectivity_vhbas"></a> [san\_connectivity\_vhbas](#output\_san\_connectivity\_vhbas) | Moid's of the SAN Connectivity - VHBAs Policies. |
+| <a name="output_sd_card"></a> [sd\_card](#output\_sd\_card) | Moid's of the SD Card Policies. |
 | <a name="output_serial_over_lan"></a> [serial\_over\_lan](#output\_serial\_over\_lan) | Moid's of the Serial over LAN Policies. |
 | <a name="output_smtp"></a> [smtp](#output\_smtp) | Moid's of the SMTP Policies. |
 | <a name="output_snmp"></a> [snmp](#output\_snmp) | Moid's of the SNMP Policies. |
@@ -86,7 +88,6 @@ A Terraform module to configure Intersight Infrastructure Policies.
 | <a name="output_virtual_media"></a> [virtual\_media](#output\_virtual\_media) | Moid's of the Virtual Media Policies. |
 | <a name="output_vlan"></a> [vlan](#output\_vlan) | Moid's of the VLAN Policies. |
 | <a name="output_vsan"></a> [vsan](#output\_vsan) | Moid's of the VSAN Policies. |
-| <a name="output_z_moids_of_pools_and_policies_that_were_referenced_in_policies_but_not_already_created"></a> [z\_moids\_of\_pools\_and\_policies\_that\_were\_referenced\_in\_policies\_but\_not\_already\_created](#output\_z\_moids\_of\_pools\_and\_policies\_that\_were\_referenced\_in\_policies\_but\_not\_already\_created) | moids of Pools that were referenced in server profiles but not defined |
 ## Resources
 
 | Name | Type |
@@ -99,26 +100,19 @@ A Terraform module to configure Intersight Infrastructure Policies.
 | [intersight_deviceconnector_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/deviceconnector_policy) | resource |
 | [intersight_fabric_appliance_pc_role.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fabric_appliance_pc_role) | resource |
 | [intersight_fabric_appliance_role.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fabric_appliance_role) | resource |
-| [intersight_fabric_eth_network_control_policy.data](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fabric_eth_network_control_policy) | resource |
 | [intersight_fabric_eth_network_control_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fabric_eth_network_control_policy) | resource |
-| [intersight_fabric_eth_network_group_policy.data](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fabric_eth_network_group_policy) | resource |
 | [intersight_fabric_eth_network_group_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fabric_eth_network_group_policy) | resource |
 | [intersight_fabric_eth_network_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fabric_eth_network_policy) | resource |
 | [intersight_fabric_fc_network_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fabric_fc_network_policy) | resource |
 | [intersight_fabric_fc_storage_role.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fabric_fc_storage_role) | resource |
 | [intersight_fabric_fc_uplink_pc_role.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fabric_fc_uplink_pc_role) | resource |
 | [intersight_fabric_fc_uplink_role.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fabric_fc_uplink_role) | resource |
-| [intersight_fabric_fc_zone_policy.data](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fabric_fc_zone_policy) | resource |
 | [intersight_fabric_fc_zone_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fabric_fc_zone_policy) | resource |
 | [intersight_fabric_fcoe_uplink_pc_role.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fabric_fcoe_uplink_pc_role) | resource |
 | [intersight_fabric_fcoe_uplink_role.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fabric_fcoe_uplink_role) | resource |
-| [intersight_fabric_flow_control_policy.data](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fabric_flow_control_policy) | resource |
 | [intersight_fabric_flow_control_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fabric_flow_control_policy) | resource |
-| [intersight_fabric_link_aggregation_policy.data](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fabric_link_aggregation_policy) | resource |
 | [intersight_fabric_link_aggregation_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fabric_link_aggregation_policy) | resource |
-| [intersight_fabric_link_control_policy.data](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fabric_link_control_policy) | resource |
 | [intersight_fabric_link_control_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fabric_link_control_policy) | resource |
-| [intersight_fabric_multicast_policy.data](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fabric_multicast_policy) | resource |
 | [intersight_fabric_multicast_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fabric_multicast_policy) | resource |
 | [intersight_fabric_port_mode.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fabric_port_mode) | resource |
 | [intersight_fabric_port_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fabric_port_policy) | resource |
@@ -129,8 +123,6 @@ A Terraform module to configure Intersight Infrastructure Policies.
 | [intersight_fabric_uplink_role.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fabric_uplink_role) | resource |
 | [intersight_fabric_vlan.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fabric_vlan) | resource |
 | [intersight_fabric_vsan.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fabric_vsan) | resource |
-| [intersight_fcpool_pool.wwnn](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fcpool_pool) | resource |
-| [intersight_fcpool_pool.wwpn](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fcpool_pool) | resource |
 | [intersight_firmware_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/firmware_policy) | resource |
 | [intersight_iam_end_point_user.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/iam_end_point_user) | resource |
 | [intersight_iam_end_point_user_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/iam_end_point_user_policy) | resource |
@@ -139,10 +131,7 @@ A Terraform module to configure Intersight Infrastructure Policies.
 | [intersight_iam_ldap_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/iam_ldap_policy) | resource |
 | [intersight_iam_ldap_provider.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/iam_ldap_provider) | resource |
 | [intersight_ipmioverlan_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/ipmioverlan_policy) | resource |
-| [intersight_ippool_pool.data](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/ippool_pool) | resource |
-| [intersight_iqnpool_pool.data](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/iqnpool_pool) | resource |
 | [intersight_kvm_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/kvm_policy) | resource |
-| [intersight_macpool_pool.data](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/macpool_pool) | resource |
 | [intersight_memory_persistent_memory_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/memory_persistent_memory_policy) | resource |
 | [intersight_networkconfig_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/networkconfig_policy) | resource |
 | [intersight_ntp_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/ntp_policy) | resource |
@@ -159,28 +148,21 @@ A Terraform module to configure Intersight Infrastructure Policies.
 | [intersight_syslog_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/syslog_policy) | resource |
 | [intersight_thermal_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/thermal_policy) | resource |
 | [intersight_vmedia_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/vmedia_policy) | resource |
-| [intersight_vnic_eth_adapter_policy.data](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/vnic_eth_adapter_policy) | resource |
 | [intersight_vnic_eth_adapter_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/vnic_eth_adapter_policy) | resource |
 | [intersight_vnic_eth_if.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/vnic_eth_if) | resource |
-| [intersight_vnic_eth_network_policy.data](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/vnic_eth_network_policy) | resource |
 | [intersight_vnic_eth_network_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/vnic_eth_network_policy) | resource |
-| [intersight_vnic_eth_qos_policy.data](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/vnic_eth_qos_policy) | resource |
 | [intersight_vnic_eth_qos_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/vnic_eth_qos_policy) | resource |
-| [intersight_vnic_fc_adapter_policy.data](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/vnic_fc_adapter_policy) | resource |
 | [intersight_vnic_fc_adapter_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/vnic_fc_adapter_policy) | resource |
 | [intersight_vnic_fc_if.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/vnic_fc_if) | resource |
-| [intersight_vnic_fc_network_policy.data](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/vnic_fc_network_policy) | resource |
 | [intersight_vnic_fc_network_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/vnic_fc_network_policy) | resource |
-| [intersight_vnic_fc_qos_policy.data](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/vnic_fc_qos_policy) | resource |
 | [intersight_vnic_fc_qos_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/vnic_fc_qos_policy) | resource |
-| [intersight_vnic_iscsi_adapter_policy.data](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/vnic_iscsi_adapter_policy) | resource |
 | [intersight_vnic_iscsi_adapter_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/vnic_iscsi_adapter_policy) | resource |
-| [intersight_vnic_iscsi_boot_policy.data](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/vnic_iscsi_boot_policy) | resource |
 | [intersight_vnic_iscsi_boot_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/vnic_iscsi_boot_policy) | resource |
-| [intersight_vnic_iscsi_static_target_policy.data](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/vnic_iscsi_static_target_policy) | resource |
 | [intersight_vnic_iscsi_static_target_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/vnic_iscsi_static_target_policy) | resource |
 | [intersight_vnic_lan_connectivity_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/vnic_lan_connectivity_policy) | resource |
 | [intersight_vnic_san_connectivity_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/vnic_san_connectivity_policy) | resource |
 | [intersight_iam_account.account](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/data-sources/iam_account) | data source |
 | [intersight_iam_end_point_role.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/data-sources/iam_end_point_role) | data source |
+| [intersight_search_search_item.policies](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/data-sources/search_search_item) | data source |
+| [intersight_search_search_item.pools](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/data-sources/search_search_item) | data source |
 <!-- END_TF_DOCS -->

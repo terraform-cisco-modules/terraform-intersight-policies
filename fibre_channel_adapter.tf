@@ -54,19 +54,3 @@ resource "intersight_vnic_fc_adapter_policy" "map" {
     }
   }
 }
-
-resource "intersight_vnic_fc_adapter_policy" "data" {
-  depends_on = [intersight_vnic_fc_adapter_policy.map]
-  for_each   = { for v in local.pp.fc_adapter : v => v if lookup(local.fibre_channel_adapter, v, "#NOEXIST") == "#NOEXIST" }
-  name       = element(split("/", each.value), 1)
-  organization { moid = var.orgs[element(split("/", each.value), 0)] }
-  lifecycle {
-    ignore_changes = [
-      account_moid, additional_properties, ancestors, create_time, description, domain_group_moid, error_detection_timeout,
-      error_recovery_settings, flogi_settings, interrupt_settings, io_throttle_count, lun_count, lun_queue_depth, mod_time, owners, parent,
-      permission_resources, plogi_settings, resource_allocation_timeout, rx_queue_settings, scsi_queue_settings, shared_scope, tags,
-      tx_queue_settings, version_context
-    ]
-    prevent_destroy = true
-  }
-}

@@ -32,28 +32,61 @@ locals {
         for e in [lookup(s, "vmmq_adapter_policy", { name = "UNUSED", org = "UNUSED" })] : "${e.org}/${e.name}" if e.name != "UNUSED"]]]
       )
     )))
-    ethernet_network = distinct(compact(flatten([for v in local.vnics : [for e in [v.ethernet_network_policy] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
-    ethernet_qos     = distinct(compact(flatten([for v in local.vnics : [for e in [v.ethernet_qos_policy] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
-    fc_adapter       = distinct(compact(flatten([for v in local.vhbas : [for e in [v.fibre_channel_adapter_policy] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
-    fc_network       = distinct(compact(flatten([for v in local.vhbas : [for e in [v.fibre_channel_network_policy] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
-    fc_qos           = distinct(compact(flatten([for v in local.vhbas : [for e in [v.fibre_channel_qos_policy] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
-    fc_zone          = distinct(compact(flatten([for v in local.vhbas : [for e in v.fc_zone_policies : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
-    ip_pool = distinct(compact(concat(
+    ethernet_network      = distinct(compact(flatten([for v in local.vnics : [for e in [v.ethernet_network_policy] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
+    ethernet_qos          = distinct(compact(flatten([for v in local.vnics : [for e in [v.ethernet_qos_policy] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
+    fc_zone               = distinct(compact(flatten([for v in local.vhbas : [for e in v.fc_zone_policies : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
+    fibre_channel_adapter = distinct(compact(flatten([for v in local.vhbas : [for e in [v.fibre_channel_adapter_policy] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
+    fibre_channel_network = distinct(compact(flatten([for v in local.vhbas : [for e in [v.fibre_channel_network_policy] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
+    fibre_channel_qos     = distinct(compact(flatten([for v in local.vhbas : [for e in [v.fibre_channel_qos_policy] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
+    ip = distinct(compact(concat(
       flatten([for v in local.imc_access : [for e in [v.inband_ip_pool] : "${e.org}/${e.name}" if e.name != "UNUSED"]]),
       flatten([for v in local.imc_access : [for e in [v.out_of_band_ip_pool] : "${e.org}/${e.name}" if e.name != "UNUSED"]]),
       flatten([for v in local.iscsi_boot : [for e in [v.initiator_ip_pool] : "${e.org}/${e.name}" if e.name != "UNUSED"]])
     )))
-    iqn_pool      = distinct(compact(flatten([for v in local.lan_connectivity : [for e in [v.iqn_pool] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
+    iqn           = distinct(compact(flatten([for v in local.lan_connectivity : [for e in [v.iqn_pool] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
     iscsi_adapter = distinct(compact(flatten([for v in local.iscsi_boot : [for e in [v.iscsi_adapter_policy] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
     iscsi_boot    = distinct(compact(flatten([for v in local.vnics : [for e in [v.iscsi_boot_policy] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
     iscsi_static_target = distinct(compact(flatten([[for s in ["primary", "secondary"] : [
       for k, v in local.iscsi_boot : [for e in [lookup(v, "${s}_target_policy", { name = "UNUSED", org = "UNUSED" })] : "${e.org}/${e.name}" if e.name != "UNUSED"]]
     ]])))
-    mac_pool  = distinct(compact(flatten([for v in local.vnics : [for e in [v.mac_address_pool] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
+    mac       = distinct(compact(flatten([for v in local.vnics : [for e in [v.mac_address_pool] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
     multicast = distinct(compact(flatten([for v in local.vlans : [for e in [v.multicast_policy] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
-    wwnn_pool = distinct(compact(flatten([for v in local.san_connectivity : [for e in [v.wwnn_pool] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
-    wwpn_pool = distinct(compact(flatten([for v in local.vhbas : [for e in [v.wwpn_pool] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
+    wwnn      = distinct(compact(flatten([for v in local.san_connectivity : [for e in [v.wwnn_pool] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
+    wwpn      = distinct(compact(flatten([for v in local.vhbas : [for e in [v.wwpn_pool] : "${e.org}/${e.name}" if e.name != "UNUSED"]])))
   })
+  pools = {
+    ip   = { moids = lookup(lookup(var.pools, "map", {}), "ip", []), object = "ippool.Pool" }
+    iqn  = { moids = lookup(lookup(var.pools, "map", {}), "iqn", []), object = "iqnpool.Pool" }
+    mac  = { moids = lookup(lookup(var.pools, "map", {}), "mac", []), object = "macpool.Pool" }
+    wwnn = { moids = lookup(lookup(var.pools, "map", {}), "wwnn", []), object = "fcpool.Pool" }
+    wwpn = { moids = lookup(lookup(var.pools, "map", {}), "wwpn", []), object = "fcpool.Pool" }
+  }
+  policies = {
+    ethernet_adapter         = { keys = keys(local.ethernet_adapter), object = "vnic.EthAdapterPolicy" }
+    ethernet_network         = { keys = keys(local.ethernet_network), object = "vnic.EthNetworkPolicy" }
+    ethernet_network_control = { keys = keys(local.ethernet_network_control), object = "fabric.EthNetworkControlPolicy" }
+    ethernet_network_group   = { keys = keys(local.ethernet_network_group), object = "fabric.EthNetworkGroupPolicy" }
+    ethernet_qos             = { keys = keys(local.ethernet_qos), object = "vnic.EthQosPolicy" }
+    fc_zone                  = { keys = keys(local.fc_zone), object = "fabric.FcZonePolicy" }
+    fibre_channel_adapter    = { keys = keys(local.fibre_channel_adapter), object = "vnic.FcAdapterPolicy" }
+    fibre_channel_network    = { keys = keys(local.fibre_channel_network), object = "vnic.FcNetworkPolicy" }
+    fibre_channel_qos        = { keys = keys(local.fibre_channel_qos), object = "vnic.FcQosPolicy" }
+    flow_control             = { keys = keys(local.flow_control), object = "fabric.FcZonePolicy" }
+    iscsi_adapter            = { keys = keys(local.iscsi_adapter), object = "vnic.IscsiAdapterPolicy" }
+    iscsi_boot               = { keys = keys(local.iscsi_boot), object = "vnic.IscsiBootPolicy" }
+    iscsi_static_target      = { keys = keys(local.iscsi_static_target), object = "vnic.IscsiStaticTargetPolicy" }
+    link_aggregation         = { keys = keys(local.link_aggregation), object = "fabric.LinkAggregationPolicy" }
+    link_control             = { keys = keys(local.link_control), object = "fabric.LinkControlPolicy" }
+    multicast                = { keys = keys(local.multicast), object = "fabric.MulticastPolicy" }
+  }
+  policy_types = [
+    "ethernet_adapter", "ethernet_network", "ethernet_network_control", "ethernet_network_group", "ethernet_qos",
+    "fc_zone", "fibre_channel_adapter", "fibre_channel_network", "fibre_channel_qos", "flow_control",
+    "iscsi_adapter", "iscsi_boot", "iscsi_static_target", "link_aggregation", "link_control", "multicast"
+  ]
+  pool_types    = ["ip", "iqn", "mac", "wwnn", "wwpn"]
+  data_policies = { for e in local.policy_types : e => [for v in local.pp[e] : element(split("/", v), 1) if contains(local.policies[e].keys, v) == false] }
+  data_pools    = { for e in local.pool_types : e => [for v in local.pp[e] : element(split("/", v), 1) if contains(keys(local.pools[e].moids), v) == false] }
   #
   # Local Defaults, no local loop
   cert_mgmt = local.defaults.certificate_management
@@ -64,8 +97,8 @@ locals {
   vmedia    = local.defaults.virtual_media
   #
   # Global Settings
-  pools = lookup(var.pools, "map", {})
-  ps    = var.policies_sensitive
+  org_moids = { for k, v in var.orgs : v => k }
+  ps        = var.policies_sensitive
   #
   # Naming Prefixes and Suffixes
   name_prefix = local.defaults.name_prefix

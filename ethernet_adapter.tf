@@ -117,18 +117,3 @@ resource "intersight_vnic_eth_adapter_policy" "map" {
     }
   }
 }
-
-resource "intersight_vnic_eth_adapter_policy" "data" {
-  depends_on = [intersight_vnic_eth_adapter_policy.map]
-  for_each   = { for v in local.pp.ethernet_adapter : v => v if lookup(local.ethernet_adapter, v, "#NOEXIST") == "#NOEXIST" }
-  name       = element(split("/", each.value), 1)
-  organization { moid = var.orgs[element(split("/", each.value), 0)] }
-  lifecycle {
-    ignore_changes = [
-      account_moid, additional_properties, advanced_filter, ancestors, arfs_settings, create_time, completion_queue_settings, description, domain_group_moid, geneve_enabled,
-      interrupt_scaling, interrupt_settings, mod_time, nvgre_settings, owners, parent, permission_resources, roce_settings, rss_hash_settings, rss_settings, rx_queue_settings,
-      shared_scope, tags, tcp_offload_settings, tx_queue_settings, uplink_failback_timeout, version_context, vxlan_settings
-    ]
-    prevent_destroy = true
-  }
-}

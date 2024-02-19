@@ -21,17 +21,3 @@ resource "intersight_fabric_link_control_policy" "map" {
     }
   }
 }
-
-resource "intersight_fabric_link_control_policy" "data" {
-  depends_on = [intersight_fabric_link_aggregation_policy.map]
-  for_each   = { for v in local.pp.link_control : v => v if lookup(local.link_control, v, "#NOEXIST") == "#NOEXIST" }
-  name       = element(split("/", each.value), 1)
-  organization { moid = var.orgs[element(split("/", each.value), 0)] }
-  lifecycle {
-    ignore_changes = [
-      account_moid, additional_properties, ancestors, create_time, description, domain_group_moid,
-      mod_time, owners, parent, permission_resources, shared_scope, tags, udld_settings, version_context
-    ]
-    prevent_destroy = true
-  }
-}

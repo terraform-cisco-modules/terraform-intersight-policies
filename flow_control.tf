@@ -20,17 +20,3 @@ resource "intersight_fabric_flow_control_policy" "map" {
     }
   }
 }
-
-resource "intersight_fabric_flow_control_policy" "data" {
-  depends_on = [intersight_fabric_flow_control_policy.map]
-  for_each   = { for v in local.pp.flow_control : v => v if lookup(local.flow_control, v, "#NOEXIST") == "#NOEXIST" }
-  name       = element(split("/", each.value), 1)
-  organization { moid = var.orgs[element(split("/", each.value), 0)] }
-  lifecycle {
-    ignore_changes = [
-      account_moid, additional_properties, ancestors, create_time, description, domain_group_moid, mod_time, owners,
-      parent, priority_flow_control_mode, permission_resources, receive_direction, send_direction, shared_scope, tags, version_context
-    ]
-    prevent_destroy = true
-  }
-}

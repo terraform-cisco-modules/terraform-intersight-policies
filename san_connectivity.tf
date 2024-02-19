@@ -5,7 +5,6 @@
 #__________________________________________________________________
 
 resource "intersight_vnic_san_connectivity_policy" "map" {
-  depends_on          = [intersight_fcpool_pool.wwnn]
   for_each            = local.san_connectivity
   description         = coalesce(each.value.description, "${each.value.name} SAN Connectivity Policy.")
   name                = each.value.name
@@ -24,9 +23,10 @@ resource "intersight_vnic_san_connectivity_policy" "map" {
   dynamic "wwnn_pool" {
     for_each = { for v in [each.value.wwnn_pool] : v.name => v if v.name != "UNUSED" }
     content {
-      moid = lookup(lookup(local.pools, "wwnn", {}), "${wwnn_pool.value.org}/${wwnn_pool.value.name}", "#NOEXIST"
-        ) != "#NOEXIST" ? local.pools.wwnn["${wwnn_pool.value.org}/${wwnn_pool.value.name}"
-      ] : intersight_fcpool_pool.wwnn["${wwnn_pool.value.org}/${wwnn_pool.value.name}"].moid
+      moid = contains(keys(local.pools["wwnn"].moids), "${wwnn_pool.value.org}/${wwnn_pool.value.name}"
+        ) == true ? local.pools.wwnn.moids["${wwnn_pool.value.org}/${wwnn_pool.value.name}"] : [for i in data.intersight_search_search_item.pools["wwnn"
+          ].results : i.moid if jsondecode(i.additional_properties).Name == wwnn_pool.value.name && jsondecode(i.additional_properties
+      ).Organization.Moid == var.orgs[wwnn_pool.value.org]][0]
       object_type = "fcpool.Pool"
     }
   }
@@ -41,13 +41,9 @@ resource "intersight_vnic_san_connectivity_policy" "map" {
 
 resource "intersight_vnic_fc_if" "map" {
   depends_on = [
-    intersight_fabric_fc_zone_policy.data,
     intersight_fabric_fc_zone_policy.map,
-    intersight_vnic_fc_adapter_policy.data,
     intersight_vnic_fc_adapter_policy.map,
-    intersight_vnic_fc_network_policy.data,
     intersight_vnic_fc_network_policy.map,
-    intersight_vnic_fc_qos_policy.data,
     intersight_vnic_fc_qos_policy.map,
     intersight_vnic_san_connectivity_policy.map
   ]
@@ -61,17 +57,23 @@ resource "intersight_vnic_fc_if" "map" {
   fc_adapter_policy {
     moid = contains(keys(local.fibre_channel_adapter), "${each.value.fibre_channel_adapter_policy.org}/${each.value.fibre_channel_adapter_policy.name}"
       ) == true ? intersight_vnic_fc_adapter_policy.map["${each.value.fibre_channel_adapter_policy.org}/${each.value.fibre_channel_adapter_policy.name}"
-    ].moid : intersight_vnic_fc_adapter_policy.data["${each.value.fibre_channel_adapter_policy.org}/${each.value.fibre_channel_adapter_policy.name}"].moid
+      ].moid : [for i in data.intersight_search_search_item.policies["fibre_channel_adapter"
+        ].results : i.moid if jsondecode(i.additional_properties).Name == each.value.fibre_channel_adapter_policy.name && jsondecode(i.additional_properties
+    ).Organization.Moid == var.orgs[each.value.fibre_channel_adapter_policy.org]][0]
   }
   fc_network_policy {
     moid = contains(keys(local.fibre_channel_network), "${each.value.fibre_channel_network_policy.org}/${each.value.fibre_channel_network_policy.name}"
       ) == true ? intersight_vnic_fc_network_policy.map["${each.value.fibre_channel_network_policy.org}/${each.value.fibre_channel_network_policy.name}"
-    ].moid : intersight_vnic_fc_network_policy.data["${each.value.fibre_channel_network_policy.org}/${each.value.fibre_channel_network_policy.name}"].moid
+      ].moid : [for i in data.intersight_search_search_item.policies["fibre_channel_network"
+        ].results : i.moid if jsondecode(i.additional_properties).Name == each.value.fibre_channel_network_policy.name && jsondecode(i.additional_properties
+    ).Organization.Moid == var.orgs[each.value.fibre_channel_network_policy.org]][0]
   }
   fc_qos_policy {
     moid = contains(keys(local.fibre_channel_qos), "${each.value.fibre_channel_qos_policy.org}/${each.value.fibre_channel_qos_policy.name}"
       ) == true ? intersight_vnic_fc_qos_policy.map["${each.value.fibre_channel_qos_policy.org}/${each.value.fibre_channel_qos_policy.name}"
-    ].moid : intersight_vnic_fc_qos_policy.data["${each.value.fibre_channel_qos_policy.org}/${each.value.fibre_channel_qos_policy.name}"].moid
+      ].moid : [for i in data.intersight_search_search_item.policies["fibre_channel_qos"
+        ].results : i.moid if jsondecode(i.additional_properties).Name == each.value.fibre_channel_qos_policy.name && jsondecode(i.additional_properties
+    ).Organization.Moid == var.orgs[each.value.fibre_channel_qos_policy.org]][0]
   }
   san_connectivity_policy {
     moid = intersight_vnic_san_connectivity_policy.map[each.value.san_connectivity].moid
@@ -85,17 +87,20 @@ resource "intersight_vnic_fc_if" "map" {
   dynamic "fc_zone_policies" {
     for_each = { for v in each.value.fc_zone_policies : v.name => v if v.name != "UNUSED" }
     content {
-      moid = contains(local.fc_zone, "${fc_zone_policies.value.org}/${fc_zone_policies.value.name}"
+      moid = contains(keys(local.fc_zone), "${fc_zone_policies.value.org}/${fc_zone_policies.value.name}"
         ) == true ? intersight_fabric_fc_zone_policy.map["${fc_zone_policies.value.org}/${fc_zone_policies.value.name}"
-      ].moid : intersight_fabric_fc_zone_policy.data["${fc_zone_policies.value.org}/${fc_zone_policies.value.name}"].moid
+        ].moid : [for i in data.intersight_search_search_item.policies["fc_zone"
+          ].results : i.moid if jsondecode(i.additional_properties).Name == fc_zone_policies.value.name && jsondecode(i.additional_properties
+      ).Organization.Moid == var.orgs[fc_zone_policies.value.org]][0]
     }
   }
   dynamic "wwpn_pool" {
     for_each = { for v in [each.value.wwpn_pool] : v.name => v if v.name != "UNUSED" }
     content {
-      moid = lookup(lookup(local.pools, "wwpn", {}), "${wwpn_pool.value.org}/${wwpn_pool.value.name}", "#NOEXIST"
-        ) != "#NOEXIST" ? local.pools.wwpn["${wwpn_pool.value.org}/${wwpn_pool.value.name}"
-      ] : intersight_fcpool_pool.wwpn["${wwpn_pool.value.org}/${wwpn_pool.value.name}"].moid
+      moid = contains(keys(local.pools.wwpn.moids), "${wwpn_pool.value.org}/${wwpn_pool.value.name}"
+        ) == true ? local.pools.wwpn.moids["${wwpn_pool.value.org}/${wwpn_pool.value.name}"] : [for i in data.intersight_search_search_item.pools["wwpn"
+          ].results : i.moid if jsondecode(i.additional_properties).Name == wwpn_pool.value.name && jsondecode(i.additional_properties
+      ).Organization.Moid == var.orgs[wwpn_pool.value.org]][0]
       object_type = "fcpool.Pool"
     }
   }

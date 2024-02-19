@@ -21,17 +21,3 @@ resource "intersight_fabric_eth_network_group_policy" "map" {
     }
   }
 }
-
-resource "intersight_fabric_eth_network_group_policy" "data" {
-  depends_on = [intersight_fabric_eth_network_group_policy.map]
-  for_each   = { for v in local.pp.ethernet_network_group : v => v if lookup(local.ethernet_network_group, v, "#NOEXIST") == "#NOEXIST" }
-  name       = element(split("/", each.value), 1)
-  organization { moid = var.orgs[element(split("/", each.value), 0)] }
-  lifecycle {
-    ignore_changes = [
-      account_moid, additional_properties, ancestors, create_time, description, domain_group_moid, mod_time, owners,
-      parent, permission_resources, shared_scope, tags, version_context, vlan_settings
-    ]
-    prevent_destroy = true
-  }
-}

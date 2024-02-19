@@ -21,17 +21,3 @@ resource "intersight_vnic_fc_network_policy" "map" {
     }
   }
 }
-
-resource "intersight_vnic_fc_network_policy" "data" {
-  depends_on = [intersight_vnic_fc_network_policy.map]
-  for_each   = { for v in local.pp.fc_network : v => v if lookup(local.fibre_channel_network, v, "#NOEXIST") == "#NOEXIST" }
-  name       = element(split("/", each.value), 1)
-  organization { moid = var.orgs[element(split("/", each.value), 0)] }
-  lifecycle {
-    ignore_changes = [
-      account_moid, additional_properties, ancestors, create_time, description, domain_group_moid, mod_time, owners,
-      parent, permission_resources, shared_scope, tags, version_context, vsan_settings
-    ]
-    prevent_destroy = true
-  }
-}
