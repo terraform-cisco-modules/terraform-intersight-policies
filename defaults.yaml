@@ -2,12 +2,12 @@
 policies:
   adapter_configuration:
     add_vic_adapter_configuration:
-      dce_interface_settings: # If you put just one it will do the same for all 4 Interfaces or list all 4
-        dce_interface_fec_modes: [cl91] # Options are cl74, cl91, Off
+      dce_interface_settings:
+        dce_interface_fec_modes: [cl91]
       enable_fip: true
       enable_lldp: true
       enable_port_channel: true
-      pci_slot: MLOM # Supported values are 1-15 or MLOM
+      pci_slot: MLOM
     description: ''
     name: '**REQUIRED**'
     tags:
@@ -653,23 +653,23 @@ policies:
       tpm_control: disabled
       tpm_support: disabled
   boot_order:
-    boot_devices: # Optional List of Map
+    boot_devices:
       bootloader:
-        description: '' # Optional for Uefi
-        name: 'BOOTx64.EFI' # Optional for Uefi
-        path: '\\EFI\\BOOT\\' # Optional for Uefi, used by boot.Iscsi, boot.LocalDisk, boot.Nvme, boot.PchStorage, boot.San, boot.SdCard
-      enabled: true #Optional
-      interface_name: '' # Used by boot.Iscsi, boot.Pxe, boot.San
-      interface_source: name # Used only by boot.Pxe. Options are name, mac, port
-      ip_type: IPv4 # Used only by boot.Pxe.  Options are None, IPv4, IPv6
-      lun: 0 # Used by the following: boot.PchStorage, boot.San, boot.SdCard
-      mac_address: '' # Used by boot.Pxe if Interface_Source is mac
+        description: ''
+        name: 'BOOTx64.EFI'
+        path: '\\EFI\\BOOT\\'
+      enabled: true
+      interface_name: ''
+      interface_source: name
+      ip_type: IPv4
+      lun: 0
+      mac_address: ''
       name: '**REQUIRED**'
-      object_type: '**REQUIRED**' # Options are boot.Iscsi, boot.LocalCdd, boot.LocalDisk, boot.Nvme, boot.PchStorage, boot.Pxe, boot.San, boot.SdCard, boot.UefiShell, boot.Usb, boot.VirtualMedia
-      port: -1 # boot.Iscsi can be 0-255.  boot.Pxe is the Port ID of the adapter and values can be between -1 (not defined) and 255.
-      slot: MLOM # Options for boot.Iscsi, boot.Pxe and boot.San are 1-255, MLOM, L1, L2.  boot.Iscsi and boot.Pxe also support L and OCP.  For boot.LocalDisk values can be 1-205, FMEZZ1-SAS, HBA, M, MRAID, MRAID1, MRAID2, MSTOR-RAID, SAS, RAID.
-      sub_type: None # Options for boot.VirtualMedia: None, cimc-mapped-dvd, cimc-mapped-hdd, kvm-mapped-dvd, kvm-mapped-hdd, kvm-mapped-fdd. Options are boot.SdCard: None, flex-util, flex-flash, SDCARD.  Options for boot.Usb: None, usb-cd, usb-fdd, usb-hdd
-      wwpn: '' # Used only by boot.San
+      object_type: '**REQUIRED**'
+      port: -1
+      slot: MLOM
+      sub_type: None
+      wwpn: ''
     boot_mode: Uefi
     description: ''
     enable_secure_boot: false
@@ -803,12 +803,12 @@ policies:
       value: ''
   fc_zone:
     description: ''
-    targets: # This is a list of target_members
+    targets:
       name: '**REQUIRED**'
-      switch_id: A # A or B
+      switch_id: A
       vsan_id: '**REQUIRED**'
       wwpn: '**REQUIRED**'
-    fc_target_zoning_type: SIMT # None, SIST (Single Initiator, Single Target), SIMT (Single Initiator, Multiple Target)
+    fc_target_zoning_type: SIMT
     name: '**REQUIRED**'
     tags:
       key: ''
@@ -925,12 +925,12 @@ policies:
     description: ''
     dhcp_vendor_id_iqn: ''
     initiator_ip_source: DHCP
-    initiator_static_ipv4_config: # If Defined Following are Required
+    initiator_static_ipv4_config:
       ip_address: '**REQUIRED**'
       gateway: '**REQUIRED**'
       netmask: '**REQUIRED**'
-      primary_dns: '' # Optional
-      secondary_dns: '' # Optional
+      primary_dns: ''
+      secondary_dns: ''
     name: '**REQUIRED**'
     password: 1
     primary_target_policy: ''
@@ -949,7 +949,7 @@ policies:
     tags:
       key: ''
       value: ''
-    target_name: '**REQUIRED**' # 
+    target_name: '**REQUIRED**'
   lan_connectivity:
     description: ''
     enable_azure_stack_host_qos: false
@@ -995,7 +995,7 @@ policies:
         vmmq_adapter_policy: ''
   ldap:
     base_settings:
-      base_dn: '' ## Default is Domain Name
+      base_dn: ''
       domain: '**REQUIRED**'
       timeout: 0
     binding_parameters:
@@ -1333,7 +1333,7 @@ policies:
       fibre_channel_adapter_policy: UNUSED
       fibre_channel_network_policies: []
       fibre_channel_qos_policy: UNUSED
-      names: [] # Required
+      names: []
       persistent_lun_bindings: false
       placement:
         pci_links: [0]
@@ -1386,29 +1386,29 @@ policies:
     enable_snmp: true
     description: ''
     name: '**REQUIRED**'
-    snmp_community_access: Disabled # Disabled, Full, Limited
+    snmp_community_access: Disabled
     snmp_engine_input_id: ''
     snmp_port: 161
-    snmp_trap_destinations: # Optional List of Maps
-      community_string: 1 # value between 1 and 5 to specify the TF_VAR_snmp_trap_community_string_[1-5] for snmpv2c
+    snmp_trap_destinations:
+      community_string: 1
       destination_address: '**REQUIRED**'
       enable: true
       port: 162
-      trap_type: Trap # Inform or Trap
+      trap_type: Trap
       user: ''
-    snmp_users: # Optional List of Maps
-      auth_password: 1 # value between 1 and 5 to specify the TF_VAR_snmp_auth_password_[1-5]
-      auth_type: SHA # MD5 or SHA
-      name: '**REQUIRED**' # Name of snmp user.
-      privacy_password: 1 # Required for AuthPriv.  value between 1 and 5 to specify the TF_VAR_snmp_privacy_password_[1-5]
-      privacy_type: AES # Optional. AES or DES if privacy password is defined
-      security_level: AuthPriv # AuthNoPriv, AuthPriv, NoAuthPriv
+    snmp_users:
+      auth_password: 1
+      auth_type: SHA
+      name: '**REQUIRED**'
+      privacy_password: 1
+      privacy_type: AES
+      security_level: AuthPriv
     system_contact: ''
     system_location: ''
     tags:
       key: ''
       value: ''
-    trap_community_string: 1 # value between 1 and 5 to specify the TF_VAR_snmp_auth_password_[1-5]
+    trap_community_string: 1
   ssh:
     description: ''
     enable_ssh: true
@@ -1419,7 +1419,7 @@ policies:
       key: ''
       value: ''
   storage:
-    default_drive_state: UnconfiguredGood # [UnconfiguredGood Jbod RAID0]
+    default_drive_state: UnconfiguredGood
     description: ''
     drive_groups:
       automatic_drive_group:
@@ -1451,7 +1451,7 @@ policies:
       slot: MSTOR-RAID-1
     name: '**REQUIRED**'
     single_drive_raid0_configuration:
-      drive_slots: '' # Required
+      drive_slots: ''
       virtual_drive_policy:
         access_policy: Default
         drive_cache: Default
@@ -1483,7 +1483,7 @@ policies:
     local_logging:
       minimum_severity: warning
     name: '**REQUIRED**'
-    remote_logging: # Defined as server1: and server2:
+    remote_logging:
       enable: true
       hostname: 0.0.0.0
       minimum_severity: warning
@@ -1642,7 +1642,7 @@ policies:
   virtual_media:
     add_virtual_media:
       authentication_protocol: none
-      device_type: cdd # cdd or hdd
+      device_type: cdd
       file_location: '**REQUIRED**'
       mount_options: ''
       name: '**REQUIRED**'
@@ -1681,7 +1681,7 @@ policies:
     uplink_trunking: false
     vsans:
       default_zoning: Disabled
-      fcoe_vlan_id: null # Default is same as the 
+      fcoe_vlan_id: null
       name: '**REQUIRED**'
-      vsan_scope: Uplink # Common, Storage, Uplink
+      vsan_scope: Uplink
       vsan_id: '**REQUIRED**'

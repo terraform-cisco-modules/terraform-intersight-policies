@@ -17,8 +17,6 @@ resource "intersight_fabric_system_qos_policy" "map" {
       ) > 0 ? "Enabled" : lookup(classes.value, "state", local.qos.classes[classes.key].state)
       bandwidth_percent = length(regexall("Enabled", lookup(classes.value, "state", local.qos.classes[classes.key].weight))
       ) > 0 ? tonumber(format("%.0f", tonumber((tonumber(lookup(classes.value, "weight", local.qos.classes[classes.key].weight)) / each.value.bandwidth_total) * 100))) : 0
-      #bandwidth_percent = length(regexall("Enabled", lookup(classes.value, "state", local.qos.classes[classes.key].state))
-      #) > 0 ? format("%.0f", [lookup(classes.value, "weight", local.qos.classes[classes.key].weight) / each.value.bandwidth_total][0]) : 0
       cos = lookup(classes.value, "cos", local.qos.classes[classes.key].cos)
       mtu = classes.key == "FC" ? 2240 : length(
         regexall("Enabled", lookup(classes.value, "state", local.qos.classes[classes.key].state))

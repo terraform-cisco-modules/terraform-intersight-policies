@@ -84,9 +84,11 @@ locals {
     "fc_zone", "fibre_channel_adapter", "fibre_channel_network", "fibre_channel_qos", "flow_control",
     "iscsi_adapter", "iscsi_boot", "iscsi_static_target", "link_aggregation", "link_control", "multicast"
   ]
-  pool_types    = ["ip", "iqn", "mac", "wwnn", "wwpn"]
-  data_policies = { for e in local.policy_types : e => [for v in local.pp[e] : element(split("/", v), 1) if contains(local.policies[e].keys, v) == false] }
-  data_pools    = { for e in local.pool_types : e => [for v in local.pp[e] : element(split("/", v), 1) if contains(keys(local.pools[e].moids), v) == false] }
+  pool_types = ["ip", "iqn", "mac", "wwnn", "wwpn"]
+  data_policies = { for e in local.policy_types : e => [for v in local.pp[e] : element(split("/", v), 1
+  ) if contains(local.policies[e].keys, v) == false] }
+  data_pools = { for e in local.pool_types : e => [for v in local.pp[e] : element(split("/", v), 1
+  ) if contains(keys(local.pools[e].moids), v) == false] }
   #
   # Local Defaults, no local loop
   cert_mgmt = local.defaults.certificate_management

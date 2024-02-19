@@ -5,12 +5,14 @@
 
 output "data_policies" {
   value = { for e in keys(data.intersight_search_search_item.policies) : e => {
-    for i in data.intersight_search_search_item.policies[e].results : "${local.org_moids[jsondecode(i.additional_properties).Organization.Moid]}/${jsondecode(i.additional_properties).Name}" => i.moid }
+    for i in data.intersight_search_search_item.policies[e
+    ].results : "${local.org_moids[jsondecode(i.additional_properties).Organization.Moid]}/${jsondecode(i.additional_properties).Name}" => i.moid }
   }
 }
 output "data_pools" {
   value = { for e in keys(data.intersight_search_search_item.pools) : e => {
-    for i in data.intersight_search_search_item.pools[e].results : "${local.org_moids[jsondecode(i.additional_properties).Organization.Moid]}/${jsondecode(i.additional_properties).Name}" => i.moid }
+    for i in data.intersight_search_search_item.pools[e
+    ].results : "${local.org_moids[jsondecode(i.additional_properties).Organization.Moid]}/${jsondecode(i.additional_properties).Name}" => i.moid }
   }
 }
 
@@ -162,47 +164,6 @@ output "local_user" {
   description = "Moid's of the Local User Policies."
   value       = { for v in sort(keys(intersight_iam_end_point_user_policy.map)) : v => intersight_iam_end_point_user_policy.map[v].moid }
 }
-
-#output "locals" {
-#  value = {
-#    #adapter_configuration = concat(
-#    #  [for k, v in local.adapter_configuration : k],
-#    #  [for v in local.pp.adapter_configuration : v if contains(sort(keys(local.adapter_configuration)), v) == false]
-#    #)
-#    adapter_configuration  = [for k, v in local.adapter_configuration : k]
-#    bios                   = [for k, v in local.bios : k]
-#    boot_order             = [for k, v in local.boot_order : k]
-#    certificate_management = [for k, v in local.certificate_management : k]
-#    device_connector       = [for k, v in local.device_connector : k]
-#    drive_security         = [for k, v in local.drive_security : k]
-#    firmware               = [for k, v in local.firmware : k]
-#    imc_access             = [for k, v in local.imc_access : k]
-#    ipmi_over_lan          = [for k, v in local.ipmi_over_lan : k]
-#    lan_connectivity       = [for k, v in local.lan_connectivity : k]
-#    ldap                   = [for k, v in local.ldap : k]
-#    local_user             = [for k, v in local.local_user : k]
-#    network_connectivity   = [for k, v in local.network_connectivity : k]
-#    ntp                    = [for k, v in local.ntp : k]
-#    persistent_memory      = [for k, v in local.persistent_memory : k]
-#    port                   = [for k, v in local.port : k]
-#    power                  = [for k, v in local.power : k]
-#    san_connectivity       = [for k, v in local.san_connectivity : k]
-#    sd_card                = [for k, v in local.sd_card : k]
-#    serial_over_lan        = [for k, v in local.serial_over_lan : k]
-#    smtp                   = [for k, v in local.smtp : k]
-#    snmp                   = [for k, v in local.snmp : k]
-#    ssh                    = [for k, v in local.ssh : k]
-#    storage                = [for k, v in local.storage : k]
-#    switch_control         = [for k, v in local.switch_control : k]
-#    syslog                 = [for k, v in local.syslog : k]
-#    system_qos             = [for k, v in local.system_qos : k]
-#    thermal                = [for k, v in local.thermal : k]
-#    virtual_kvm            = [for k, v in local.virtual_kvm : k]
-#    virtual_media          = [for k, v in local.virtual_media : k]
-#    vlan                   = [for k, v in local.vlan : k]
-#    vsan                   = [for k, v in local.vsan : k]
-#  }
-#}
 
 output "multicast" {
   description = "Moid's of the Multicast Policies."
