@@ -110,7 +110,7 @@ resource "intersight_fabric_uplink_pc_role" "map" {
     content {
       moid = contains(keys(local.flow_control), "${flow_control_policy.value.org}/${flow_control_policy.value.name}"
         ) == true ? intersight_fabric_flow_control_policy.map["${flow_control_policy.value.org}/${flow_control_policy.value.name}"
-        ].moid : [for i in data.intersight_search_search_item.policies["link_aggregation"
+        ].moid : [for i in data.intersight_search_search_item.policies["flow_control"
           ].results : i.moid if jsondecode(i.additional_properties).Name == flow_control_policy.value.name && jsondecode(i.additional_properties
       ).Organization.Moid == var.orgs[flow_control_policy.value.org]][0]
     }
@@ -332,7 +332,7 @@ resource "intersight_fabric_uplink_role" "map" {
     content {
       moid = contains(keys(local.flow_control), "${flow_control_policy.value.org}/${flow_control_policy.value.name}"
         ) == true ? intersight_fabric_flow_control_policy.map["${flow_control_policy.value.org}/${flow_control_policy.value.name}"
-        ].moid : [for i in data.intersight_search_search_item.policies["link_aggregation"
+        ].moid : [for i in data.intersight_search_search_item.policies["flow_control"
           ].results : i.moid if jsondecode(i.additional_properties).Name == flow_control_policy.value.name && jsondecode(i.additional_properties
       ).Organization.Moid == var.orgs[flow_control_policy.value.org]][0]
     }
