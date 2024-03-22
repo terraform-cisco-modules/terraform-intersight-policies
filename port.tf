@@ -166,7 +166,6 @@ resource "intersight_fabric_fc_uplink_pc_role" "map" {
   ]
   for_each     = local.port_channel_fc_uplinks
   admin_speed  = each.value.admin_speed
-  fill_pattern = each.value.fill_pattern
   pc_id        = each.value.pc_id
   vsan_id      = each.value.vsan_id
   port_policy { moid = intersight_fabric_port_policy.map[each.value.port_policy].moid }
@@ -399,7 +398,6 @@ resource "intersight_fabric_fc_uplink_role" "map" {
   for_each          = local.port_role_fc_uplinks
   admin_speed       = each.value.admin_speed
   aggregate_port_id = lookup(each.value, "breakout_port_id", 0)
-  fill_pattern      = each.value.fill_pattern
   port_id           = each.value.port_id
   slot_id           = lookup(each.value, "slot_id", 1)
   vsan_id           = each.value.vsan_id
