@@ -164,10 +164,10 @@ resource "intersight_fabric_fc_uplink_pc_role" "map" {
     intersight_fabric_port_policy.map,
     intersight_fabric_port_mode.map
   ]
-  for_each     = local.port_channel_fc_uplinks
-  admin_speed  = each.value.admin_speed
-  pc_id        = each.value.pc_id
-  vsan_id      = each.value.vsan_id
+  for_each    = local.port_channel_fc_uplinks
+  admin_speed = each.value.admin_speed
+  pc_id       = each.value.pc_id
+  vsan_id     = each.value.vsan_id
   port_policy { moid = intersight_fabric_port_policy.map[each.value.port_policy].moid }
   dynamic "ports" {
     for_each = each.value.interfaces

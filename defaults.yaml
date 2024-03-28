@@ -1447,9 +1447,13 @@ policies:
           strip_size: 64
           write_policy: Default
     global_hot_spares: ''
+    hybrid_slot_configuration:direct_attached_nvme_slots: ''
+    hybrid_slot_configuration:raid_attached_nvme_slots: ''
     m2_raid_configuration:
+      name: MStorBootVd
       slot: MSTOR-RAID-1
     name: '**REQUIRED**'
+    secure_jbod_disk_slots: ''
     single_drive_raid0_configuration:
       drive_slots: ''
       virtual_drive_policy:

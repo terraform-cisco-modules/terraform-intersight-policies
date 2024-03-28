@@ -10,6 +10,7 @@ resource "intersight_storage_storage_policy" "map" {
   description              = coalesce(each.value.description, "${each.value.name} Storage Policy.")
   global_hot_spares        = each.value.global_hot_spares
   name                     = each.value.name
+  secure_jbods             = each.value.secure_jbod_disk_slots
   unused_disks_state       = each.value.unused_disks_state
   use_jbod_for_vd_creation = each.value.use_jbod_for_vd_creation
   # retain_policy_virtual_drives = each.value.retain_policy
