@@ -384,6 +384,11 @@ resource "intersight_bios_policy" "map" {
   qpi_link_frequency = each.value.qpi_link_frequency # QPI Link Frequency Select
   qpi_snoop_mode     = each.value.qpi_snoop_mode     # QPI Snoop Mode
   #+++++++++++++++++++++++++++++++
+  # Security Section
+  #+++++++++++++++++++++++++++++++
+  enable_tdx         = each.value.enable_tdx         # Trust Domain Extension (TDX)
+  enable_tdx_seamldr = each.value.enable_tdx_seamldr # TDX Secure Arbitration Mode (SEAM) Loader
+  #+++++++++++++++++++++++++++++++
   # Serial Port Section
   #+++++++++++++++++++++++++++++++
   serial_port_aenable = each.value.serial_port_aenable # Serial A Enable
@@ -429,7 +434,9 @@ resource "intersight_bios_policy" "map" {
   sgx_le_wr                       = each.value.sgx_le_wr                       # SGX Write Eanble
   sgx_package_info_in_band_access = each.value.sgx_package_info_in_band_access # SGX Package Information In-Band Access
   sgx_qos                         = each.value.sgx_qos                         # SGX QoS
-  sha1pcr_bank                    = each.value.sha256pcr_bank                  # SHA256 PCR Bank
+  sha1pcr_bank                    = each.value.sha1pcr_bank                    # SHA1 PCR Bank
+  sha256pcr_bank                  = each.value.sha256pcr_bank                  # SHA256 PCR Bank
+  sha384pcr_bank                  = each.value.sha384pcr_bank                  # SHA384 PCR Bank
   tpm_control                     = each.value.tpm_control                     # Trusted Platform Module State
   tpm_pending_operation           = each.value.tpm_pending_operation           # TPM Pending Operation
   tpm_ppi_required                = each.value.tpm_ppi_required                # TPM Minimal Physical Presence

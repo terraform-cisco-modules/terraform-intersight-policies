@@ -405,6 +405,11 @@ policies:
     qpi_link_frequency: platform-default
     qpi_snoop_mode: platform-default
     #+++++++++++++++++++++++++++++++
+    # Security Section
+    #+++++++++++++++++++++++++++++++
+    enable_tdx: platform-default
+    enable_tdx_seamldr: platform-default
+    #+++++++++++++++++++++++++++++++
     # Serial Port Section
     #+++++++++++++++++++++++++++++++
     serial_port_aenable: platform-default
@@ -452,6 +457,7 @@ policies:
     sgx_qos: platform-default
     sha1pcr_bank: platform-default
     sha256pcr_bank: platform-default
+    sha384pcr_bank: platform-default
     tpm_control: platform-default
     tpm_pending_operation: platform-default
     tpm_ppi_required: platform-default
