@@ -728,12 +728,13 @@ policies:
     enable_geneve_offload: false
     enable_interrupt_scaling: false
     enable_nvgre_offload: false
+    enable_precision_time_protocol: false
     enable_vxlan_offload: false
     interrupt_settings:
       coalescing_type: MIN
+      interrupts: 8
       mode: MSIx
       timer: 125
-      interrupts: 8
     name: '**REQUIRED**'
     receive:
       queue_count: 4
@@ -742,15 +743,15 @@ policies:
       enable_ipv4_hash: true
       enable_ipv6_extensions_hash: false
       enable_ipv6_hash: true
+      enable_receive_side_scaling: true
       enable_tcp_and_ipv4_hash: true
       enable_tcp_and_ipv6_extensions_hash: false
       enable_tcp_and_ipv6_hash: true
       enable_udp_and_ipv4_hash: false
       enable_udp_and_ipv6_hash: false
-    receive_side_scaling_enable: true
     roce_settings:
       enable_rdma_over_converged_ethernet: false
-      cos: 5
+      class_of_service: 5
       memory_regions: 0
       queue_pairs: 0
       resource_groups: 0
@@ -759,7 +760,7 @@ policies:
       key: ''
       value: ''
     tcp_offload:
-      enable_large_recieve_offload: true
+      enable_large_receive_offload: true
       enable_large_send_offload: true
       enable_rx_checksum_offload: true
       enable_tx_checksum_offload: true
@@ -832,7 +833,7 @@ policies:
     flogi:
       retries: 8
       timeout: 4000
-    interrupt_settings:
+    interrupt:
       mode: MSIx
     io_throttle_count: 512
     lun_queue_depth: 20

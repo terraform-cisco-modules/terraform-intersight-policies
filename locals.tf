@@ -269,83 +269,198 @@ locals {
   # Intersight Ethernet Adapter Policy
   # GUI Location: Policies > Create Policy > Ethernet Adapter
   #__________________________________________________________________
-  eadapt = local.defaults.ethernet_adapter
-  earss  = local.eadapt.receive_side_scaling
-  earsse = local.eadapt.receive_side_scaling_enable
-  ethernet_adapter = { for i in flatten([for org in sort(keys(var.model)) : [
-    for v in lookup(lookup(var.model[org], "policies", {}), "ethernet_adapter", []) : merge(local.eadapt, v, {
-      interrupt_settings = merge(local.eadapt.interrupt_settings,
-        lookup(v, "interrupt_settings", {})
-      )
-      key          = v.name
-      name         = "${local.npfx[org].ethernet_adapter}${v.name}${local.nsfx[org].ethernet_adapter}"
-      organization = org
-      receive      = merge(local.eadapt.receive, lookup(v, "receive", {}))
-      rss = length(regexall("EMPTY", lookup(v, "adapter_template", "EMPTY"))
-      ) == 0 ? false : lookup(v, "receive_side_scaling_enable", local.earsse)
-      receive_side_scaling = merge(local.earss, lookup(v, "receive_side_scaling", {}))
-      receive_side_scaling_enable = length(regexall("EMPTY", lookup(v, "adapter_template", "EMPTY"))
-      ) == 0 ? false : lookup(v, "receive_side_scaling_enable", local.earsse)
-      roce_settings = merge(local.eadapt.roce_settings, lookup(v, "roce_settings", {}))
-      tags          = lookup(v, "tags", var.global_settings.tags)
-      tcp_offload   = merge(local.eadapt.tcp_offload, lookup(v, "tcp_offload", {}))
-      transmit      = merge(local.eadapt.transmit, lookup(v, "transmit", {}))
-    })
-  ] if length(lookup(lookup(var.model[org], "policies", {}), "ethernet_adapter", [])) > 0]) : "${i.organization}/${i.key}" => i }
-  eth_settings = {
+  eth_adapter = local.defaults.ethernet_adapter
+  eth_adapter_templates = {
+    "16RxQs-4G" = {
+      description        = "Recommended adapter settings for 16RxQs-4G."
+      completion         = { queue_count = 9 }
+      interrupt_settings = { interrupts = 19 }
+      receive            = { queue_count = 8, ring_size = 4096 }
+      transmit           = { queue_count = 1, ring_size = 4096 }
+    }
+    "16RxQs-5G" = {
+      description        = "Recommended adapter settings for 16RxQs-5G."
+      completion         = { queue_count = 9 }
+      interrupt_settings = { interrupts = 19 }
+      receive            = { queue_count = 16, ring_size = 16384 }
+      transmit           = { queue_count = 1, ring_size = 16384 }
+    }
     EMPTY = {}
-    Linux-NVMe-RoCE = {
-      description = "Recommended adapter settings for NVMe using RDMA."
-      comp_count  = 2, int_count = 256, rx_queue_count = 1
-    }
     Linux = {
-      description = "Recommended adapter settings for linux."
-      comp_count  = 2, int_count = 4, rx_queue_count = 1
+      description        = "Recommended adapter settings for linux."
+      completion         = { queue_count = 2 }
+      interrupt_settings = { interrupts = 4 }
+      receive            = { queue_count = 1 }
+      receive_side_scaline = {
+        enable_receive_side_scaling = false
+        enable_ipv4_hash            = false
+        enable_ipv6_hash            = false
+        enable_tcp_and_ipv4_hash    = false
+        enable_tcp_and_ipv6_hash    = false
+      }
     }
-    MQ-SMBd = {
-      description = "Recommended adapter settings for MultiQueue with RDMA."
-      comp_count  = 576, int_count = 512, rx_queue_count = 512, tx_queue_count = 64
+    Linux-NVMe-RoCE = {
+      description        = "Recommended adapter settings for NVMe using RDMA."
+      completion         = { queue_count = 2 }
+      interrupt_settings = { interrupts = 256 }
+      receive            = { queue_count = 1 }
+      roce_settings      = { class_of_service = 5, enable_rdma_over_converged_ethernet = true, memory_regions = 131072, queue_pairs = 1024, resource_groups = 8, version = 2 }
+    }
+    Linux-v2 = {
+      description        = "Recommended adapter settings for linux Version 2."
+      completion         = { queue_count = 9 }
+      interrupt_settings = { interrupts = 11 }
+      receive            = { queue_count = 8, ring_size = 4096 }
+      roce_settings      = { class_of_service = 5, enable_rdma_over_converged_ethernet = true, memory_regions = 131072, queue_pairs = 1024, resource_groups = 8, version = 2 }
+      transmit           = { queue_count = 1, ring_size = 4096 }
     }
     MQ = {
-      description = "Recommended adapter settings for VM Multi Queue Connection with no RDMA."
-      comp_count  = 576, int_count = 256, rx_queue_count = 512, tx_queue_count = 64
+      description        = "Recommended adapter settings for VM Multi Queue Connection with no RDMA."
+      completion         = { queue_count = 576, ring_size = 4 }
+      interrupt_settings = { interrupts = 256 }
+      receive            = { queue_count = 512 }
+      transmit           = { queue_count = 64 }
     }
-    SMBClient = { description = "Recommended adapter settings for SMB Client.", comp_count = 2 }
-    SMBServer = { description = "Recommended adapter settings for SMB server." }
-    Solaris   = { description = "Recommended adapter settings for Solaris.", comp_count = 2, int_count = 4 }
-    SRIOV = {
-      description = "Recommended adapter settings for Win8 SRIOV-VMFEX PF.", int_count = 32
+    MQ-SMBd = {
+      description        = "Recommended adapter settings for MultiQueue with RDMA."
+      completion         = { queue_count = 576 }
+      interrupt_settings = { interrupts = 512 }
+      receive            = { queue_count = 512, ring_size = 512 }
+      roce_settings      = { class_of_service = 5, enable_rdma_over_converged_ethernet = true, memory_regions = 65536, queue_pairs = 256, resource_groups = 2, version = 2 }
+      transmit           = { queue_count = 64, ring_size = 256 }
     }
-    usNICOracleRAC = {
-      description = "Recommended adapter settings for usNIC Oracle RAC Connection."
-      comp_count  = 2000, int_count = 1024, rx_queue_count = 1000, tx_queue_count = 1000
+    SMBClient = {
+      description   = "Recommended adapter settings for SMB Client.",
+      roce_settings = { enable_rdma_over_converged_ethernet = true, memory_regions = 131072, queue_pairs = 256, resource_groups = 32 }
+    }
+    SMBServer = {
+      description   = "Recommended adapter settings for SMB server."
+      roce_settings = { enable_rdma_over_converged_ethernet = true, memory_regions = 131072, queue_pairs = 2048, resource_groups = 32 }
+    }
+    Solaris = {
+      description        = "Recommended adapter settings for Solaris.",
+      completion         = { queue_count = 2 }
+      interrupt_settings = { interrupts = 4 }
+      receive_side_scaling = {
+        enable_receive_side_scaling = false
+        enable_ipv4_hash            = false
+        enable_ipv6_hash            = false
+        enable_tcp_and_ipv4_hash    = false
+        enable_tcp_and_ipv6_hash    = false
+      }
+    }
+    SRIOV-HPN = {
+      description        = "Recommended adapter settings for SRIOV high performance and networking."
+      interrupt_settings = { interrupts = 32 }
     }
     usNIC = {
-      description = "Recommended adapter settings for usNIC Connection."
-      comp_count  = 12, rx_count = 6, tx_queue_count = 6
+      description             = "Recommended adapter settings for usNIC Connection."
+      completion              = { queue_count = 12 }
+      receive                 = { queue_count = 6 }
+      transmit                = { queue_count = 6 }
+      uplink_fallback_timeout = 0
+    }
+    usNICOracleRAC = {
+      description              = "Recommended adapter settings for usNIC Oracle RAC Connection."
+      enable_interrupt_scaling = true
+      completion               = { queue_count = 2000, ring_size = 4 }
+      interrupt_settings       = { interrupts = 1024 }
+      receive                  = { queue_count = 1000 }
+      transmit                 = { queue_count = 1000 }
+      uplink_fallback_timeout  = 0
+    }
+    VMware = {
+      description        = "Recommended adapter settings for VMware."
+      completion         = { queue_count = 2 }
+      interrupt_settings = { interrupts = 4 }
+      receive            = { queue_count = 4 }
+      receive_side_scaling = {
+        enable_receive_side_scaling = false
+        enable_ipv4_hash            = false
+        enable_ipv6_hash            = false
+        enable_tcp_and_ipv4_hash    = false
+        enable_tcp_and_ipv6_hash    = false
+      }
+    }
+    VMware-High-Trf = {
+      description        = "Recommended adapter settings for VMware High Traffic."
+      completion         = { queue_count = 9 }
+      interrupt_settings = { interrupts = 11 }
+      receive            = { queue_count = 8, ring_size = 4096 }
+      transmit           = { queue_count = 1, ring_size = 4096 }
+    }
+    VMware-v2 = {
+      description        = "Recommended adapter settings for VMware Version 2."
+      completion         = { queue_count = 9 }
+      interrupt_settings = { interrupts = 11 }
+      receive            = { queue_count = 8, ring_size = 4096 }
+      roce_settings      = { class_of_service = 5, enable_rdma_over_converged_ethernet = true, memory_regions = 131072, queue_pairs = 1024, resource_groups = 8, version = 2 }
+      transmit           = { queue_count = 1, ring_size = 4096 }
+    }
+    VMWareNVMeRoCEv2 = {
+      description        = "Recommended adapter settings for VMware NVMe ROCEv2."
+      completion         = { queue_count = 2 }
+      interrupt_settings = { interrupts = 256 }
+      receive            = { queue_count = 1, ring_size = 512 }
+      roce_settings      = { class_of_service = 5, enable_rdma_over_converged_ethernet = true, memory_regions = 131072, queue_pairs = 1024, resource_groups = 8, version = 2 }
+      transmit           = { queue_count = 1, ring_size = 256 }
     }
     VMwarePassThru = {
-      description = "Recommended adapter settings for VMware pass-thru."
-      comp_count  = 8, int_count = 12, tx_queue_count = 4
-    }
-    VMware = { description = "Recommended adapter settings for VMware."
-      comp_count = 2, int_count = 4, tx_queue_count = 1
+      description        = "Recommended adapter settings for VMware pass-thru."
+      completion         = { queue_count = 8 }
+      interrupt_settings = { interrupts = 12 }
+      transmit           = { queue_count = 4 }
     }
     Win-AzureStack = {
-      description = "Recommended adapter settings for Azure Stack."
-      comp_count  = 11, rx_queue_count = 8, tx_queue_count = 3
-    }
-    Win-HPN-SMBd = {
-      description = "Recommended adapter settings for Windows high performance and networking with RoCE V2."
-      int_count   = 512, int_count = 256
+      description                   = "Recommended adapter settings for Azure Stack."
+      enable_virtual_extensible_lan = true
+      completion                    = { queue_count = 11, ring_size = 256 }
+      interrupt_settings            = { interrupts = 256 }
+      receive                       = { queue_count = 8, ring_size = 4096 }
+      roce_settings                 = { class_of_service = 5, enable_rdma_over_converged_ethernet = true, memory_regions = 131072, queue_pairs = 256, resource_groups = 2, version = 2 }
+      transmit                      = { queue_count = 3, ring_size = 1024 }
     }
     Win-HPN = {
-      description = "Recommended adapter settings for Windows high performance and networking."
-      int_count   = 512
+      description                   = "Recommended adapter settings for Windows high performance and networking."
+      enable_virtual_extensible_lan = true
+      interrupt_settings            = { interrupts = 512 }
     }
-    Windows = {
-      description = "Recommended adapter settings for Windows."
+    Win-HPN-SMBd = {
+      description                   = "Recommended adapter settings for Windows high performance and networking with RoCE V2."
+      enable_virtual_extensible_lan = true
+      interrupt_settings            = { interrupts = 512 }
+      roce_settings                 = { class_of_service = 5, enable_rdma_over_converged_ethernet = true, memory_regions = 131072, queue_pairs = 256, resource_groups = 2, version = 2 }
     }
+    Win-HPN-v2 = {
+      description        = "Recommended adapter settings for Windows high performance and networking v2."
+      completion         = { queue_count = 9 }
+      interrupt_settings = { interrupts = 16 }
+      receive            = { queue_count = 8, ring_size = 4096 }
+      roce_settings      = { class_of_service = 5, enable_rdma_over_converged_ethernet = true, memory_regions = 131072, queue_pairs = 1024, resource_groups = 8, version = 2 }
+      transmit           = { queue_count = 1, ring_size = 4096 }
+    }
+    Windows = { description = "Recommended adapter settings for Windows." }
+  }
+  eth_adapter_l1 = flatten([for org in sort(keys(var.model)) : [for v in lookup(lookup(var.model[org], "policies", {}), "ethernet_adapter", []) : merge({ adapter_template = "EMPTY" }, v, {
+    key          = v.name
+    name         = "${local.npfx[org].ethernet_adapter}${v.name}${local.nsfx[org].ethernet_adapter}"
+    organization = org
+    })
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "ethernet_adapter", [])) > 0])
+  ethernet_adapter = { for v in local.eth_adapter_l1 : "${v.organization}/${v.key}" => merge(local.eth_adapter, local.eth_adapter_templates[v.adapter_template], v, {
+    completion = merge(local.eth_adapter.completion, lookup(local.eth_adapter_templates[v.adapter_template], "completion", {}), lookup(v, "completion", {}))
+    interrupt_settings = merge(
+      local.eth_adapter.interrupt_settings, lookup(local.eth_adapter_templates[v.adapter_template], "interrupt_settings", {}
+    ), lookup(v, "interrupt_settings", {}))
+    receive = merge(local.eth_adapter.receive, lookup(local.eth_adapter_templates[v.adapter_template], "receive", {}), lookup(v, "receive", {}))
+    receive_side_scaling = merge(
+      local.eth_adapter.receive_side_scaling, lookup(local.eth_adapter_templates[v.adapter_template], "receive_side_scaling", {}
+    ), lookup(v, "receive_side_scaling", {}))
+    roce_settings = merge(local.eth_adapter.roce_settings, lookup(local.eth_adapter_templates[v.adapter_template], "roce_settings", {}), lookup(v, "roce_settings", {}))
+    tags          = lookup(v, "tags", var.global_settings.tags)
+    tcp_offload   = merge(local.eth_adapter.tcp_offload, lookup(local.eth_adapter_templates[v.adapter_template], "tcp_offload", {}), lookup(v, "tcp_offload", {}))
+    transmit      = merge(local.eth_adapter.transmit, lookup(local.eth_adapter_templates[v.adapter_template], "transmit", {}), lookup(v, "transmit", {}))
+    })
   }
 
 
@@ -426,21 +541,64 @@ locals {
   #__________________________________________________________________
 
   fca = local.defaults.fibre_channel_adapter
-  fibre_channel_adapter = { for i in flatten([for org in sort(keys(var.model)) : [
-    for v in lookup(lookup(var.model[org], "policies", {}), "fibre_channel_adapter", []) : merge(local.fca, v, {
-      error_recovery     = merge(local.fca.error_recovery, lookup(v, "error_recovery", {}))
-      flogi              = merge(local.fca.flogi, lookup(v, "flogi", {}))
-      interrupt_settings = merge(local.fca.interrupt_settings, lookup(v, "interrupt_settings", {}))
-      key                = v.name
-      name               = "${local.npfx[org].fibre_channel_adapter}${v.name}${local.nsfx[org].fibre_channel_adapter}"
-      organization       = org
-      plogi              = merge(local.fca.plogi, lookup(v, "plogi", {}))
-      receive            = merge(local.fca.receive, lookup(v, "receive", {}))
-      scsi_io            = merge(local.fca.scsi_io, lookup(v, "scsi_io", {}))
-      tags               = lookup(v, "tags", var.global_settings.tags)
-      transmit           = merge(local.fca.transmit, lookup(v, "transmit", {}))
+  fc_adapter_templates = {
+    FCNVMeInitiator = {
+      description    = "Recommended adapter settings for NVMe over FC Initiator."
+      error_recovery = { port_down_timeout = 30000, port_down_io_retry = 30 }
+    }
+    FCNVMeTarget = {
+      description    = "Recommended adapter settings for NVMe over FC Initiator."
+      error_recovery = { port_down_timeout = 30000, port_down_io_retry = 30 }
+    }
+    EMPTY = {}
+    Initiator = {
+      description    = "Recommended adapter settings for SCSI Initiator."
+      error_recovery = { port_down_timeout = 10000, port_down_io_retry = 30 }
+    }
+    Linux = {
+      description    = "Recommended adapter settings for Linux."
+      error_recovery = { port_down_timeout = 30000, port_down_io_retry = 30 }
+    }
+    Solaris = {
+      description    = "Recommended adapter settings for Solaris."
+      error_recovery = { port_down_timeout = 30000, port_down_io_retry = 30 }
+      flogi          = { timeout = 20000 }
+    }
+    Target = {
+      description    = "Recommended adapter settings for SCSI Target."
+      error_recovery = { port_down_timeout = 30000, port_down_io_retry = 30 }
+    }
+    VMware = {
+      description    = "Recommended adapter settings for VMware."
+      error_recovery = { port_down_timeout = 10000, port_down_io_retry = 30 }
+    }
+    WindowsBoot = {
+      description    = "Recommended adapter settings for Windows Boot.",
+      error_recovery = { port_down_timeout = 5000, port_down_io_retry = 30 }
+      plogi          = { timeout = 4000 }
+    }
+    Windows = {
+      description    = "Recommended adapter settings for Windows."
+      error_recovery = { port_down_timeout = 30000, port_down_io_retry = 30 }
+    }
+  }
+  fc_adapter_l1 = flatten([for org in sort(keys(var.model)) : [for v in lookup(lookup(var.model[org], "policies", {}), "fibre_channel_adapter", []) : merge({ adapter_template = "EMPTY" }, v, {
+    key          = v.name
+    name         = "${local.npfx[org].fibre_channel_adapter}${v.name}${local.nsfx[org].fibre_channel_adapter}"
+    organization = org
     })
-  ] if length(lookup(lookup(var.model[org], "policies", {}), "fibre_channel_adapter", [])) > 0]) : "${i.organization}/${i.key}" => i }
+  ] if length(lookup(lookup(var.model[org], "policies", {}), "fibre_channel_adapter", [])) > 0])
+  fibre_channel_adapter = { for v in local.fc_adapter_l1 : "${v.organization}/${v.key}" => merge(local.fca, local.fc_adapter_templates[v.adapter_template], v, {
+    error_recovery = merge(local.fca.error_recovery, lookup(local.fc_adapter_templates[v.adapter_template], "error_recovery", {}), lookup(v, "error_recovery", {}))
+    flogi          = merge(local.fca.flogi, lookup(local.fc_adapter_templates[v.adapter_template], "flogi", {}), lookup(v, "flogi", {}))
+    interrupt      = merge(local.fca.interrupt, lookup(local.fc_adapter_templates[v.adapter_template], "interrupt", {}), lookup(v, "interrupt", {}))
+    plogi          = merge(local.fca.plogi, lookup(local.fc_adapter_templates[v.adapter_template], "plogi", {}), lookup(v, "plogi", {}))
+    receive        = merge(local.fca.receive, lookup(local.fc_adapter_templates[v.adapter_template], "receive", {}), lookup(v, "receive", {}))
+    scsi_io        = merge(local.fca.scsi_io, lookup(local.fc_adapter_templates[v.adapter_template], "scsi_io", {}), lookup(v, "scsi_io", {}))
+    tags           = lookup(v, "tags", var.global_settings.tags)
+    transmit       = merge(local.fca.transmit, lookup(local.fc_adapter_templates[v.adapter_template], "transmit", {}), lookup(v, "transmit", {}))
+    })
+  }
 
   #__________________________________________________________________
   #
