@@ -173,11 +173,11 @@ locals {
   # GUI Location: Policies > Create Policy > Boot Order
   #__________________________________________________________________
   boot_arg_convert = {
-    description    = "Description", device_name = "Name", device_type = "ObjectType", enabled = "Enabled", dns_ip = "DnsIp", gateway_ip = "GatewayIp",
-    interface_name = "InterfaceName", interface_source = "InterfaceSource", ip_config_type = "IpConfigType", ip_type = "IpType",
-    ipv4_config    = "StaticIpV4Settings", ipv6_config = "StaticIpV6Settings", lun = "Lun", mac_address = "MacAddress", network_mask = "NetworkMask",
-    path           = "Path", port = "Port", prefix_length = "PrefixLength", protocol = "Protocol", slot = "Slot", static_ip = "Ip", subtype = "Subtype",
-    target_wwpn    = "Wwpn", uri = "Uri",
+    bootloader  = "Bootloader", description = "Description", device_name = "Name", device_type = "ObjectType", enabled = "Enabled", dns_ip = "DnsIp",
+    gateway_ip  = "GatewayIp", interface_name = "InterfaceName", interface_source = "InterfaceSource", ip_config_type = "IpConfigType", ip_type = "IpType",
+    ipv4_config = "StaticIpV4Settings", ipv6_config = "StaticIpV6Settings", lun = "Lun", mac_address = "MacAddress", network_mask = "NetworkMask",
+    path        = "Path", port = "Port", prefix_length = "PrefixLength", protocol = "Protocol", slot = "Slot", static_ip = "Ip", subtype = "Subtype",
+    target_wwpn = "Wwpn", uri = "Uri",
   }
   boot_arguments = {
     flex_mmc = { Subtype = "flexmmc-mapped-dvd" }
