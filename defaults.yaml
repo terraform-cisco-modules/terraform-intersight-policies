@@ -664,18 +664,18 @@ policies:
         description: ''
         name: 'BOOTx64.EFI'
         path: '\\EFI\\BOOT\\'
+      device_name: '**REQUIRED**'
+      device_type: '**REQUIRED**'
       enabled: true
       interface_name: ''
       interface_source: name
       ip_type: IPv4
       lun: 0
       mac_address: ''
-      name: '**REQUIRED**'
-      object_type: '**REQUIRED**'
       port: -1
       slot: MLOM
       sub_type: None
-      wwpn: ''
+      target_wwpn: ''
     boot_mode: Uefi
     description: ''
     enable_secure_boot: false
@@ -1476,11 +1476,12 @@ policies:
     use_jbod_for_vd_creation: false
   switch_control:
     description: ''
-    ethernet_switching_mode: end-host
-    fc_switching_mode: end-host
+    fabric_port_channel_vhba_reset: Disabled
     mac_address_table_aging: Default
     mac_aging_time: 14500
     name: '**REQUIRED**'
+    switching_mode_ethernet: end-host
+    switching_mode_fc: end-host
     tags:
       key: ''
       value: ''

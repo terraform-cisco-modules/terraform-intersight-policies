@@ -172,44 +172,67 @@ locals {
   # Intersight Boot Order Policy
   # GUI Location: Policies > Create Policy > Boot Order
   #__________________________________________________________________
+  boot_arg_convert = {
+    description    = "Description", device_name = "Name", device_type = "ObjectType", enabled = "Enabled", dns_ip = "DnsIp", gateway_ip = "GatewayIp",
+    interface_name = "InterfaceName", interface_source = "InterfaceSource", ip_config_type = "IpConfigType", ip_type = "IpType",
+    ipv4_config    = "StaticIpV4Settings", ipv6_config = "StaticIpV6Settings", lun = "Lun", mac_address = "MacAddress", network_mask = "NetworkMask",
+    path           = "Path", port = "Port", prefix_length = "PrefixLength", protocol = "Protocol", slot = "Slot", static_ip = "Ip", subtype = "Subtype",
+    target_wwpn    = "Wwpn", uri = "Uri",
+  }
+  boot_arguments = {
+    flex_mmc = { Subtype = "flexmmc-mapped-dvd" }
+    http_boot = { InterfaceName = "", InterfaceSource = "name", IpConfigType = "DHCP", IpType = "IPv4", MacAddress = "", Port = -1,
+      Protocol = "HTTPS", Slot = "MLOM", Uri = ""
+    }
+    iscsi_boot    = { InterfaceName = "", Port = 0, Slot = "MLOM" }
+    local_disk    = { Slot = "MSTOR-RAID" }
+    nvme          = {}
+    pch_storage   = { Lun = 0 }
+    pxe_boot      = { InterfaceName = "", InterfaceSource = "name", IpType = "IPv4", MacAddress = "", Port = -1, Slot = "MLOM" }
+    san_boot      = { InterfaceName = "", Lun = 0, Slot = "MLOM", Wwpn = "20:00:00:25:B5:00:00:00" }
+    sd_card       = { Subtype = "SDCARD", Lun = 0 }
+    uefi_shell    = {}
+    usb           = { Subtype = "usb-cd" }
+    virtual_media = { Subtype = "kvm-mapped-dvd" }
+  }
   boot_loader = {
     ClassId    = "boot.Bootloader", Description = "", Name = "BOOTx64.EFI",
     ObjectType = "boot.Bootloader", Path = "\\EFI\\BOOT\\"
   }
-  boot_type = {
-    Iscsi      = ["InterfaceName:interface_name", "Port:port", "Slot:slot"]
-    LocalDisk  = ["Slot:slot"]
-    Nvme       = []
-    PchStorage = ["Lun:lun"]
-    Pxe = ["InterfaceName:interface_name", "InterfaceSource:interface_source", "IpType:ip_type",
-      "MacAddress:mac_address", "Port:port", "Slot:slot"
-    ]
-    San          = ["InterfaceName:interface_name", "Lun:lun", "Slot:slot", "Wwpn:wwpn"]
-    UefiShell    = []
-    VirtualMedia = ["Subtype:sub_type"]
+  boot_loader_keys = { description = "Description", name = "Name", path = "Path" }
+  boot_object_types = {
+    flex_mmc   = "boot.FlexMmc", http_boot = "boot.Http", iscsi_boot = "boot.Iscsi", local_cdd = "boot.LocalCdd", local_disk = "boot.LocalDisk",
+    nvme       = "boot.Nvme", pch_storage = "boot.PchStorage", pxe_boot = "boot.Pxe", san_boot = "boot.San", sd_card = "boot.SdCard",
+    uefi_shell = "boot.UefiShell", usb = "boot.Usb", virtual_media = "boot.VirtualMedia"
   }
-  boot_var = {
-    Iscsi        = { interface_name = "", port = 0, slot = "MLOM" }
-    LocalDisk    = { slot = "MSTOR-RAID" }
-    PchStorage   = { lun = 0 }
-    Pxe          = { interface_name = "", interface_source = "name", ip_type = "IPv4", mac_address = "", port = -1, slot = "MLOM" }
-    San          = { interface_name = "", lun = 0, slot = "MLOM", wwpn = "" }
-    VirtualMedia = { sub_type = "None" }
+  boot_static_ipv4 = {
+    ClassId    = "boot.StaticIpV4Settings", DnsIp = "", GatewayIp = "", Ip = "",
+    ObjectType = "boot.StaticIpV4Settings", NetworkMask = ""
+  }
+  boot_static_ipv6 = {
+    ClassId    = "boot.StaticIpV6Settings", DnsIp = "", GatewayIp = "", Ip = "",
+    ObjectType = "boot.StaticIpV6Settings", PrefixLength = 1
   }
   boot_order = { for i in flatten([for org in sort(keys(var.model)) : [
     for e in lookup(lookup(var.model[org], "policies", {}), "boot_order", []) : merge(local.defaults.boot_order, e, {
       boot_devices = [
         for v in lookup(e, "boot_devices", []) : {
-          additional_properties = e.boot_mode == "Uefi" && length(regexall("^boot.(Pxe|UefiShell|Usb|VirtualMedia)$", v.object_type)
-            ) == 0 ? jsonencode(merge({ Bootloader = merge(local.boot_loader, lookup(v, "boot_loader", {})) },
-              { for s in local.boot_type[element(split(".", v.object_type), 1)] : element(split(":", s), 0
-                ) => lookup(v, element(split(":", s), 1), local.boot_var[element(split(".", v.object_type), 1)]
-                [element(split(":", s), 1)]) })) : jsonencode({ for s in local.boot_type[element(split(".", v.object_type), 1)
-                ] : element(split(":", s), 0) => lookup(v, element(split(":", s), 1
-          ), local.boot_var[element(split(".", v.object_type), 1)][element(split(":", s), 1)]) })
+          additional_properties = e.boot_mode == "Uefi" && length(regexall("^(iscsi|san)_boot|local_disk|nvme|pch_storage|sd_card$", v.device_type)
+            ) > 0 && length(lookup(v, "boot_loader", {})) > 0 ? jsonencode(merge(
+              { Bootloader = merge(local.boot_loader, { for key, value in lookup(v, "boot_loader", {}) : local.boot_loader_keys[key] => value }) },
+              merge(local.boot_arguments[v.device_type], { for key, value in v : local.boot_arg_convert[key] => value if contains(
+            keys(local.boot_arguments[v.device_type]), local.boot_arg_convert[key]) }))
+            ) : v.device_type == "http_boot" ? jsonencode(merge(
+              { StaticIpV4Settings = merge(local.boot_static_ipv4, { for key, value in lookup(v, "ipv4_config", {}) : local.boot_arg_convert[key] => value }) },
+              { StaticIpV6Settings = merge(local.boot_static_ipv6, { for key, value in lookup(v, "ipv6_config", {}) : local.boot_arg_convert[key] => value }) },
+              merge(local.boot_arguments[v.device_type], { for key, value in v : local.boot_arg_convert[key] => value if contains(
+            keys(local.boot_arguments[v.device_type]), local.boot_arg_convert[key]) }))
+            ) : jsonencode(merge(local.boot_arguments[v.device_type], {
+              for key, value in v : local.boot_arg_convert[key] => value if contains(keys(local.boot_arguments[v.device_type]), local.boot_arg_convert[key])
+          }))
           enabled     = lookup(v, "enabled", true)
-          name        = v.name
-          object_type = v.object_type
+          name        = v.device_name
+          object_type = local.boot_object_types[v.device_type]
         }
       ]
       key          = e.name
@@ -1375,7 +1398,7 @@ locals {
       vhbas = [
         for e in lookup(v, "vhbas", []) : merge(local.scp.vhbas, e, {
           names     = e.names
-          placement = merge(local.scp.vhbas.placement, lookup(v, "placement", {}))
+          placement = merge(local.scp.vhbas.placement, lookup(e, "placement", {}))
         })
       ]
     })

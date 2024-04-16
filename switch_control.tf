@@ -7,8 +7,9 @@
 resource "intersight_fabric_switch_control_policy" "map" {
   for_each                = local.switch_control
   description             = coalesce(each.value.description, "${each.value.name} Switch Control Policy.")
-  ethernet_switching_mode = each.value.ethernet_switching_mode
-  fc_switching_mode       = each.value.fc_switching_mode
+  ethernet_switching_mode = each.value.switching_mode_ethernet
+  fabric_pc_vhba_reset    = each.value.fabric_port_channel_vhba_reset
+  fc_switching_mode       = each.value.switching_mode_fc
   name                    = each.value.name
   reserved_vlan_start_id  = each.value.reserved_vlan_start_id
   #
