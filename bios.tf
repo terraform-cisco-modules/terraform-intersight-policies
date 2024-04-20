@@ -440,8 +440,8 @@ resource "intersight_bios_policy" "map" {
   tpm_control                     = each.value.tpm_control                     # Trusted Platform Module State
   tpm_pending_operation           = each.value.tpm_pending_operation           # TPM Pending Operation
   tpm_ppi_required                = each.value.tpm_ppi_required                # TPM Minimal Physical Presence
-  tpm_support                     = each.value.tpm_support
-  txt_support                     = each.value.txt_support # Intel Trusted Execution Technology Support
+  tpm_support                     = each.value.tpm_support                     # Trusted Platform Module State
+  txt_support                     = each.value.txt_support                     # Intel Trusted Execution Technology Support
   #+++++++++++++++++++++++++++++++
   # USB Section
   #+++++++++++++++++++++++++++++++

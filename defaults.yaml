@@ -486,14 +486,6 @@ policies:
       processor_c3report: disabled
       processor_c6report: disabled
       processor_cstate: disabled
-    M5-intel-virtual:
-      cpu_power_management: custom
-      nvmdimm_perform_config: Balanced Profile
-      pcie_slots_cdn_enable: enabled
-      processor_c1e: disabled
-      processor_c3report: disabled
-      processor_c6report: disabled
-      processor_cstate: disabled
     M5-intel-dss:
       cpu_power_management: custom
       intel_vt_for_directed_io: disabled
@@ -517,6 +509,14 @@ policies:
       processor_cstate: disabled
     M5-intel-oltp:
       cpu_power_management: custom
+      processor_c1e: disabled
+      processor_c3report: disabled
+      processor_c6report: disabled
+      processor_cstate: disabled
+    M5-intel-virtual:
+      cpu_power_management: custom
+      nvmdimm_perform_config: Balanced Profile
+      pcie_slots_cdn_enable: enabled
       processor_c1e: disabled
       processor_c3report: disabled
       processor_c6report: disabled
@@ -652,6 +652,7 @@ policies:
       processor_c6report: enabled
     tpm:
       sha1pcr_bank: disabled
+      sha256pcr_bank: enabled
       tpm_control: enabled
       tpm_ppi_required: enabled
       tpm_support: enabled
