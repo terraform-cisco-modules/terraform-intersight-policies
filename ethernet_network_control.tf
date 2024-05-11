@@ -3,7 +3,6 @@
 # Intersight Ethernet Network Control Policy
 # GUI Location: Policies > Create Policy > Ethernet Network Control
 #__________________________________________________________________
-
 resource "intersight_fabric_eth_network_control_policy" "map" {
   for_each              = local.ethernet_network_control
   cdp_enabled           = each.value.cdp_enable

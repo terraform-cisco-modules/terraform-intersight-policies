@@ -3,7 +3,6 @@
 # Intersight Link Aggregation Policy
 # GUI Location: Policies > Create Policy > Link Aggregation
 #__________________________________________________________________
-
 resource "intersight_fabric_link_aggregation_policy" "map" {
   for_each           = local.link_aggregation
   description        = coalesce(each.value.description, "${each.value.name} Link Aggregation Policy.")

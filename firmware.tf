@@ -3,16 +3,8 @@
 # Intersight Firmware Policy
 # GUI Location: Policies > Create Policy > Firmware
 #__________________________________________________________________
-
 data "intersight_iam_account" "account" {
 }
-
-#resource "intersight_firmware_eula" "eula" {
-#  account {
-#    object_type = "iam.Account"
-#    moid        = data.intersight_iam_account.account.results[0].moid
-#  }
-#}
 
 resource "intersight_softwarerepository_authorization" "map" {
   for_each        = { for v in local.firmware_authenticate : "auth" => v }

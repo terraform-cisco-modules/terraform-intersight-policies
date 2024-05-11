@@ -3,7 +3,6 @@
 # Intersight Virtual KVM Policy
 # GUI Location: Policies > Create Policy > Virtual KVM
 #__________________________________________________________________
-
 resource "intersight_kvm_policy" "map" {
   for_each                  = local.virtual_kvm
   description               = coalesce(each.value.description, "${each.value.name} Virtual KVM Policy.")

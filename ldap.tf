@@ -3,7 +3,6 @@
 # Intersight LDAP Policy
 # GUI Location: Policies > Create Policy > LDAP
 #__________________________________________________________________
-
 resource "intersight_iam_ldap_policy" "map" {
   for_each    = local.ldap
   description = coalesce(each.value.description, "${each.value.name} LDAP Policy.")
@@ -55,7 +54,6 @@ resource "intersight_iam_ldap_policy" "map" {
 # Intersight LDAP Policy > Add New LDAP Group
 # GUI Location: Policies > Create Policy > LDAP > Add New LDAP Group
 #____________________________________________________________________
-
 data "intersight_iam_end_point_role" "map" {
   for_each = { for v in toset(local.roles) : v => v }
   name     = each.value
@@ -84,15 +82,12 @@ resource "intersight_iam_ldap_group" "map" {
 # Intersight LDAP Policy - Server
 # GUI Location: Policies > Create Policy > LDAP Policy > Server
 #__________________________________________________________________
-
 resource "intersight_iam_ldap_provider" "map" {
   for_each = local.ldap_providers
   depends_on = [
     intersight_iam_ldap_policy.map
   ]
-  ldap_policy {
-    moid = intersight_iam_ldap_policy.map[each.value.ldap_policy].moid
-  }
+  ldap_policy { moid = intersight_iam_ldap_policy.map[each.value.ldap_policy].moid }
   port   = each.value.port
   server = each.value.server
 }

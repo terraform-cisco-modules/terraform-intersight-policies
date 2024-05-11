@@ -3,7 +3,6 @@
 # Intersight IPMI over LAN Policy
 # GUI Location: Policies > Create Policy > IPMI over LAN
 #__________________________________________________________________
-
 resource "intersight_ipmioverlan_policy" "map" {
   for_each    = local.ipmi_over_lan
   description = coalesce(each.value.description, "${each.value.name} IPMI over LAN Policy.")

@@ -3,7 +3,6 @@
 # Intersight Serial over LAN Policy
 # GUI Location: Policies > Create Policy > Serial over LAN
 #__________________________________________________________________
-
 resource "intersight_sol_policy" "map" {
   for_each    = local.serial_over_lan
   baud_rate   = each.value.baud_rate

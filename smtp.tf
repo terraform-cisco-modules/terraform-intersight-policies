@@ -3,7 +3,6 @@
 # Intersight SMTP Policy
 # GUI Location: Policies > Create Policy > SMTP
 #__________________________________________________________________
-
 resource "intersight_smtp_policy" "map" {
   for_each        = local.smtp
   description     = coalesce(each.value.description, "${each.value.name} SMTP Policy.")

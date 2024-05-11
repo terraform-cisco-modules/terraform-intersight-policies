@@ -3,7 +3,6 @@
 # Intersight Fibre Channel Adapter Policy
 # GUI Location: Policies > Create Policy > Fibre Channel Adapter
 #__________________________________________________________________
-
 resource "intersight_vnic_fc_adapter_policy" "map" {
   for_each                    = local.fibre_channel_adapter
   description                 = coalesce(each.value.description, "${each.value.name} Fibre-Channel Adapter Policy.")

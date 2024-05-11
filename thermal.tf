@@ -3,7 +3,6 @@
 # Intersight Thermal Policy
 # GUI Location: Policies > Create Policy > Thermal
 #__________________________________________________________________
-
 resource "intersight_thermal_policy" "map" {
   for_each         = local.thermal
   description      = coalesce(each.value.description, "${each.value.name} Thermal Policy.")

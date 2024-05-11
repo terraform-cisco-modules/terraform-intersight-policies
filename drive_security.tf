@@ -3,7 +3,6 @@
 # Intersight Drive Security Policy
 # GUI Location: Policies > Create Policy > Drive Security
 #__________________________________________________________________
-
 resource "intersight_storage_drive_security_policy" "map" {
   for_each    = local.drive_security
   description = coalesce(each.value.description, "${each.value.name} Drive Security Policy.")

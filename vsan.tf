@@ -3,7 +3,6 @@
 # Intersight VSAN Policy
 # GUI Location: Policies > Create Policy > VSAN
 #__________________________________________________________________
-
 resource "intersight_fabric_fc_network_policy" "map" {
   for_each        = local.vsan
   description     = coalesce(each.value.description, "${each.value.name} VSAN Policy.")
@@ -24,7 +23,6 @@ resource "intersight_fabric_fc_network_policy" "map" {
 # Intersight > {VSAN Policy} > Edit  > Add VSAN
 # GUI Location: Policies > Create Policy > VSAN > Add VSAN
 #__________________________________________________________________
-
 resource "intersight_fabric_vsan" "map" {
   depends_on = [
     intersight_fabric_fc_network_policy.map

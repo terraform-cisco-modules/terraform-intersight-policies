@@ -10,16 +10,10 @@ policies:
       pci_slot: MLOM
     description: ''
     name: '**REQUIRED**'
-    tags:
-      key: ''
-      value: ''
   bios:
     bios_template: EMPTY
     description: ''
     name: '**REQUIRED**'
-    tags:
-      key: ''
-      value: ''
     #+++++++++++++++++++++++++++++++
     # Boot Options Section
     #+++++++++++++++++++++++++++++++
@@ -681,9 +675,6 @@ policies:
     description: ''
     enable_secure_boot: false
     name: '**REQUIRED**'
-    tags:
-      key: ''
-      value: ''
   certificate_management:
     assigned_sensitive_data: false
     certificates:
@@ -693,16 +684,10 @@ policies:
       variable_id: 1
     description: ''
     name: '**REQUIRED**'
-    tags:
-      key: ''
-      value: ''
   device_connector:
     configuration_lockout: false
     description: ''
     name: '**REQUIRED**'
-    tags:
-      key: ''
-      value: ''
   drive_security:
     assigned_sensitive_data: false
     description: ''
@@ -757,9 +742,6 @@ policies:
       queue_pairs: 0
       resource_groups: 0
       version: 1
-    tags:
-      key: ''
-      value: ''
     tcp_offload:
       enable_large_receive_offload: true
       enable_large_send_offload: true
@@ -773,9 +755,6 @@ policies:
     default_vlan: 0
     description: ''
     name: '**REQUIRED**'
-    tags:
-      key: ''
-      value: ''
     vlan_mode: ACCESS
   ethernet_network_control:
     action_on_uplink_fail: linkDown
@@ -786,17 +765,11 @@ policies:
     mac_register_mode: nativeVlanOnly
     mac_security_forge: allow
     name: '**REQUIRED**'
-    tags:
-      key: ''
-      value: ''
   ethernet_network_group:
     allowed_vlans: '**REQUIRED**'
     description: ''
     name: '**REQUIRED**'
     native_vlan: null
-    tags:
-      key: ''
-      value: ''
   ethernet_qos:
     burst: 10240
     cos: 0
@@ -806,9 +779,6 @@ policies:
     name: '**REQUIRED**'
     priority: Best Effort
     rate_limit: 0
-    tags:
-      key: ''
-      value: ''
   fc_zone:
     description: ''
     targets:
@@ -818,9 +788,6 @@ policies:
       wwpn: '**REQUIRED**'
     fc_target_zoning_type: SIMT
     name: '**REQUIRED**'
-    tags:
-      key: ''
-      value: ''
   fibre_channel_adapter:
     adapter_template: 'EMPTY'
     description: ''
@@ -849,9 +816,6 @@ policies:
     scsi_io:
       queue_count: 1
       ring_size: 512
-    tags:
-      key: ''
-      value: ''
     transmit:
       ring_size: 64
   fibre_channel_network:
@@ -859,9 +823,6 @@ policies:
     description: ''
     name: '**REQUIRED**'
     vsan_id: '**REQUIRED**'
-    tags:
-      key: ''
-      value: ''
   fibre_channel_qos:
     burst: 10240
     cos: 3
@@ -869,9 +830,6 @@ policies:
     max_data_field_size: 2112
     name: '**REQUIRED**'
     rate_limit: 0
-    tags:
-      key: ''
-      value: ''
   firmware:
     advanced_mode:
       exclude_drives: false
@@ -886,9 +844,6 @@ policies:
     model_bundle_version:
       firmware_version: '4.2(3d)'
       server_models: []
-    tags:
-      key: ''
-      value: ''
     target_platform: 'FIAttached'
   flow_control:
     description: ''
@@ -896,9 +851,6 @@ policies:
     priority: auto
     receive: Disabled
     send: Disabled
-    tags:
-      key: ''
-      value: ''
   imc_access:
     description: ''
     inband_ip_pool: ''
@@ -907,31 +859,23 @@ policies:
     ipv6_address_configuration: false
     name: '**REQUIRED**'
     out_of_band_ip_pool: ''
-    tags:
-      key: ''
-      value: ''
   ipmi_over_lan:
     description: ''
     enabled: true
     encryption_key: 1
     name: '**REQUIRED**'
     privilege: admin
-    tags:
-      key: ''
-      value: ''
   iscsi_adapter:
     description: ''
     dhcp_timeout: 60
     lun_busy_retry_count: 15
     name: '**REQUIRED**'
-    tags:
-      key: ''
-      value: ''
     tcp_connection_timeout: 15
   iscsi_boot:
     authentication: ''
     description: ''
     dhcp_vendor_id_iqn: ''
+    initiator_ip_pool: UNUSED
     initiator_ip_source: DHCP
     initiator_static_ipv4_config:
       ip_address: '**REQUIRED**'
@@ -941,11 +885,8 @@ policies:
       secondary_dns: ''
     name: '**REQUIRED**'
     password: 1
-    primary_target_policy: ''
-    secondary_target_policy: ''
-    tags:
-      key: ''
-      value: ''
+    primary_target_policy: UNUSED
+    secondary_target_policy: UNUSED
     target_source_type: Auto
     username: ''
   iscsi_static_target:
@@ -954,53 +895,90 @@ policies:
     lun_id: 0
     name: '**REQUIRED**'
     port: 3260
-    tags:
-      key: ''
-      value: ''
     target_name: '**REQUIRED**'
   lan_connectivity:
     description: ''
     enable_azure_stack_host_qos: false
     iqn_allocation_type: None
-    iqn_pool: ''
+    iqn_pool: UNUSED
     name: '**REQUIRED**'
     iqn_static_identifier: ''
-    tags:
-      key: ''
-      value: ''
     target_platform: FIAttached
     vnic_placement_mode: custom
     vnics:
       cdn_source: vnic
       cdn_values: []
       enable_failover: false
-      ethernet_adapter_policy: ''
+      ethernet_adapter_policy: UNUSED
       ethernet_network_control_policy: UNUSED
-      ethernet_network_group_policies: []
+      ethernet_network_group_policies: [UNUSED]
       ethernet_network_policy: UNUSED
-      ethernet_qos_policy: ''
-      iscsi_boot_policies: []
+      ethernet_qos_policy: UNUSED
+      iscsi_boot_policies: [UNUSED]
       mac_address_allocation_type: POOL
-      mac_address_pools: []
+      mac_address_pools: [UNUSED]
       mac_addresses_static: []
       names: ['**REQUIRED**']
       placement:
-        pci_links: [0]
+        automatic_pci_link_assignment: true
+        automatic_slot_id_assignment: true
+        pci_links: []
         pci_order: [2, 3]
-        slot_ids: [MLOM]
+        slot_ids: []
         switch_ids: [A, B]
         uplink_ports: [0]
-      usnic_settings:
+      sr_iov:
+        completion_queue_count_per_vf: 5
+        enabled: false
+        interrupt_count_per_vf: 8
+        number_of_vfs: 64
+        receive_queue_count_per_vf: 4
+        transmit_queue_count_per_vf: 1
+      usnic:
         class_of_service: 5
         number_of_usnics: 0
-        usnic_adapter_policy: ''
-      vmq_settings:
+        usnic_adapter_policy: UNUSED
+      vmq:
         enable_virtual_machine_multi_queue: false
         enabled: false
         number_of_interrupts: 16
         number_of_sub_vnics: 64
         number_of_virtual_machine_queues: 4
-        vmmq_adapter_policy: ''
+        vmmq_adapter_policy: UNUSED
+    vnics_from_template:
+      cdn_value: ''
+      enable_failover: false
+      ethernet_adapter_policy: UNUSED
+      iscsi_boot_policy: UNUSED
+      mac_address_pool: UNUSED
+      name: '**REQUIRED**'
+      placement:
+        automatic_pci_link_assignment: true
+        automatic_slot_id_assignment: true
+        pci_link: null
+        pci_order: 2
+        slot_id: ''
+        switch_id: A
+        uplink_port: 0
+      sr_iov:
+        completion_queue_count_per_vf: 5
+        enabled: false
+        interrupt_count_per_vf: 8
+        number_of_vfs: 64
+        receive_queue_count_per_vf: 4
+        transmit_queue_count_per_vf: 1
+      usnic:
+        class_of_service: 5
+        number_of_usnics: 0
+        usnic_adapter_policy: UNUSED
+      vmq:
+        enable_virtual_machine_multi_queue: false
+        enabled: false
+        number_of_interrupts: 16
+        number_of_sub_vnics: 64
+        number_of_virtual_machine_queues: 4
+        vmmq_adapter_policy: UNUSED
+      template: UNUSED
   ldap:
     base_settings:
       base_dn: ''
@@ -1030,26 +1008,17 @@ policies:
       attribute: CiscoAvPair
       filter: samAccountName
       group_attribute: memberOf
-    tags:
-      key: ''
-      value: ''
     user_search_precedence: LocalUserDb
   link_aggregation:
     description: ''
     lacp_rate: normal
     name: '**REQUIRED**'
     suspend_individual: false
-    tags:
-      key: ''
-      value: ''
   link_control: 
     admin_state: Enabled
     description: ''
     mode: normal
     name: '**REQUIRED**'
-    tags:
-      key: ''
-      value: ''
   local_user:
     description: ''
     name: '**REQUIRED**'
@@ -1061,9 +1030,6 @@ policies:
       notification_period: 15
       password_expiry_duration: 90
       password_history: 0
-    tags:
-      key: ''
-      value: ''
     users:
       enabled: true
       password: 1
@@ -1077,9 +1043,6 @@ policies:
     querier_state: Disabled
     snooping_state: Enabled
     source_ip_proxy_state: Enabled
-    tags:
-      key: ''
-      value: ''
   name_prefix:
     default: ''
     adapter_configuration: ''
@@ -1126,8 +1089,10 @@ policies:
     syslog: ''
     system_qos: ''
     thermal: ''
+    vhba_template: ''
     virtual_kvm: ''
     virtual_media: ''
+    vnic_template: ''
     vlan: ''
     vsan: ''
   name_suffix:
@@ -1176,8 +1141,10 @@ policies:
     syslog: ''
     system_qos: ''
     thermal: ''
+    vhba_template: ''
     virtual_kvm: ''
     virtual_media: ''
+    vnic_template: ''
     vlan: ''
     vsan: ''
   network_connectivity:
@@ -1188,18 +1155,12 @@ policies:
     name: '**REQUIRED**'
     obtain_ipv4_dns_from_dhcp: false
     obtain_ipv6_dns_from_dhcp: false
-    tags:
-      key: ''
-      value: ''
     update_domain: ''
   ntp:
     description: ''
     enabled: true
     name: '**REQUIRED**'
     ntp_servers: [time-a-g.nist.gov, time-b-g.nist.gov]
-    tags:
-      key: ''
-      value: ''
     timezone: Etc/GMT
   persistent_memory:
     description: ''
@@ -1216,50 +1177,38 @@ policies:
       socket_memory_id: 'Not Applicable'
     passphrase: 1
     retain_namespaces: true
-    tags:
-      key: ''
-      value: ''
   port:
     description: ''
     device_model: UCS-FI-6454
-    name: '**REQUIRED**'
+    names: []
+    pc_interfaces:
+      breakout_port_id: 0
+      port_id: 1
+      slot_id: 1
     port_channel_appliances:
       admin_speed: Auto
       ethernet_network_control_policy: UNUSED
       ethernet_network_group_policy: UNUSED
-      interfaces:
-        breakout_port_id: 0
-        port_id: '**REQUIRED**'
-        slot_id: 1
       link_aggregation_policy: UNUSED
       mode: trunk
+      pc_ids: [1]
       priority: Best Effort
     port_channel_ethernet_uplinks:
       admin_speed: Auto
       ethernet_network_group_policy: UNUSED
-      interfaces:
-        breakout_port_id: 0
-        port_id: '**REQUIRED**'
-        slot_id: 1
       flow_control_policy: UNUSED
       link_aggregation_policy: UNUSED
       link_control_policy: UNUSED
+      pc_ids: [1]
     port_channel_fc_uplinks:
       admin_speed: 32Gbps
-      fill_pattern: Idle
-      interfaces:
-        breakout_port_id: 0
-        port_id: '**REQUIRED**'
-        slot_id: 1
-      vsan_ids: [1, 2]
+      pc_ids: [1]
+      vsan_ids: [1]
     port_channel_fcoe_uplinks:
       admin_speed: Auto
-      interfaces:
-        breakout_port_id: 0
-        port_id: '**REQUIRED**'
-        slot_id: 1
       link_aggregation_policy: UNUSED
       link_control_policy: UNUSED
+      pc_ids: [1]
     port_modes:
       custom_mode: FibreChannel
       port_list: [1, 4]
@@ -1271,7 +1220,7 @@ policies:
       ethernet_network_group_policy: UNUSED
       fec: Auto
       mode: trunk
-      port_list: '**REQUIRED**'
+      port_list: '1'
       priority: Best Effort
       slot_id: 1
     port_role_ethernet_uplinks:
@@ -1281,18 +1230,18 @@ policies:
       fec: Auto
       flow_control_policy: UNUSED
       link_control_policy: UNUSED
-      port_list: '**REQUIRED**'
+      port_list: '1'
       slot_id: 1
     port_role_fc_storage:
       admin_speed: 16Gbps
       breakout_port_id: 0
-      port_list: '**REQUIRED**'
+      port_list: '1'
       slot_id: 1
       vsan_id: 1
     port_role_fc_uplinks:
       admin_speed: 32Gbps
       breakout_port_id: 0
-      port_list: '**REQUIRED**'
+      port_list: '1'
       slot_id: 1
       vsan_id: 1
     port_role_fcoe_uplinks:
@@ -1300,7 +1249,7 @@ policies:
       breakout_port_id: 0
       fec: Auto
       link_control_policy: UNUSED
-      port_list: '**REQUIRED**'
+      port_list: '1'
       slot_id: 1
     port_role_servers:
       auto_negotiation: false
@@ -1308,11 +1257,8 @@ policies:
       connected_device_type: Auto
       device_number: 0
       fec: Auto
-      port_list: '**REQUIRED**'
+      port_list: '1'
       slot_id: 1
-    tags:
-      key: ''
-      value: ''
   power:
     description: ''
     dynamic_power_rebalancing: Enabled
@@ -1324,36 +1270,46 @@ policies:
     power_redundancy: Grid
     power_restore: LastState
     power_save_mode: Enabled
-    tags:
-      key: ''
-      value: ''
   san_connectivity:
     description: ''
     name: '**REQUIRED**'
-    tags:
-      key: ''
-      value: ''
     target_platform: FIAttached
     vhba_placement_mode: custom
     vhbas:
-      fc_zone_policies: []
+      fc_zone_policies: [UNUSED]
       fibre_channel_adapter_policy: UNUSED
-      fibre_channel_network_policies: []
+      fibre_channel_network_policies: [UNUSED]
       fibre_channel_qos_policy: UNUSED
       names: []
       persistent_lun_bindings: false
       placement:
+        automatic_pci_link_assignment: true
+        automatic_slot_id_assignment: true
         pci_links: [0]
         pci_order: [0, 1]
-        slot_ids: [MLOM]
+        slot_ids: []
         switch_ids: [A, B]
         uplink_ports: [0]
       vhba_type: fc-initiator
       wwpn_allocation_type: POOL
-      wwpn_pools: []
+      wwpn_pools: [UNUSED]
       wwpn_static_addresses: []
+    vhbas_from_template:
+      fibre_channel_adapter_policy: UNUSED
+      fibre_channel_network_policy: UNUSED
+      name: '**REQUIRED**'
+      placement:
+        automatic_pci_link_assignment: true
+        automatic_slot_id_assignment: true
+        pci_link: null
+        pci_order: 2
+        slot_id: ''
+        switch_id: A
+        uplink_port: 0
+      template: '**REQUIRED**'
+      wwpn_pool: ''
     wwnn_allocation_type: POOL
-    wwnn_pool: ''
+    wwnn_pool: UNUSED
     wwnn_static_address: ''
   sd_card:
     description: ''
@@ -1363,9 +1319,6 @@ policies:
     enable_os: false
     enable_scu: false
     name: '**REQUIRED**'
-    tags:
-      key: ''
-      value: ''
   serial_over_lan:
     baud_rate: 115200
     com_port: com0
@@ -1373,9 +1326,6 @@ policies:
     enabled: true
     name: '**REQUIRED**'
     ssh_port: 2400
-    tags:
-      key: ''
-      value: ''
   smtp:
     description: ''
     enable_smtp: true
@@ -1385,9 +1335,6 @@ policies:
     smtp_alert_sender_address: ''
     smtp_port: 25
     smtp_server_address: '**REQUIRED**'
-    tags:
-      key: ''
-      value: ''
   snmp:
     access_community_string: 1
     enable_snmp: true
@@ -1412,9 +1359,6 @@ policies:
       security_level: AuthPriv
     system_contact: ''
     system_location: ''
-    tags:
-      key: ''
-      value: ''
     trap_community_string: 1
   ssh:
     description: ''
@@ -1422,9 +1366,6 @@ policies:
     name: '**REQUIRED**'
     ssh_port: 22
     ssh_timeout: 1800
-    tags:
-      key: ''
-      value: ''
   storage:
     default_drive_state: UnconfiguredGood
     description: ''
@@ -1469,9 +1410,6 @@ policies:
         read_policy: Default
         strip_size: 64
         write_policy: Default
-    tags:
-      key: ''
-      value: ''
     unused_disks_state: NoChange
     use_jbod_for_vd_creation: false
   switch_control:
@@ -1482,9 +1420,6 @@ policies:
     name: '**REQUIRED**'
     switching_mode_ethernet: end-host
     switching_mode_fc: end-host
-    tags:
-      key: ''
-      value: ''
     reserved_vlan_start_id: 3915
     udld_global_settings:
       message_interval: 15
@@ -1501,9 +1436,6 @@ policies:
       minimum_severity: warning
       port: 514
       protocol: udp
-    tags:
-      key: ''
-      value: ''
   system_qos:
     classes:
       Best Effort:
@@ -1629,16 +1561,21 @@ policies:
     description: ''
     jumbo_mtu: true
     name: '**REQUIRED**'
-    tags:
-      key: ''
-      value: ''
   thermal:
     description: ''
     fan_control_mode: Balanced
     name: '**REQUIRED**'
-    tags:
-      key: ''
-      value: ''
+  vhba_templates:
+    allow_override: false
+    fc_zone_policies: []
+    fibre_channel_adapter_policy: UNUSED
+    fibre_channel_network_policy: UNUSED
+    fibre_channel_qos_policy: UNUSED
+    name: '**REQUIRED**'
+    persistent_lun_bindings: false
+    vhba_type: fc-initiator
+    wwpn_allocation_type: POOL
+    wwpn_pool: UNUSED
   virtual_kvm:
     allow_tunneled_vkvm: false
     description: ''
@@ -1648,9 +1585,6 @@ policies:
     maximum_sessions: 4
     name: '**REQUIRED**'
     remote_port: 2068
-    tags:
-      key: ''
-      value: ''
   virtual_media:
     add_virtual_media:
       authentication_protocol: none
@@ -1666,15 +1600,39 @@ policies:
     enable_virtual_media: true
     enable_virtual_media_encryption: true
     name: '**REQUIRED**'
-    tags:
-      key: ''
-      value: ''
+  vnic_templates:
+    allow_override: false
+    cdn_source: vnic
+    cdn_value: ''
+    enable_failover: false
+    ethernet_adapter_policy: UNUSED
+    ethernet_network_control_policy: UNUSED
+    ethernet_network_group_policy: UNUSED
+    ethernet_qos_policy: UNUSED
+    iscsi_boot_policy: UNUSED
+    mac_address_pool: UNUSED
+    name: '**REQUIRED**'
+    sr_iov:
+      completion_queue_count_per_vf: 5
+      enabled: false
+      interrupt_count_per_vf: 8
+      number_of_vfs: 64
+      receive_queue_count_per_vf: 4
+      transmit_queue_count_per_vf: 1
+    usnic:
+      class_of_service: 5
+      number_of_usnics: 0
+      usnic_adapter_policy: ''
+    vmq:
+      enable_virtual_machine_multi_queue: false
+      enabled: false
+      number_of_interrupts: 16
+      number_of_sub_vnics: 64
+      number_of_virtual_machine_queues: 4
+      vmmq_adapter_policy: ''
   vlan:
     description: ''
     name: '**REQUIRED**'
-    tags:
-      key: ''
-      value: ''
     vlans:
       auto_allow_on_uplinks: false
       multicast_policy: ''
@@ -1687,9 +1645,6 @@ policies:
   vsan:
     description: ''
     name: '**REQUIRED**'
-    tags:
-      key: ''
-      value: ''
     uplink_trunking: false
     vsans:
       default_zoning: Disabled

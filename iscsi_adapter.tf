@@ -3,7 +3,6 @@
 # Intersight iSCSI Adapter Policy
 # GUI Location: Policies > Create Policy > iSCSI Adapter
 #__________________________________________________________________
-
 resource "intersight_vnic_iscsi_adapter_policy" "map" {
   for_each             = local.iscsi_adapter
   connection_time_out  = each.value.tcp_connection_timeout

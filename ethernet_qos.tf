@@ -3,7 +3,6 @@
 # Intersight Ethernet QoS Policy
 # GUI Location: Policies > Create Policy > Ethernet QoS
 #__________________________________________________________________
-
 resource "intersight_vnic_eth_qos_policy" "map" {
   for_each       = local.ethernet_qos
   description    = coalesce(each.value.description, "${each.value.name} Ethernet QoS Policy.")

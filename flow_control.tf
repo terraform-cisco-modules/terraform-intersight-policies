@@ -3,7 +3,6 @@
 # Intersight Flow Control Policy
 # GUI Location: Policies > Create Policy > Flow Control
 #__________________________________________________________________
-
 resource "intersight_fabric_flow_control_policy" "map" {
   for_each                   = local.flow_control
   description                = coalesce(each.value.description, "${each.value.name} Flow Control Policy.")

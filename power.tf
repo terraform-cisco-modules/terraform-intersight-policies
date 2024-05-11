@@ -3,7 +3,6 @@
 # Intersight Power Policy
 # GUI Location: Policies > Create Policy > Power
 #__________________________________________________________________
-
 resource "intersight_power_policy" "map" {
   for_each                = local.power
   allocated_budget        = each.value.power_allocation

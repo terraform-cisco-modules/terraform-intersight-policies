@@ -3,7 +3,6 @@
 # Intersight Syslog Policy
 # GUI Location: Policies > Create Policy > Syslog
 #__________________________________________________________________
-
 resource "intersight_syslog_policy" "map" {
   for_each    = local.syslog
   description = coalesce(each.value.description, "${each.value.name} Syslog Policy.")

@@ -3,7 +3,6 @@
 # Intersight Ethernet Adapter Policy
 # GUI Location: Policies > Create Policy > Ethernet Adapter
 #__________________________________________________________________
-
 resource "intersight_vnic_eth_adapter_policy" "map" {
   for_each                = { for k, v in local.ethernet_adapter : k => merge(v, { rss = v.receive_side_scaling.enable_receive_side_scaling }) }
   advanced_filter         = each.value.enable_geneve_offload == true ? false : each.value.enable_advanced_filter

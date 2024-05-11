@@ -3,7 +3,6 @@
 # Intersight Fibre Channel QoS Policy
 # GUI Location: Policies > Create Policy > Fibre Channel QoS
 #__________________________________________________________________
-
 resource "intersight_vnic_fc_qos_policy" "map" {
   for_each            = local.fibre_channel_qos
   burst               = each.value.burst # FI-Attached

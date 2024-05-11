@@ -3,7 +3,6 @@
 # Intersight NTP Policy
 # GUI Location: Policies > Create Policy > NTP
 #__________________________________________________________________
-
 resource "intersight_ntp_policy" "map" {
   for_each    = local.ntp
   description = coalesce(each.value.description, "${each.value.name} NTP Policy.")

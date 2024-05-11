@@ -3,7 +3,6 @@
 # Intersight VLAN Policy
 # GUI Location: Policies > Create Policy > VLAN
 #__________________________________________________________________
-
 resource "intersight_fabric_eth_network_policy" "map" {
   for_each    = local.vlan
   description = coalesce(each.value.description, "${each.value.name} VLAN Policy.")
@@ -45,10 +44,7 @@ resource "intersight_fabric_vlan" "map" {
   vlan_id = each.value.vlan_id
   eth_network_policy { moid = intersight_fabric_eth_network_policy.map[each.value.vlan_policy].moid }
   multicast_policy {
-    moid = contains(keys(local.multicast), "${each.value.multicast_policy.org}/${each.value.multicast_policy.name}"
-      ) == true ? intersight_fabric_multicast_policy.map["${each.value.multicast_policy.org}/${each.value.multicast_policy.name}"
-      ].moid : [for i in data.intersight_search_search_item.policies["multicast"
-        ].results : i.moid if jsondecode(i.additional_properties).Name == each.value.multicast_policy.name && jsondecode(i.additional_properties
-    ).Organization.Moid == var.orgs[each.value.multicast_policy.org]][0]
+    moid = contains(keys(local.multicast), each.value.multicast_policy) == true ? intersight_fabric_multicast_policy.map[each.value.multicast_policy
+    ].moid : local.policies_data["multicast"][each.value.multicast_policy].moid
   }
 }

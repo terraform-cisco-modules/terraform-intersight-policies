@@ -3,7 +3,6 @@
 # Intersight Fibre Channel Network Policy
 # GUI Location: Policies > Create Policy > Fibre Channel Network
 #__________________________________________________________________
-
 resource "intersight_vnic_fc_network_policy" "map" {
   for_each    = local.fibre_channel_network
   description = coalesce(each.value.description, "${each.value.name} Fibre-Channel Network Policy.")

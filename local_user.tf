@@ -3,7 +3,6 @@
 # Intersight Local User Policy
 # GUI Location: Policies > Create Policy > Local User
 #__________________________________________________________________
-
 resource "intersight_iam_end_point_user_policy" "map" {
   for_each    = local.local_user
   description = coalesce(each.value.description, "${each.value.name} Local User Policy.")
@@ -34,7 +33,6 @@ resource "intersight_iam_end_point_user_policy" "map" {
 # Intersight Local User - Add New User
 # GUI Location: Policies > Create Policy > Local User > Add New User
 #____________________________________________________________________
-
 resource "intersight_iam_end_point_user" "map" {
   depends_on = [
     intersight_iam_end_point_user_policy.map

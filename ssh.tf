@@ -3,7 +3,6 @@
 # Intersight SSH Policy
 # GUI Location: Policies > Create Policy > SSH
 #__________________________________________________________________
-
 resource "intersight_ssh_policy" "map" {
   for_each    = local.ssh
   description = coalesce(each.value.description, "${each.value.name} SSH Policy.")

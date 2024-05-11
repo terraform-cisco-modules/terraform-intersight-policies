@@ -3,7 +3,6 @@
 # Intersight SD Card Policy
 # GUI Location: Policies > Create Policy > SD Card
 #__________________________________________________________________
-
 resource "intersight_sdcard_policy" "map" {
   for_each    = local.sd_card
   description = coalesce(each.value.description, "${each.value.name} SD Card Policy.")

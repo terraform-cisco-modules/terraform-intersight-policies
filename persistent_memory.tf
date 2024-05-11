@@ -3,7 +3,6 @@
 # Intersight Persistent Memory Policy
 # GUI Location: Policies > Create Policy > Persistent Memory
 #__________________________________________________________________
-
 resource "intersight_memory_persistent_memory_policy" "map" {
   for_each          = local.persistent_memory
   description       = coalesce(each.value.description, "${each.value.name} Persistent Memory Policy.")

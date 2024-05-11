@@ -1,3 +1,8 @@
+#_________________________________________________________________
+#
+# Intersight BIOS Policy
+# GUI Location: Policies > Create Policy > BIOS
+#_________________________________________________________________
 resource "intersight_bios_policy" "map" {
   for_each    = local.bios
   description = coalesce(each.value.description, "${each.value.name} BIOS Policy.")

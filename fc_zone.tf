@@ -3,7 +3,6 @@
 # FC Zone Policies
 # GUI Location: Configure > Policies > Create Policy > FC Zone
 #__________________________________________________________________
-
 resource "intersight_fabric_fc_zone_policy" "map" {
   for_each              = local.fc_zone
   description           = coalesce(each.value.description, "${each.value.name} FC Zone Policy.")

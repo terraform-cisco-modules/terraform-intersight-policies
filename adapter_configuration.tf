@@ -3,7 +3,6 @@
 # Intersight Adapter Configuration Policy
 # GUI Location: Policies > Create Policy > Adapter Configuration
 #_________________________________________________________________
-
 resource "intersight_adapter_config_policy" "map" {
   for_each    = local.adapter_configuration
   description = coalesce(each.value.description, "${each.value.name} Adapter Configuration Policy.")

@@ -3,7 +3,6 @@
 # Intersight System QoS Policy
 # GUI Location: Policies > Create Policy > System QoS
 #__________________________________________________________________
-
 resource "intersight_fabric_system_qos_policy" "map" {
   for_each    = local.system_qos
   description = coalesce(each.value.description, "${each.value.name} System QoS Policy.")

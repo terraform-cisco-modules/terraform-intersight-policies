@@ -3,7 +3,6 @@
 # Intersight SNMP Policy
 # GUI Location: Policies > Create Policy > SNMP
 #__________________________________________________________________
-
 resource "intersight_snmp_policy" "map" {
   for_each                = local.snmp
   access_community_string = local.ps.snmp.access_community_string[each.value.access_community_string]

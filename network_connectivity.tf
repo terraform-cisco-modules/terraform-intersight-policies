@@ -3,7 +3,6 @@
 # Intersight Network Connectivity Policy
 # GUI Location: Policies > Create Policy > Network Connectivity
 #__________________________________________________________________
-
 resource "intersight_networkconfig_policy" "map" {
   for_each                 = local.network_connectivity
   alternate_ipv4dns_server = length(each.value.dns_servers_v4) > 1 ? each.value.dns_servers_v4[1] : "0.0.0.0"

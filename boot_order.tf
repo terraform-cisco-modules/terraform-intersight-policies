@@ -3,7 +3,6 @@
 # Intersight Boot Order Policy
 # GUI Location: Policies > Create Policy > Boot Order
 #__________________________________________________________________
-
 resource "intersight_boot_precision_policy" "map" {
   depends_on = [
     intersight_vnic_lan_connectivity_policy.map,

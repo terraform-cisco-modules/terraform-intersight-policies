@@ -3,7 +3,6 @@
 # Intersight Link Control Policy
 # GUI Location: Policies > Create Policy > Link Control
 #__________________________________________________________________
-
 resource "intersight_fabric_link_control_policy" "map" {
   for_each    = local.link_control
   description = coalesce(each.value.description, "${each.value.name} Link Control Policy.")

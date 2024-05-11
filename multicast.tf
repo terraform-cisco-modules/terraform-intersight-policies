@@ -3,7 +3,6 @@
 # Intersight Multicast Policy
 # GUI Location: Policies > Create Policy > Multicast
 #__________________________________________________________________
-
 resource "intersight_fabric_multicast_policy" "map" {
   for_each                = local.multicast
   description             = coalesce(each.value.description, "${each.value.name} Multicast Policy.")

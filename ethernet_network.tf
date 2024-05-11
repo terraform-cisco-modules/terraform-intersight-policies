@@ -3,7 +3,6 @@
 # Intersight Ethernet Network Policy
 # GUI Location: Policies > Create Policy > Ethernet Network
 #__________________________________________________________________
-
 resource "intersight_vnic_eth_network_policy" "map" {
   for_each    = local.ethernet_network
   description = coalesce(each.value.description, "${each.value.name} Ethernet Network Policy.")

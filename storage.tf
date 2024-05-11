@@ -3,7 +3,6 @@
 # Intersight Storage Policy
 # GUI Location: Policies > Create Policy > Storage
 #__________________________________________________________________
-
 resource "intersight_storage_storage_policy" "map" {
   for_each                 = local.storage
   default_drive_mode       = each.value.default_drive_state

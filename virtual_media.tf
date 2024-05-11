@@ -3,7 +3,6 @@
 # Intersight Virtual Media Policy
 # GUI Location: Policies > Create Policy > Virtual Media
 #__________________________________________________________________
-
 resource "intersight_vmedia_policy" "map" {
   for_each      = local.virtual_media
   description   = coalesce(each.value.description, "${each.value.name} Virtual Media Policy.")

@@ -3,7 +3,6 @@
 # Intersight iSCSI Static Target Policy
 # GUI Location: Policies > Create Policy > iSCSI Static Target
 #__________________________________________________________________
-
 resource "intersight_vnic_iscsi_static_target_policy" "map" {
   for_each    = local.iscsi_static_target
   description = coalesce(each.value.description, "${each.value.name} iSCSI Static Target Policy.")

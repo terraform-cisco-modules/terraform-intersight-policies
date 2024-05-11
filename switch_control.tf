@@ -3,7 +3,6 @@
 # Intersight Switch Control Policy
 # GUI Location: Policies > Create Policy > Switch Control
 #__________________________________________________________________
-
 resource "intersight_fabric_switch_control_policy" "map" {
   for_each                = local.switch_control
   description             = coalesce(each.value.description, "${each.value.name} Switch Control Policy.")

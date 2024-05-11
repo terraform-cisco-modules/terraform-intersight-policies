@@ -3,7 +3,6 @@
 # Intersight Certificate Management Policy
 # GUI Location: Policies > Create Policy > Certificate Management
 #__________________________________________________________________
-
 resource "intersight_certificatemanagement_policy" "map" {
   for_each    = local.certificate_management
   description = coalesce(each.value.description, "${each.value.name} Certificate Management Policy.")

@@ -3,7 +3,6 @@
 # Intersight Ethernet Network Group Policy
 # GUI Location: Policies > Create Policy > Ethernet Network Group
 #__________________________________________________________________
-
 resource "intersight_fabric_eth_network_group_policy" "map" {
   for_each    = local.ethernet_network_group
   description = coalesce(each.value.description, "${each.value.name} Ethernet Network Group Policy.")
