@@ -39,7 +39,6 @@ resource "intersight_vnic_vnic_template" "map" {
     intersight_fabric_eth_network_control_policy.map,
     intersight_fabric_eth_network_group_policy.map,
     intersight_vnic_eth_adapter_policy.map,
-    intersight_vnic_eth_network_policy.map,
     intersight_vnic_eth_qos_policy.map,
     intersight_vnic_iscsi_boot_policy.map
   ]
@@ -47,6 +46,7 @@ resource "intersight_vnic_vnic_template" "map" {
   enable_override  = each.value.allow_override
   failover_enabled = each.value.enable_failover
   name             = each.value.name
+  switch_id        = each.value.placement_switch_id
   cdn {
     value     = each.value.cdn_source == "user" ? each.value.cdn_value : each.value.name
     nr_source = each.value.cdn_source
@@ -132,16 +132,14 @@ resource "intersight_vnic_eth_if" "map" {
     intersight_vnic_eth_adapter_policy.map,
     intersight_vnic_eth_network_policy.map,
     intersight_vnic_eth_qos_policy.map,
-    intersight_vnic_iscsi_boot_policy.map,
-    intersight_vnic_vnic_template.map
+    intersight_vnic_iscsi_boot_policy.map
   ]
-  for_each         = local.vnics
-  failover_enabled = each.value.enable_failover
-  mac_address_type = each.value.mac_address_allocation_type
-  name             = each.value.name
-  order            = each.value.placement.pci_order
-  static_mac_address = length(regexall("STATIC", each.value.mac_address_allocation_type)
-  ) > 0 ? each.value.mac_address_static : null
+  for_each           = local.vnics
+  failover_enabled   = each.value.enable_failover
+  mac_address_type   = length(compact([each.value.mac_address_static])) > 0 ? "STATIC" : "POOL"
+  name               = each.value.name
+  order              = each.value.placement.pci_order
+  static_mac_address = length(compact([each.value.mac_address_static])) > 0 ? each.value.mac_address_static : null
   cdn {
     value     = each.value.cdn_source == "user" ? each.value.cdn_value : each.value.name
     nr_source = each.value.cdn_source
@@ -248,47 +246,44 @@ resource "intersight_vnic_eth_if" "from_template" {
     intersight_vnic_iscsi_boot_policy.map,
     intersight_vnic_vnic_template.map
   ]
-  for_each         = local.vnics_from_template
-  mac_address_type = each.value.mac_address_allocation_type
-  name             = each.value.name
-  order            = each.value.placement.pci_order
-  static_mac_address = length(regexall("STATIC", each.value.mac_address_allocation_type)
-  ) > 0 ? each.value.mac_address_static : null
-  cdn {
-    value     = each.value.cdn_source == "user" ? each.value.cdn_value : each.value.name
-    nr_source = each.value.cdn_source
-  }
-  dynamic "eth_adapter_policy" {
-    for_each = { for v in [each.value.ethernet_adapter_policy] : v => v if element(split("/", v), 1) != "UNUSED" }
-    content {
-      moid = contains(keys(local.ethernet_adapter), eth_adapter_policy.value) == true ? intersight_vnic_eth_adapter_policy.map[eth_adapter_policy.value
-      ].moid : local.policies_data["ethernet_adapter"][eth_adapter_policy.value].moid
-    }
-  }
-  lan_connectivity_policy {
-    moid = intersight_vnic_lan_connectivity_policy.map[each.value.lan_connectivity].moid
-  }
+  for_each           = local.vnics_from_template
+  mac_address_type   = length(compact([each.value.mac_address_static])) > 0 ? "STATIC" : "POOL"
+  name               = each.value.name
+  order              = each.value.placement.pci_order
+  static_mac_address = length(compact([each.value.mac_address_static])) > 0 ? each.value.mac_address_static : null
+  cdn { value = local.vnic_condition_check[each.value.vnic_template].cdn_source == "user" ? each.value.cdn_value : each.value.name }
+  lan_connectivity_policy { moid = intersight_vnic_lan_connectivity_policy.map[each.value.lan_connectivity].moid }
   placement {
     auto_pci_link = each.value.placement.automatic_pci_link_assignment
     auto_slot_id  = each.value.placement.automatic_slot_id_assignment
     id            = each.value.placement.slot_id
     pci_link      = each.value.placement.pci_link
-    switch_id     = each.value.placement.switch_id
+    switch_id     = local.vnic_condition_check[each.value.vnic_template].allow_override == true ? each.value.placement.switch_id : null
     uplink        = each.value.placement.uplink_port
   }
   src_template {
     moid = contains(keys(local.vnic_template), each.value.vnic_template) == true ? intersight_vnic_vnic_template.map[each.value.vnic_template
     ].moid : local.data_vnic_template["map"][each.value.vnic_template].moid
   }
+  dynamic "eth_adapter_policy" {
+    for_each = { for v in [each.value.ethernet_adapter_policy] : v => v if element(split("/", v), 1
+    ) != "UNUSED" && local.vnic_condition_check[each.value.vnic_template].allow_override == true }
+    content {
+      moid = contains(keys(local.ethernet_adapter), eth_adapter_policy.value) == true ? intersight_vnic_eth_adapter_policy.map[eth_adapter_policy.value
+      ].moid : local.policies_data["ethernet_adapter"][eth_adapter_policy.value].moid
+    }
+  }
   dynamic "iscsi_boot_policy" {
-    for_each = { for v in [each.value.iscsi_boot_policy] : v => v if element(split("/", v), 1) != "UNUSED" }
+    for_each = { for v in [each.value.iscsi_boot_policy] : v => v if element(split("/", v), 1
+    ) != "UNUSED" && local.vnic_condition_check[each.value.vnic_template].allow_override == true }
     content {
       moid = contains(keys(local.iscsi_boot), iscsi_boot_policy.value) == true ? intersight_vnic_iscsi_boot_policy.map[iscsi_boot_policy.value
       ].moid : local.policies_data["iscsi_boot"][iscsi_boot_policy.value].moid
     }
   }
   dynamic "mac_pool" {
-    for_each = { for v in [each.value.mac_address_pool] : v => v if element(split("/", v), 1) != "UNUSED" }
+    for_each = { for v in [each.value.mac_address_pool] : v => v if element(split("/", v), 1
+    ) != "UNUSED" && local.vnic_condition_check[each.value.vnic_template].allow_override == true }
     content {
       moid = contains(keys(local.pools.mac.moids), mac_pool.value) == true ? local.pools.mac.moids[mac_pool.value] : local.pools_data["mac"][mac_pool.value].moid
     }

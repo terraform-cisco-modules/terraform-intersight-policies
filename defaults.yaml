@@ -915,7 +915,6 @@ policies:
       ethernet_network_policy: UNUSED
       ethernet_qos_policy: UNUSED
       iscsi_boot_policies: [UNUSED]
-      mac_address_allocation_type: POOL
       mac_address_pools: [UNUSED]
       mac_addresses_static: []
       names: ['**REQUIRED**']
@@ -951,6 +950,7 @@ policies:
       ethernet_adapter_policy: UNUSED
       iscsi_boot_policy: UNUSED
       mac_address_pool: UNUSED
+      mac_address_static: ''
       name: '**REQUIRED**'
       placement:
         automatic_pci_link_assignment: true
@@ -1291,7 +1291,6 @@ policies:
         switch_ids: [A, B]
         uplink_ports: [0]
       vhba_type: fc-initiator
-      wwpn_allocation_type: POOL
       wwpn_pools: [UNUSED]
       wwpn_static_addresses: []
     vhbas_from_template:
@@ -1307,8 +1306,8 @@ policies:
         switch_id: A
         uplink_port: 0
       template: '**REQUIRED**'
-      wwpn_pool: ''
-    wwnn_allocation_type: POOL
+      wwpn_pool: UNUSED
+      wwpn_static_address: ''
     wwnn_pool: UNUSED
     wwnn_static_address: ''
   sd_card:
@@ -1565,7 +1564,7 @@ policies:
     description: ''
     fan_control_mode: Balanced
     name: '**REQUIRED**'
-  vhba_templates:
+  vhba_template:
     allow_override: false
     fc_zone_policies: []
     fibre_channel_adapter_policy: UNUSED
@@ -1573,8 +1572,8 @@ policies:
     fibre_channel_qos_policy: UNUSED
     name: '**REQUIRED**'
     persistent_lun_bindings: false
+    placement_switch_id: A
     vhba_type: fc-initiator
-    wwpn_allocation_type: POOL
     wwpn_pool: UNUSED
   virtual_kvm:
     allow_tunneled_vkvm: false
@@ -1600,7 +1599,7 @@ policies:
     enable_virtual_media: true
     enable_virtual_media_encryption: true
     name: '**REQUIRED**'
-  vnic_templates:
+  vnic_template:
     allow_override: false
     cdn_source: vnic
     cdn_value: ''
@@ -1612,6 +1611,7 @@ policies:
     iscsi_boot_policy: UNUSED
     mac_address_pool: UNUSED
     name: '**REQUIRED**'
+    placement_switch_id: A
     sr_iov:
       completion_queue_count_per_vf: 5
       enabled: false

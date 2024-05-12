@@ -10,7 +10,7 @@ resource "intersight_vnic_san_connectivity_policy" "map" {
   placement_mode      = each.value.vhba_placement_mode
   static_wwnn_address = each.value.wwnn_static_address
   target_platform     = each.value.target_platform
-  wwnn_address_type   = each.value.wwnn_allocation_type
+  wwnn_address_type   = length(compact([each.value.wwnn_static_address])) > 0 ? "STATIC" : "POOL"
   organization { moid = var.orgs[each.value.organization] }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
@@ -45,6 +45,7 @@ resource "intersight_vnic_vhba_template" "map" {
   enable_override     = each.value.allow_override
   name                = each.value.name
   persistent_bindings = each.value.persistent_lun_bindings
+  switch_id           = each.value.placement_switch_id
   type                = each.value.vhba_type
   fc_adapter_policy {
     moid = contains(keys(local.fibre_channel_adapter), each.value.fibre_channel_adapter_policy
@@ -94,9 +95,9 @@ resource "intersight_vnic_fc_if" "map" {
   name                = each.value.name
   order               = each.value.placement.pci_order
   persistent_bindings = each.value.persistent_lun_bindings
-  static_wwpn_address = each.value.wwpn_allocation_type == "STATIC" ? each.value.wwpn_static_address : ""
+  static_wwpn_address = each.value.wwpn_static_address
   type                = each.value.vhba_type
-  wwpn_address_type   = each.value.wwpn_allocation_type
+  wwpn_address_type   = length(compact([each.value.wwpn_static_address])) > 0 ? "STATIC" : "POOL"
   fc_adapter_policy {
     moid = contains(keys(local.fibre_channel_adapter), each.value.fibre_channel_adapter_policy
       ) == true ? intersight_vnic_fc_adapter_policy.map[each.value.fibre_channel_adapter_policy
@@ -154,8 +155,8 @@ resource "intersight_vnic_fc_if" "from_template" {
   for_each            = local.vhbas_from_template
   name                = each.value.name
   order               = each.value.placement.pci_order
-  static_wwpn_address = each.value.wwpn_allocation_type == "STATIC" ? each.value.wwpn_static_address : ""
-  wwpn_address_type   = each.value.wwpn_allocation_type
+  static_wwpn_address = each.value.wwpn_static_address
+  wwpn_address_type   = length(compact([each.value.wwpn_static_address])) > 0 ? "STATIC" : "POOL"
   san_connectivity_policy {
     moid = intersight_vnic_san_connectivity_policy.map[each.value.san_connectivity].moid
   }

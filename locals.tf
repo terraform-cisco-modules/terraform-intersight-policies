@@ -132,10 +132,16 @@ locals {
   data_vnic_template = {
     for e in lookup(lookup(data.intersight_vnic_vnic_template.map, "0", {}), "results", []) : "${local.org_names[e.organization[0].moid]}/${e.name}" => e
   }
-  vnic_condition_check = merge({ for k, v in local.data_vnic_template : k => {
-    proceed = v.sriov_settings[0].enabled == true ? false : v.usnic_settings[0].nr_count > 0 ? false : v.vmq_settings[0].enabled == true ? false : true
-    } }, { for k, v in local.vnic_template : k => {
-    proceed = v.sr_iov.enabled == true ? false : v.usnic.number_of_usnics > 0 ? false : v.vmq_settings.enabled == true ? false : true
+  vnic_condition_check = merge({
+    for k, v in local.data_vnic_template : k => {
+      allow_override = v.enable_override
+      cdn_source     = v.cdn[0].nr_source
+      proceed        = v.sriov_settings[0].enabled == true ? false : v.usnic_settings[0].nr_count > 0 ? false : v.vmq_settings[0].enabled == true ? false : true
+    }
+    }, { for k, v in local.vnic_template : k => {
+      allow_override = v.allow_override
+      cdn_source     = v.cdn_source
+      proceed        = v.sr_iov.enabled == true ? false : v.usnic.number_of_usnics > 0 ? false : v.vmq_settings.enabled == true ? false : true
   } })
   #
   # Local Defaults, no local loop
@@ -899,7 +905,7 @@ locals {
   ]]) : "${i.lan_connectivity}/${i.name}" => i }
   vnics_from_template = { for i in flatten([
     for k, v in local.lan_connectivity : [for e in v.vnics_from_template : merge(e, {
-      template_source = contains(keys(local.vnic_templates), e.vnic_template) ? "local" : "data"
+      template_source = contains(keys(local.vnic_template), e.vnic_template) ? "local" : "data"
     })]
   ]) : "${i.lan_connectivity}/${i.name}" => i }
 
@@ -1265,12 +1271,12 @@ locals {
         uplink_port                   = length(d.uplink_ports) == 2 ? element(d.uplink_ports, x) : element(d.uplink_ports, 0)
       }][0]
       wwpn_pool           = length(e.wwpn_pools) >= 2 ? element(e.wwpn_pools, x) : element(e.wwpn_pools, 0)
-      wwpn_static_address = length(e.wwpn_static_addresses) > 0 ? element(e.wwpn_static_addresses, x) : ""
+      wwpn_static_address = length(e.wwpn_static_addresses) == length(e.names) ? element(e.wwpn_static_addresses, x) : ""
     })]
   ]]) : "${i.san_connectivity}/${i.name}" => i }
   vhbas_from_template = { for i in flatten([
     for k, v in local.san_connectivity : [for e in v.vhbas_from_template : merge(e, {
-      template_source = contains(keys(local.vhba_templates), e.vhba_template) ? "local" : "data"
+      template_source = contains(keys(local.vhba_template), e.vhba_template) ? "local" : "data"
     })]
   ]) : "${i.lan_connectivity}/${i.name}" => i }
 
@@ -1468,29 +1474,17 @@ locals {
   # Intersight vHBA Templates
   # GUI Location: Templates > vHBA Templates > Create vHBA Template
   #_________________________________________________________________________
-  vhba_templates = local.defaults.vhba_templates
+  vhbat          = ["fibre_channel_adapter_policy", "fibre_channel_network_policy", "fibre_channel_qos_policy", "wwpn_pool"]
+  vhba_templates = local.defaults.vhba_template
   vhba_template = { for i in flatten([for org in sort(keys(var.model)) : [
     for v in lookup(lookup(var.model[org], "policies", {}), "vnic_template", []) : merge(local.vhba_templates, v, {
-      fc_zone_policies = length(v.fc_zone_policies) > 0 ? v.fc_zone_policies : []
-      fibre_channel_adapter_policy = {
-        name = length(regexall("/", v.fibre_channel_adapter_policy)) > 0 ? element(split("/", v.fibre_channel_adapter_policy), 1) : v.fibre_channel_adapter_policy
-        org  = length(regexall("/", v.fibre_channel_adapter_policy)) > 0 ? element(split("/", v.fibre_channel_adapter_policy), 0) : org
-      }
-      fibre_channel_network_policy = {
-        name = length(regexall("/", v.fibre_channel_network_policy)) > 0 ? element(split("/", v.fibre_channel_network_policy), 1) : v.fibre_channel_network_policies
-        org  = length(regexall("/", v.fibre_channel_network_policy)) > 0 ? element(split("/", v.fibre_channel_network_policy), 0) : org
-      }
-      fibre_channel_qos_policy = {
-        name = length(regexall("/", v.fibre_channel_qos_policy)) > 0 ? element(split("/", v.fibre_channel_qos_policy), 1) : v.fibre_channel_qos_policy
-        org  = length(regexall("/", v.fibre_channel_qos_policy)) > 0 ? element(split("/", v.fibre_channel_qos_policy), 0) : org
-      }
-      name         = "${local.npfx[org].vnic_template}${v.name}${local.nsfx[org].vnic_template}"
-      organization = org
-      tags         = lookup(v, "tags", var.global_settings.tags)
-      wwpn_pool = {
-        name = length(regexall("/", v.wwpn_pool)) > 0 ? element(split("/", v.wwpn_pool), 1) : v.wwpn_pool
-        org  = length(regexall("/", v.wwpn_pool)) > 0 ? element(split("/", v.wwpn_pool), 0) : org
-      }
+      for e in local.vhbat : e => length(regexall("/", lookup(v, e, "UNUSED"))) > 0 ? v[e] : "${org}/${lookup(v, e, "UNUSED")}"
+      }, {
+      fc_zone_policies = [for e in lookup(v, "fc_zone_policies", []) : length(regexall("/", e)) > 0 ? e : "${org}/${e}"]
+      key              = v.name
+      name             = "${local.npfx[org].vnic_template}${v.name}${local.nsfx[org].vnic_template}"
+      organization     = org
+      tags             = lookup(v, "tags", var.global_settings.tags)
     })
   ] if length(lookup(lookup(var.model[org], "policies", {}), "vnic_template", [])) > 0]) : "${i.organization}/${i.key}" => i }
 
@@ -1529,7 +1523,7 @@ locals {
   # GUI Location: Templates > vNIC Templates > Create vNIC Template
   #_________________________________________________________________________
   vnict          = ["ethernet_adapter_policy", "ethernet_network_control_policy", "ethernet_network_group_policy", "ethernet_qos_policy", "iscsi_boot_policy", "mac_address_pool"]
-  vnic_templates = local.defaults.vnic_templates
+  vnic_templates = local.defaults.vnic_template
   vnic_template = { for i in flatten([for org in sort(keys(var.model)) : [
     for v in lookup(lookup(var.model[org], "policies", {}), "vnic_template", []) : merge(local.vnic_templates, v, {
       for e in local.vnict : e => length(regexall("/", lookup(v, e, "UNUSED"))) > 0 ? v[e] : "${org}/${lookup(v, e, "UNUSED")}"
