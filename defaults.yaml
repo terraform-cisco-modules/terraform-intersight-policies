@@ -241,15 +241,23 @@ policies:
     advanced_mem_test: platform-default
     bme_dma_mitigation: platform-default
     burst_and_postponed_refresh: platform-default
+    cbs_cmn_cpu_sev_asid_space_limit: platform-default
     cbs_cmn_cpu_smee: platform-default
     cbs_cmn_gnb_nb_iommu: platform-default
     cbs_cmn_mem_ctrl_bank_group_swap_ddr4: platform-default
+    cbs_cmn_mem_dram_refresh_rate: platform-default
     cbs_cmn_mem_map_bank_interleave_ddr4: platform-default
+    cbs_cmn_mem_speed_ddr47xx2: platform-default
+    cbs_cmn_mem_speed_ddr47xx3: platform-default
     cbs_dbg_cpu_snp_mem_cover: platform-default
     cbs_dbg_cpu_snp_mem_size_cover: platform-default
+    cbs_df_cmn4link_max_xgmi_speed: platform-default
     cbs_df_cmn_dram_nps: platform-default
+    cbs_df_cmn_dram_scrub_time: platform-default
     cbs_df_cmn_mem_intlv: platform-default
+    cbs_df_cmn_mem_intlv_control: platform-default
     cbs_df_cmn_mem_intlv_size: platform-default
+    cbs_gnb_dbg_pcie_tbt_support: platform-default
     cbs_sev_snp_support: platform-default
     cke_low_policy: platform-default
     cr_qos: platform-default
@@ -266,6 +274,8 @@ policies:
     memory_size_limit: platform-default
     memory_thermal_throttling: platform-default
     mirroring_mode: platform-default
+    mmioh_base: platform-default
+    mmioh_size: platform-default
     numa_optimized: platform-default
     nvmdimm_perform_config: platform-default
     operation_mode: platform-default
@@ -279,6 +289,7 @@ policies:
     partial_mirror_value4: platform-default
     pc_ie_ras_support: platform-default
     post_package_repair: platform-default
+    runtime_post_package_repair: platform-default
     select_memory_ras_configuration: platform-default
     select_ppr_type: platform-default
     sev: platform-default
@@ -299,6 +310,7 @@ policies:
     onboard10gbit_lom: platform-default
     onboard_gbit_lom: platform-default
     pc_ie_ssd_hot_plug_support: platform-default
+    resize_bar_support: platform-default
     sr_iov: platform-default
     vga_priority: platform-default
     #+++++++++++++++++++++++++++++++
@@ -312,6 +324,7 @@ policies:
     cbs_cmn_cpu_l2stream_hw_prefetcher: platform-default
     cbs_cmn_determinism_slider: platform-default
     cbs_cmn_efficiency_mode_en: platform-default
+    cbs_cmn_efficiency_mode_en_rs: platform-default
     cbs_cmn_gnb_smucppc: platform-default
     cbs_cmnc_tdp_ctl: platform-default
     cpu_perf_enhancement: platform-default
@@ -331,14 +344,30 @@ policies:
     autonumous_cstate_enable: platform-default
     boot_performance_mode: platform-default
     cbs_cmn_apbdis: platform-default
+    cbs_cmn_apbdis_df_pstate_rs: platform-default
+    cbs_cmn_cpu_avx512: platform-default
     cbs_cmn_cpu_gen_downcore_ctrl: platform-default
     cbs_cmn_cpu_streaming_stores_ctrl: platform-default
+    cbs_cmn_edc_control_throttle: platform-default
     cbs_cmn_fixed_soc_pstate: platform-default
     cbs_cmn_gnb_smu_df_cstates: platform-default
+    cbs_cmn_gnb_smu_dffo_rs: platform-default
+    cbs_cmn_gnb_smu_dlwm_support: platform-default
+    cbs_cmn_mem_ctrller_pwr_dn_en_ddr: platform-default
+    cbs_cmn_preferred_io7xx2: platform-default
+    cbs_cmn_preferred_io7xx3: platform-default
+    cbs_cmnx_gmi_force_link_width_rs: platform-default
     cbs_cpu_ccd_ctrl_ssp: platform-default
     cbs_cpu_core_ctrl: platform-default
+    cbs_cpu_down_core_ctrl_bergamo: platform-default
+    cbs_cpu_down_core_ctrl_genoa: platform-default
     cbs_cpu_smt_ctrl: platform-default
+    cbs_dbg_cpu_gen_cpu_wdt: platform-default
+    cbs_dbg_cpu_lapic_mode: platform-default
+    cbs_dbg_cpu_lapic_mode7xx2: platform-default
+    cbs_dbg_cpu_lapic_mode7xx3: platform-default
     cbs_df_cmn_acpi_srat_l3numa: platform-default
+    cbs_df_dbg_xgmi_link_cfg: platform-default
     channel_inter_leave: platform-default
     cisco_xgmi_max_speed: platform-default
     closed_loop_therm_throtl: platform-default
@@ -351,6 +380,7 @@ policies:
     cpu_performance: platform-default
     cpu_power_management: platform-default
     demand_scrub: platform-default
+    dfx_osb_en: platform-default
     direct_cache_access: platform-default
     dram_clock_throttling: platform-default
     energy_efficient_turbo: platform-default
@@ -368,6 +398,7 @@ policies:
     intel_speed_select: platform-default
     intel_turbo_boost_tech: platform-default
     intel_virtualization_technology: platform-default
+    ioat_config_cpm: platform-default
     ioh_error_enable: platform-default
     ip_prefetch: platform-default
     kti_prefetch: platform-default
@@ -427,6 +458,7 @@ policies:
     out_of_band_mgmt_port: platform-default
     putty_key_pad: platform-default
     redirection_after_post: platform-default
+    serial_mux: platform-default
     terminal_type: platform-default
     ucsm_boot_order_rule: platform-default
     #+++++++++++++++++++++++++++++++
