@@ -11,14 +11,14 @@ output "data_pools" {
   description = "Moid's of the Pools that were not defined locally."
   value       = { for e in sort(keys(local.pools_data)) : e => { for k, v in local.pools_data[e] : k => v.moid } }
 }
-#output "data_vhba_templates" {
-#  description = "Moid's of the vHBA Templates that were not defined locally."
-#  value       = { for k, v in local.data_vhba_template : k => v.moid }
-#}
-#output "data_vnic_templates" {
-#  description = "Moid's of the vNIC Templates that were not defined locally."
-#  value       = { for k, v in local.data_vnic_template : k => v.moid }
-#}
+output "data_vhba_templates" {
+  description = "Moid's of the vHBA Templates that were not defined locally."
+  value       = { for k, v in local.data_vhba_template : k => v.moid }
+}
+output "data_vnic_templates" {
+  description = "Moid's of the vNIC Templates that were not defined locally."
+  value       = { for k, v in local.data_vnic_template : k => v.moid }
+}
 
 #__________________________________________________________
 #
