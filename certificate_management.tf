@@ -7,10 +7,7 @@ resource "intersight_certificatemanagement_policy" "map" {
   for_each    = local.certificate_management
   description = coalesce(each.value.description, "${each.value.name} Certificate Management Policy.")
   name        = each.value.name
-  organization {
-    moid        = var.orgs[each.value.organization]
-    object_type = "organization.Organization"
-  }
+  organization { moid = var.orgs[each.value.org] }
   dynamic "certificates" {
     for_each = { for k, v in each.value.certificates : k => v }
     content {

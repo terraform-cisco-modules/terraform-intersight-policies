@@ -7,10 +7,7 @@ resource "intersight_adapter_config_policy" "map" {
   for_each    = local.adapter_configuration
   description = coalesce(each.value.description, "${each.value.name} Adapter Configuration Policy.")
   name        = each.value.name
-  organization {
-    moid        = var.orgs[each.value.organization]
-    object_type = "organization.Organization"
-  }
+  organization { moid = var.orgs[each.value.org] }
   dynamic "settings" {
     for_each = { for v in each.value.add_vic_adapter_configuration : v.pci_slot => v }
     content {

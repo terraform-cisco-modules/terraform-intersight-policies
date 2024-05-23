@@ -11,7 +11,7 @@ resource "intersight_syslog_policy" "map" {
     min_severity = each.value.local_logging.minimum_severity
     object_type  = "syslog.LocalFileLoggingClient"
   }
-  organization { moid = var.orgs[each.value.organization] }
+  organization { moid = var.orgs[each.value.org] }
   dynamic "remote_clients" {
     for_each = { for k, v in each.value.remote_logging : k => merge(local.defaults.syslog.remote_logging, v) }
     content {

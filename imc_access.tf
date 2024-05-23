@@ -18,7 +18,7 @@ resource "intersight_access_policy" "map" {
     configure_inband      = length(regexall("UNUSED", each.value.inband_ip_pool)) == 0 ? true : false
     configure_out_of_band = length(regexall("UNUSED", each.value.out_of_band_ip_pool)) == 0 ? true : false
   }
-  organization { moid = var.orgs[each.value.organization] }
+  organization { moid = var.orgs[each.value.org] }
   dynamic "inband_ip_pool" {
     for_each = { for v in [each.value.inband_ip_pool] : v => v if element(split("/", v), 1) != "UNUSED" }
     content {

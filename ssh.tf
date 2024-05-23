@@ -10,7 +10,7 @@ resource "intersight_ssh_policy" "map" {
   name        = each.value.name
   port        = each.value.ssh_port
   timeout     = each.value.ssh_timeout
-  organization { moid = var.orgs[each.value.organization] }
+  organization { moid = var.orgs[each.value.org] }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
     content {

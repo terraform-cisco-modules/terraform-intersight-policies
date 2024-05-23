@@ -12,7 +12,7 @@ resource "intersight_fabric_multicast_policy" "map" {
   querier_state           = each.value.querier_state
   snooping_state          = each.value.snooping_state
   src_ip_proxy            = each.value.source_ip_proxy_state
-  organization { moid = var.orgs[each.value.organization] }
+  organization { moid = var.orgs[each.value.org] }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
     content {

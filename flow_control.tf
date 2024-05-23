@@ -10,7 +10,7 @@ resource "intersight_fabric_flow_control_policy" "map" {
   priority_flow_control_mode = each.value.priority
   receive_direction          = each.value.receive
   send_direction             = each.value.send
-  organization { moid = var.orgs[each.value.organization] }
+  organization { moid = var.orgs[each.value.org] }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
     content {

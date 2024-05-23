@@ -17,7 +17,7 @@ resource "intersight_snmp_policy" "map" {
   trap_community          = local.ps.snmp.trap_community_string[each.value.trap_community_string]
   v2_enabled              = length(each.value.v2_enabled) > 0 ? true : false
   v3_enabled              = length(each.value.snmp_users) > 0 ? true : false
-  organization { moid = var.orgs[each.value.organization] }
+  organization { moid = var.orgs[each.value.org] }
   dynamic "snmp_traps" {
     for_each = { for v in each.value.snmp_trap_destinations : v.destination_address => v }
     content {

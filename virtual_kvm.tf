@@ -13,7 +13,7 @@ resource "intersight_kvm_policy" "map" {
   name                      = each.value.name
   remote_port               = each.value.remote_port
   tunneled_kvm_enabled      = each.value.allow_tunneled_vkvm
-  organization { moid = var.orgs[each.value.organization] }
+  organization { moid = var.orgs[each.value.org] }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
     content {

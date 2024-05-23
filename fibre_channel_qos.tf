@@ -11,7 +11,7 @@ resource "intersight_vnic_fc_qos_policy" "map" {
   max_data_field_size = each.value.max_data_field_size
   name                = each.value.name
   rate_limit          = each.value.rate_limit
-  organization { moid = var.orgs[each.value.organization] }
+  organization { moid = var.orgs[each.value.org] }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
     content {

@@ -10,7 +10,7 @@ resource "intersight_vmedia_policy" "map" {
   encryption    = each.value.enable_virtual_media_encryption
   low_power_usb = each.value.enable_low_power_usb
   name          = each.value.name
-  organization { moid = var.orgs[each.value.organization] }
+  organization { moid = var.orgs[each.value.org] }
   dynamic "mappings" {
     for_each = { for v in each.value.add_virtual_media : v.name => v }
     content {

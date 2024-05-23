@@ -11,27 +11,13 @@ output "data_pools" {
   description = "Moid's of the Pools that were not defined locally."
   value       = { for e in sort(keys(local.pools_data)) : e => { for k, v in local.pools_data[e] : k => v.moid } }
 }
-#output "data_vhba_templates" {
-#  description = "Moid's of the vHBA Templates that were not defined locally."
-#  value       = { for k, v in local.data_vhba_template : k => v.moid }
-#}
-#output "data_vnic_templates" {
-#  description = "Moid's of the vNIC Templates that were not defined locally."
-#  value       = { for k, v in local.data_vnic_template : k => v.moid }
-#}
-
-#__________________________________________________________
-#
-# Name Prefix/Suffix Outputs
-#__________________________________________________________
-
-output "name_prefix" {
-  description = "Name Prefix Outputs."
-  value       = local.name_prefix
+output "data_vhba_templates" {
+  description = "Moid's of the vHBA Templates that were not defined locally."
+  value       = { for k, v in local.data_vhba_template : k => v.moid }
 }
-output "name_suffix" {
-  description = "Name Suffix Outputs."
-  value       = local.name_suffix
+output "data_vnic_templates" {
+  description = "Moid's of the vNIC Templates that were not defined locally."
+  value       = { for k, v in local.data_vnic_template : k => v.moid }
 }
 
 #__________________________________________________________
@@ -132,11 +118,7 @@ output "lan_connectivity" {
 }
 output "lan_connectivity_vnics" {
   description = "Moid's of the LAN Connectivity - VNICs Policies."
-  value = merge(
-    { for k, v in intersight_vnic_eth_if.map : k => v.moid }
-    #{ for k, v in intersight_vnic_eth_if.map : k => v.moid },
-    #{ for k, v in intersight_vnic_eth_if.from_template : k => v.moid }
-  )
+  value       = { for k, v in intersight_vnic_eth_if.map : k => v.moid }
 }
 output "link_aggregation" {
   description = "Moid's of the Link Control Policies."
@@ -174,25 +156,6 @@ output "port" {
   description = "Moid's of the Port Policies."
   value       = { for k, v in intersight_fabric_port_policy.map : k => v.moid }
 }
-output "ports" {
-  description = "Moid's of the Port Child Policies."
-  value = {
-    lan_pin_groups                = { for k, v in intersight_fabric_lan_pin_group.map : k => v.moid }
-    port_channel_appliances       = { for k, v in intersight_fabric_appliance_pc_role.map : k => v.moid }
-    port_channel_appliances       = { for k, v in intersight_fabric_appliance_pc_role.map : k => v.moid }
-    port_channel_ethernet_uplinks = { for k, v in intersight_fabric_uplink_pc_role.map : k => v.moid }
-    port_channel_fc_uplinks       = { for k, v in intersight_fabric_fc_uplink_pc_role.map : k => v.moid }
-    port_channel_fcoe_uplinks     = { for k, v in intersight_fabric_fcoe_uplink_pc_role.map : k => v.moid }
-    port_modes                    = { for k, v in intersight_fabric_port_mode.map : k => v.moid }
-    port_role_appliances          = { for k, v in intersight_fabric_appliance_role.map : k => v.moid }
-    port_role_ethernet_uplinks    = { for k, v in intersight_fabric_uplink_role.map : k => v.moid }
-    port_role_fc_storage          = { for k, v in intersight_fabric_fc_storage_role.map : k => v.moid }
-    port_role_fc_uplinks          = { for k, v in intersight_fabric_fc_uplink_role.map : k => v.moid }
-    port_role_fcoe_uplinks        = { for k, v in intersight_fabric_fcoe_uplink_role.map : k => v.moid }
-    port_role_servers             = { for k, v in intersight_fabric_server_role.map : k => v.moid }
-    san_pin_groups                = { for k, v in intersight_fabric_san_pin_group.map : k => v.moid }
-  }
-}
 output "power" {
   description = "Moid's of the Power Policies."
   value       = { for k, v in intersight_power_policy.map : k => v.moid }
@@ -203,11 +166,7 @@ output "san_connectivity" {
 }
 output "san_connectivity_vhbas" {
   description = "Moid's of the SAN Connectivity - VHBAs Policies."
-  value = merge(
-    { for k, v in intersight_vnic_fc_if.map : k => v.moid }
-    #{ for k, v in intersight_vnic_fc_if.map : k => v.moid },
-    #{ for k, v in intersight_vnic_fc_if.from_template : k => v.moid }
-  )
+  value       = { for k, v in intersight_vnic_fc_if.map : k => v.moid }
 }
 output "sd_card" {
   description = "Moid's of the SD Card Policies."
@@ -249,10 +208,10 @@ output "thermal" {
   description = "Moid's of the Thermal Policies."
   value       = { for k, v in intersight_thermal_policy.map : k => v.moid }
 }
-#output "vhba_template" {
-#  description = "Moid's of the vHBA Templates."
-#  value       = { for k, v in intersight_vnic_vhba_template.map : k => v.moid }
-#}
+output "vhba_template" {
+  description = "Moid's of the vHBA Templates."
+  value       = { for k, v in intersight_vnic_vhba_template.map : k => v.moid }
+}
 output "virtual_kvm" {
   description = "Moid's of the Virtual KVM Policies."
   value       = { for k, v in intersight_kvm_policy.map : k => v.moid }
@@ -265,11 +224,17 @@ output "vlan" {
   description = "Moid's of the VLAN Policies."
   value       = { for k, v in intersight_fabric_eth_network_policy.map : k => v.moid }
 }
-#output "vnic_template" {
-#  description = "Moid's of the vNIC Templates."
-#  value       = { for k, v in intersight_vnic_vnic_template.map : k => v.moid }
-#}
+output "vnic_template" {
+  description = "Moid's of the vNIC Templates."
+  value       = { for k, v in intersight_vnic_vnic_template.map : k => v.moid }
+}
 output "vsan" {
   description = "Moid's of the VSAN Policies."
   value       = { for k, v in intersight_fabric_fc_network_policy.map : k => v.moid }
+}
+output "xtesting" {
+  value = local.vnics
+}
+output "xtesting2" {
+  value = local.vnic_template
 }

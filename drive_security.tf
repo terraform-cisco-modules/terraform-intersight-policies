@@ -31,10 +31,7 @@ resource "intersight_storage_drive_security_policy" "map" {
     }
   }
   name = each.value.name
-  organization {
-    moid        = var.orgs[each.value.organization]
-    object_type = "organization.Organization"
-  }
+  organization { moid = var.orgs[each.value.org] }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
     content {

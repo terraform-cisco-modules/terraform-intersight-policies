@@ -24,7 +24,7 @@ resource "intersight_vnic_fc_adapter_policy" "map" {
     timeout = each.value.flogi.timeout
   }
   interrupt_settings { mode = each.value.interrupt.mode }
-  organization { moid = var.orgs[each.value.organization] }
+  organization { moid = var.orgs[each.value.org] }
   plogi_settings {
     retries = each.value.plogi.retries
     timeout = each.value.plogi.timeout

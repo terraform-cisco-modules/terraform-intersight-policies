@@ -16,10 +16,7 @@ resource "intersight_iam_end_point_user_policy" "map" {
     password_expiry_duration = each.value.password_properties.password_expiry_duration
     password_history         = each.value.password_properties.password_history
   }
-  organization {
-    moid        = var.orgs[each.value.organization]
-    object_type = "organization.Organization"
-  }
+  organization { moid = var.orgs[each.value.org] }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
     content {
@@ -39,7 +36,7 @@ resource "intersight_iam_end_point_user" "map" {
   ]
   for_each = local.users
   name     = each.value.name
-  organization { moid = var.orgs[each.value.organization] }
+  organization { moid = var.orgs[each.value.org] }
 }
 
 resource "intersight_iam_end_point_user_role" "map" {

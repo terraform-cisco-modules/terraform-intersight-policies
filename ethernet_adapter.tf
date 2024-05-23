@@ -24,7 +24,7 @@ resource "intersight_vnic_eth_adapter_policy" "map" {
     mode            = each.value.interrupt_settings.mode
   }
   nvgre_settings { enabled = each.value.enable_nvgre_offload }
-  organization { moid = var.orgs[each.value.organization] }
+  organization { moid = var.orgs[each.value.org] }
   ptp_settings { enabled = each.value.enable_precision_time_protocol }
   roce_settings {
     class_of_service = each.value.roce_settings.class_of_service

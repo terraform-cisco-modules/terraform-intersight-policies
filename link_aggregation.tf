@@ -9,7 +9,7 @@ resource "intersight_fabric_link_aggregation_policy" "map" {
   lacp_rate          = each.value.lacp_rate
   name               = each.value.name
   suspend_individual = each.value.suspend_individual
-  organization { moid = var.orgs[each.value.organization] }
+  organization { moid = var.orgs[each.value.org] }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
     content {

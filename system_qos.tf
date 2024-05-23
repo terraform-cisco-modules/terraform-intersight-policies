@@ -7,7 +7,7 @@ resource "intersight_fabric_system_qos_policy" "map" {
   for_each    = local.system_qos
   description = coalesce(each.value.description, "${each.value.name} System QoS Policy.")
   name        = each.value.name
-  organization { moid = var.orgs[each.value.organization] }
+  organization { moid = var.orgs[each.value.org] }
   dynamic "classes" {
     for_each = each.value.classes
     content {

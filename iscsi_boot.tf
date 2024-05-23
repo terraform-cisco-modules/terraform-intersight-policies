@@ -65,7 +65,7 @@ resource "intersight_vnic_iscsi_boot_policy" "map" {
   ] : null
   name               = each.value.name
   target_source_type = each.value.target_source_type
-  organization { moid = var.orgs[each.value.organization] }
+  organization { moid = var.orgs[each.value.org] }
   dynamic "initiator_ip_pool" {
     for_each = { for v in [each.value.initiator_ip_pool] : v => v if element(split("/", v), 1) != "UNUSED" }
     content {

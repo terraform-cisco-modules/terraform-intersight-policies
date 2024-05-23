@@ -13,7 +13,7 @@ resource "intersight_vnic_eth_qos_policy" "map" {
   priority       = each.value.priority
   rate_limit     = each.value.rate_limit
   trust_host_cos = each.value.enable_trust_host_cos
-  organization { moid = var.orgs[each.value.organization] }
+  organization { moid = var.orgs[each.value.org] }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
     content {

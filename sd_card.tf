@@ -7,7 +7,7 @@ resource "intersight_sdcard_policy" "map" {
   for_each    = local.sd_card
   description = coalesce(each.value.description, "${each.value.name} SD Card Policy.")
   name        = each.value.name
-  organization { moid = var.orgs[each.value.organization] }
+  organization { moid = var.orgs[each.value.org] }
   dynamic "partitions" {
     for_each = { for v in [each.value.enable_os] : v => v if each.value.enable_os == true }
     content {

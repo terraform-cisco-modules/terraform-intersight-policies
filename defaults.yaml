@@ -950,6 +950,7 @@ policies:
       mac_address_pools: [UNUSED]
       mac_addresses_static: []
       names: ['**REQUIRED**']
+      pin_group_names: []
       placement:
         automatic_pci_link_assignment: true
         automatic_slot_id_assignment: true
@@ -984,6 +985,7 @@ policies:
       mac_address_pool: UNUSED
       mac_address_static: ''
       name: '**REQUIRED**'
+      pin_group_name: ''
       placement:
         automatic_pci_link_assignment: true
         automatic_slot_id_assignment: true
@@ -1209,6 +1211,24 @@ policies:
       socket_memory_id: 'Not Applicable'
     passphrase: 1
     retain_namespaces: true
+  pool_prefix:
+    default: ''
+    ip: ''
+    iqn: ''
+    mac: ''
+    resource: ''
+    uuid: ''
+    wwnn: ''
+    wwpn: ''
+  pool_suffix:
+    default: ''
+    ip: ''
+    iqn: ''
+    mac: ''
+    resource: ''
+    uuid: ''
+    wwnn: ''
+    wwpn: ''
   port:
     description: ''
     device_model: UCS-FI-6454
@@ -1217,6 +1237,12 @@ policies:
       breakout_port_id: 0
       port_id: 1
       slot_id: 1
+    pin_groups:
+      enabled: true
+      identifier: 1/1
+      interface_type: port
+      pin_group_name: pg1
+      pin_group_type: san
     port_channel_appliances:
       admin_speed: Auto
       ethernet_network_control_policy: UNUSED
@@ -1269,13 +1295,13 @@ policies:
       breakout_port_id: 0
       port_list: '1'
       slot_id: 1
-      vsan_id: 1
+      vsan_ids: [1]
     port_role_fc_uplinks:
       admin_speed: 32Gbps
       breakout_port_id: 0
       port_list: '1'
       slot_id: 1
-      vsan_id: 1
+      vsan_ids: [1]
     port_role_fcoe_uplinks:
       admin_speed: Auto
       breakout_port_id: 0
@@ -1314,6 +1340,7 @@ policies:
       fibre_channel_qos_policy: UNUSED
       names: []
       persistent_lun_bindings: false
+      pin_group_names: []
       placement:
         automatic_pci_link_assignment: true
         automatic_slot_id_assignment: true
@@ -1329,6 +1356,7 @@ policies:
       fibre_channel_adapter_policy: UNUSED
       fibre_channel_network_policy: UNUSED
       name: '**REQUIRED**'
+      pin_group_name: ''
       placement:
         automatic_pci_link_assignment: true
         automatic_slot_id_assignment: true
@@ -1603,6 +1631,7 @@ policies:
     fibre_channel_network_policy: UNUSED
     fibre_channel_qos_policy: UNUSED
     name: '**REQUIRED**'
+    pin_group_name: ''
     persistent_lun_bindings: false
     placement_switch_id: A
     vhba_type: fc-initiator
@@ -1643,6 +1672,7 @@ policies:
     iscsi_boot_policy: UNUSED
     mac_address_pool: UNUSED
     name: '**REQUIRED**'
+    pin_group_name: ''
     placement_switch_id: A
     sr_iov:
       completion_queue_count_per_vf: 5
@@ -1654,14 +1684,14 @@ policies:
     usnic:
       class_of_service: 5
       number_of_usnics: 0
-      usnic_adapter_policy: ''
+      usnic_adapter_policy: UNUSED
     vmq:
       enable_virtual_machine_multi_queue: false
       enabled: false
       number_of_interrupts: 16
       number_of_sub_vnics: 64
       number_of_virtual_machine_queues: 4
-      vmmq_adapter_policy: ''
+      vmmq_adapter_policy: UNUSED
   vlan:
     description: ''
     name: '**REQUIRED**'

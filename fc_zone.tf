@@ -8,7 +8,7 @@ resource "intersight_fabric_fc_zone_policy" "map" {
   description           = coalesce(each.value.description, "${each.value.name} FC Zone Policy.")
   fc_target_zoning_type = each.value.fc_target_zoning_type
   name                  = each.value.name
-  organization { moid = var.orgs[each.value.organization] }
+  organization { moid = var.orgs[each.value.org] }
   dynamic "fc_target_members" {
     for_each = { for v in lookup(each.value, "targets", []) : v.name => v }
     content {

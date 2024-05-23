@@ -15,7 +15,7 @@ resource "intersight_fabric_port_policy" "map" {
   description  = coalesce(each.value.description, "${each.value.name} Port Policy.")
   device_model = each.value.device_model
   name         = each.value.name
-  organization { moid = var.orgs[each.value.organization] }
+  organization { moid = var.orgs[each.value.org] }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
     content {
@@ -423,6 +423,62 @@ resource "intersight_fabric_server_role" "map" {
   preferred_device_id       = lookup(each.value, "device_number", null)
   preferred_device_type     = lookup(each.value, "connected_device_type", "Auto") # Chassis, RackServer
   slot_id                   = lookup(each.value, "slot_id", 1)
+  port_policy { moid = intersight_fabric_port_policy.map[each.value.port_policy].moid }
+  dynamic "tags" {
+    for_each = { for v in each.value.tags : v.key => v }
+    content {
+      key   = tags.value.key
+      value = tags.value.value
+    }
+  }
+}
+
+resource "intersight_fabric_lan_pin_group" "map" {
+  depends_on = [
+    intersight_fabric_port_policy.map,
+    intersight_fabric_uplink_pc_role.map,
+    intersight_fabric_fc_uplink_pc_role.map,
+    intersight_fabric_uplink_role.map,
+    intersight_fabric_fc_storage_role.map,
+    intersight_fabric_fc_uplink_role.map
+  ]
+  for_each = { for k, v in local.port_pin_groups : k => v if v.pin_group_type == "lan" }
+  name     = each.value.pin_group_name
+  dynamic "pin_target_interface_role" {
+    for_each = { for v in [0] : v => v if each.value.enabled == true }
+    content {
+      moid        = local.pin_group_maps[each.value.interface_type].moids[each.value.policy_name]
+      object_type = local.pin_group_maps[each.value.interface_type].object
+    }
+  }
+  port_policy { moid = intersight_fabric_port_policy.map[each.value.port_policy].moid }
+  dynamic "tags" {
+    for_each = { for v in each.value.tags : v.key => v }
+    content {
+      key   = tags.value.key
+      value = tags.value.value
+    }
+  }
+}
+
+resource "intersight_fabric_san_pin_group" "map" {
+  depends_on = [
+    intersight_fabric_port_policy.map,
+    intersight_fabric_uplink_pc_role.map,
+    intersight_fabric_fc_uplink_pc_role.map,
+    intersight_fabric_uplink_role.map,
+    intersight_fabric_fc_storage_role.map,
+    intersight_fabric_fc_uplink_role.map
+  ]
+  for_each = { for k, v in local.port_pin_groups : k => v if v.pin_group_type == "san" }
+  name     = each.value.pin_group_name
+  dynamic "pin_target_interface_role" {
+    for_each = { for v in [0] : v => v if each.value.enabled == true }
+    content {
+      moid        = local.pin_group_maps[each.value.interface_type].moids[each.value.policy_name]
+      object_type = local.pin_group_maps[each.value.interface_type].object
+    }
+  }
   port_policy { moid = intersight_fabric_port_policy.map[each.value.port_policy].moid }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }

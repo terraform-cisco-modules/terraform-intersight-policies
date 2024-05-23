@@ -10,7 +10,7 @@ resource "intersight_vnic_iscsi_static_target_policy" "map" {
   name        = each.value.name
   port        = each.value.port
   target_name = each.value.target_name
-  organization { moid = var.orgs[each.value.organization] }
+  organization { moid = var.orgs[each.value.org] }
   dynamic "lun" {
     for_each = { for v in [lookup(each.value, "lun_id", 0)] : v => v }
     content {

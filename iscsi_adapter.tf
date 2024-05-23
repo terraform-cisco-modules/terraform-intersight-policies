@@ -10,7 +10,7 @@ resource "intersight_vnic_iscsi_adapter_policy" "map" {
   dhcp_timeout         = each.value.dhcp_timeout
   lun_busy_retry_count = each.value.lun_busy_retry_count
   name                 = each.value.name
-  organization { moid = var.orgs[each.value.organization] }
+  organization { moid = var.orgs[each.value.org] }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
     content {

@@ -16,7 +16,7 @@ resource "intersight_fabric_eth_network_control_policy" "map" {
     receive_enabled  = each.value.lldp_enable_receive
     transmit_enabled = each.value.lldp_enable_transmit
   }
-  organization { moid = var.orgs[each.value.organization] }
+  organization { moid = var.orgs[each.value.org] }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
     content {

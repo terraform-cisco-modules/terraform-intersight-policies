@@ -8,10 +8,7 @@ resource "intersight_deviceconnector_policy" "map" {
   description     = coalesce(each.value.description, "${each.value.name} Device Connector Policy.")
   lockout_enabled = each.value.configuration_lockout
   name            = each.value.name
-  organization {
-    moid        = var.orgs[each.value.organization]
-    object_type = "organization.Organization"
-  }
+  organization { moid = var.orgs[each.value.org] }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
     content {

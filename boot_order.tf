@@ -13,10 +13,7 @@ resource "intersight_boot_precision_policy" "map" {
   description              = coalesce(each.value.description, "${each.value.name} Boot Order Policy.")
   enforce_uefi_secure_boot = each.value.enable_secure_boot
   name                     = each.value.name
-  organization {
-    moid        = var.orgs[each.value.organization]
-    object_type = "organization.Organization"
-  }
+  organization { moid = var.orgs[each.value.org] }
   dynamic "boot_devices" {
     for_each = { for v in each.value.boot_devices : v.name => v }
     content {

@@ -7,7 +7,7 @@ resource "intersight_vnic_fc_network_policy" "map" {
   for_each    = local.fibre_channel_network
   description = coalesce(each.value.description, "${each.value.name} Fibre-Channel Network Policy.")
   name        = each.value.name
-  organization { moid = var.orgs[each.value.organization] }
+  organization { moid = var.orgs[each.value.org] }
   vsan_settings {
     default_vlan_id = each.value.default_vlan_id
     id              = each.value.vsan_id

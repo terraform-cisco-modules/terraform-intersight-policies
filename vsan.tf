@@ -8,7 +8,7 @@ resource "intersight_fabric_fc_network_policy" "map" {
   description     = coalesce(each.value.description, "${each.value.name} VSAN Policy.")
   enable_trunking = each.value.uplink_trunking
   name            = each.value.name
-  organization { moid = var.orgs[each.value.organization] }
+  organization { moid = var.orgs[each.value.org] }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
     content {

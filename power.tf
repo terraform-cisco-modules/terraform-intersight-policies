@@ -15,7 +15,7 @@ resource "intersight_power_policy" "map" {
   power_restore_state     = each.value.power_restore
   power_save_mode         = each.value.power_save_mode
   redundancy_mode         = each.value.power_redundancy
-  organization { moid = var.orgs[each.value.organization] }
+  organization { moid = var.orgs[each.value.org] }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
     content {
