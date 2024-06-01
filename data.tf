@@ -14,6 +14,6 @@ data "intersight_search_search_item" "pools" {
     ) > 0 ? jsonencode({ "ClassId" = "${local.pools[each.key].object}' and Name in ('${trim(join("', '", local.data_pools[each.key]), ", '")}') and PoolPurpose eq '${upper(each.key)}" }
   ) : jsonencode({ "ClassId" = "${local.pools[each.key].object}' and Name in ('${trim(join("', '", local.data_pools[each.key]), ", '")}') and ObjectType eq '${local.pools[each.key].object}" })
 }
-data "intersight_vnic_vhba_template" "map" { for_each = { for v in [0] : v => v if length(local.data_policies["vhba_template"]) > 0 } }
-data "intersight_vnic_vnic_template" "map" { for_each = { for v in [0] : v => v if length(local.data_policies["vnic_template"]) > 0 } }
+#data "intersight_vnic_vhba_template" "map" { for_each = { for v in [0] : v => v if length(local.data_policies["vhba_template"]) > 0 } }
+#data "intersight_vnic_vnic_template" "map" { for_each = { for v in [0] : v => v if length(local.data_policies["vnic_template"]) > 0 } }
 
