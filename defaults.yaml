@@ -6,6 +6,7 @@ policies:
         dce_interface_fec_modes: [cl91]
       enable_fip: true
       enable_lldp: true
+      enable_physical_nic_mode: false
       enable_port_channel: true
       pci_slot: MLOM
     description: ''
@@ -788,6 +789,7 @@ policies:
     description: ''
     name: '**REQUIRED**'
     vlan_mode: ACCESS
+    qinq_vlan: 0
   ethernet_network_control:
     action_on_uplink_fail: linkDown
     cdp_enable: false
@@ -802,6 +804,7 @@ policies:
     description: ''
     name: '**REQUIRED**'
     native_vlan: null
+    qinq_vlan: 0
   ethernet_qos:
     burst: 10240
     cos: 0
@@ -959,7 +962,7 @@ policies:
         slot_ids: []
         switch_ids: [A, B]
         uplink_ports: [0]
-      sr_iov:
+      sriov:
         completion_queue_count_per_vf: 5
         enabled: false
         interrupt_count_per_vf: 8
@@ -994,7 +997,7 @@ policies:
         slot_id: ''
         switch_id: A
         uplink_port: 0
-      sr_iov:
+      sriov:
         completion_queue_count_per_vf: 5
         enabled: false
         interrupt_count_per_vf: 8
@@ -1446,7 +1449,7 @@ policies:
         boot_drive: false
         expand_to_available: true
         name: '**REQUIRED**'
-        size: 50
+        size: 0
         virtual_drive_policy:
           access_policy: Default
           drive_cache: Default
@@ -1674,7 +1677,7 @@ policies:
     name: '**REQUIRED**'
     pin_group_name: ''
     placement_switch_id: A
-    sr_iov:
+    sriov:
       completion_queue_count_per_vf: 5
       enabled: false
       interrupt_count_per_vf: 8

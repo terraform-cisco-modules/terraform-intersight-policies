@@ -11,7 +11,7 @@ locals {
   lds       = local.defaults.drive_security
   model     = { for org in local.org_keys : org => lookup(var.model[org], "policies", {}) }
   org_keys  = sort(keys(var.model))
-  org_names = { for k, v in var.orgs : v => k }
+  org_names = merge({ for k, v in var.orgs : v => k }, jsondecode("{\"5ddfd9ff6972652d31ee6582\":\"x_cisco_intersight_internal\"}"))
   ps        = var.policies_sensitive
   vmedia    = local.defaults.virtual_media
   #____________________________________________________________
@@ -191,7 +191,7 @@ locals {
     }, { for k, v in local.vnic_template : k => {
       allow_override = v.allow_override
       cdn_source     = v.cdn_source
-      proceed        = v.sr_iov.enabled == true ? false : v.usnic.number_of_usnics > 0 ? false : v.vmq.enabled == true ? false : true
+      proceed        = v.sriov.enabled == true ? false : v.usnic.number_of_usnics > 0 ? false : v.vmq.enabled == true ? false : true
   } })
 
   #_________________________________________________________________
@@ -877,9 +877,9 @@ locals {
       vnics = flatten([for e in lookup(v, "vnics", []) : merge(local.lcp.vnics, e, {
         enable_failover = length(regexall(true, lookup(e, "enable_failover", false))
         ) > 0 ? e.enable_failover : length(e.names) == 1 ? true : false
-        org    = org
-        sr_iov = merge(local.lcp.vnics.sr_iov, lookup(e, "sr_iov", {}))
-        tags   = lookup(v, "tags", var.global_settings.tags)
+        org   = org
+        sriov = merge(local.lcp.vnics.sriov, lookup(e, "sriov", {}))
+        tags  = lookup(v, "tags", var.global_settings.tags)
         usnic = [for d in [merge(local.lcp.vnics.usnic, lookup(e, "usnic", {}))] : merge(d, {
           usnic_adapter_policy = [for f in [d.usnic_adapter_policy] : {
             name = length(regexall("/", f)) > 0 ? element(split("/", f), 1) : f
@@ -906,13 +906,13 @@ locals {
         for e in lookup(v, "vnics_from_template", []) : merge(local.lcp.vnics_from_template, e, {
           name = e.name
           org  = org
-          placement = [for d in [merge(local.lcp.vnics.placement, lookup(e, "placement", {}))] : {
+          placement = [for d in [merge(local.lcp.vnics_from_template.placement, lookup(e, "placement", {}))] : merge(d, {
             automatic_pci_link_assignment = d.pci_link != null ? false : true
             automatic_slot_id_assignment  = d.slot_id != "" ? false : true
             pci_link                      = d.pci_link != null ? d.pci_link : 0
-          }][0]
-          sr_iov = merge(local.lcp.vnics.sr_iov, lookup(e, "sr_iov", {}))
-          tags   = lookup(v, "tags", var.global_settings.tags)
+          })][0]
+          sriov = merge(local.lcp.vnics.sriov, lookup(e, "sriov", {}))
+          tags  = lookup(v, "tags", var.global_settings.tags)
           usnic = [for d in [merge(local.lcp.vnics.usnic, lookup(e, "usnic", {}))] : merge(d, {
             usnic_adapter_policy = [for f in [d.usnic_adapter_policy] : {
               name = length(regexall("/", f)) > 0 ? element(split("/", f), 1) : f
@@ -989,7 +989,7 @@ locals {
       }, {
       usnic = merge(e.usnic, { usnic_adapter_policy = [for f in [e.usnic.usnic_adapter_policy] : length(regexall("^UNUSED$", f.name)
       ) == 0 ? "${f.org}/${local.ppfx[f.org].ethernet_adapter}${f.name}${local.psfx[f.org].ethernet_adapter}" : "${f.org}/${f.name}"][0] })
-      vmq = merge(e.vmq, { vmmq_adapter_policy = [for f in [e.vmq.vmmq_adapter_policy] : length(regexall("^UNUSED$", f)
+      vmq = merge(e.vmq, { vmmq_adapter_policy = [for f in [e.vmq.vmmq_adapter_policy] : length(regexall("^UNUSED$", f.name)
       ) == 0 ? "${f.org}/${local.ppfx[f.org].ethernet_adapter}${f.name}${local.psfx[f.org].ethernet_adapter}" : "${f.org}/${f.name}"][0] })
     })]
   ]) : "${i.lan_connectivity}/${i.name}" => i }
@@ -1156,9 +1156,8 @@ locals {
   # Intersight Port Policy
   # GUI Location: Policies > Create Policy > Port
   #__________________________________________________________________
-  lport  = local.defaults.port
-  pcethp = ["ethernet_network_control_policy", "ethernet_network_group_policy", "flow_control_policy", "link_aggregation_policy", "link_control_policy"]
-  prethp = setsubtract(local.pcethp, ["link_aggregation_policy"])
+  lport = local.defaults.port
+  pethp = ["ethernet_network_control_policy", "ethernet_network_group_policy", "flow_control_policy", "link_aggregation_policy", "link_control_policy"]
   port = { for i in flatten([for org in local.org_keys : [
     for v in lookup(local.model[org], "port", []) : [
       for x in range(length(v.names)) : merge(local.defaults.port, v, {
@@ -1175,7 +1174,7 @@ locals {
           slot_id = lookup(e, "interface_type", local.lport.pin_groups.interface_type) == "port" ? element(split("/", e.identifier), 0) : 1
         })]
         port_channel_appliances = [for e in lookup(v, "port_channel_appliances", []) : merge(local.lport.port_channel_appliances, e, {
-          for d in local.pcethp : d => {
+          for d in local.pethp : d => {
             name = length(regexall("/", lookup(e, d, "UNUSED"))) > 0 ? element(split("/", e[d]), 1) : lookup(e, d, "UNUSED")
             org  = length(regexall("/", lookup(e, d, "UNUSED"))) > 0 ? element(split("/", e[d]), 0) : org
           } }, {
@@ -1184,7 +1183,7 @@ locals {
           port_policy = "${org}/${local.npfx[org].port}${element(v.names, x)}${local.nsfx[org].port}"
         })]
         port_channel_ethernet_uplinks = [for e in lookup(v, "port_channel_ethernet_uplinks", []) : merge(local.lport.port_channel_ethernet_uplinks, e, {
-          for d in local.pcethp : d => {
+          for d in local.pethp : d => {
             name = length(regexall("/", lookup(e, d, "UNUSED"))) > 0 ? element(split("/", e[d]), 1) : lookup(e, d, "UNUSED")
             org  = length(regexall("/", lookup(e, d, "UNUSED"))) > 0 ? element(split("/", e[d]), 0) : org
           } }, {
@@ -1199,7 +1198,7 @@ locals {
           vsan_id     = length(e.vsan_ids) >= 2 ? element(e.vsan_ids, x) : element(e.vsan_ids, 0)
         })]
         port_channel_fcoe_uplinks = [for e in lookup(v, "port_channel_fcoe_uplinks", []) : merge(local.lport.port_channel_fcoe_uplinks, e, {
-          for d in local.pcethp : d => {
+          for d in local.pethp : d => {
             name = length(regexall("/", lookup(e, d, "UNUSED"))) > 0 ? element(split("/", e[d]), 1) : lookup(e, d, "UNUSED")
             org  = length(regexall("/", lookup(e, d, "UNUSED"))) > 0 ? element(split("/", e[d]), 0) : org
           } }, {
@@ -1212,7 +1211,7 @@ locals {
           port_policy = "${org}/${local.npfx[org].port}${element(v.names, x)}${local.nsfx[org].port}"
         })]
         port_role_appliances = [for e in lookup(v, "port_role_appliances", []) : merge(local.lport.port_role_appliances, e, {
-          for d in local.prethp : d => {
+          for d in local.pethp : d => {
             name = length(regexall("/", lookup(e, d, "UNUSED"))) > 0 ? element(split("/", e[d]), 1) : lookup(e, d, "UNUSED")
             org  = length(regexall("/", lookup(e, d, "UNUSED"))) > 0 ? element(split("/", e[d]), 0) : org
           } }, {
@@ -1222,7 +1221,7 @@ locals {
           ), (tonumber(element(split("-", d), 1)) + 1)) : tonumber(y)] : [d]])
         })]
         port_role_ethernet_uplinks = [for e in lookup(v, "port_role_ethernet_uplinks", []) : merge(local.lport.port_role_ethernet_uplinks, e, {
-          for d in local.prethp : d => {
+          for d in local.pethp : d => {
             name = length(regexall("/", lookup(e, d, "UNUSED"))) > 0 ? element(split("/", e[d]), 1) : lookup(e, d, "UNUSED")
             org  = length(regexall("/", lookup(e, d, "UNUSED"))) > 0 ? element(split("/", e[d]), 0) : org
           } }, {
@@ -1246,7 +1245,7 @@ locals {
           vsan_id = length(e.vsan_ids) >= 2 ? element(e.vsan_ids, x) : element(e.vsan_ids, 0)
         })]
         port_role_fcoe_uplinks = [for e in lookup(v, "port_role_fcoe_uplinks", []) : merge(local.lport.port_role_fcoe_uplinks, e, {
-          for d in local.prethp : d => {
+          for d in local.pethp : d => {
             name = length(regexall("/", lookup(e, d, "UNUSED"))) > 0 ? element(split("/", e[d]), 1) : lookup(e, d, "UNUSED")
             org  = length(regexall("/", lookup(e, d, "UNUSED"))) > 0 ? element(split("/", e[d]), 0) : org
           } }, {
@@ -1280,20 +1279,19 @@ locals {
   port_pin_groups = { for k, v in local.pin_groups_loop1 : k => merge(v, {
     enabled = contains(keys(local.pin_group_maps[v.interface_type].moids), v.policy_name)
   }) }
-  pc_policy = ["ethernet_network_control", "ethernet_network_group", "flow_control", "link_aggregation", "link_control"]
-  pr_policy = setsubtract(local.pcethp, ["link_aggregation"])
+  peth = ["ethernet_network_control", "ethernet_network_group", "flow_control", "link_aggregation", "link_control"]
   port_channel_appliances = { for i in flatten([for k, v in local.port : [for e in v.port_channel_appliances : merge(e, {
-    for d in local.pc_policy : "${d}_policy" => [for f in [e["${d}_policy"]] : length(regexall("^UNUSED$", f.name)
+    for d in local.peth : "${d}_policy" => [for f in [e["${d}_policy"]] : length(regexall("^UNUSED$", f.name)
     ) == 0 ? "${f.org}/${local.npfx[f.org][d]}${f.name}${local.nsfx[f.org][d]}" : "${f.org}/${f.name}"][0]
   }, { tags = v.tags })]]) : "${i.port_policy}/${i.pc_id}" => i }
   port_channel_ethernet_uplinks = { for i in flatten([for k, v in local.port : [for e in v.port_channel_ethernet_uplinks : merge(e, {
-    for d in local.pc_policy : "${d}_policy" => [for f in [e["${d}_policy"]] : length(regexall("^UNUSED$", f.name)
+    for d in local.peth : "${d}_policy" => [for f in [e["${d}_policy"]] : length(regexall("^UNUSED$", f.name)
     ) == 0 ? "${f.org}/${local.npfx[f.org][d]}${f.name}${local.nsfx[f.org][d]}" : "${f.org}/${f.name}"][0]
   }, { tags = v.tags })]]) : "${i.port_policy}/${i.pc_id}" => i }
   port_channel_fc_uplinks = { for i in flatten([for k, v in local.port : [for e in v.port_channel_fc_uplinks : merge(e, { tags = v.tags })]]
   ) : "${i.port_policy}/${i.pc_id}" => i }
   port_channel_fcoe_uplinks = { for i in flatten([for k, v in local.port : [for e in v.port_channel_fcoe_uplinks : merge(e, {
-    for d in local.pc_policy : "${d}_policy" => [for f in [e["${d}_policy"]] : length(regexall("^UNUSED$", f.name)
+    for d in local.peth : "${d}_policy" => [for f in [e["${d}_policy"]] : length(regexall("^UNUSED$", f.name)
     ) == 0 ? "${f.org}/${local.npfx[f.org][d]}${f.name}${local.nsfx[f.org][d]}" : "${f.org}/${f.name}"][0]
   }, { tags = v.tags })]]) : "${i.port_policy}/${i.pc_id}" => i }
   port_modes = { for i in flatten([for k, v in local.port : [
@@ -1301,12 +1299,12 @@ locals {
   ]]) : "${i.port_policy}/${i.slot_id}-${element(i.port_list, 0)}" => i }
   port_role_appliances = { for i in flatten([for k, v in local.port : [
     for e in v.port_role_appliances : [for p in e.port_list : merge(e, {
-      for d in local.pr_policy : "${d}_policy" => [for f in [e["${d}_policy"]] : length(regexall("^UNUSED$", f.name)
+      for d in local.peth : "${d}_policy" => [for f in [e["${d}_policy"]] : length(regexall("^UNUSED$", f.name)
       ) == 0 ? "${f.org}/${local.npfx[f.org][d]}${f.name}${local.nsfx[f.org][d]}" : "${f.org}/${f.name}"][0]
   }, { port_id = p, port_policy = k, tags = v.tags })]]]) : "${i.port_policy}/${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
   port_role_ethernet_uplinks = { for i in flatten([for k, v in local.port : [
     for e in v.port_role_ethernet_uplinks : [for p in e.port_list : merge(e, {
-      for d in local.pr_policy : "${d}_policy" => [for f in [e["${d}_policy"]] : length(regexall("^UNUSED$", f.name)
+      for d in local.peth : "${d}_policy" => [for f in [e["${d}_policy"]] : length(regexall("^UNUSED$", f.name)
       ) == 0 ? "${f.org}/${local.npfx[f.org][d]}${f.name}${local.nsfx[f.org][d]}" : "${f.org}/${f.name}"][0]
   }, { port_id = p, port_policy = k, tags = v.tags })]]]) : "${i.port_policy}/${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
   port_role_fc_storage = { for i in flatten([for k, v in local.port : [
@@ -1317,7 +1315,7 @@ locals {
   ]]) : "${i.port_policy}/${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
   port_role_fcoe_uplinks = { for i in flatten([for k, v in local.port : [
     for e in v.port_role_fcoe_uplinks : [for p in e.port_list : merge(e, {
-      for d in local.pr_policy : "${d}_policy" => [for f in [e["${d}_policy"]] : length(regexall("^UNUSED$", f.name)
+      for d in local.peth : "${d}_policy" => [for f in [e["${d}_policy"]] : length(regexall("^UNUSED$", f.name)
       ) == 0 ? "${f.org}/${local.npfx[f.org][d]}${f.name}${local.nsfx[f.org][d]}" : "${f.org}/${f.name}"][0]
   }, { port_id = p, port_policy = k, tags = v.tags })]]]) : "${i.port_policy}/${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
   port_role_servers = { for i in flatten([for k, v in local.port : [
@@ -1375,11 +1373,11 @@ locals {
         }]
         name = e.name
         org  = org
-        placement = [for d in [merge(local.scp.vhbas.placement, lookup(e, "placement", {}))] : {
+        placement = [for d in [merge(local.scp.vhbas_from_template.placement, lookup(e, "placement", {}))] : merge(d, {
           automatic_pci_link_assignment = d.pci_link != null ? false : true
           automatic_slot_id_assignment  = d.slot_id != "" ? false : true
           pci_link                      = d.pci_link != null ? d.pci_link : 0
-        }][0]
+        })][0]
         tags          = lookup(v, "tags", var.global_settings.tags)
         vhba_template = length(regexall("/", e.vhba_template)) > 0 ? e.vhba_template : "${org}/${e.vhba_template}"
         }, { for d in local.svtemplate : d => {
@@ -1650,7 +1648,7 @@ locals {
     ) == 0 ? "${e.org}/${local.npfx[e.org].fc_zone}${e.name}${local.nsfx[e.org].fc_zone}" : "${e.org}/${e.name}"]
     }, {
     for e in local.vhba_policies : "${e}_policy" => [for d in [v["${e}_policy"]] : length(regexall("^UNUSED$", d.name)
-    ) == 0 ? "${d.org}/${local.npfx[d.org][e]}${element(split("/", d), 1)}${local.nsfx[d.org][e]}" : "${d.org}/${d.name}"][0]
+    ) == 0 ? "${d.org}/${local.npfx[d.org][e]}${d.name}${local.nsfx[d.org][e]}" : "${d.org}/${d.name}"][0]
     }, {
     for e in local.vhba_pools : "${e}_pool" => [for d in [v["${e}_pool"]] : length(regexall("^UNUSED$", d.name)
     ) == 0 ? "${d.org}/${local.ppfx[d.org][e]}${d.name}${local.psfx[d.org][e]}" : "${d.org}/${d.name}"][0]
@@ -1702,18 +1700,18 @@ locals {
       cdn_value = length(lookup(v, "cdn_value", "")) > 0 ? v.cdn_value : ""
       name      = "${local.npfx[org].lan_connectivity}${v.name}${local.nsfx[org].lan_connectivity}"
       org       = org
-      sr_iov    = merge(local.vnic_templates.sr_iov, lookup(v, "sr_iov", {}))
+      sriov     = merge(local.vnic_templates.sriov, lookup(v, "sriov", {}))
       tags      = lookup(v, "tags", var.global_settings.tags)
       usnic = [for e in [merge(local.vnic_templates.usnic, lookup(v, "usnic", {}))] : merge(e, {
         usnic_adapter_policy = [for d in [e.usnic_adapter_policy] : {
-          name = length(regexall("/", e)) > 0 ? element(split("/", d), 1) : d
-          org  = length(regexall("/", e)) > 0 ? element(split("/", d), 0) : org
+          name = length(regexall("/", d)) > 0 ? element(split("/", d), 1) : d
+          org  = length(regexall("/", d)) > 0 ? element(split("/", d), 0) : org
         }][0]
       })][0]
       vmq = [for e in [merge(local.vnic_templates.vmq, lookup(v, "vmq", {}))] : merge(e, {
         vmmq_adapter_policy = [for d in [e.vmmq_adapter_policy] : {
-          name = length(regexall("/", e)) > 0 ? element(split("/", d), 1) : d
-          org  = length(regexall("/", e)) > 0 ? element(split("/", d), 0) : org
+          name = length(regexall("/", d)) > 0 ? element(split("/", d), 1) : d
+          org  = length(regexall("/", d)) > 0 ? element(split("/", d), 0) : org
         }][0]
       })][0]
     })
@@ -1727,7 +1725,7 @@ locals {
     }, {
     usnic = merge(v.usnic, { usnic_adapter_policy = [for e in [v.usnic.usnic_adapter_policy] : length(regexall("^UNUSED$", e.name)
     ) == 0 ? "${e.org}/${local.ppfx[e.org].ethernet_adapter}${e.name}${local.psfx[e.org].ethernet_adapter}" : "${e.org}/${e.name}"][0] })
-    vmq = merge(v.vmq, { vmmq_adapter_policy = [for e in [v.vmq.vmmq_adapter_policy] : length(regexall("^UNUSED$", e)
+    vmq = merge(v.vmq, { vmmq_adapter_policy = [for e in [v.vmq.vmmq_adapter_policy] : length(regexall("^UNUSED$", e.name)
     ) == 0 ? "${e.org}/${local.ppfx[e.org].ethernet_adapter}${e.name}${local.psfx[e.org].ethernet_adapter}" : "${e.org}/${e.name}"][0] })
   }) }
 

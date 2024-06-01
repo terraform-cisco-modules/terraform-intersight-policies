@@ -76,12 +76,12 @@ resource "intersight_vnic_vnic_template" "map" {
     ) == true ? local.pools.mac.moids[each.value.mac_address_pool] : local.pools_data["mac"][each.value.mac_address_pool].moid
   }
   sriov_settings {
-    comp_count_per_vf = each.value.sr_iov.completion_queue_count_per_vf
-    enabled           = each.value.sr_iov.enabled
-    int_count_per_vf  = each.value.sr_iov.interrupt_count_per_vf
-    rx_count_per_vf   = each.value.sr_iov.receive_queue_count_per_vf
-    tx_count_per_vf   = each.value.sr_iov.transmit_queue_count_per_vf
-    vf_count          = each.value.sr_iov.number_of_vfs
+    comp_count_per_vf = each.value.sriov.completion_queue_count_per_vf
+    enabled           = each.value.sriov.enabled
+    int_count_per_vf  = each.value.sriov.interrupt_count_per_vf
+    rx_count_per_vf   = each.value.sriov.receive_queue_count_per_vf
+    tx_count_per_vf   = each.value.sriov.transmit_queue_count_per_vf
+    vf_count          = each.value.sriov.number_of_vfs
   }
   usnic_settings {
     cos      = each.value.usnic.class_of_service
@@ -172,12 +172,12 @@ resource "intersight_vnic_eth_if" "map" {
     uplink        = each.value.placement.uplink_port
   }
   sriov_settings {
-    comp_count_per_vf = each.value.sr_iov.completion_queue_count_per_vf
-    enabled           = each.value.sr_iov.enabled
-    int_count_per_vf  = each.value.sr_iov.interrupt_count_per_vf
-    rx_count_per_vf   = each.value.sr_iov.receive_queue_count_per_vf
-    tx_count_per_vf   = each.value.sr_iov.transmit_queue_count_per_vf
-    vf_count          = each.value.sr_iov.number_of_vfs
+    comp_count_per_vf = each.value.sriov.completion_queue_count_per_vf
+    enabled           = each.value.sriov.enabled
+    int_count_per_vf  = each.value.sriov.interrupt_count_per_vf
+    rx_count_per_vf   = each.value.sriov.receive_queue_count_per_vf
+    tx_count_per_vf   = each.value.sriov.transmit_queue_count_per_vf
+    vf_count          = each.value.sriov.number_of_vfs
   }
   usnic_settings {
     cos      = each.value.usnic.class_of_service
@@ -295,7 +295,7 @@ resource "intersight_vnic_eth_if" "from_template" {
     }
   }
   dynamic "sriov_settings" {
-    for_each = { for v in [each.value.sr_iov] : "sriov" => v if local.vnic_condition_check[each.value.vnic_template].proceed == true }
+    for_each = { for v in [each.value.sriov] : "sriov" => v if local.vnic_condition_check[each.value.vnic_template].proceed == true }
     content {
       comp_count_per_vf = sriov_settings.value.completion_queue_count_per_vf
       enabled           = sriov_settings.value.enabled

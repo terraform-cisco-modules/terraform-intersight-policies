@@ -38,8 +38,6 @@ A Terraform module to configure Intersight Infrastructure Policies.
 |------|-------------|
 | <a name="output_data_policies"></a> [data\_policies](#output\_data\_policies) | Moid's of the Policies that were not defined locally. |
 | <a name="output_data_pools"></a> [data\_pools](#output\_data\_pools) | Moid's of the Pools that were not defined locally. |
-| <a name="output_data_vhba_templates"></a> [data\_vhba\_templates](#output\_data\_vhba\_templates) | Moid's of the vHBA Templates that were not defined locally. |
-| <a name="output_data_vnic_templates"></a> [data\_vnic\_templates](#output\_data\_vnic\_templates) | Moid's of the vNIC Templates that were not defined locally. |
 | <a name="output_name_prefix"></a> [name\_prefix](#output\_name\_prefix) | Name Prefix Outputs. |
 | <a name="output_name_suffix"></a> [name\_suffix](#output\_name\_suffix) | Name Suffix Outputs. |
 | <a name="output_adapter_configuration"></a> [adapter\_configuration](#output\_adapter\_configuration) | Moid's of the Adapter Configuration Policies. |
@@ -89,9 +87,11 @@ A Terraform module to configure Intersight Infrastructure Policies.
 | <a name="output_syslog"></a> [syslog](#output\_syslog) | Moid's of the Syslog Policies. |
 | <a name="output_system_qos"></a> [system\_qos](#output\_system\_qos) | Moid's of the System QoS Policies. |
 | <a name="output_thermal"></a> [thermal](#output\_thermal) | Moid's of the Thermal Policies. |
+| <a name="output_vhba_template"></a> [vhba\_template](#output\_vhba\_template) | Moid's of the vHBA Templates. |
 | <a name="output_virtual_kvm"></a> [virtual\_kvm](#output\_virtual\_kvm) | Moid's of the Virtual KVM Policies. |
 | <a name="output_virtual_media"></a> [virtual\_media](#output\_virtual\_media) | Moid's of the Virtual Media Policies. |
 | <a name="output_vlan"></a> [vlan](#output\_vlan) | Moid's of the VLAN Policies. |
+| <a name="output_vnic_template"></a> [vnic\_template](#output\_vnic\_template) | Moid's of the vNIC Templates. |
 | <a name="output_vsan"></a> [vsan](#output\_vsan) | Moid's of the VSAN Policies. |
 ## Resources
 

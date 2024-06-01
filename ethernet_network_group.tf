@@ -9,8 +9,10 @@ resource "intersight_fabric_eth_network_group_policy" "map" {
   name        = each.value.name
   organization { moid = var.orgs[each.value.org] }
   vlan_settings {
-    native_vlan   = each.value.native_vlan
     allowed_vlans = each.value.allowed_vlans
+    native_vlan   = each.value.native_vlan
+    qinq_enabled  = each.value.qinq_vlan != 0 ? true : false
+    qinq_vlan     = each.value.qinq_vlan == 0 ? 2 : each.value.qinq_vlan
   }
   dynamic "tags" {
     for_each = each.value.tags
