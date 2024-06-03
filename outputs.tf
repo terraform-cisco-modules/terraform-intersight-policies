@@ -7,27 +7,13 @@ output "data_policies" {
   description = "Moid's of the Policies that were not defined locally."
   value = merge(
     { for e in sort(keys(local.policies_data)) : e => { for k, v in local.policies_data[e] : k => v.moid } }, {
-      #vhba_templates = { for k, v in local.data_vhba_template : k => v.moid }
-      #vnic_templates = { for k, v in local.data_vnic_template : k => v.moid }
+      vhba_templates = { for k, v in local.data_vhba_template : k => v.moid }
+      vnic_templates = { for k, v in local.data_vnic_template : k => v.moid }
   })
 }
 output "data_pools" {
   description = "Moid's of the Pools that were not defined locally."
   value       = { for e in sort(keys(local.pools_data)) : e => { for k, v in local.pools_data[e] : k => v.moid } }
-}
-
-#__________________________________________________________
-#
-# Name Prefix/Suffix Outputs
-#__________________________________________________________
-
-output "name_prefix" {
-  description = "Name Prefix Outputs."
-  value       = local.name_prefix
-}
-output "name_suffix" {
-  description = "Name Suffix Outputs."
-  value       = local.name_suffix
 }
 
 #__________________________________________________________
@@ -243,10 +229,10 @@ output "thermal" {
   description = "Moid's of the Thermal Policies."
   value       = { for k, v in intersight_thermal_policy.map : k => v.moid }
 }
-#output "vhba_template" {
-#  description = "Moid's of the vHBA Templates."
-#  value       = { for k, v in intersight_vnic_vhba_template.map : k => v.moid }
-#}
+output "vhba_template" {
+  description = "Moid's of the vHBA Templates."
+  value       = { for k, v in intersight_vnic_vhba_template.map : k => v.moid }
+}
 output "virtual_kvm" {
   description = "Moid's of the Virtual KVM Policies."
   value       = { for k, v in intersight_kvm_policy.map : k => v.moid }
@@ -259,10 +245,10 @@ output "vlan" {
   description = "Moid's of the VLAN Policies."
   value       = { for k, v in intersight_fabric_eth_network_policy.map : k => v.moid }
 }
-#output "vnic_template" {
-#  description = "Moid's of the vNIC Templates."
-#  value       = { for k, v in intersight_vnic_vnic_template.map : k => v.moid }
-#}
+output "vnic_template" {
+  description = "Moid's of the vNIC Templates."
+  value       = { for k, v in intersight_vnic_vnic_template.map : k => v.moid }
+}
 output "vsan" {
   description = "Moid's of the VSAN Policies."
   value       = { for k, v in intersight_fabric_fc_network_policy.map : k => v.moid }

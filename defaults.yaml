@@ -246,7 +246,6 @@ policies:
     cbs_cmn_cpu_smee: platform-default
     cbs_cmn_gnb_nb_iommu: platform-default
     cbs_cmn_mem_ctrl_bank_group_swap_ddr4: platform-default
-    cbs_cmn_mem_dram_refresh_rate: platform-default
     cbs_cmn_mem_map_bank_interleave_ddr4: platform-default
     cbs_cmn_mem_speed_ddr47xx2: platform-default
     cbs_cmn_mem_speed_ddr47xx3: platform-default
@@ -365,8 +364,6 @@ policies:
     cbs_cpu_smt_ctrl: platform-default
     cbs_dbg_cpu_gen_cpu_wdt: platform-default
     cbs_dbg_cpu_lapic_mode: platform-default
-    cbs_dbg_cpu_lapic_mode7xx2: platform-default
-    cbs_dbg_cpu_lapic_mode7xx3: platform-default
     cbs_df_cmn_acpi_srat_l3numa: platform-default
     cbs_df_dbg_xgmi_link_cfg: platform-default
     channel_inter_leave: platform-default

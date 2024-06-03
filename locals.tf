@@ -18,14 +18,6 @@ locals {
   #
   # Name Prefixes and Suffixes
   #____________________________________________________________
-  name_prefix = { for org in local.org_keys : org => {
-    for e in local.policy_names : e => lookup(lookup(local.model[org], "name_prefix", {}
-    ), e, lookup(lookup(local.model[org], "name_prefix", local.defaults.name_prefix), "default", ""))
-  } }
-  name_suffix = { for org in local.org_keys : org => {
-    for e in local.policy_names : e => lookup(lookup(local.model[org], "name_suffix", {}
-    ), e, lookup(lookup(local.model[org], "name_suffix", local.defaults.name_suffix), "default", ""))
-  } }
   npfx = { for org in keys(var.orgs) : org => {
     for e in local.policy_names : e => lookup(lookup(lookup(local.model, org, {}), "name_prefix", {}
     ), e, lookup(lookup(lookup(local.model, org, {}), "name_prefix", local.defaults.name_prefix), "default", ""))
@@ -45,16 +37,20 @@ locals {
   ]
   pool_names = ["ip", "iqn", "mac", "resource", "uuid", "wwnn", "wwpn"]
   pools = {
-    ip          = { moids = lookup(lookup(var.pools, "map", {}), "ip", []), object = "ippool.Pool" }
-    iqn         = { moids = lookup(lookup(var.pools, "map", {}), "iqn", []), object = "iqnpool.Pool" }
-    mac         = { moids = lookup(lookup(var.pools, "map", {}), "mac", []), object = "macpool.Pool" }
-    name_prefix = { for org in local.org_keys : org => lookup(lookup(lookup(var.pools, "map", {}), "name_prefix", {}), org, local.defaults.pool_prefix) }
-    name_suffix = { for org in local.org_keys : org => lookup(lookup(lookup(var.pools, "map", {}), "name_suffix", {}), org, local.defaults.pool_suffix) }
-    wwnn        = { moids = lookup(lookup(var.pools, "map", {}), "wwnn", []), object = "fcpool.Pool" }
-    wwpn        = { moids = lookup(lookup(var.pools, "map", {}), "wwpn", []), object = "fcpool.Pool" }
+    ip   = { moids = lookup(lookup(var.pools, "map", {}), "ip", []), object = "ippool.Pool" }
+    iqn  = { moids = lookup(lookup(var.pools, "map", {}), "iqn", []), object = "iqnpool.Pool" }
+    mac  = { moids = lookup(lookup(var.pools, "map", {}), "mac", []), object = "macpool.Pool" }
+    wwnn = { moids = lookup(lookup(var.pools, "map", {}), "wwnn", []), object = "fcpool.Pool" }
+    wwpn = { moids = lookup(lookup(var.pools, "map", {}), "wwpn", []), object = "fcpool.Pool" }
   }
-  ppfx = { for org in keys(var.orgs) : org => { for e in local.pool_names : e => lookup(lookup(local.pools.name_prefix, org, {}), e, "") } }
-  psfx = { for org in keys(var.orgs) : org => { for e in local.pool_names : e => lookup(lookup(local.pools.name_suffix, org, {}), e, "") } }
+  ppfx = { for org in keys(var.orgs) : org => {
+    for e in local.pool_names : e => lookup(lookup(lookup(lookup(var.model, org, {}), "pools", {}), "name_prefix", {}
+    ), e, lookup(lookup(lookup(lookup(var.model, org, {}), "pools", {}), "name_prefix", local.defaults.pool_suffix), "default", ""))
+  } }
+  psfx = { for org in keys(var.orgs) : org => {
+    for e in local.pool_names : e => lookup(lookup(lookup(lookup(var.model, org, {}), "pools", {}), "name_suffix", {}
+    ), e, lookup(lookup(lookup(lookup(var.model, org, {}), "pools", {}), "name_suffix", local.defaults.pool_suffix), "default", ""))
+  } }
 
   #____________________________________________________________
   #
@@ -176,23 +172,23 @@ locals {
         moid                  = e.moid
     })
   } }
-  #data_vhba_template = {
-  #  for e in lookup(lookup(data.intersight_vnic_vhba_template.map, "0", {}), "results", []) : "${local.org_names[e.organization[0].moid]}/${e.name}" => e
-  #}
-  #data_vnic_template = {
-  #  for e in lookup(lookup(data.intersight_vnic_vnic_template.map, "0", {}), "results", []) : "${local.org_names[e.organization[0].moid]}/${e.name}" => e
-  #}
-  #vnic_condition_check = merge({
-  #  for k, v in local.data_vnic_template : k => {
-  #    allow_override = v.enable_override
-  #    cdn_source     = v.cdn[0].nr_source
-  #    proceed        = v.sriov_settings[0].enabled == true ? false : v.usnic_settings[0].nr_count > 0 ? false : v.vmq_settings[0].enabled == true ? false : true
-  #  }
-  #  }, { for k, v in local.vnic_template : k => {
-  #    allow_override = v.allow_override
-  #    cdn_source     = v.cdn_source
-  #    proceed        = v.sriov.enabled == true ? false : v.usnic.number_of_usnics > 0 ? false : v.vmq.enabled == true ? false : true
-  #} })
+  data_vhba_template = {
+    for e in lookup(lookup(data.intersight_vnic_vhba_template.map, "0", {}), "results", []) : "${local.org_names[e.organization[0].moid]}/${e.name}" => e
+  }
+  data_vnic_template = {
+    for e in lookup(lookup(data.intersight_vnic_vnic_template.map, "0", {}), "results", []) : "${local.org_names[e.organization[0].moid]}/${e.name}" => e
+  }
+  vnic_condition_check = merge({
+    for k, v in local.data_vnic_template : k => {
+      allow_override = v.enable_override
+      cdn_source     = v.cdn[0].nr_source
+      proceed        = v.sriov_settings[0].enabled == true ? false : v.usnic_settings[0].nr_count > 0 ? false : v.vmq_settings[0].enabled == true ? false : true
+    }
+    }, { for k, v in local.vnic_template : k => {
+      allow_override = v.allow_override
+      cdn_source     = v.cdn_source
+      proceed        = v.sriov.enabled == true ? false : v.usnic.number_of_usnics > 0 ? false : v.vmq.enabled == true ? false : true
+  } })
 
   #_________________________________________________________________
   #
