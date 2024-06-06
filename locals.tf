@@ -1528,7 +1528,7 @@ locals {
     for v in lookup(local.model[org], "storage", []) : merge(local.defaults.storage, v, {
       drive_groups = lookup(v, "drive_groups", [])
       m2_raid_configuration = length(lookup(v, "m2_raid_configuration", {})
-      ) > 0 ? [lookup(v, "m2_raid_configuration", {})] : []
+      ) > 0 ? [merge(local.defaults.storage.m2_raid_configuration, v.m2_raid_configuration)] : []
       name = "${local.npfx[org].storage}${v.name}${local.nsfx[org].storage}"
       org  = org
       single_drive_raid0_configuration = [

@@ -19,6 +19,7 @@ resource "intersight_storage_storage_policy" "map" {
     content {
       controller_slot = m2_virtual_drive.value.slot
       enable          = true
+      name            = m2_virtual_drive.value.name
       # additional_properties = ""
       # object_type           = "storage.DiskGroupPolicy"
     }
