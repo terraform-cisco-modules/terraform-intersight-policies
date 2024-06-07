@@ -176,7 +176,7 @@ resource "intersight_vnic_fc_if" "from_template" {
   }
   src_template {
     moid = contains(keys(local.vhba_template), each.value.vhba_template) == true ? intersight_vnic_vhba_template.map[each.value.vhba_template
-    ].moid : local.data_vhba_template["map"][each.value.vhba_template].moid
+    ].moid : local.data_vhba_template[each.value.vhba_template].moid
   }
   dynamic "fc_adapter_policy" {
     for_each = { for v in each.value.fibre_channel_adapter : v => v if element(split("/", v), 1) != "UNUSED" }

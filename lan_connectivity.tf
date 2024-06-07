@@ -269,7 +269,7 @@ resource "intersight_vnic_eth_if" "from_template" {
   }
   src_template {
     moid = contains(keys(local.vnic_template), each.value.vnic_template) == true ? intersight_vnic_vnic_template.map[each.value.vnic_template
-    ].moid : local.data_vnic_template["map"][each.value.vnic_template].moid
+    ].moid : local.data_vnic_template[each.value.vnic_template].moid
   }
   dynamic "eth_adapter_policy" {
     for_each = { for v in [each.value.ethernet_adapter_policy] : v => v if element(split("/", v), 1

@@ -37,11 +37,11 @@ locals {
   ]
   pool_names = ["ip", "iqn", "mac", "resource", "uuid", "wwnn", "wwpn"]
   pools = {
-    ip   = { moids = lookup(lookup(var.pools, "map", {}), "ip", []), object = "ippool.Pool" }
-    iqn  = { moids = lookup(lookup(var.pools, "map", {}), "iqn", []), object = "iqnpool.Pool" }
-    mac  = { moids = lookup(lookup(var.pools, "map", {}), "mac", []), object = "macpool.Pool" }
-    wwnn = { moids = lookup(lookup(var.pools, "map", {}), "wwnn", []), object = "fcpool.Pool" }
-    wwpn = { moids = lookup(lookup(var.pools, "map", {}), "wwpn", []), object = "fcpool.Pool" }
+    ip   = { moids = lookup(lookup(var.pools, "map", {}), "ip", {}), object = "ippool.Pool" }
+    iqn  = { moids = lookup(lookup(var.pools, "map", {}), "iqn", {}), object = "iqnpool.Pool" }
+    mac  = { moids = lookup(lookup(var.pools, "map", {}), "mac", {}), object = "macpool.Pool" }
+    wwnn = { moids = lookup(lookup(var.pools, "map", {}), "wwnn", {}), object = "fcpool.Pool" }
+    wwpn = { moids = lookup(lookup(var.pools, "map", {}), "wwpn", {}), object = "fcpool.Pool" }
   }
   ppfx = { for org in keys(var.orgs) : org => {
     for e in local.pool_names : e => lookup(lookup(lookup(lookup(var.model, org, {}), "pools", {}), "name_prefix", {}
@@ -871,7 +871,7 @@ locals {
       org                   = org
       tags                  = lookup(v, "tags", var.global_settings.tags)
       vnics = flatten([for e in lookup(v, "vnics", []) : merge(local.lcp.vnics, e, {
-        enable_failover = length(regexall(true, lookup(e, "enable_failover", false))
+        enable_failover = length(regexall("true|false", tostring(lookup(e, "enable_failover", "blank")))
         ) > 0 ? e.enable_failover : length(e.names) == 1 ? true : false
         org   = org
         sriov = merge(local.lcp.vnics.sriov, lookup(e, "sriov", {}))
