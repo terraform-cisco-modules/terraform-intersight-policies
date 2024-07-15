@@ -502,37 +502,384 @@ policies:
     usb_port_vmedia: platform-default
     usb_xhci_support: platform-default
   bios_templates:
-    M5-amd-virtual:
-      cpu_power_management: custom
-      nvmdimm_perform_config: Balanced Profile
-      pcie_slots_cdn_enable: enabled
-      processor_c1e: disabled
-      processor_c3report: disabled
-      processor_c6report: disabled
-      processor_cstate: disabled
-    M5-intel-dss:
+    AnalyticalDatabaseSystems-M6-Intel:
+      cpu_perf_enhancement: Auto
+      energy_efficient_turbo: enabled
+      intel_virtualization_technology: disabled
+      intel_vt_for_directed_io: disabled
+      memory_refresh_rate: 1x Refresh
+      patrol_scrub: disabled
+      processor_c6report: enabled
+      work_load_config: Balanced
+    AnalyticalDatabaseSystems-M7-Intel:
+      intel_virtualization_technology: disabled
+      processor_c6report: enabled
+      work_load_config: Balanced
+    AnalyticsDatabaseSystems-M5-Intel:
       cpu_power_management: custom
       intel_vt_for_directed_io: disabled
       processor_c1e: disabled
-      processor_c3report: disabled
       processor_c6report: disabled
-      processor_cstate: disabled
-    M5-intel-hpc:
+    AzureStack-M6-Intel:
+      # Boot Options
+      ipv4http: disabled
+      ipv4pxe: enabled
+      ipv6http: disabled
+      ipv6pxe: enabled
+      pop_support: disabled
+      vmd_enable: disabled
+      # Intel Direct IO
+      intel_vt_for_directed_io: enabled
+      intel_vtd_coherency_support: disabled
+      intel_vtdats_support: enabled
+      # Main
+      pcie_slots_cdn_enable: enabled
+      # Power and Performance
+      c1auto_demotion: enabled
+      c1auto_un_demotion: enabled
+      cpu_perf_enhancement: disabled
+      llc_alloc: enabled
+      upi_link_enablement: Auto
+      upi_power_management: disabled
+      virtual_numa: disabled
+      xpt_remote_prefetch: Auto
+      # Processor
+      adjacent_cache_line_prefetch: enabled
+      autonumous_cstate_enable: disabled
+      boot_performance_mode: Max Performance
+      cmci_enable: enabled
+      config_tdp_level: Normal
+      core_multi_processing: all
+      cpu_energy_performance: balanced-performance
+      cpu_performance: custom
+      energy_efficient_turbo: disabled
+      enhanced_intel_speed_step_tech: enabled
+      epp_profile: Balanced Performance
+      hardware_prefetch: enabled
+      hwpm_enable: disabled
+      intel_dynamic_speed_select: disabled
+      intel_hyper_threading_tech: enabled
+      intel_speed_select: Base
+      intel_turbo_boost_tech: enabled
+      intel_virtualization_technology: enabled
+      ip_prefetch: enabled
+      kti_prefetch: enabled
+      llc_prefetch: disabled
+      package_cstate_limit: C0 C1 State
+      patrol_scrub: enabled
+      processor_c1e: disabled
+      pstate_coord_type: HW ALL
+      pwr_perf_tuning: os
+      qpi_link_frequency: auto
+      qpi_link_speed: Auto
+      snc: disabled
+      streamer_prefetch: enabled
+      ufs_disable: enabled
+      work_load_config: I/O Sensitive
+      x2apic_opt_out: disabled
+      xpt_prefetch: enabled
+      # Trusted Platform
+      cpu_pa_limit: enabled
+      dma_ctrl_opt_in: enabled
+      enable_mktme: disabled
+      enable_sgx: disabled
+      enable_tme: enabled
+      epoch_update: Manual User Defined Owner EPOCHs
+      sgx_auto_registration_agent: disabled
+      sgx_epoch0: "0"
+      sgx_epoch1: "0"
+      sgx_factory_reset: disabled
+      sgx_le_pub_key_hash0: "0"
+      sgx_le_pub_key_hash1: "0"
+      sgx_le_pub_key_hash2: "0"
+      sgx_le_pub_key_hash3: "0"
+      sgx_le_wr: enabled
+      sgx_package_info_in_band_access: disabled
+      sgx_qos: enabled
+      sha256pcr_bank: enabled
+      sha384pcr_bank: enabled
+      tpm_control: enabled
+      tpm_pending_operation: None
+      tpm_ppi_required: enabled
+      tpm_support: enabled
+      txt_support: enabled
+    AzureStack-M7-Intel:
+      # Boot Options
+      ipv4http: disabled
+      ipv4pxe: enabled
+      ipv6http: disabled
+      ipv6pxe: enabled
+      pop_support: disabled
+      vmd_enable: disabled
+      # Intel Direct IO
+      intel_vt_for_directed_io: enabled
+      intel_vtd_coherency_support: disabled
+      intel_vtdats_support: enabled
+      # Main
+      pcie_slots_cdn_enable: enabled
+      # Power and Performance
+      c1auto_demotion: enabled
+      c1auto_un_demotion: enabled
+      cpu_perf_enhancement: disabled
+      llc_alloc: enabled
+      upi_link_enablement: Auto
+      upi_power_management: disabled
+      virtual_numa: disabled
+      xpt_remote_prefetch: Auto
+      # Processor
+      adjacent_cache_line_prefetch: enabled
+      autonumous_cstate_enable: disabled
+      boot_performance_mode: Max Performance
+      cmci_enable: enabled
+      config_tdp_level: Normal
+      core_multi_processing: all
+      cpu_energy_performance: balanced-performance
+      cpu_performance: custom
+      energy_efficient_turbo: disabled
+      enhanced_intel_speed_step_tech: enabled
+      epp_profile: Balanced Performance
+      hardware_prefetch: enabled
+      hwpm_enable: disabled
+      intel_dynamic_speed_select: disabled
+      intel_hyper_threading_tech: enabled
+      intel_speed_select: Base
+      intel_turbo_boost_tech: enabled
+      intel_virtualization_technology: enabled
+      ip_prefetch: enabled
+      kti_prefetch: enabled
+      llc_prefetch: disabled
+      package_cstate_limit: C0 C1 State
+      patrol_scrub: enabled
+      processor_c1e: disabled
+      pstate_coord_type: HW ALL
+      pwr_perf_tuning: os
+      qpi_link_frequency: auto
+      qpi_link_speed: Auto
+      snc: disabled
+      streamer_prefetch: enabled
+      ufs_disable: enabled
+      work_load_config: I/O Sensitive
+      x2apic_opt_out: disabled
+      xpt_prefetch: enabled
+      # Trusted Platform
+      cpu_pa_limit: enabled
+      dma_ctrl_opt_in: enabled
+      enable_mktme: disabled
+      enable_sgx: disabled
+      enable_tme: enabled
+      epoch_update: Manual User Defined Owner EPOCHs
+      sgx_auto_registration_agent: disabled
+      sgx_epoch0: "0"
+      sgx_epoch1: "0"
+      sgx_factory_reset: disabled
+      sgx_le_pub_key_hash0: "0"
+      sgx_le_pub_key_hash1: "0"
+      sgx_le_pub_key_hash2: "0"
+      sgx_le_pub_key_hash3: "0"
+      sgx_le_wr: enabled
+      sgx_package_info_in_band_access: disabled
+      sgx_qos: enabled
+      sha256pcr_bank: enabled
+      sha384pcr_bank: enabled
+      tpm_control: enabled
+      tpm_pending_operation: None
+      tpm_ppi_required: enabled
+      tpm_support: enabled
+      txt_support: enabled
+    CPUIntensive-M6-Intel:
+      adjacent_cache_line_prefetch: disabled
+      cpu_perf_enhancement: Auto
+      kti_prefetch: enabled
+      llc_alloc: disabled
+      llc_prefetch: disabled
+      memory_refresh_rate: 1x Refresh
+      patrol_scrub: disabled
+      processor_c1e: enabled
+      processor_c6report: enabled
+      snc: enabled
+      streamer_prefetch: disabled
+      upi_link_enablement: '1'
+      upi_power_management: enabled
+      work_load_config: Balanced
+      xpt_prefetch: enabled
+    CPUIntensive-M7-Intel:
+      kti_prefetch: enabled
+      llc_alloc: disabled
+      llc_prefetch: disabled
+      patrol_scrub: disabled
+      processor_c6report: enabled
+      select_memory_ras_configuration: maximum-performance
+      snc: SNC4
+      upi_link_enablement: '2'
+      upi_power_management: enabled
+      xpt_prefetch: enabled
+    ComputationIntensive-M6-AMD:
+      cbs_cmn_apbdis: '1'
+      cbs_cmn_cpu_cpb: Auto
+      cbs_cmn_cpu_global_cstate_ctrl: Auto
+      cbs_cmn_cpu_l1stream_hw_prefetcher: Auto
+      cbs_cmn_cpu_l2stream_hw_prefetcher: Auto
+      cbs_cmn_determinism_slider: Power
+      cbs_cmn_efficiency_mode_en: Auto
+      cbs_cmn_fixed_soc_pstate: P0
+      cbs_cmn_gnb_nb_iommu: Auto
+      cbs_cpu_smt_ctrl: Auto
+      cbs_df_cmn_acpi_srat_l3numa: enabled
+      cbs_df_cmn_dram_nps: NPS4
+      cisco_xgmi_max_speed: enabled
+      svm_mode: enabled
+    DataAnalytics-M6-Intel:
+      cpu_perf_enhancement: Auto
+      energy_efficient_turbo: enabled
+      intel_vt_for_directed_io: disabled
+      processor_c1e: enabled
+      processor_c6report: enabled
+      work_load_config: Balanced
+    DataAnalytics-M7-Intel:
+      intel_virtualization_technology: disabled
+      processor_c6report: enabled
+    EnergyEfficiency-M5-Intel:
+      auto_cc_state: enabled
       cpu_power_management: custom
+      intel_turbo_boost_tech: disabled
+      package_cstate_limit: C6 Retention
+    EnergyEfficiency-M6-AMD:
+      cbs_cmn_apbdis: '0'
+      cbs_cmn_cpu_cpb: Auto
+      cbs_cmn_cpu_global_cstate_ctrl: Auto
+      cbs_cmn_cpu_l1stream_hw_prefetcher: disabled
+      cbs_cmn_cpu_l2stream_hw_prefetcher: disabled
+      cbs_cmn_determinism_slider: Performance
+      cbs_cmn_efficiency_mode_en: Auto
+      cbs_cmn_fixed_soc_pstate: P3
+      cbs_cmn_gnb_nb_iommu: Auto
+      cbs_cpu_smt_ctrl: Auto
+      cbs_df_cmn_acpi_srat_l3numa: Auto
+      cbs_df_cmn_dram_nps: NPS1
+      cisco_xgmi_max_speed: disabled
+      svm_mode: enabled
+    EnergyEfficiency-M6-Intel:
+      adjacent_cache_line_prefetch: disabled
+      energy_efficient_turbo: enabled
+      hardware_prefetch: disabled
+      ip_prefetch: disabled
+      package_cstate_limit: C6 Non Retention
+      processor_c1e: enabled
+      processor_c6report: enabled
+      streamer_prefetch: disabled
+      work_load_config: Balanced
+    EnergyEfficient-M7-Intel:
+      energy_efficient_turbo: enabled
+      package_cstate_limit: C6 Non Retention
+      processor_c1e: enabled
+      processor_c6report: enabled
+      work_load_config: Balanced
+    HighPerformanceComputing-M5-Intel:
       intel_hyper_threading_tech: disabled
       intel_virtualization_technology: disabled
       intel_vt_for_directed_io: disabled
       work_load_config: Balanced
-    M5-intel-java:
+    HighPerformanceComputing-M6-AMD:
+      cbs_cmn_apbdis: '1'
+      cbs_cmn_cpu_cpb: Auto
+      cbs_cmn_cpu_global_cstate_ctrl: Auto
+      cbs_cmn_cpu_l1stream_hw_prefetcher: Auto
+      cbs_cmn_cpu_l2stream_hw_prefetcher: Auto
+      cbs_cmn_determinism_slider: Power
+      cbs_cmn_efficiency_mode_en: Auto
+      cbs_cmn_fixed_soc_pstate: P0
+      cbs_cmn_gnb_nb_iommu: disabled
+      cbs_cpu_smt_ctrl: disabled
+      cbs_df_cmn_acpi_srat_l3numa: Auto
+      cbs_df_cmn_dram_nps: NPS4
+      cisco_xgmi_max_speed: enabled
+      svm_mode: disabled
+    HighPerformanceComputing-M6-Intel:
+      cpu_perf_enhancement: Auto
+      intel_virtualization_technology: disabled
+      intel_vt_for_directed_io: disabled
+      llc_alloc: disabled
+      llc_prefetch: disabled
+      memory_refresh_rate: 1x Refresh
+      patrol_scrub: disabled
+      snc: enabled
+      upi_power_management: enabled
+      work_load_config: Balanced
+      xpt_prefetch: enabled
+    HighPerformanceComputing-M7-Intel:
+      intel_virtualization_technology: disabled
+      llc_alloc: disabled
+      llc_prefetch: disabled
+      processor_c6report: enabled
+      work_load_config: Balanced
+    IOIntensive-M6-AMD:
+      cbs_cmn_apbdis: '1'
+      cbs_cmn_cpu_cpb: Auto
+      cbs_cmn_cpu_global_cstate_ctrl: Auto
+      cbs_cmn_cpu_l1stream_hw_prefetcher: Auto
+      cbs_cmn_cpu_l2stream_hw_prefetcher: Auto
+      cbs_cmn_determinism_slider: Power
+      cbs_cmn_efficiency_mode_en: Auto
+      cbs_cmn_fixed_soc_pstate: P0
+      cbs_cmn_gnb_nb_iommu: Auto
+      cbs_cpu_smt_ctrl: Auto
+      cbs_df_cmn_acpi_srat_l3numa: Auto
+      cbs_df_cmn_dram_nps: NPS4
+      cisco_xgmi_max_speed: enabled
+      svm_mode: enabled
+    IOIntensive-M6-Intel:
+      adjacent_cache_line_prefetch: disabled
+      hardware_prefetch: disabled
+      llc_prefetch: disabled
+      streamer_prefetch: disabled
+    JavaApplicationServer-M5-Intel:
       cpu_power_management: custom
       intel_virtualization_technology: disabled
       intel_vt_for_directed_io: disabled
       processor_c1e: disabled
-      processor_c3report: disabled
       processor_c6report: disabled
-      processor_cstate: disabled
-    M5-intel-oltp:
+    LowLatency-M5-Intel:
       cpu_power_management: custom
+      intel_hyper_threading_tech: disabled
+      intel_virtualization_technology: disabled
+      intel_vt_for_directed_io: disabled
+      processor_c1e: disabled
+      processor_c6report: disabled
+      work_load_config: Balanced
+    LowLatency-M6-AMD:
+      cbs_cmn_apbdis: Auto
+      cbs_cmn_cpu_cpb: disabled
+      cbs_cmn_cpu_global_cstate_ctrl: disabled
+      cbs_cmn_cpu_l1stream_hw_prefetcher: Auto
+      cbs_cmn_cpu_l2stream_hw_prefetcher: Auto
+      cbs_cmn_determinism_slider: Power
+      cbs_cmn_efficiency_mode_en: Auto
+      cbs_cmn_fixed_soc_pstate: Auto
+      cbs_cmn_gnb_nb_iommu: disabled
+      cbs_cpu_smt_ctrl: disabled
+      cbs_df_cmn_acpi_srat_l3numa: Auto
+      cbs_df_cmn_dram_nps: Auto
+      cisco_xgmi_max_speed: disabled
+      svm_mode: enabled
+    LowLatency-M6-Intel:
+      cpu_performance: enterprise
+      energy_efficient_turbo: enabled
+      intel_turbo_boost_tech: disabled
+      intel_virtualization_technology: disabled
+      intel_vt_for_directed_io: disabled
+      memory_refresh_rate: 1x Refresh
+      patrol_scrub: disabled
+      work_load_config: Balanced
+    LowLatency-M7-Intel:
+      intel_hyper_threading_tech: disabled
+      intel_turbo_boost_tech: disabled
+      intel_virtualization_technology: disabled
+      intel_vt_for_directed_io: disabled
+      work_load_config: Balanced
+    M5-amd-virtual:
+      cpu_power_management: custom
+      nvmdimm_perform_config: Balanced Profile
+      pcie_slots_cdn_enable: enabled
       processor_c1e: disabled
       processor_c3report: disabled
       processor_c6report: disabled
@@ -561,112 +908,6 @@ policies:
       pcie_slots_cdn_enable: enabled
       processor_c6report: enabled
       work_load_config: Balanced
-    M6-intel-azure:
-      # Boot Options
-      ipv4http: disabled
-      ipv4pxe: enabled
-      ipv6http: disabled
-      ipv6pxe: enabled
-      pop_support: disabled
-      # Intel Direct IO
-      intel_vt_for_directed_io: enabled
-      intel_vtd_coherency_support: disabled
-      intel_vtdats_support: enabled
-      # Main
-      pcie_slots_cdn_enable: enabled
-      # Power and Performance
-      c1auto_demotion: enabled
-      c1auto_un_demotion: enabled
-      cpu_perf_enhancement: disabled
-      llc_alloc: enabled
-      upi_link_enablement: Auto
-      upi_power_management: disabled
-      virtual_numa: disabled
-      xpt_remote_prefetch: Auto
-      # Processor
-      adjacent_cache_line_prefetch: enabled
-      autonumous_cstate_enable: disabled
-      boot_performance_mode: Max Performance
-      cmci_enable: enabled
-      config_tdp_level: Normal
-      core_multi_processing: all
-      cpu_energy_performance: balanced-performance
-      cpu_performance: custom
-      energy_efficient_turbo: disabled
-      enhanced_intel_speed_step_tech: enabled
-      epp_enable: Balanced Performance
-      extended_apic: disabled
-      hardware_prefetch: enabled
-      hwpm_enable: disabled
-      intel_dynamic_speed_select: disabled
-      intel_hyper_threading_tech: enabled
-      intel_speed_select: Base
-      intel_turbo_boost_tech: enabled
-      intel_virtualization_technology: enabled
-      ip_prefetch: enabled
-      kti_prefetch: enabled
-      llc_prefetch: disabled
-      package_cstate_limit: C0 C1 State
-      patrol_scrub: enabled
-      processor_c1e: disabled
-      processor_c6report: disabled
-      pstate_coord_type: HW ALL
-      pwr_perf_tuning: os
-      qpi_link_frequency: auto
-      snc: disabled
-      streamer_prefetch: enabled
-      ufs_disable: enabled
-      work_load_config: I/O Sensitive
-      x2apic_opt_out: disabled
-      xpt_prefetch: enabled
-      # Trusted Platform
-      cpu_pa_limit: enabled
-      dma_ctrl_opt_in: enabled
-      enable_mktme: disabled
-      enable_sgx: disabled
-      enable_tme: enabled
-      epoch_update: Manual User Defined Owner EPOCHs
-      sgx_auto_registration_agent: disabled
-      sgx_epoch0: "0"
-      sgx_epoch1: "0"
-      sgx_factory_reset: disabled
-      sgx_le_pub_key_hash0: "0"
-      sgx_le_pub_key_hash1: "0"
-      sgx_le_pub_key_hash2: "0"
-      sgx_le_pub_key_hash3: "0"
-      sgx_le_wr: enabled
-      sgx_package_info_in_band_access: disabled
-      sgx_qos: enabled
-      sha256pcr_bank: enabled
-      txt_support: enabled
-    M6-intel-hpc:
-      cpu_perf_enhancement: Auto
-      intel_virtualization_technology: disabled
-      intel_vt_for_directed_io: disabled
-      llc_alloc: disabled
-      llc_prefetch: disabled
-      memory_inter_leave: 1 Way Node Interleave
-      memory_refresh_rate: 1x
-      nvmdimm_perform_config: Balanced Profile
-      patrol_scrub: enabled
-      pcie_slots_cdn_enable: enabled
-      snc: enabled
-      upi_power_management: enabled
-      work_load_config: Balanced
-      xpt_prefetch: enabled
-    M6-intel-relational-DB:
-      cpu_perf_enhancement: Auto
-      llc_alloc: disabled
-      llc_prefetch: disabled
-      memory_inter_leave: 1 Way Node Interleave
-      memory_refresh_rate: 1x
-      nvmdimm_perform_config: Balanced Profile
-      patrol_scrub: enabled
-      pcie_slots_cdn_enable: enabled
-      processor_c6report: enabled
-      snc: enabled
-      upi_power_management: enabled
-      xpt_prefetch: enabled
     M6-intel-virtual:
       cpu_perf_enhancement: Auto
       energy_efficient_turbo: enabled
@@ -674,9 +915,81 @@ policies:
       pcie_slots_cdn_enable: enabled
       processor_c1e: enabled
       processor_c6report: enabled
+    MaximumPerformance-M5-Intel:
+      cpu_power_management: custom
+      imc_interleave: 1-way Interleave
+      intel_virtualization_technology: disabled
+      intel_vt_for_directed_io: disabled
+      processor_c1e: disabled
+      processor_c6report: disabled
+      snc: enabled
+      work_load_config: Balanced
+    OnlineTransactionProcessing-M5-Intel:
+      cpu_power_management: custom
+      processor_c1e: disabled
+      processor_c6report: disabled
+    RelationalDatabaseSystems-M6-Intel:
+      cpu_perf_enhancement: Auto
+      llc_alloc: disabled
+      llc_prefetch: disabled
+      memory_refresh_rate: 1x Refresh
+      patrol_scrub: disabled
+      processor_c6report: enabled
+      snc: enabled
+      upi_power_management: enabled
+      xpt_prefetch: enabled
+    RelationalDatabaseSystems-M7-Intel:
+      llc_alloc: disabled
+      llc_prefetch: disabled
+      patrol_scrub: disabled
+      snc: Auto
+      xpt_prefetch: enabled
+    VDI-M6-AMD:
+      cbs_cmn_apbdis: '1'
+      cbs_cmn_cpu_cpb: Auto
+      cbs_cmn_cpu_global_cstate_ctrl: disabled
+      cbs_cmn_cpu_l1stream_hw_prefetcher: Auto
+      cbs_cmn_cpu_l2stream_hw_prefetcher: Auto
+      cbs_cmn_determinism_slider: Power
+      cbs_cmn_efficiency_mode_en: Auto
+      cbs_cmn_fixed_soc_pstate: P0
+      cbs_cmn_gnb_nb_iommu: Auto
+      cbs_cpu_smt_ctrl: Auto
+      cbs_df_cmn_acpi_srat_l3numa: enabled
+      cbs_df_cmn_dram_nps: NPS4
+      cisco_xgmi_max_speed: enabled
+      svm_mode: enabled
+    Virtualization-M5-Intel:
+      cpu_power_management: custom
+      processor_c1e: disabled
+      processor_c6report: disabled
+    Virtualization-M6-AMD:
+      cbs_cmn_apbdis: '1'
+      cbs_cmn_cpu_cpb: Auto
+      cbs_cmn_cpu_global_cstate_ctrl: Auto
+      cbs_cmn_cpu_l1stream_hw_prefetcher: Auto
+      cbs_cmn_cpu_l2stream_hw_prefetcher: Auto
+      cbs_cmn_determinism_slider: Power
+      cbs_cmn_efficiency_mode_en: Auto
+      cbs_cmn_fixed_soc_pstate: P0
+      cbs_cmn_gnb_nb_iommu: Auto
+      cbs_cpu_smt_ctrl: Auto
+      cbs_df_cmn_acpi_srat_l3numa: enabled
+      cbs_df_cmn_dram_nps: NPS4
+      cisco_xgmi_max_speed: disabled
+      svm_mode: enabled
+    Virtualization-M6-Intel:
+      cpu_perf_enhancement: Auto
+      energy_efficient_turbo: enabled
+      processor_c1e: enabled
+      processor_c6report: enabled
+    Virtualization-M7-Intel:
+      processor_c6report: enabled
+      work_load_config: Balanced
     tpm:
       sha1pcr_bank: disabled
       sha256pcr_bank: enabled
+      sha384pcr_bank: enabled
       tpm_control: enabled
       tpm_ppi_required: enabled
       tpm_support: enabled

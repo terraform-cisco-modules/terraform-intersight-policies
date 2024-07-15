@@ -225,8 +225,8 @@ locals {
   #__________________________________________________________________
   bios = { for i in flatten([for org in local.org_keys : [
     for v in lookup(local.model[org], "bios", []) : lookup(v, "bios_template", "UNUSED") != "UNUSED" ? merge(
-      local.defaults.bios, local.defaults.bios_templates[replace(v.bios_template, "-tpm", "")],
-      local.defaults.bios_templates[length(regexall("-tpm$", v.bios_template)) > 0 ? "tpm" : "tpm_disabled"], v, {
+      local.defaults.bios, local.defaults.bios_templates[replace(replace(v.bios_template, "-tpm", ""), "-Tpm", "")],
+      local.defaults.bios_templates[length(regexall("-tpm$", lower(v.bios_template))) > 0 ? "tpm" : "tpm_disabled"], v, {
         name = "${local.npfx[org].bios}${v.name}${local.nsfx[org].bios}"
         org  = org
         tags = lookup(v, "tags", var.global_settings.tags)
@@ -1250,7 +1250,7 @@ locals {
             ) : length(regexall("-", d)) > 0 ? [for y in range(tonumber(element(split("-", d), 0)
           ), (tonumber(element(split("-", d), 1)) + 1)) : tonumber(y)] : [d]])
         })]
-        port_role_servers = [for e in lookup(v, "port_role_servers", []) : merge(local.lport.port_role_servers, v, {
+        port_role_servers = [for e in lookup(v, "port_role_servers", []) : merge(local.lport.port_role_servers, e, {
           port_list = flatten([for d in compact(length(regexall("-", e.port_list)) > 0 ? tolist(split(",", e.port_list)
             ) : length(regexall(",", e.port_list)) > 0 ? tolist(split(",", e.port_list)) : [e.port_list]
             ) : length(regexall("-", d)) > 0 ? [for y in range(tonumber(element(split("-", d), 0)
