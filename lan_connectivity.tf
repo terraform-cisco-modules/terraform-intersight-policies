@@ -259,6 +259,7 @@ resource "intersight_vnic_eth_if" "from_template" {
   static_mac_address = length(compact([each.value.mac_address_static])) > 0 ? each.value.mac_address_static : null
   cdn { value = local.vnic_condition_check[each.value.vnic_template].cdn_source == "user" ? each.value.cdn_value : each.value.name }
   lan_connectivity_policy { moid = intersight_vnic_lan_connectivity_policy.map[each.value.lan_connectivity].moid }
+  lifecycle { ignore_changes = [failover_enabled] }
   placement {
     auto_pci_link = each.value.placement.automatic_pci_link_assignment
     auto_slot_id  = each.value.placement.automatic_slot_id_assignment

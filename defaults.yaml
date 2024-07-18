@@ -509,15 +509,18 @@ policies:
       intel_vt_for_directed_io: disabled
       memory_refresh_rate: 1x Refresh
       patrol_scrub: disabled
+      pcie_slots_cdn_enable: enabled
       processor_c6report: enabled
       work_load_config: Balanced
     AnalyticalDatabaseSystems-M7-Intel:
       intel_virtualization_technology: disabled
+      pcie_slots_cdn_enable: enabled
       processor_c6report: enabled
       work_load_config: Balanced
     AnalyticsDatabaseSystems-M5-Intel:
       cpu_power_management: custom
       intel_vt_for_directed_io: disabled
+      pcie_slots_cdn_enable: enabled
       processor_c1e: disabled
       processor_c6report: disabled
     AzureStack-M6-Intel:
@@ -694,6 +697,7 @@ policies:
       llc_prefetch: disabled
       memory_refresh_rate: 1x Refresh
       patrol_scrub: disabled
+      pcie_slots_cdn_enable: enabled
       processor_c1e: enabled
       processor_c6report: enabled
       snc: enabled
@@ -707,6 +711,7 @@ policies:
       llc_alloc: disabled
       llc_prefetch: disabled
       patrol_scrub: disabled
+      pcie_slots_cdn_enable: enabled
       processor_c6report: enabled
       select_memory_ras_configuration: maximum-performance
       snc: SNC4
@@ -727,22 +732,26 @@ policies:
       cbs_df_cmn_acpi_srat_l3numa: enabled
       cbs_df_cmn_dram_nps: NPS4
       cisco_xgmi_max_speed: enabled
+      pcie_slots_cdn_enable: enabled
       svm_mode: enabled
     DataAnalytics-M6-Intel:
       cpu_perf_enhancement: Auto
       energy_efficient_turbo: enabled
       intel_vt_for_directed_io: disabled
+      pcie_slots_cdn_enable: enabled
       processor_c1e: enabled
       processor_c6report: enabled
       work_load_config: Balanced
     DataAnalytics-M7-Intel:
       intel_virtualization_technology: disabled
+      pcie_slots_cdn_enable: enabled
       processor_c6report: enabled
     EnergyEfficiency-M5-Intel:
       auto_cc_state: enabled
       cpu_power_management: custom
       intel_turbo_boost_tech: disabled
       package_cstate_limit: C6 Retention
+      pcie_slots_cdn_enable: enabled
     EnergyEfficiency-M6-AMD:
       cbs_cmn_apbdis: '0'
       cbs_cmn_cpu_cpb: Auto
@@ -757,6 +766,7 @@ policies:
       cbs_df_cmn_acpi_srat_l3numa: Auto
       cbs_df_cmn_dram_nps: NPS1
       cisco_xgmi_max_speed: disabled
+      pcie_slots_cdn_enable: enabled
       svm_mode: enabled
     EnergyEfficiency-M6-Intel:
       adjacent_cache_line_prefetch: disabled
@@ -764,6 +774,7 @@ policies:
       hardware_prefetch: disabled
       ip_prefetch: disabled
       package_cstate_limit: C6 Non Retention
+      pcie_slots_cdn_enable: enabled
       processor_c1e: enabled
       processor_c6report: enabled
       streamer_prefetch: disabled
@@ -771,6 +782,7 @@ policies:
     EnergyEfficient-M7-Intel:
       energy_efficient_turbo: enabled
       package_cstate_limit: C6 Non Retention
+      pcie_slots_cdn_enable: enabled
       processor_c1e: enabled
       processor_c6report: enabled
       work_load_config: Balanced
@@ -778,6 +790,7 @@ policies:
       intel_hyper_threading_tech: disabled
       intel_virtualization_technology: disabled
       intel_vt_for_directed_io: disabled
+      pcie_slots_cdn_enable: enabled
       work_load_config: Balanced
     HighPerformanceComputing-M6-AMD:
       cbs_cmn_apbdis: '1'
@@ -793,6 +806,7 @@ policies:
       cbs_df_cmn_acpi_srat_l3numa: Auto
       cbs_df_cmn_dram_nps: NPS4
       cisco_xgmi_max_speed: enabled
+      pcie_slots_cdn_enable: enabled
       svm_mode: disabled
     HighPerformanceComputing-M6-Intel:
       cpu_perf_enhancement: Auto
@@ -802,6 +816,7 @@ policies:
       llc_prefetch: disabled
       memory_refresh_rate: 1x Refresh
       patrol_scrub: disabled
+      pcie_slots_cdn_enable: enabled
       snc: enabled
       upi_power_management: enabled
       work_load_config: Balanced
@@ -810,6 +825,7 @@ policies:
       intel_virtualization_technology: disabled
       llc_alloc: disabled
       llc_prefetch: disabled
+      pcie_slots_cdn_enable: enabled
       processor_c6report: enabled
       work_load_config: Balanced
     IOIntensive-M6-AMD:
@@ -826,16 +842,19 @@ policies:
       cbs_df_cmn_acpi_srat_l3numa: Auto
       cbs_df_cmn_dram_nps: NPS4
       cisco_xgmi_max_speed: enabled
+      pcie_slots_cdn_enable: enabled
       svm_mode: enabled
     IOIntensive-M6-Intel:
       adjacent_cache_line_prefetch: disabled
       hardware_prefetch: disabled
       llc_prefetch: disabled
+      pcie_slots_cdn_enable: enabled
       streamer_prefetch: disabled
     JavaApplicationServer-M5-Intel:
       cpu_power_management: custom
       intel_virtualization_technology: disabled
       intel_vt_for_directed_io: disabled
+      pcie_slots_cdn_enable: enabled
       processor_c1e: disabled
       processor_c6report: disabled
     LowLatency-M5-Intel:
@@ -843,6 +862,7 @@ policies:
       intel_hyper_threading_tech: disabled
       intel_virtualization_technology: disabled
       intel_vt_for_directed_io: disabled
+      pcie_slots_cdn_enable: enabled
       processor_c1e: disabled
       processor_c6report: disabled
       work_load_config: Balanced
@@ -860,6 +880,7 @@ policies:
       cbs_df_cmn_acpi_srat_l3numa: Auto
       cbs_df_cmn_dram_nps: Auto
       cisco_xgmi_max_speed: disabled
+      pcie_slots_cdn_enable: enabled
       svm_mode: enabled
     LowLatency-M6-Intel:
       cpu_performance: enterprise
@@ -869,12 +890,14 @@ policies:
       intel_vt_for_directed_io: disabled
       memory_refresh_rate: 1x Refresh
       patrol_scrub: disabled
+      pcie_slots_cdn_enable: enabled
       work_load_config: Balanced
     LowLatency-M7-Intel:
       intel_hyper_threading_tech: disabled
       intel_turbo_boost_tech: disabled
       intel_virtualization_technology: disabled
       intel_vt_for_directed_io: disabled
+      pcie_slots_cdn_enable: enabled
       work_load_config: Balanced
     M5-amd-virtual:
       cpu_power_management: custom
@@ -902,7 +925,7 @@ policies:
       energy_efficient_turbo: enabled
       intel_virtualization_technology: disabled
       intel_vt_for_directed_io: disabled
-      memory_refresh_rate: 1x
+      memory_refresh_rate: 1x Refresh
       nvmdimm_perform_config: Balanced Profile
       patrol_scrub: enabled
       pcie_slots_cdn_enable: enabled
@@ -920,12 +943,14 @@ policies:
       imc_interleave: 1-way Interleave
       intel_virtualization_technology: disabled
       intel_vt_for_directed_io: disabled
+      pcie_slots_cdn_enable: enabled
       processor_c1e: disabled
       processor_c6report: disabled
       snc: enabled
       work_load_config: Balanced
     OnlineTransactionProcessing-M5-Intel:
       cpu_power_management: custom
+      pcie_slots_cdn_enable: enabled
       processor_c1e: disabled
       processor_c6report: disabled
     RelationalDatabaseSystems-M6-Intel:
@@ -934,6 +959,7 @@ policies:
       llc_prefetch: disabled
       memory_refresh_rate: 1x Refresh
       patrol_scrub: disabled
+      pcie_slots_cdn_enable: enabled
       processor_c6report: enabled
       snc: enabled
       upi_power_management: enabled
@@ -942,6 +968,7 @@ policies:
       llc_alloc: disabled
       llc_prefetch: disabled
       patrol_scrub: disabled
+      pcie_slots_cdn_enable: enabled
       snc: Auto
       xpt_prefetch: enabled
     VDI-M6-AMD:
@@ -958,9 +985,11 @@ policies:
       cbs_df_cmn_acpi_srat_l3numa: enabled
       cbs_df_cmn_dram_nps: NPS4
       cisco_xgmi_max_speed: enabled
+      pcie_slots_cdn_enable: enabled
       svm_mode: enabled
     Virtualization-M5-Intel:
       cpu_power_management: custom
+      pcie_slots_cdn_enable: enabled
       processor_c1e: disabled
       processor_c6report: disabled
     Virtualization-M6-AMD:
@@ -977,13 +1006,16 @@ policies:
       cbs_df_cmn_acpi_srat_l3numa: enabled
       cbs_df_cmn_dram_nps: NPS4
       cisco_xgmi_max_speed: disabled
+      pcie_slots_cdn_enable: enabled
       svm_mode: enabled
     Virtualization-M6-Intel:
       cpu_perf_enhancement: Auto
       energy_efficient_turbo: enabled
+      pcie_slots_cdn_enable: enabled
       processor_c1e: enabled
       processor_c6report: enabled
     Virtualization-M7-Intel:
+      pcie_slots_cdn_enable: enabled
       processor_c6report: enabled
       work_load_config: Balanced
     tpm:

@@ -258,6 +258,7 @@ locals {
       Protocol = "HTTPS", Slot = "MLOM", Uri = ""
     }
     iscsi_boot    = { InterfaceName = "", Port = 0, Slot = "MLOM" }
+    local_cdd     = {}
     local_disk    = { Slot = "MSTOR-RAID" }
     nvme          = {}
     pch_storage   = { Lun = 0 }
