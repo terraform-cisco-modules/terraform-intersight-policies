@@ -237,7 +237,8 @@ resource "intersight_bios_policy" "map" {
   cbs_cmn_cpu_smee                      = each.value.cbs_cmn_cpu_smee                      # CPU SMEE
   cbs_cmn_gnb_nb_iommu                  = each.value.cbs_cmn_gnb_nb_iommu                  # IOMMU
   cbs_cmn_mem_ctrl_bank_group_swap_ddr4 = each.value.cbs_cmn_mem_ctrl_bank_group_swap_ddr4 # Bank Group Swap
-  cbs_cmn_mem_map_bank_interleave_ddr4  = each.value.cbs_cmn_mem_map_bank_interleave_ddr4  # Chipset Interleave
+  #cbs_cmn_mem_dram_refresh_rate         = each.value.cbs_cmn_mem_dram_refresh_rate         # DRAM Refresh Rate
+  cbs_cmn_mem_map_bank_interleave_ddr4 = each.value.cbs_cmn_mem_map_bank_interleave_ddr4 # Chipset Interleave
   #cbs_cmn_mem_speed_ddr47xx2            = each.value.cbs_cmn_mem_speed_ddr47xx2            # Memory Clock Speed 7xx2
   #cbs_cmn_mem_speed_ddr47xx3            = each.value.cbs_cmn_mem_speed_ddr47xx3            # Memory Clock Speed 7xx3
   cbs_dbg_cpu_snp_mem_cover      = each.value.cbs_dbg_cpu_snp_mem_cover      # SNP Memory Coverage
@@ -320,7 +321,6 @@ resource "intersight_bios_policy" "map" {
   cbs_cmnc_tdp_ctl     = each.value.cbs_cmnc_tdp_ctl     # cTDP Control
   cpu_perf_enhancement = each.value.cpu_perf_enhancement # Enhanced CPU Performance
   llc_alloc            = each.value.llc_alloc            # LLC Dead Line
-  optimized_power_mode = each.value.optimized_power_mode # Optimized Power Mode
   upi_link_enablement  = each.value.upi_link_enablement  # UPI Link Enablement
   upi_power_management = each.value.upi_power_management # UPI Power Management
   virtual_numa         = each.value.virtual_numa         # Virtual Numa
@@ -354,8 +354,10 @@ resource "intersight_bios_policy" "map" {
   cbs_cpu_smt_ctrl = each.value.cbs_cpu_smt_ctrl # CPU SMT Mode
   #cbs_dbg_cpu_gen_cpu_wdt           = each.value.cbs_dbg_cpu_gen_cpu_wdt           # Core Watchdog Timer Enable
   #cbs_dbg_cpu_lapic_mode            = each.value.cbs_dbg_cpu_lapic_mode            # Local APIC Mode
+  #cbs_dbg_cpu_lapic_mode7xx2        = each.value.cbs_dbg_cpu_lapic_mode7xx2        # Local APIC Mode 7xx2
+  #cbs_dbg_cpu_lapic_mode7xx3        = each.value.cbs_dbg_cpu_lapic_mode7xx3        # Local APIC Mode 7xx3
   cbs_df_cmn_acpi_srat_l3numa = each.value.cbs_df_cmn_acpi_srat_l3numa # ACPI SRAT L3 Cache As NUMA Domain
-  #cbs_df_dbg_xgmi_link_cfg        = each.value.cbs_df_dbg_xgmi_link_cfg        # Cisco xGMI Max Speed
+  #cbs_df_dbg_xgmi_link_cfg          = each.value.cbs_df_dbg_xgmi_link_cfg          # Cisco xGMI Max Speed
   channel_inter_leave      = each.value.channel_inter_leave      # Channel Interleaving
   cisco_xgmi_max_speed     = each.value.cisco_xgmi_max_speed     # Cisco xGMI Max Speed
   closed_loop_therm_throtl = each.value.closed_loop_therm_throtl # Closed Loop Thermal Throttling
@@ -368,7 +370,7 @@ resource "intersight_bios_policy" "map" {
   cpu_performance          = each.value.cpu_performance          # CPU Performance
   cpu_power_management     = each.value.cpu_power_management     # Power Technology
   demand_scrub             = each.value.demand_scrub             # Demand Scrub
-  #dfx_osb_en                      = each.value.dfx_osb_en                      # DFX OSB
+  #dfx_osb_en                        = each.value.dfx_osb_en                        # DFX OSB
   direct_cache_access             = each.value.direct_cache_access             # Direct Cache Access Support
   dram_clock_throttling           = each.value.dram_clock_throttling           # DRAM Clock Throttling
   energy_efficient_turbo          = each.value.energy_efficient_turbo          # Energy Efficient Turbo
@@ -386,7 +388,7 @@ resource "intersight_bios_policy" "map" {
   intel_speed_select              = each.value.intel_speed_select              # Intel Speed Select
   intel_turbo_boost_tech          = each.value.intel_turbo_boost_tech          # Intel Turbo Boost Tech
   intel_virtualization_technology = each.value.intel_virtualization_technology # Intel(R) VT
-  #ioat_config_cpm                 = each.value.ioat_config_cpm                 # IOAT Configuration
+  #ioat_config_cpm                   = each.value.ioat_config_cpm                   # IOAT Configuration
   ioh_error_enable      = each.value.ioh_error_enable      # IIO Error Enable
   ip_prefetch           = each.value.ip_prefetch           # DCU IP Prefetcher
   kti_prefetch          = each.value.kti_prefetch          # KTI Prefetch
@@ -420,8 +422,8 @@ resource "intersight_bios_policy" "map" {
   #+++++++++++++++++++++++++++++++
   # Security Section
   #+++++++++++++++++++++++++++++++
-  enable_tdx         = each.value.enable_tdx         # Trust Domain Extension (TDX)
-  enable_tdx_seamldr = each.value.enable_tdx_seamldr # TDX Secure Arbitration Mode (SEAM) Loader
+  #enable_tdx         = each.value.enable_tdx         # Trust Domain Extension (TDX)
+  #enable_tdx_seamldr = each.value.enable_tdx_seamldr # TDX Secure Arbitration Mode (SEAM) Loader
   #+++++++++++++++++++++++++++++++
   # Serial Port Section
   #+++++++++++++++++++++++++++++++
@@ -471,12 +473,12 @@ resource "intersight_bios_policy" "map" {
   sgx_qos                         = each.value.sgx_qos                         # SGX QoS
   sha1pcr_bank                    = each.value.sha1pcr_bank                    # SHA1 PCR Bank
   sha256pcr_bank                  = each.value.sha256pcr_bank                  # SHA256 PCR Bank
-  sha384pcr_bank                  = each.value.sha384pcr_bank                  # SHA384 PCR Bank
-  tpm_control                     = each.value.tpm_control                     # Trusted Platform Module State
-  tpm_pending_operation           = each.value.tpm_pending_operation           # TPM Pending Operation
-  tpm_ppi_required                = each.value.tpm_ppi_required                # TPM Minimal Physical Presence
-  tpm_support                     = each.value.tpm_support                     # Trusted Platform Module State
-  txt_support                     = each.value.txt_support                     # Intel Trusted Execution Technology Support
+  #sha384pcr_bank                  = each.value.sha384pcr_bank                  # SHA384 PCR Bank
+  tpm_control           = each.value.tpm_control           # Trusted Platform Module State
+  tpm_pending_operation = each.value.tpm_pending_operation # TPM Pending Operation
+  tpm_ppi_required      = each.value.tpm_ppi_required      # TPM Minimal Physical Presence
+  tpm_support           = each.value.tpm_support           # Trusted Platform Module State
+  txt_support           = each.value.txt_support           # Intel Trusted Execution Technology Support
   #+++++++++++++++++++++++++++++++
   # USB Section
   #+++++++++++++++++++++++++++++++

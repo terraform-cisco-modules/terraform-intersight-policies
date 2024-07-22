@@ -172,23 +172,23 @@ locals {
         moid                  = e.moid
     })
   } }
-  data_vhba_template = {
-    for e in lookup(lookup(data.intersight_vnic_vhba_template.map, "0", {}), "results", []) : "${local.org_names[e.organization[0].moid]}/${e.name}" => e
-  }
-  data_vnic_template = {
-    for e in lookup(lookup(data.intersight_vnic_vnic_template.map, "0", {}), "results", []) : "${local.org_names[e.organization[0].moid]}/${e.name}" => e
-  }
-  vnic_condition_check = merge({
-    for k, v in local.data_vnic_template : k => {
-      allow_override = v.enable_override
-      cdn_source     = v.cdn[0].nr_source
-      proceed        = v.sriov_settings[0].enabled == true ? false : v.usnic_settings[0].nr_count > 0 ? false : v.vmq_settings[0].enabled == true ? false : true
-    }
-    }, { for k, v in local.vnic_template : k => {
-      allow_override = v.allow_override
-      cdn_source     = v.cdn_source
-      proceed        = v.sriov.enabled == true ? false : v.usnic.number_of_usnics > 0 ? false : v.vmq.enabled == true ? false : true
-  } })
+  #data_vhba_template = {
+  #  for e in lookup(lookup(data.intersight_vnic_vhba_template.map, "0", {}), "results", []) : "${local.org_names[e.organization[0].moid]}/${e.name}" => e
+  #}
+  #data_vnic_template = {
+  #  for e in lookup(lookup(data.intersight_vnic_vnic_template.map, "0", {}), "results", []) : "${local.org_names[e.organization[0].moid]}/${e.name}" => e
+  #}
+  #vnic_condition_check = merge({
+  #  for k, v in local.data_vnic_template : k => {
+  #    allow_override = v.enable_override
+  #    cdn_source     = v.cdn[0].nr_source
+  #    proceed        = v.sriov_settings[0].enabled == true ? false : v.usnic_settings[0].nr_count > 0 ? false : v.vmq_settings[0].enabled == true ? false : true
+  #  }
+  #  }, { for k, v in local.vnic_template : k => {
+  #    allow_override = v.allow_override
+  #    cdn_source     = v.cdn_source
+  #    proceed        = v.sr_iov.enabled == true ? false : v.usnic.number_of_usnics > 0 ? false : v.vmq.enabled == true ? false : true
+  #} })
 
   #_________________________________________________________________
   #
