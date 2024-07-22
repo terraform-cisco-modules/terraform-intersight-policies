@@ -13,6 +13,8 @@ resource "intersight_vnic_eth_network_policy" "map" {
     default_vlan  = each.value.default_vlan
     mode          = each.value.vlan_mode
     object_type   = "vnic.VlanSettings"
+    qinq_enabled  = each.value.qinq_vlan != 0 ? true : false
+    qinq_vlan     = each.value.qinq_vlan == 0 ? 2 : each.value.qinq_vlan
   }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
