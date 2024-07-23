@@ -20,10 +20,6 @@ resource "intersight_adapter_config_policy" "map" {
       fc_settings {
         fip_enabled = settings.value.enable_fip
       }
-      physical_nic_mode_settings {
-        phy_nic_enabled = settings.value.enable_lldp == false && length(regexall(false, settings.value.enable_fip)
-        ) > 0 && settings.value.enable_port_channel == false ? settings.value.enable_physical_nic_mode : false
-      }
       port_channel_settings {
         enabled = settings.value.enable_port_channel
       }
