@@ -1149,7 +1149,7 @@ policies:
     qinq_vlan: 0
   ethernet_qos:
     burst: 10240
-    cos: 0
+    class_of_service: 0
     description: ''
     enable_trust_host_cos: false
     mtu: 1500
@@ -1196,13 +1196,13 @@ policies:
     transmit:
       ring_size: 64
   fibre_channel_network:
-    default_vlan_id: 0
+    default_vlan: 0
     description: ''
     name: '**REQUIRED**'
     vsan_id: '**REQUIRED**'
   fibre_channel_qos:
     burst: 10240
-    cos: 3
+    class_of_service: 3
     description: ''
     max_data_field_size: 2112
     name: '**REQUIRED**'
@@ -1212,7 +1212,7 @@ policies:
       exclude_drives: false
       exclude_drives_except_boot_drives: false
       exclude_storage_controllers: false
-      exclude_storage_sas_expander: false
+      exclude_storage_sasexpander: false
       exclude_storage_u2: false
     cco_password: 1
     cco_user: 1

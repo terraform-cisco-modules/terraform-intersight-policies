@@ -5,8 +5,8 @@
 #__________________________________________________________________
 resource "intersight_vnic_fc_qos_policy" "map" {
   for_each            = local.fibre_channel_qos
-  burst               = each.value.burst # FI-Attached
-  cos                 = each.value.cos   # Standalone
+  burst               = each.value.burst            # FI-Attached
+  cos                 = each.value.class_of_service # Standalone
   description         = coalesce(each.value.description, "${each.value.name} Fibre-Channel QoS Policy.")
   max_data_field_size = each.value.max_data_field_size
   name                = each.value.name
