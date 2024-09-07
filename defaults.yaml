@@ -1064,20 +1064,26 @@ policies:
     description: ''
     name: '**REQUIRED**'
   drive_security:
-    assigned_sensitive_data: false
     description: ''
     name: '**REQUIRED**'
-    password: 1
-    primary_kmip_server:
-      ip_address_hostname: '**REQUIRED**'
-      port: 5696
-      timeout: 60
-    secondary_kmip_server:
-      ip_address_hostname: ''
-      port: 5696
-      timeout: 60
-    server_public_root_ca_certificate: 1
-    username: ''
+    manual_key:
+      current_security_key_passphrase: 0
+      new_security_key_passphrase: 0
+    remote_key_management:
+      assigned_sensitive_data: false
+      current_security_key_passphrase: 0
+      enable_authentication:
+        password: 1
+        username: ''
+      primary_server:
+        hostname_ip_address: ''
+        port: 5696
+        timeout: 60
+      secondary_server:
+        hostname_ip_address: ''
+        port: 5696
+        timeout: 60
+      server_public_root_ca_certificate: 1
   ethernet_adapter:
     adapter_template: 'EMTPY'
     completion:
