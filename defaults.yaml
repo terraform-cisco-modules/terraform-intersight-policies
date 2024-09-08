@@ -3,7 +3,10 @@ policies:
   adapter_configuration:
     add_vic_adapter_configuration:
       dce_interface_settings:
-        dce_interface_fec_modes: [cl91]
+        dce_interface_1_fec_mode: cl91
+        dce_interface_2_fec_mode: cl91
+        dce_interface_3_fec_mode: cl91
+        dce_interface_4_fec_mode: cl91
       enable_fip: true
       enable_lldp: true
       enable_physical_nic_mode: false
@@ -1060,7 +1063,7 @@ policies:
     description: ''
     name: '**REQUIRED**'
   device_connector:
-    configuration_lockout: false
+    configuration_from_intersight_only: false
     description: ''
     name: '**REQUIRED**'
   drive_security:
@@ -1151,7 +1154,7 @@ policies:
     allowed_vlans: '**REQUIRED**'
     description: ''
     name: '**REQUIRED**'
-    native_vlan: null
+    native_vlan: 1
     qinq_vlan: 0
   ethernet_qos:
     burst: 10240

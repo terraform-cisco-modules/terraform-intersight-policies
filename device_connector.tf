@@ -6,7 +6,7 @@
 resource "intersight_deviceconnector_policy" "map" {
   for_each        = local.device_connector
   description     = coalesce(each.value.description, "${each.value.name} Device Connector Policy.")
-  lockout_enabled = each.value.configuration_lockout
+  lockout_enabled = each.value.configuration_from_intersight_only
   name            = each.value.name
   organization { moid = var.orgs[each.value.org] }
   dynamic "tags" {

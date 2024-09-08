@@ -197,19 +197,15 @@ locals {
   #_________________________________________________________________
   ladapter = local.defaults.adapter_configuration
   laddvic  = local.ladapter.add_vic_adapter_configuration
-  fecmode  = local.laddvic.dce_interface_settings.dce_interface_fec_modes
+  dcefec   = local.laddvic.dce_interface_settings
   adapter_configuration = { for i in flatten([for org in local.org_keys : [
     for v in lookup(local.model[org], "adapter_configuration", []) : {
       add_vic_adapter_configuration = [for e in v.add_vic_adapter_configuration : merge(local.laddvic, e, {
-        dce_interface_settings = [
-          for x in range(4) : {
-            additional_properties = "", class_id = "adapter.DceInterfaceSettings"
-            fec_mode = length(lookup(lookup(e, "dce_interface_settings", {}), "dce_interface_fec_modes", local.fecmode)
-              ) == 4 ? element(lookup(lookup(e, "dce_interface_settings", {}), "dce_interface_fec_modes", local.fecmode), x
-            ) : element(lookup(lookup(e, "dce_interface_settings", {}), "dce_interface_fec_modes", local.fecmode), 0)
-            interface_id = x, object_type = "adapter.DceInterfaceSettings"
-          }
-        ]
+        dce_interface_settings = [for key, value in merge(local.dcefec, lookup(e, "dce_interface_settings", {})) : {
+          additional_properties = "", class_id = "adapter.DceInterfaceSettings"
+          fec_mode              = value, interface_id = tonumber(replace(replace(key, "dce_interface_", ""), "_fec_mode", "")) - 1
+          object_type           = "adapter.DceInterfaceSettings"
+        }]
       })]
       description = lookup(v, "description", "")
       name        = "${local.npfx[org].adapter_configuration}${v.name}${local.nsfx[org].adapter_configuration}"
