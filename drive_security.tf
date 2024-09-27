@@ -21,10 +21,6 @@ resource "intersight_storage_drive_security_policy" "map" {
     dynamic "remote_key" {
       for_each = { for k, v in { remote_key = each.value.remote_key_management } : k => v if v.assigned_sensitive_data == true }
       content {
-        #additional_properties = jsonencode({
-        #  ExistingKey = length(regexall("0", tostring(remote_key.value.current_security_key_passphrase))
-        #  ) == 0 ? local.ps.drive_security.current_security_key_passphrase[remote_key.value.current_security_key_passphrase] : ""
-        #})
         auth_credentials {
           password = length(compact([remote_key.value.enable_authentication.username])
           ) > 0 ? local.ps.drive_security.password[remote_key.value.enable_authentication.password] : ""
