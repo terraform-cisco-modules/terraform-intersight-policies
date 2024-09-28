@@ -15,12 +15,12 @@ resource "intersight_boot_precision_policy" "map" {
   name                     = each.value.name
   organization { moid = var.orgs[each.value.org] }
   dynamic "boot_devices" {
-    for_each = { for v in each.value.boot_devices : v.name => v }
+    for_each = { for k, v in each.value.boot_devices : k => v }
     content {
       additional_properties = boot_devices.value.additional_properties
       enabled               = boot_devices.value.enabled
-      object_type           = boot_devices.value.object_type
       name                  = boot_devices.value.name
+      object_type           = boot_devices.value.object_type
     }
   }
   dynamic "tags" {

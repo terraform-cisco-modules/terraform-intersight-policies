@@ -1596,10 +1596,10 @@ locals {
   system_qos_loop_1 = { for i in flatten([for org in local.org_keys : [
     for v in lookup(local.model[org], "system_qos", []) : merge(local.qos, v, {
       classes = length(regexall(true, lookup(v, "configure_default_classes", local.qos.configure_default_classes))
-        ) > 0 ? { for v in local.qos.classes_default : v.priority => v } : length(
+        ) > 0 ? { for k, v in local.qos.classes_default : k => v } : length(
         regexall(true, lookup(v, "configure_recommended_classes", local.qos.configure_recommended_classes))
-        ) > 0 ? { for v in local.qos.classes_recommended : v.priority => v } : length(lookup(v, "classes", [])
-      ) == 0 ? local.qos.classes : { for v in v.classes : v.priority => v }
+        ) > 0 ? { for k, v in local.qos.classes_recommended : k => v } : length(lookup(v, "classes", [])
+      ) == 0 ? local.qos.classes : { for k, v in v.classes : k => v }
       name = "${local.npfx[org].system_qos}${v.name}${local.nsfx[org].system_qos}"
       org  = org
       tags = lookup(v, "tags", var.global_settings.tags)

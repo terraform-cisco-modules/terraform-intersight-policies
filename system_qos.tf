@@ -9,25 +9,25 @@ resource "intersight_fabric_system_qos_policy" "map" {
   name        = each.value.name
   organization { moid = var.orgs[each.value.org] }
   dynamic "classes" {
-    for_each = each.value.classes
+    for_each = { for k, v in each.value.classes : k => v }
     content {
       additional_properties = ""
-      admin_state = length(regexall("(Best Effort|FC)", classes.key)
-      ) > 0 ? "Enabled" : lookup(classes.value, "state", local.qos.classes[classes.key].state)
-      bandwidth_percent = length(regexall("Enabled", lookup(classes.value, "state", local.qos.classes[classes.key].weight))
-      ) > 0 ? tonumber(format("%.0f", tonumber((tonumber(lookup(classes.value, "weight", local.qos.classes[classes.key].weight)) / each.value.bandwidth_total) * 100))) : 0
-      cos = lookup(classes.value, "cos", local.qos.classes[classes.key].cos)
-      mtu = classes.key == "FC" ? 2240 : length(
-        regexall("Enabled", lookup(classes.value, "state", local.qos.classes[classes.key].state))
+      admin_state = length(regexall("(Best Effort|FC)", classes.value.priority)
+      ) > 0 ? "Enabled" : lookup(classes.value, "state", local.qos.classes[classes.value.priority].state)
+      bandwidth_percent = length(regexall("Enabled", lookup(classes.value, "state", local.qos.classes[classes.value.priority].weight))
+      ) > 0 ? tonumber(format("%.0f", tonumber((tonumber(lookup(classes.value, "weight", local.qos.classes[classes.value.priority].weight)) / each.value.bandwidth_total) * 100))) : 0
+      cos = lookup(classes.value, "cos", local.qos.classes[classes.value.priority].cos)
+      mtu = classes.value.priority == "FC" ? 2240 : length(
+        regexall("Enabled", lookup(classes.value, "state", local.qos.classes[classes.value.priority].state))
       ) > 0 && each.value.jumbo_mtu == true ? 9216 : 1500
-      multicast_optimize = classes.key == "Silver" ? true : false
-      name               = classes.key
+      multicast_optimize = classes.value.priority == "Silver" ? true : false
+      name               = classes.value.priority
       object_type        = "fabric.QosClass"
       packet_drop = length(
-        regexall("(Best Effort)", classes.key)) > 0 ? true : length(
-        regexall("(FC)", classes.key)
-      ) > 0 ? false : lookup(classes.value, "packet_drop", local.qos.classes[classes.key].packet_drop)
-      weight = lookup(classes.value, "weight", local.qos.classes[classes.key].weight)
+        regexall("(Best Effort)", classes.value.priority)) > 0 ? true : length(
+        regexall("(FC)", classes.value.priority)
+      ) > 0 ? false : lookup(classes.value, "packet_drop", local.qos.classes[classes.value.priority].packet_drop)
+      weight = lookup(classes.value, "weight", local.qos.classes[classes.value.priority].weight)
     }
   }
   dynamic "tags" {
