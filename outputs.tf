@@ -189,6 +189,10 @@ output "san_connectivity_vhbas" {
     { for k, v in intersight_vnic_fc_if.from_template : k => v.moid }
   )
 }
+output "scrub" {
+  description = "Moid's of the Scrub Policies."
+  value       = { for k, v in intersight_compute_scrub_policy.map : k => v.moid }
+}
 output "sd_card" {
   description = "Moid's of the SD Card Policies."
   value       = { for k, v in intersight_sdcard_policy.map : k => v.moid }

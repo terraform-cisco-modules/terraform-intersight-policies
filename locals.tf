@@ -32,8 +32,8 @@ locals {
     "fibre_channel_adapter", "fibre_channel_network", "fibre_channel_qos", "firmware", "flow_control", "imc_access",
     "ipmi_over_lan", "iscsi_adapter", "iscsi_boot", "iscsi_static_target", "lan_connectivity", "ldap", "link_aggregation",
     "link_control", "local_user", "multicast", "network_connectivity", "ntp", "persistent_memory", "port",
-    "power", "san_connectivity", "sd_card", "serial_over_lan", "smtp", "snmp", "ssh", "storage",
-    "switch_control", "syslog", "system_qos", "thermal", "vhba_template", "virtual_kvm", "virtual_media", "vlan", "vnic_template", "vsan"
+    "power", "san_connectivity", "scrub", "sd_card", "serial_over_lan", "smtp", "snmp", "ssh", "storage", "switch_control",
+    "syslog", "system_qos", "thermal", "vhba_template", "virtual_kvm", "virtual_media", "vlan", "vnic_template", "vsan"
   ]
   pool_names = ["ip", "iqn", "mac", "resource", "uuid", "wwnn", "wwpn"]
   pools = {
@@ -1439,6 +1439,19 @@ locals {
       ) == 0 ? "${d.org}/${local.npfx[d.org].fc_zone}${d.name}${local.nsfx[d.org].fc_zone}" : "${d.org}/${d.name}"]
     })]
   ]) : "${i.san_connectivity}/${i.name}" => i }
+
+  #__________________________________________________________________
+  #
+  # Intersight Scrub Policy
+  # GUI Location: Policies > Create Policy > Scrub
+  #__________________________________________________________________
+  scrub = { for i in flatten([for org in local.org_keys : [
+    for v in lookup(local.model[org], "scrub", []) : merge(local.defaults.scrub, v, {
+      name = "${local.npfx[org].scrub}${v.name}${local.nsfx[org].scrub}"
+      org  = org
+      tags = lookup(v, "tags", var.global_settings.tags)
+    })
+  ] if length(lookup(local.model[org], "scrub", [])) > 0]) : "${i.org}/${i.name}" => i }
 
   #__________________________________________________________________
   #

@@ -1458,6 +1458,7 @@ policies:
     port: ''
     power: ''
     san_connectivity: ''
+    scrub: ''
     sd_card: ''
     serial_over_lan: ''
     smtp: ''
@@ -1510,6 +1511,7 @@ policies:
     port: ''
     power: ''
     san_connectivity: ''
+    scrub: ''
     sd_card: ''
     serial_over_lan: ''
     smtp: ''
@@ -1715,6 +1717,11 @@ policies:
       wwpn_static_address: ''
     wwnn_pool: UNUSED
     wwnn_static_address: ''
+  scrub:
+    bios: false
+    description: ''
+    disk: false
+    name: '**REQUIRED**'
   sd_card:
     description: ''
     enable_diagnostics: false
