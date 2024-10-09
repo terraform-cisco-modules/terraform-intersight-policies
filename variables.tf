@@ -36,6 +36,8 @@ variable "policies_sensitive" {
       private_key = {}
     }
     drive_security = {
+      current_security_key_passphrase   = {}
+      new_security_key_passphrase       = {}
       password                          = {}
       server_public_root_ca_certificate = {}
     }
@@ -74,7 +76,9 @@ variable "policies_sensitive" {
       * certificate: The IMC or Root CA (KMIP) Certificate in PEM Format.
       * private_key: The IMC Private Key in PEM Format.
     drive_security:
-      * password: Drive Security User Password(s).
+      * current_security_key_passphrase: Drive Security -> Manual Key/Remote Key Management -> Current Security Key Passphrase.
+      * new_security_key_passphrase: Drive Security -> Manual Key -> New Security Key Passphrase.
+      * password: Drive Security -> Remote Key Management -> Enable Authentication: Password.
       * server_public_root_ca_certificate: The root certificate from the KMIP server.
     firmware:
       * cco_password: The User Password with Permissions to download the Software from cisco.com.
@@ -107,6 +111,8 @@ variable "policies_sensitive" {
       private_key = map(string)
     })
     drive_security = object({
+      current_security_key_passphrase   = map(string)
+      new_security_key_passphrase       = map(string)
       password                          = map(string)
       server_public_root_ca_certificate = map(string)
     })

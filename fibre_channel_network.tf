@@ -9,7 +9,7 @@ resource "intersight_vnic_fc_network_policy" "map" {
   name        = each.value.name
   organization { moid = var.orgs[each.value.org] }
   vsan_settings {
-    default_vlan_id = each.value.default_vlan_id
+    default_vlan_id = each.value.default_vlan
     id              = each.value.vsan_id
   }
   dynamic "tags" {

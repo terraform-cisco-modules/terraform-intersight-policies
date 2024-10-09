@@ -27,8 +27,8 @@ locals {
     ), e, lookup(lookup(lookup(local.model, org, {}), "name_suffix", local.defaults.name_suffix), "default", ""))
   } }
   policy_names = [
-    "adapter_configuration", "bios", "boot_order", "certificate_management", "device_connector", "ethernet_adapter",
-    "ethernet_network", "ethernet_network_control", "ethernet_network_group", "ethernet_qos", "fc_zone",
+    "adapter_configuration", "bios", "boot_order", "certificate_management", "device_connector", "drive_security",
+    "ethernet_adapter", "ethernet_network", "ethernet_network_control", "ethernet_network_group", "ethernet_qos", "fc_zone",
     "fibre_channel_adapter", "fibre_channel_network", "fibre_channel_qos", "firmware", "flow_control", "imc_access",
     "ipmi_over_lan", "iscsi_adapter", "iscsi_boot", "iscsi_static_target", "lan_connectivity", "ldap", "link_aggregation",
     "link_control", "local_user", "multicast", "network_connectivity", "ntp", "persistent_memory", "port",
@@ -197,19 +197,15 @@ locals {
   #_________________________________________________________________
   ladapter = local.defaults.adapter_configuration
   laddvic  = local.ladapter.add_vic_adapter_configuration
-  fecmode  = local.laddvic.dce_interface_settings.dce_interface_fec_modes
+  dcefec   = local.laddvic.dce_interface_settings
   adapter_configuration = { for i in flatten([for org in local.org_keys : [
     for v in lookup(local.model[org], "adapter_configuration", []) : {
       add_vic_adapter_configuration = [for e in v.add_vic_adapter_configuration : merge(local.laddvic, e, {
-        dce_interface_settings = [
-          for x in range(4) : {
-            additional_properties = "", class_id = "adapter.DceInterfaceSettings"
-            fec_mode = length(lookup(lookup(e, "dce_interface_settings", {}), "dce_interface_fec_modes", local.fecmode)
-              ) == 4 ? element(lookup(lookup(e, "dce_interface_settings", {}), "dce_interface_fec_modes", local.fecmode), x
-            ) : element(lookup(lookup(e, "dce_interface_settings", {}), "dce_interface_fec_modes", local.fecmode), 0)
-            interface_id = x, object_type = "adapter.DceInterfaceSettings"
-          }
-        ]
+        dce_interface_settings = [for key, value in merge(local.dcefec, lookup(e, "dce_interface_settings", {})) : {
+          additional_properties = "", class_id = "adapter.DceInterfaceSettings"
+          fec_mode              = value, interface_id = tonumber(replace(replace(key, "dce_interface_", ""), "_fec_mode", "")) - 1
+          object_type           = "adapter.DceInterfaceSettings"
+        }]
       })]
       description = lookup(v, "description", "")
       name        = "${local.npfx[org].adapter_configuration}${v.name}${local.nsfx[org].adapter_configuration}"
@@ -349,12 +345,22 @@ locals {
   #__________________________________________________________________
   drive_security = { for i in flatten([for org in local.org_keys : [
     for v in lookup(local.model[org], "drive_security", []) : merge(local.lds, v, {
-      name             = "${local.npfx[org].drive_security}${v.name}${local.nsfx[org].drive_security}"
-      org              = org
-      primary_server   = merge(local.lds.primary_server, lookup(v, "primary_server", {}))
-      secondary_server = merge(local.lds.secondary_server, lookup(v, "secondary_server", {}))
-      tags             = lookup(v, "tags", var.global_settings.tags)
-    }) if lookup(v, "assigned_sensitive_data", local.lds.assigned_sensitive_data) == true
+      name       = "${local.npfx[org].drive_security}${v.name}${local.nsfx[org].drive_security}"
+      org        = org
+      manual_key = merge(local.lds.manual_key, lookup(v, "manual_key", {}))
+      remote_key_management = merge(local.lds.remote_key_management, lookup(v, "remote_key_management", {}), {
+        enable_authentication = merge(
+          local.lds.remote_key_management.enable_authentication, lookup(lookup(v, "remote_key_management", {}), "enable_authentication", {})
+        )
+        primary_server = merge(
+          local.lds.remote_key_management.primary_server, lookup(lookup(v, "remote_key_management", {}), "primary_server", {})
+        )
+        secondary_server = merge(
+          local.lds.remote_key_management.secondary_server, lookup(lookup(v, "remote_key_management", {}), "secondary_server", {})
+        )
+      })
+      tags = lookup(v, "tags", var.global_settings.tags)
+    }) if length(lookup(v, "manual_key", {})) > 0 || length(lookup(v, "remote_key_management", {})) > 0
   ] if length(lookup(local.model[org], "drive_security", [])) > 0]) : "${i.org}/${i.name}" => i }
 
   #__________________________________________________________________
@@ -1603,10 +1609,10 @@ locals {
   system_qos_loop_1 = { for i in flatten([for org in local.org_keys : [
     for v in lookup(local.model[org], "system_qos", []) : merge(local.qos, v, {
       classes = length(regexall(true, lookup(v, "configure_default_classes", local.qos.configure_default_classes))
-        ) > 0 ? { for v in local.qos.classes_default : v.priority => v } : length(
+        ) > 0 ? { for k, v in local.qos.classes_default : k => v } : length(
         regexall(true, lookup(v, "configure_recommended_classes", local.qos.configure_recommended_classes))
-        ) > 0 ? { for v in local.qos.classes_recommended : v.priority => v } : length(lookup(v, "classes", [])
-      ) == 0 ? local.qos.classes : { for v in v.classes : v.priority => v }
+        ) > 0 ? { for k, v in local.qos.classes_recommended : k => v } : length(lookup(v, "classes", [])
+      ) == 0 ? local.qos.classes : { for k, v in v.classes : k => v }
       name = "${local.npfx[org].system_qos}${v.name}${local.nsfx[org].system_qos}"
       org  = org
       tags = lookup(v, "tags", var.global_settings.tags)

@@ -7,7 +7,7 @@ resource "intersight_vnic_eth_qos_policy" "map" {
   for_each       = local.ethernet_qos
   description    = coalesce(each.value.description, "${each.value.name} Ethernet QoS Policy.")
   burst          = each.value.burst
-  cos            = each.value.cos
+  cos            = each.value.class_of_service
   mtu            = each.value.mtu
   name           = each.value.name
   priority       = each.value.priority

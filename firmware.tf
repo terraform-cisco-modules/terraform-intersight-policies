@@ -25,14 +25,14 @@ resource "intersight_firmware_policy" "map" {
       e.exclude_drives,
       e.exclude_drives_except_boot_drives,
       e.exclude_storage_controllers,
-      e.exclude_storage_sas_expander,
+      e.exclude_storage_sasexpander,
       e.exclude_storage_u2
     ]
     ) ? compact(concat([
       length(regexall(true, e.exclude_drives)) > 0 ? "local-disk" : ""], [
       length(regexall(true, e.exclude_drives_except_boot_drives)) > 0 ? "drives-except-boot-drives" : ""], [
       length(regexall(true, e.exclude_storage_controllers)) > 0 ? "storage-controller" : ""], [
-      length(regexall(true, e.exclude_storage_sas_expander)) > 0 ? "storage-sasexpander" : ""], [
+      length(regexall(true, e.exclude_storage_sasexpander)) > 0 ? "storage-sasexpander" : ""], [
       length(regexall(true, e.exclude_storage_u2)) > 0 ? "storage-u2" : ""
   ])) : ["none"]][0]
   name            = each.value.name

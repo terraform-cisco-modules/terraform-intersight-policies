@@ -3,7 +3,10 @@ policies:
   adapter_configuration:
     add_vic_adapter_configuration:
       dce_interface_settings:
-        dce_interface_fec_modes: [cl91]
+        dce_interface_1_fec_mode: cl91
+        dce_interface_2_fec_mode: cl91
+        dce_interface_3_fec_mode: cl91
+        dce_interface_4_fec_mode: cl91
       enable_fip: true
       enable_lldp: true
       enable_physical_nic_mode: false
@@ -1060,24 +1063,30 @@ policies:
     description: ''
     name: '**REQUIRED**'
   device_connector:
-    configuration_lockout: false
+    configuration_from_intersight_only: false
     description: ''
     name: '**REQUIRED**'
   drive_security:
-    assigned_sensitive_data: false
     description: ''
     name: '**REQUIRED**'
-    password: 1
-    primary_kmip_server:
-      ip_address_hostname: '**REQUIRED**'
-      port: 5696
-      timeout: 60
-    secondary_kmip_server:
-      ip_address_hostname: ''
-      port: 5696
-      timeout: 60
-    server_public_root_ca_certificate: 1
-    username: ''
+    manual_key:
+      current_security_key_passphrase: 0
+      new_security_key_passphrase: 0
+    remote_key_management:
+      assigned_sensitive_data: false
+      current_security_key_passphrase: 0
+      enable_authentication:
+        password: 1
+        username: ''
+      primary_server:
+        hostname_ip_address: ''
+        port: 5696
+        timeout: 60
+      secondary_server:
+        hostname_ip_address: ''
+        port: 5696
+        timeout: 60
+      server_public_root_ca_certificate: 1
   ethernet_adapter:
     adapter_template: 'EMTPY'
     completion:
@@ -1145,11 +1154,11 @@ policies:
     allowed_vlans: '**REQUIRED**'
     description: ''
     name: '**REQUIRED**'
-    native_vlan: null
+    native_vlan: 1
     qinq_vlan: 0
   ethernet_qos:
     burst: 10240
-    cos: 0
+    class_of_service: 0
     description: ''
     enable_trust_host_cos: false
     mtu: 1500
@@ -1196,13 +1205,13 @@ policies:
     transmit:
       ring_size: 64
   fibre_channel_network:
-    default_vlan_id: 0
+    default_vlan: 0
     description: ''
     name: '**REQUIRED**'
     vsan_id: '**REQUIRED**'
   fibre_channel_qos:
     burst: 10240
-    cos: 3
+    class_of_service: 3
     description: ''
     max_data_field_size: 2112
     name: '**REQUIRED**'
@@ -1212,7 +1221,7 @@ policies:
       exclude_drives: false
       exclude_drives_except_boot_drives: false
       exclude_storage_controllers: false
-      exclude_storage_sas_expander: false
+      exclude_storage_sasexpander: false
       exclude_storage_u2: false
     cco_password: 1
     cco_user: 1
