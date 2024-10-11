@@ -8,8 +8,8 @@ resource "intersight_compute_scrub_policy" "map" {
   description = coalesce(each.value.description, "${each.value.name} Scrub Policy.")
   name        = each.value.name
   scrub_targets = anytrue([each.value.bios, each.value.disk]) ? compact(concat([
-      length(regexall(true, each.value.bios)) > 0 ? "BIOS" : ""], [
-      length(regexall(true, each.value.disk)) > 0 ? "Disk" : ""]
+    length(regexall(true, each.value.bios)) > 0 ? "BIOS" : ""], [
+    length(regexall(true, each.value.disk)) > 0 ? "Disk" : ""]
   )) : []
   organization { moid = var.orgs[each.value.org] }
   dynamic "tags" {

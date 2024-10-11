@@ -431,6 +431,23 @@ locals {
       }
       transmit = { queue_count = 64, ring_size = 256 }
     }
+    MQ-SMBdv2 = {
+      description        = "Recommended adapter settings for VIC 1400/14000/15000 series and later optimized for Multi Queue SMBd high performance networking."
+      completion         = { queue_count = 576 }
+      interrupt_settings = { interrupts = 512 }
+      receive            = { queue_count = 512, ring_size = 4096 }
+      roce_settings = {
+        class_of_service = 5, enable_rdma_over_converged_ethernet = true, memory_regions = 131072, queue_pairs = 256, resource_groups = 32, version = 2
+      }
+      transmit = { queue_count = 64, ring_size = 4096 }
+    }
+    MQ-v2 = {
+      description        = "Recommended adapter settings for VIC 1400/14000/15000 series and later optimized for Multi Queue high performance networking."
+      completion         = { queue_count = 576, ring_size = 4 }
+      interrupt_settings = { interrupts = 256 }
+      receive            = { queue_count = 512, ring_size = 4096 }
+      transmit           = { queue_count = 64, ring_size = 4096 }
+    }
     SMBClient = {
       description   = "Recommended adapter settings for SMB Client.",
       roce_settings = { enable_rdma_over_converged_ethernet = true, memory_regions = 131072, queue_pairs = 256, resource_groups = 32 }
@@ -478,6 +495,22 @@ locals {
         enable_tcp_and_ipv4_hash    = false, enable_tcp_and_ipv6_hash = false
       }
     }
+    VMWareNVMeRoCEv2 = {
+      description        = "Recommended adapter settings for VMware NVMe ROCEv2."
+      completion         = { queue_count = 2 }
+      interrupt_settings = { interrupts = 256 }
+      receive            = { queue_count = 1, ring_size = 512 }
+      roce_settings = {
+        class_of_service = 5, enable_rdma_over_converged_ethernet = true, memory_regions = 131072, queue_pairs = 1024, resource_groups = 8, version = 2
+      }
+      transmit = { queue_count = 1, ring_size = 256 }
+    }
+    VMwarePassThru = {
+      description        = "Recommended adapter settings for VMware pass-thru."
+      completion         = { queue_count = 8 }
+      interrupt_settings = { interrupts = 12 }
+      transmit           = { queue_count = 4 }
+    }
     VMware-High-Trf = {
       description        = "Recommended adapter settings for VMware High Traffic."
       completion         = { queue_count = 9 }
@@ -494,22 +527,6 @@ locals {
         class_of_service = 5, enable_rdma_over_converged_ethernet = true, memory_regions = 131072, queue_pairs = 1024, resource_groups = 8, version = 2
       }
       transmit = { queue_count = 1, ring_size = 4096 }
-    }
-    VMWareNVMeRoCEv2 = {
-      description        = "Recommended adapter settings for VMware NVMe ROCEv2."
-      completion         = { queue_count = 2 }
-      interrupt_settings = { interrupts = 256 }
-      receive            = { queue_count = 1, ring_size = 512 }
-      roce_settings = {
-        class_of_service = 5, enable_rdma_over_converged_ethernet = true, memory_regions = 131072, queue_pairs = 1024, resource_groups = 8, version = 2
-      }
-      transmit = { queue_count = 1, ring_size = 256 }
-    }
-    VMwarePassThru = {
-      description        = "Recommended adapter settings for VMware pass-thru."
-      completion         = { queue_count = 8 }
-      interrupt_settings = { interrupts = 12 }
-      transmit           = { queue_count = 4 }
     }
     Win-AzureStack = {
       description                   = "Recommended adapter settings for Azure Stack."
@@ -534,6 +551,17 @@ locals {
       roce_settings = {
         class_of_service = 5, enable_rdma_over_converged_ethernet = true, memory_regions = 131072, queue_pairs = 256, resource_groups = 2, version = 2
       }
+    }
+    Win-HPN-SMBd-v2 = {
+      description                   = "Recommended adapter settings for VIC 1400/14000/15000 series and later optimized for Windows SMBd high performance networking."
+      completion                    = { queue_count = 9 }
+      enable_virtual_extensible_lan = true
+      interrupt_settings            = { interrupts = 512 }
+      receive                       = { queue_count = 8, ring_size = 4096 }
+      roce_settings = {
+        class_of_service = 5, enable_rdma_over_converged_ethernet = true, memory_regions = 131072, queue_pairs = 256, resource_groups = 2, version = 2
+      }
+      transmit = { queue_count = 1, ring_size = 4096 }
     }
     Win-HPN-v2 = {
       description        = "Recommended adapter settings for Windows high performance and networking v2."

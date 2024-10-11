@@ -17,12 +17,12 @@ A Terraform module to configure Intersight Infrastructure Policies.
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >=1.3.0 |
-| <a name="requirement_intersight"></a> [intersight](#requirement\_intersight) | >=1.0.55 |
+| <a name="requirement_intersight"></a> [intersight](#requirement\_intersight) | >=1.0.57 |
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_intersight"></a> [intersight](#provider\_intersight) | 1.0.54 |
+| <a name="provider_intersight"></a> [intersight](#provider\_intersight) | 1.0.57 |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
@@ -75,6 +75,7 @@ A Terraform module to configure Intersight Infrastructure Policies.
 | <a name="output_power"></a> [power](#output\_power) | Moid's of the Power Policies. |
 | <a name="output_san_connectivity"></a> [san\_connectivity](#output\_san\_connectivity) | Moid's of the SAN Connectivity Policies. |
 | <a name="output_san_connectivity_vhbas"></a> [san\_connectivity\_vhbas](#output\_san\_connectivity\_vhbas) | Moid's of the SAN Connectivity - VHBAs Policies. |
+| <a name="output_scrub"></a> [scrub](#output\_scrub) | Moid's of the Scrub Policies. |
 | <a name="output_sd_card"></a> [sd\_card](#output\_sd\_card) | Moid's of the SD Card Policies. |
 | <a name="output_serial_over_lan"></a> [serial\_over\_lan](#output\_serial\_over\_lan) | Moid's of the Serial over LAN Policies. |
 | <a name="output_smtp"></a> [smtp](#output\_smtp) | Moid's of the SMTP Policies. |
@@ -100,6 +101,7 @@ A Terraform module to configure Intersight Infrastructure Policies.
 | [intersight_bios_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/bios_policy) | resource |
 | [intersight_boot_precision_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/boot_precision_policy) | resource |
 | [intersight_certificatemanagement_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/certificatemanagement_policy) | resource |
+| [intersight_compute_scrub_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/compute_scrub_policy) | resource |
 | [intersight_deviceconnector_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/deviceconnector_policy) | resource |
 | [intersight_fabric_appliance_pc_role.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fabric_appliance_pc_role) | resource |
 | [intersight_fabric_appliance_role.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/fabric_appliance_role) | resource |

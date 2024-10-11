@@ -14,8 +14,8 @@ resource "intersight_fabric_system_qos_policy" "map" {
       additional_properties = ""
       admin_state = length(regexall("(Best Effort|FC)", classes.value.priority)
       ) > 0 ? "Enabled" : lookup(classes.value, "state", local.qos.classes[classes.value.priority].state)
-      bandwidth_percent = length(regexall("Enabled", lookup(classes.value, "state", local.qos.classes[classes.value.priority].weight))
-      ) > 0 ? tonumber(format("%.0f", tonumber((tonumber(lookup(classes.value, "weight", local.qos.classes[classes.value.priority].weight)) / each.value.bandwidth_total) * 100))) : 0
+      # bandwidth_percent = length(regexall("Enabled", lookup(classes.value, "state", local.qos.classes[classes.value.priority].weight))
+      # ) > 0 ? tonumber(format("%.0f", tonumber((tonumber(lookup(classes.value, "weight", local.qos.classes[classes.value.priority].weight)) / each.value.bandwidth_total) * 100))) : 0
       cos = lookup(classes.value, "cos", local.qos.classes[classes.value.priority].cos)
       mtu = classes.value.priority == "FC" ? 2240 : length(
         regexall("Enabled", lookup(classes.value, "state", local.qos.classes[classes.value.priority].state))
