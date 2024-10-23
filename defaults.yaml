@@ -1423,6 +1423,10 @@ policies:
       password: 1
       role: readonly
       username: '**REQUIRED**'
+  memory:
+    description: ''
+    name: '**REQUIRED**'
+    dimm_blocklisting: false
   multicast:
     description: ''
     name: '**REQUIRED**'
@@ -1460,6 +1464,7 @@ policies:
     link_aggregation: ''
     link_control: ''
     local_user: ''
+    memory: ''
     multicast: ''
     network_connectivity: ''
     ntp: ''
@@ -1513,6 +1518,7 @@ policies:
     link_aggregation: ''
     link_control: ''
     local_user: ''
+    memory: ''
     multicast: ''
     network_connectivity: ''
     ntp: ''

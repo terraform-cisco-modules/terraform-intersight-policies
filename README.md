@@ -66,6 +66,7 @@ A Terraform module to configure Intersight Infrastructure Policies.
 | <a name="output_link_control"></a> [link\_control](#output\_link\_control) | Moid's of the Link Control Policies. |
 | <a name="output_ldap"></a> [ldap](#output\_ldap) | Moid's of the LDAP Policies. |
 | <a name="output_local_user"></a> [local\_user](#output\_local\_user) | Moid's of the Local User Policies. |
+| <a name="output_memory"></a> [memory](#output\_memory) | Moid's of the Memory Policies. |
 | <a name="output_multicast"></a> [multicast](#output\_multicast) | Moid's of the Multicast Policies. |
 | <a name="output_network_connectivity"></a> [network\_connectivity](#output\_network\_connectivity) | Moid's of the Network Connectivity Policies. |
 | <a name="output_ntp"></a> [ntp](#output\_ntp) | Moid's of the NTP Policies. |
@@ -140,6 +141,7 @@ A Terraform module to configure Intersight Infrastructure Policies.
 | [intersight_ipmioverlan_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/ipmioverlan_policy) | resource |
 | [intersight_kvm_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/kvm_policy) | resource |
 | [intersight_memory_persistent_memory_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/memory_persistent_memory_policy) | resource |
+| [intersight_memory_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/memory_policy) | resource |
 | [intersight_networkconfig_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/networkconfig_policy) | resource |
 | [intersight_ntp_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/ntp_policy) | resource |
 | [intersight_power_policy.map](https://registry.terraform.io/providers/CiscoDevNet/intersight/latest/docs/resources/power_policy) | resource |
