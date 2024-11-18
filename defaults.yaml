@@ -1095,6 +1095,7 @@ policies:
     description: ''
     enable_accelerated_receive_flow_steering: false
     enable_advanced_filter: false
+    enable_ether_channel_pinning: false
     enable_geneve_offload: false
     enable_interrupt_scaling: false
     enable_nvgre_offload: false
@@ -1615,7 +1616,7 @@ policies:
       priority: Best Effort
     port_channel_ethernet_uplinks:
       admin_speed: Auto
-      ethernet_network_group_policy: UNUSED
+      ethernet_network_group_policies: [UNUSED]
       flow_control_policy: UNUSED
       link_aggregation_policy: UNUSED
       link_control_policy: UNUSED
@@ -1646,7 +1647,7 @@ policies:
     port_role_ethernet_uplinks:
       admin_speed: Auto
       breakout_port_id: 0
-      ethernet_network_group_policy: UNUSED
+      ethernet_network_group_policies: [UNUSED]
       fec: Auto
       flow_control_policy: UNUSED
       link_control_policy: UNUSED
@@ -2034,7 +2035,7 @@ policies:
     enable_failover: false
     ethernet_adapter_policy: UNUSED
     ethernet_network_control_policy: UNUSED
-    ethernet_network_group_policy: UNUSED
+    ethernet_network_group_policies: [UNUSED]
     ethernet_qos_policy: UNUSED
     iscsi_boot_policy: UNUSED
     mac_address_pool: UNUSED

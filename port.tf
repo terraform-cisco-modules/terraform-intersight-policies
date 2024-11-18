@@ -89,7 +89,7 @@ resource "intersight_fabric_uplink_pc_role" "map" {
   pc_id = each.value.pc_id
   port_policy { moid = intersight_fabric_port_policy.map[each.value.port_policy].moid }
   dynamic "eth_network_group_policy" {
-    for_each = { for v in [each.value.ethernet_network_group_policy] : v => v if element(split("/", v), 1) != "UNUSED" }
+    for_each = { for v in each.value.ethernet_network_group_policies : v => v if element(split("/", v), 1) != "UNUSED" }
     content {
       moid = contains(keys(local.ethernet_network_group), eth_network_group_policy.value
         ) == true ? intersight_fabric_eth_network_group_policy.map[eth_network_group_policy.value
@@ -290,7 +290,7 @@ resource "intersight_fabric_uplink_role" "map" {
   slot_id           = lookup(each.value, "slot_id", 1)
   port_policy { moid = intersight_fabric_port_policy.map[each.value.port_policy].moid }
   dynamic "eth_network_group_policy" {
-    for_each = { for v in [each.value.ethernet_network_group_policy] : v => v if element(split("/", v), 1) != "UNUSED" }
+    for_each = { for v in each.value.ethernet_network_group_policies : v => v if element(split("/", v), 1) != "UNUSED" }
     content {
       moid = contains(keys(local.ethernet_network_group), eth_network_group_policy.value
         ) == true ? intersight_fabric_eth_network_group_policy.map[eth_network_group_policy.value

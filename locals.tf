@@ -56,16 +56,30 @@ locals {
   #
   # Policy Dictionaries for required Data Lookups
   #____________________________________________________________
-  network_policies = ["ethernet_network_control", "ethernet_network_group", "flow_control", "link_aggregation", "link_control"]
+  network_policies = ["flow_control", "link_aggregation", "link_control"]
   pp = merge({ for i in local.network_policies : i => distinct(compact(concat(
     flatten([for v in local.port_channel_appliances : v["${i}_policy"] if element(split("/", v["${i}_policy"]), 1) != "UNUSED"]),
     flatten([for v in local.port_channel_ethernet_uplinks : v["${i}_policy"] if element(split("/", v["${i}_policy"]), 1) != "UNUSED"]),
     flatten([for v in local.port_channel_fcoe_uplinks : v["${i}_policy"] if element(split("/", v["${i}_policy"]), 1) != "UNUSED"]),
     flatten([for v in local.port_role_appliances : v["${i}_policy"] if element(split("/", v["${i}_policy"]), 1) != "UNUSED"]),
     flatten([for v in local.port_role_ethernet_uplinks : v["${i}_policy"] if element(split("/", v["${i}_policy"]), 1) != "UNUSED"]),
-    flatten([for v in local.port_role_fcoe_uplinks : v["${i}_policy"] if element(split("/", v["${i}_policy"]), 1) != "UNUSED"]),
-    flatten([for v in local.vnics : v["${i}_policy"] if element(split("/", lookup(v, "${i}_policy", "default/UNUSED")), 1) != "UNUSED"]),
-    flatten([for v in local.vnic_template : v["${i}_policy"] if element(split("/", lookup(v, "${i}_policy", "default/UNUSED")), 1) != "UNUSED"])
+    flatten([for v in local.port_role_fcoe_uplinks : v["${i}_policy"] if element(split("/", v["${i}_policy"]), 1) != "UNUSED"])
+    )))
+    }, {
+    ethernet_network_control = distinct(compact(concat(
+      flatten([for v in local.port_channel_appliances : v.ethernet_network_control_policy if element(split("/", v.ethernet_network_control_policy), 1) != "UNUSED"]),
+      flatten([for v in local.port_role_appliances : v.ethernet_network_control_policy if element(split("/", v.ethernet_network_control_policy), 1) != "UNUSED"]),
+      flatten([for v in local.vnics : v.ethernet_network_control_policy if element(split("/", v.ethernet_network_control_policy), 1) != "UNUSED"]),
+      flatten([for v in local.vnic_template : v.ethernet_network_control_policy if element(split("/", v.ethernet_network_control_policy), 1) != "UNUSED"])
+    )))
+    }, {
+    ethernet_network_group = distinct(compact(concat(
+      flatten([for v in local.port_channel_appliances : v.ethernet_network_group_policy if element(split("/", v.ethernet_network_group_policy), 1) != "UNUSED"]),
+      flatten([for v in local.port_role_appliances : v.ethernet_network_group_policy if element(split("/", v.ethernet_network_group_policy), 1) != "UNUSED"]),
+      flatten([for v in local.port_channel_ethernet_uplinks : [for e in v.ethernet_network_group_policies : e if element(split("/", e), 1) != "UNUSED"]]),
+      flatten([for v in local.port_role_ethernet_uplinks : [for e in v.ethernet_network_group_policies : e if element(split("/", e), 1) != "UNUSED"]]),
+      flatten([for v in local.vnics : [for e in v.ethernet_network_group_policies : e if element(split("/", e), 1) != "UNUSED"]]),
+      flatten([for v in local.vnic_template : [for e in v.ethernet_network_group_policies : e if element(split("/", e), 1) != "UNUSED"]])
     )))
     }, {
     ethernet_adapter = distinct(compact(concat(
@@ -970,13 +984,11 @@ locals {
   # Intersight LAN Connectivity - vNIC / vNIC from Template
   # GUI Location: Configure > Policies > Create Policy > LAN Connectivity
   #_________________________________________________________________________
-  vnic_policies = ["ethernet_adapter", "ethernet_network_control", "ethernet_network_group", "ethernet_network", "ethernet_qos", "iscsi_boot"]
-  vnic_pools    = ["mac"]
   vnics_loop_1 = { for i in flatten([for k, v in local.lan_connectivity : [
     for e in v.vnics : [for x in range(length(e.names)) : merge(e, {
       cdn_value = length(e.cdn_values) == length(e.names) ? element(e.cdn_values, x) : ""
-      ethernet_network_group_policy = length(e.ethernet_network_group_policies
-      ) >= 2 ? element(e.ethernet_network_group_policies, x) : element(e.ethernet_network_group_policies, 0)
+      ethernet_network_group_policies = length(e.names) == 1 ? e.ethernet_network_group_policies : length(e.ethernet_network_group_policies
+      ) == 1 ? e.ethernet_network_group_policies : element(chunklist(e.ethernet_network_group_policies, length(e.ethernet_network_group_policies) / 2), x)
       iscsi_boot_policy  = length(e.iscsi_boot_policies) >= 2 ? element(e.iscsi_boot_policies, x) : element(e.iscsi_boot_policies, 0)
       lan_connectivity   = k
       mac_address_pool   = length(e.mac_address_pools) >= 2 ? element(e.mac_address_pools, x) : element(e.mac_address_pools, 0)
@@ -994,9 +1006,15 @@ locals {
       }][0]
     })]
   ]]) : "${i.lan_connectivity}/${i.name}" => i }
+  vnic_policies = ["ethernet_network_group"]
+  vnic_policy   = ["ethernet_adapter", "ethernet_network_control", "ethernet_network", "ethernet_qos", "iscsi_boot"]
+  vnic_pools    = ["mac"]
   vnics = { for k, v in local.vnics_loop_1 : k => merge(v, {
-    for e in local.vnic_policies : "${e}_policy" => [for d in [v["${e}_policy"]] : length(regexall("^UNUSED$", d.name)
+    for e in local.vnic_policy : "${e}_policy" => [for d in [v["${e}_policy"]] : length(regexall("^UNUSED$", d.name)
     ) == 0 ? "${d.org}/${local.npfx[d.org][e]}${d.name}${local.nsfx[d.org][e]}" : "${d.org}/${d.name}"][0]
+    }, {
+    for e in local.vnic_policies : "${e}_policies" => [for d in v["${e}_policies"] : length(regexall("^UNUSED$", d.name)
+    ) == 0 ? "${d.org}/${local.npfx[d.org][e]}${d.name}${local.nsfx[d.org][e]}" : "${d.org}/${d.name}"]
     }, {
     for e in local.vnic_pools : "${e}_address_pool" => [for d in [v["${e}_address_pool"]] : length(regexall("^UNUSED$", d.name)
     ) == 0 ? "${d.org}/${local.ppfx[d.org][e]}${d.name}${local.psfx[d.org][e]}" : "${d.org}/${d.name}"][0]
@@ -1202,6 +1220,8 @@ locals {
   # GUI Location: Policies > Create Policy > Port
   #__________________________________________________________________
   lport = local.defaults.port
+  pethd = ["ethernet_network_group_policies"]
+  peths = ["ethernet_network_control_policy", "flow_control_policy", "link_aggregation_policy", "link_control_policy"]
   pethp = ["ethernet_network_control_policy", "ethernet_network_group_policy", "flow_control_policy", "link_aggregation_policy", "link_control_policy"]
   port = { for i in flatten([for org in local.org_keys : [
     for v in lookup(local.model[org], "port", []) : [
@@ -1228,10 +1248,14 @@ locals {
           port_policy = "${org}/${local.npfx[org].port}${element(v.names, x)}${local.nsfx[org].port}"
         })]
         port_channel_ethernet_uplinks = [for e in lookup(v, "port_channel_ethernet_uplinks", []) : merge(local.lport.port_channel_ethernet_uplinks, e, {
-          for d in local.pethp : d => {
+          for d in local.peths : d => {
             name = length(regexall("/", lookup(e, d, "UNUSED"))) > 0 ? element(split("/", e[d]), 1) : lookup(e, d, "UNUSED")
             org  = length(regexall("/", lookup(e, d, "UNUSED"))) > 0 ? element(split("/", e[d]), 0) : org
           } }, {
+          for d in local.pethd : d => [for f in lookup(e, d, local.lport.port_channel_ethernet_uplinks[d]) : {
+            name = length(regexall("/", f)) > 0 ? element(split("/", f), 1) : f
+            org  = length(regexall("/", f)) > 0 ? element(split("/", f), 0) : org
+          }] }, {
           interfaces  = [for d in lookup(e, "interfaces", []) : merge(local.lport.pc_interfaces, d)]
           pc_id       = length(e.pc_ids) >= 2 ? element(e.pc_ids, x) : element(e.pc_ids, 0)
           port_policy = "${org}/${local.npfx[org].port}${element(v.names, x)}${local.nsfx[org].port}"
@@ -1266,10 +1290,14 @@ locals {
           ), (tonumber(element(split("-", d), 1)) + 1)) : tonumber(y)] : [d]])
         })]
         port_role_ethernet_uplinks = [for e in lookup(v, "port_role_ethernet_uplinks", []) : merge(local.lport.port_role_ethernet_uplinks, e, {
-          for d in local.pethp : d => {
+          for d in local.peths : d => {
             name = length(regexall("/", lookup(e, d, "UNUSED"))) > 0 ? element(split("/", e[d]), 1) : lookup(e, d, "UNUSED")
             org  = length(regexall("/", lookup(e, d, "UNUSED"))) > 0 ? element(split("/", e[d]), 0) : org
           } }, {
+          for d in local.pethd : d => [for f in lookup(e, d, local.lport.port_role_ethernet_uplinks[d]) : {
+            name = length(regexall("/", f)) > 0 ? element(split("/", f), 1) : f
+            org  = length(regexall("/", f)) > 0 ? element(split("/", f), 0) : org
+          }] }, {
           port_list = flatten([for d in compact(length(regexall("-", e.port_list)) > 0 ? tolist(split(",", e.port_list)
             ) : length(regexall(",", e.port_list)) > 0 ? tolist(split(",", e.port_list)) : [e.port_list]
             ) : length(regexall("-", d)) > 0 ? [for y in range(tonumber(element(split("-", d), 0)
@@ -1324,14 +1352,19 @@ locals {
   port_pin_groups = { for k, v in local.pin_groups_loop1 : k => merge(v, {
     enabled = contains(keys(local.pin_group_maps[v.interface_type].moids), v.policy_name)
   }) }
-  peth = ["ethernet_network_control", "ethernet_network_group", "flow_control", "link_aggregation", "link_control"]
+  peth       = ["ethernet_network_control", "ethernet_network_group", "flow_control", "link_aggregation", "link_control"]
+  pethdual   = ["ethernet_network_group"]
+  pethsingle = ["ethernet_network_control", "flow_control", "link_aggregation", "link_control"]
   port_channel_appliances = { for i in flatten([for k, v in local.port : [for e in v.port_channel_appliances : merge(e, {
     for d in local.peth : "${d}_policy" => [for f in [e["${d}_policy"]] : length(regexall("^UNUSED$", f.name)
     ) == 0 ? "${f.org}/${local.npfx[f.org][d]}${f.name}${local.nsfx[f.org][d]}" : "${f.org}/${f.name}"][0]
   }, { tags = v.tags })]]) : "${i.port_policy}/${i.pc_id}" => i }
   port_channel_ethernet_uplinks = { for i in flatten([for k, v in local.port : [for e in v.port_channel_ethernet_uplinks : merge(e, {
-    for d in local.peth : "${d}_policy" => [for f in [e["${d}_policy"]] : length(regexall("^UNUSED$", f.name)
+    for d in local.pethsingle : "${d}_policy" => [for f in [e["${d}_policy"]] : length(regexall("^UNUSED$", f.name)
     ) == 0 ? "${f.org}/${local.npfx[f.org][d]}${f.name}${local.nsfx[f.org][d]}" : "${f.org}/${f.name}"][0]
+    }, {
+    for d in local.pethdual : "${d}_policies" => [for f in e["${d}_policies"] : length(regexall("^UNUSED$", f.name)
+    ) == 0 ? "${f.org}/${local.npfx[f.org][d]}${f.name}${local.nsfx[f.org][d]}" : "${f.org}/${f.name}"]
   }, { tags = v.tags })]]) : "${i.port_policy}/${i.pc_id}" => i }
   port_channel_fc_uplinks = { for i in flatten([for k, v in local.port : [for e in v.port_channel_fc_uplinks : merge(e, { tags = v.tags })]]
   ) : "${i.port_policy}/${i.pc_id}" => i }
@@ -1349,8 +1382,11 @@ locals {
   }, { port_id = p, port_policy = k, tags = v.tags })]]]) : "${i.port_policy}/${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
   port_role_ethernet_uplinks = { for i in flatten([for k, v in local.port : [
     for e in v.port_role_ethernet_uplinks : [for p in e.port_list : merge(e, {
-      for d in local.peth : "${d}_policy" => [for f in [e["${d}_policy"]] : length(regexall("^UNUSED$", f.name)
+      for d in local.pethsingle : "${d}_policy" => [for f in [e["${d}_policy"]] : length(regexall("^UNUSED$", f.name)
       ) == 0 ? "${f.org}/${local.npfx[f.org][d]}${f.name}${local.nsfx[f.org][d]}" : "${f.org}/${f.name}"][0]
+      }, {
+      for d in local.pethdual : "${d}_policies" => [for f in e["${d}_policies"] : length(regexall("^UNUSED$", f.name)
+      ) == 0 ? "${f.org}/${local.npfx[f.org][d]}${f.name}${local.nsfx[f.org][d]}" : "${f.org}/${f.name}"]
   }, { port_id = p, port_policy = k, tags = v.tags })]]]) : "${i.port_policy}/${i.slot_id}-${i.breakout_port_id}-${i.port_id}" => i }
   port_role_fc_storage = { for i in flatten([for k, v in local.port : [
     for e in v.port_role_fc_storage : [for p in e.port_list : merge(e, { port_id = p, port_policy = k, tags = v.tags })]
@@ -1744,17 +1780,23 @@ locals {
   # Intersight vNIC Templates
   # GUI Location: Templates > vNIC Templates > Create vNIC Template
   #_________________________________________________________________________
-  vnict = [
-    "ethernet_adapter_policy", "ethernet_network_control_policy", "ethernet_network_group_policy",
+  vnict_dual = ["ethernet_network_group_policies"]
+  vnict_single = [
+    "ethernet_adapter_policy", "ethernet_network_control_policy",
     "ethernet_network_policy", "ethernet_qos_policy", "iscsi_boot_policy", "mac_address_pool"
   ]
   vnic_templates = local.defaults.vnic_template
   vnic_template_loop_1 = { for i in flatten([for org in local.org_keys : [
     for v in lookup(local.model[org], "vnic_template", []) : merge(local.vnic_templates, v, {
-      for e in local.vnict : e => {
+      for e in local.vnict_single : e => {
         name = length(regexall("/", lookup(v, e, "UNUSED"))) > 0 ? element(split("/", v[e]), 1) : lookup(v, e, "UNUSED")
         org  = length(regexall("/", lookup(v, e, "UNUSED"))) > 0 ? element(split("/", v[e]), 0) : org
       } }, {
+      for d in local.vnict_dual : d => [for f in lookup(v, d, local.lcp.vnics[d]) : {
+        name = length(regexall("/", f)) > 0 ? element(split("/", f), 1) : f
+        org  = length(regexall("/", f)) > 0 ? element(split("/", f), 0) : org
+      }]
+      }, {
       cdn_value = length(lookup(v, "cdn_value", "")) > 0 ? v.cdn_value : ""
       name      = "${local.npfx[org].lan_connectivity}${v.name}${local.nsfx[org].lan_connectivity}"
       org       = org
@@ -1775,8 +1817,11 @@ locals {
     })
   ] if length(lookup(local.model[org], "vnic_template", [])) > 0]) : "${i.org}/${i.name}" => i }
   vnic_template = { for k, v in local.vnic_template_loop_1 : k => merge(v, {
-    for e in local.vnic_policies : "${e}_policy" => [for d in [v["${e}_policy"]] : length(regexall("^UNUSED$", d.name)
+    for e in local.vnic_policy : "${e}_policy" => [for d in [v["${e}_policy"]] : length(regexall("^UNUSED$", d.name)
     ) == 0 ? "${d.org}/${local.npfx[d.org][e]}${d.name}${local.nsfx[d.org][e]}" : "${d.org}/${d.name}"][0]
+    }, {
+    for e in local.vnic_policies : "${e}_policies" => [for d in v["${e}_policies"] : length(regexall("^UNUSED$", d.name)
+    ) == 0 ? "${d.org}/${local.ppfx[d.org][e]}${d.name}${local.psfx[d.org][e]}" : "${d.org}/${d.name}"]
     }, {
     for e in local.vnic_pools : "${e}_address_pool" => [for d in [v["${e}_address_pool"]] : length(regexall("^UNUSED$", d.name)
     ) == 0 ? "${d.org}/${local.ppfx[d.org][e]}${d.name}${local.psfx[d.org][e]}" : "${d.org}/${d.name}"][0]

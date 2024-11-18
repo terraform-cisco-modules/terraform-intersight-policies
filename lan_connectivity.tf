@@ -66,11 +66,6 @@ resource "intersight_vnic_vnic_template" "map" {
       ) == true ? intersight_fabric_eth_network_control_policy.map[each.value.ethernet_network_control_policy
     ].moid : local.policies_data["ethernet_network_control"][each.value.ethernet_network_control_policy].moid
   }
-  fabric_eth_network_group_policy {
-    moid = contains(keys(local.ethernet_network_group), each.value.ethernet_network_group_policy
-      ) == true ? intersight_fabric_eth_network_group_policy.map[each.value.ethernet_network_group_policy
-    ].moid : local.policies_data["ethernet_network_group"][each.value.ethernet_network_group_policy].moid
-  }
   mac_pool {
     moid = contains(keys(local.pools.mac.moids), each.value.mac_address_pool
     ) == true ? local.pools.mac.moids[each.value.mac_address_pool] : local.pools_data["mac"][each.value.mac_address_pool].moid
@@ -101,6 +96,14 @@ resource "intersight_vnic_vnic_template" "map" {
       contains(keys(local.ethernet_adapter), each.value.vmq.vmmq_adapter_policy
         ) == true ? intersight_vnic_eth_adapter_policy.map[each.value.vmq.vmmq_adapter_policy
     ].moid : local.policies_data["ethernet_adapter"][each.value.vmq.vmmq_adapter_policy].moid][0] : ""
+  }
+  dynamic "fabric_eth_network_group_policy" {
+    for_each = { for v in each.value.ethernet_network_group_policies : v => v if element(split("/", v), 1) != "UNUSED" }
+    content {
+      moid = contains(keys(local.ethernet_network_group), fabric_eth_network_group_policy.value
+        ) == true ? intersight_fabric_eth_network_group_policy.map[fabric_eth_network_group_policy.value
+      ].moid : local.policies_data["ethernet_network_group"][fabric_eth_network_group_policy.value].moid
+    }
   }
   dynamic "iscsi_boot_policy" {
     for_each = { for v in [each.value.iscsi_boot_policy] : v => v if element(split("/", v), 1) != "UNUSED" }
@@ -206,7 +209,7 @@ resource "intersight_vnic_eth_if" "map" {
     }
   }
   dynamic "fabric_eth_network_group_policy" {
-    for_each = { for v in [each.value.ethernet_network_group_policy] : v => v if element(split("/", v), 1) != "UNUSED" }
+    for_each = { for v in each.value.ethernet_network_group_policies : v => v if element(split("/", v), 1) != "UNUSED" }
     content {
       moid = contains(keys(local.ethernet_network_group), fabric_eth_network_group_policy.value
         ) == true ? intersight_fabric_eth_network_group_policy.map[fabric_eth_network_group_policy.value
