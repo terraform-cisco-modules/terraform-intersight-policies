@@ -1059,7 +1059,7 @@ locals {
       binding_parameters = merge(local.lldap.binding_parameters, lookup(v, "binding_parameters", {}))
       ldap_from_dns      = merge(local.lldap.ldap_from_dns, lookup(v, "ldap_from_dns", {}))
       ldap_groups        = lookup(v, "ldap_groups", [])
-      ldap_providers     = lookup(v, "ldap_providers", [])
+      ldap_servers       = lookup(v, "ldap_servers", [])
       name               = "${local.npfx[org].ldap}${v.name}${local.nsfx[org].ldap}"
       org                = org
       search_parameters  = merge(local.lldap.search_parameters, lookup(v, "search_parameters", {}))
@@ -1067,29 +1067,15 @@ locals {
     })
   ] if length(lookup(local.model[org], "ldap", [])) > 0]) : "${i.org}/${i.name}" => i }
   ldap_groups = { for i in flatten([
-    for key, value in local.ldap : [
-      for v in value.ldap_groups : {
-        domain        = value.base_settings.domain
-        base_settings = value.base_settings
-        ldap_policy   = key
-        name          = v.name
-        role          = v.role
-      }
-    ]
+    for key, value in local.ldap : [for v in value.ldap_groups : merge(local.lldap.ldap_groups, v, {
+      domain      = length(compact([lookup(v, "domain", "")])) > 0 ? v.domain : value.base_settings.domain
+      ldap_policy = key
+    })]
   ]) : "${i.ldap_policy}/${i.name}" => i }
-  ldap_providers = { for i in flatten([
-    for key, value in local.ldap : [
-      for v in value.ldap_providers : {
-        ldap_policy = key
-        port        = lookup(v, "port", local.lldap.ldap_providers.port)
-        server      = v.server
-      }
-    ]
+  ldap_servers = { for i in flatten([
+    for key, value in local.ldap : [for v in value.ldap_servers : merge(local.lldap.ldap_servers, v, { ldap_policy = key })]
   ]) : "${i.ldap_policy}/${i.server}" => i }
-  roles = distinct(concat(
-    [for v in local.ldap_groups : v.role],
-    [for v in local.users : v.role],
-  ))
+  roles = distinct(concat([for v in local.ldap_groups : v.end_point_role], [for v in local.users : v.role], ))
 
   #__________________________________________________________________
   #
@@ -1821,7 +1807,7 @@ locals {
     ) == 0 ? "${d.org}/${local.npfx[d.org][e]}${d.name}${local.nsfx[d.org][e]}" : "${d.org}/${d.name}"][0]
     }, {
     for e in local.vnic_policies : "${e}_policies" => [for d in v["${e}_policies"] : length(regexall("^UNUSED$", d.name)
-    ) == 0 ? "${d.org}/${local.ppfx[d.org][e]}${d.name}${local.psfx[d.org][e]}" : "${d.org}/${d.name}"]
+    ) == 0 ? "${d.org}/${local.npfx[d.org][e]}${d.name}${local.nsfx[d.org][e]}" : "${d.org}/${d.name}"]
     }, {
     for e in local.vnic_pools : "${e}_address_pool" => [for d in [v["${e}_address_pool"]] : length(regexall("^UNUSED$", d.name)
     ) == 0 ? "${d.org}/${local.ppfx[d.org][e]}${d.name}${local.psfx[d.org][e]}" : "${d.org}/${d.name}"][0]

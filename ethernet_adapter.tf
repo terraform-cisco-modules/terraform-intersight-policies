@@ -4,15 +4,15 @@
 # GUI Location: Policies > Create Policy > Ethernet Adapter
 #__________________________________________________________________
 resource "intersight_vnic_eth_adapter_policy" "map" {
-  for_each        = { for k, v in local.ethernet_adapter : k => merge(v, { rss = v.receive_side_scaling.enable_receive_side_scaling }) }
-  advanced_filter = each.value.enable_geneve_offload == true ? false : each.value.enable_advanced_filter
-  description     = coalesce(each.value.description, "${each.value.name} Fibre-Channel Adapter Policy.")
-  #ether_channel_pinning_enabled = each.value.enable_ether_channel_pinning
-  geneve_enabled          = each.value.enable_geneve_offload
-  interrupt_scaling       = each.value.enable_interrupt_scaling
-  name                    = each.value.name
-  rss_settings            = each.value.receive_side_scaling.enable_receive_side_scaling
-  uplink_failback_timeout = each.value.uplink_failback_timeout
+  for_each                      = { for k, v in local.ethernet_adapter : k => merge(v, { rss = v.receive_side_scaling.enable_receive_side_scaling }) }
+  advanced_filter               = each.value.enable_geneve_offload == true ? false : each.value.enable_advanced_filter
+  description                   = coalesce(each.value.description, "${each.value.name} Fibre-Channel Adapter Policy.")
+  ether_channel_pinning_enabled = each.value.enable_ether_channel_pinning
+  geneve_enabled                = each.value.enable_geneve_offload
+  interrupt_scaling             = each.value.enable_interrupt_scaling
+  name                          = each.value.name
+  rss_settings                  = each.value.receive_side_scaling.enable_receive_side_scaling
+  uplink_failback_timeout       = each.value.uplink_failback_timeout
   arfs_settings { enabled = each.value.enable_accelerated_receive_flow_steering }
   completion_queue_settings {
     nr_count  = length(regexall(true, each.value.enable_geneve_offload)) > 0 ? 16 : each.value.completion.queue_count

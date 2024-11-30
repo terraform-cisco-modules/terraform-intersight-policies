@@ -1386,13 +1386,16 @@ policies:
       search_forest: ''
       source: Extracted
     ldap_groups:
+      domain: ''
+      end_point_role: readonly
+      group_dn: '**REQUIRED**'
       name: '**REQUIRED**'
-      role: readonly
     ldap_servers:
       port: 636
       server: '**REQUIRED**'
+      vendor: OpenLDAP
     name: '**REQUIRED**'
-    nested_group_search_depth: 128
+    nested_group_search_depth: 0
     search_parameters:
       attribute: CiscoAvPair
       filter: samAccountName
@@ -1691,6 +1694,7 @@ policies:
     power_redundancy: Grid
     power_restore: LastState
     power_save_mode: Enabled
+    processor_package_power_limit: Default
   san_connectivity:
     description: ''
     name: '**REQUIRED**'

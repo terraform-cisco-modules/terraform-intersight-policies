@@ -25,7 +25,8 @@ resource "intersight_iam_ldap_policy" "map" {
     group_attribute = each.value.search_parameters.group_attribute
     # Group Authorization
     enable_group_authorization = each.value.enable_group_authorization
-    nested_group_search_depth  = each.value.nested_group_search_depth
+    enable_nested_group_search = each.value.nested_group_search_depth == 0 ? false : true
+    nested_group_search_depth  = each.value.nested_group_search_depth == 0 ? 128 : each.value.nested_group_search_depth
   }
   # Configure LDAP Servers
   enable_dns = length(compact([each.value.ldap_from_dns.search_domain])
@@ -63,10 +64,11 @@ resource "intersight_iam_ldap_group" "map" {
     intersight_iam_ldap_policy.map
   ]
   for_each = local.ldap_groups
-  domain   = length(compact([each.value.domain])) > 0 ? each.value.domain : each.value.base_settings.domain
+  domain   = each.value.domain
+  group_dn = each.value.group_dn
   name     = each.value.name
   end_point_role {
-    moid        = data.intersight_iam_end_point_role.map[each.value.role].results[0].moid
+    moid        = data.intersight_iam_end_point_role.map[each.value.end_point_role].results[0].moid
     object_type = "iam.EndPointRole"
   }
   ldap_policy {
@@ -80,12 +82,13 @@ resource "intersight_iam_ldap_group" "map" {
 # GUI Location: Policies > Create Policy > LDAP Policy > Server
 #__________________________________________________________________
 resource "intersight_iam_ldap_provider" "map" {
-  for_each = local.ldap_providers
+  for_each = local.ldap_servers
   depends_on = [
     intersight_iam_ldap_policy.map
   ]
   ldap_policy { moid = intersight_iam_ldap_policy.map[each.value.ldap_policy].moid }
   port   = each.value.port
   server = each.value.server
+  vendor = each.value.vendor
 }
 
