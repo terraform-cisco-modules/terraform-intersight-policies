@@ -45,7 +45,7 @@ locals {
   }
   ppfx = { for org in keys(var.orgs) : org => {
     for e in local.pool_names : e => lookup(lookup(lookup(lookup(var.model, org, {}), "pools", {}), "name_prefix", {}
-    ), e, lookup(lookup(lookup(lookup(var.model, org, {}), "pools", {}), "name_prefix", local.defaults.pool_suffix), "default", ""))
+    ), e, lookup(lookup(lookup(lookup(var.model, org, {}), "pools", {}), "name_prefix", local.defaults.pool_prefix), "default", ""))
   } }
   psfx = { for org in keys(var.orgs) : org => {
     for e in local.pool_names : e => lookup(lookup(lookup(lookup(var.model, org, {}), "pools", {}), "name_suffix", {}
