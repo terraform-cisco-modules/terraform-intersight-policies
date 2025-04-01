@@ -233,6 +233,28 @@ locals {
   # Intersight BIOS Policy
   # GUI Location: Policies > Create Policy > BIOS
   #__________________________________________________________________
+  #bios_additional_attributes = {
+  #  AcpiSratSpFlagEn         = "acpi_srat_sp_flag_en"
+  #  LatencyOptimizedMode     = "latency_optimized_mode"
+  #  PreBootDmaProtection     = "pre_boot_dma_protection"
+  #  SlotFrontNvme25LinkSpeed = "slot_front_nvme25link_speed"
+  #  SlotFrontNvme25OptionRom = "slot_front_nvme25option_rom"
+  #  SlotFrontNvme26LinkSpeed = "slot_front_nvme26link_speed"
+  #  SlotFrontNvme26OptionRom = "slot_front_nvme26option_rom"
+  #  SlotFrontNvme27LinkSpeed = "slot_front_nvme27link_speed"
+  #  SlotFrontNvme27OptionRom = "slot_front_nvme27option_rom"
+  #  SlotFrontNvme28LinkSpeed = "slot_front_nvme28link_speed"
+  #  SlotFrontNvme28OptionRom = "slot_front_nvme28option_rom"
+  #  SlotFrontNvme29LinkSpeed = "slot_front_nvme29link_speed"
+  #  SlotFrontNvme29OptionRom = "slot_front_nvme29option_rom"
+  #  SlotFrontNvme30LinkSpeed = "slot_front_nvme30link_speed"
+  #  SlotFrontNvme30OptionRom = "slot_front_nvme30option_rom"
+  #  SlotFrontNvme31LinkSpeed = "slot_front_nvme31link_speed"
+  #  SlotFrontNvme31OptionRom = "slot_front_nvme31option_rom"
+  #  SlotFrontNvme32LinkSpeed = "slot_front_nvme32link_speed"
+  #  SlotFrontNvme32OptionRom = "slot_front_nvme32option_rom"
+  #  UefiMemMapSpFlagEn       = "uefi_mem_map_sp_flag_en"
+  #}
   bios = { for i in flatten([for org in local.org_keys : [
     for v in lookup(local.model[org], "bios", []) : lookup(v, "bios_template", "UNUSED") != "UNUSED" ? merge(
       local.defaults.bios, local.defaults.bios_templates[replace(replace(v.bios_template, "-tpm", ""), "-Tpm", "")],

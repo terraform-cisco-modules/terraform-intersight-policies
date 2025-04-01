@@ -22,7 +22,7 @@ A Terraform module to configure Intersight Infrastructure Policies.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_intersight"></a> [intersight](#provider\_intersight) | 1.0.59 |
+| <a name="provider_intersight"></a> [intersight](#provider\_intersight) | 1.0.61 |
 ## Inputs
 
 | Name | Description | Type | Default | Required |

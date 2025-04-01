@@ -19,6 +19,10 @@ policies:
     description: ''
     name: '**REQUIRED**'
     #+++++++++++++++++++++++++++++++
+    # Advanced Section
+    #+++++++++++++++++++++++++++++++
+    latency_optimized_mode: platform-default
+    #+++++++++++++++++++++++++++++++
     # Boot Options Section
     #+++++++++++++++++++++++++++++++
     boot_option_num_retry: platform-default
@@ -116,6 +120,24 @@ policies:
     slot9link_speed: platform-default
     slot9state: platform-default
     slot_flom_link_speed: platform-default
+    slot_front_nvme1link_speed: platform-default
+    slot_front_nvme1option_rom: platform-default
+    slot_front_nvme2link_speed: platform-default
+    slot_front_nvme2option_rom: platform-default
+    slot_front_nvme3link_speed: platform-default
+    slot_front_nvme3option_rom: platform-default
+    slot_front_nvme4link_speed: platform-default
+    slot_front_nvme4option_rom: platform-default
+    slot_front_nvme5link_speed: platform-default
+    slot_front_nvme5option_rom: platform-default
+    slot_front_nvme6link_speed: platform-default
+    slot_front_nvme6option_rom: platform-default
+    slot_front_nvme7link_speed: platform-default
+    slot_front_nvme7option_rom: platform-default
+    slot_front_nvme8link_speed: platform-default
+    slot_front_nvme8option_rom: platform-default
+    slot_front_nvme9link_speed: platform-default
+    slot_front_nvme9option_rom: platform-default
     slot_front_nvme10link_speed: platform-default
     slot_front_nvme10option_rom: platform-default
     slot_front_nvme11link_speed: platform-default
@@ -136,8 +158,6 @@ policies:
     slot_front_nvme18option_rom: platform-default
     slot_front_nvme19link_speed: platform-default
     slot_front_nvme19option_rom: platform-default
-    slot_front_nvme1link_speed: platform-default
-    slot_front_nvme1option_rom: platform-default
     slot_front_nvme20link_speed: platform-default
     slot_front_nvme20option_rom: platform-default
     slot_front_nvme21link_speed: platform-default
@@ -148,22 +168,22 @@ policies:
     slot_front_nvme23option_rom: platform-default
     slot_front_nvme24link_speed: platform-default
     slot_front_nvme24option_rom: platform-default
-    slot_front_nvme2link_speed: platform-default
-    slot_front_nvme2option_rom: platform-default
-    slot_front_nvme3link_speed: platform-default
-    slot_front_nvme3option_rom: platform-default
-    slot_front_nvme4link_speed: platform-default
-    slot_front_nvme4option_rom: platform-default
-    slot_front_nvme5link_speed: platform-default
-    slot_front_nvme5option_rom: platform-default
-    slot_front_nvme6link_speed: platform-default
-    slot_front_nvme6option_rom: platform-default
-    slot_front_nvme7link_speed: platform-default
-    slot_front_nvme7option_rom: platform-default
-    slot_front_nvme8link_speed: platform-default
-    slot_front_nvme8option_rom: platform-default
-    slot_front_nvme9link_speed: platform-default
-    slot_front_nvme9option_rom: platform-default
+    slot_front_nvme25link_speed: platform-default
+    slot_front_nvme25option_rom: platform-default
+    slot_front_nvme26link_speed: platform-default
+    slot_front_nvme26option_rom: platform-default
+    slot_front_nvme27link_speed: platform-default
+    slot_front_nvme27option_rom: platform-default
+    slot_front_nvme28link_speed: platform-default
+    slot_front_nvme28option_rom: platform-default
+    slot_front_nvme29link_speed: platform-default
+    slot_front_nvme29option_rom: platform-default
+    slot_front_nvme30link_speed: platform-default
+    slot_front_nvme30option_rom: platform-default
+    slot_front_nvme31link_speed: platform-default
+    slot_front_nvme31option_rom: platform-default
+    slot_front_nvme32link_speed: platform-default
+    slot_front_nvme32option_rom: platform-default
     slot_front_slot5link_speed: platform-default
     slot_front_slot6link_speed: platform-default
     slot_gpu1state: platform-default
@@ -241,6 +261,7 @@ policies:
     #+++++++++++++++++++++++++++++++
     # Memory Section
     #+++++++++++++++++++++++++++++++
+    acpi_srat_sp_flag_en: platform-default
     adaptive_refresh_mgmt_level: platform-default
     advanced_mem_test: platform-default
     bme_dma_mitigation: platform-default
@@ -291,6 +312,7 @@ policies:
     partial_mirror_value3: platform-default
     partial_mirror_value4: platform-default
     pc_ie_ras_support: platform-default
+    pre_boot_dma_protection: platform-default
     post_package_repair: platform-default
     runtime_post_package_repair: platform-default
     select_memory_ras_configuration: platform-default
@@ -301,6 +323,7 @@ policies:
     snoopy_mode_for_ad: platform-default
     sparing_mode: platform-default
     tsme: platform-default
+    uefi_mem_map_sp_flag_en: platform-default
     uma_based_clustering: platform-default
     vol_memory_mode: platform-default
     #+++++++++++++++++++++++++++++++

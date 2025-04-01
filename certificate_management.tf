@@ -12,11 +12,11 @@ resource "intersight_certificatemanagement_policy" "map" {
     for_each = { for k, v in each.value.certificates : k => v }
     content {
       certificate { additional_properties = jsonencode({
-        PemCertificate = base64encode(local.ps.certificate_management.certificate[certificates.value.id])
+        PemCertificate = base64encode(local.ps.certificate_management.certificate[certificates.value.variable_id])
       }) }
       additional_properties = certificates.value.type == "IMC" ? jsonencode({
-        CertType   = certificates.value.cert_type
-        Privatekey = base64encode(local.ps.certificate_management.private_key[certificates.value.id])
+        CertType   = lookup(certificates.value, "cert_type", "None")
+        Privatekey = base64encode(local.ps.certificate_management.private_key[certificates.value.variable_id])
       }) : jsonencode({ CertificateName = certificates.value.name })
       enabled = certificates.value.enabled
       object_type = length(regexall("RootCA", certificates.value.type)
