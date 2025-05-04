@@ -1450,6 +1450,41 @@ policies:
       password: 1
       role: readonly
       username: '**REQUIRED**'
+  mac_sec:
+    cipher_suite: GCM-AES-XPN-256
+    confidentiality_offset: CONF-OFFSET-0
+    eapol_configurations:
+      ether_type: 0x888e
+      mac_address: 0180.C200.0003
+    description: ''
+    include_icv_indicator: false
+    key_server_priority: 16
+    mac_sec_fallback_key_chain:
+      fallback_key_chain_name: default
+      add_key:
+        cryptographic_algorithm: AES_256_CMAC
+        id: ABCD1234
+        key_lifetime:
+          always_active: true
+          end_time: 0001-01-01T00:00:00Z
+          start_time: 0001-01-01T00:00:00Z
+          timezone: UTC
+        secret: 1
+    mac_sec_primary_key_chain:
+      primary_key_chain_name: default
+      add_key:
+        cryptographic_algorithm: AES_256_CMAC
+        id: ABCD1234
+        key_lifetime:
+          always_active: true
+          end_time: 0001-01-01T00:00:00Z
+          start_time: 0001-01-01T00:00:00Z
+          timezone: UTC
+        secret: 1
+    name: '**REQUIRED**'
+    replay_window_size: 148809600
+    sak_expiry_time: 0
+    security_policy: Should-secure
   memory:
     description: ''
     name: '**REQUIRED**'
@@ -1491,6 +1526,7 @@ policies:
     link_aggregation: ''
     link_control: ''
     local_user: ''
+    mac_sec: ''
     memory: ''
     multicast: ''
     network_connectivity: ''
@@ -1545,6 +1581,7 @@ policies:
     link_aggregation: ''
     link_control: ''
     local_user: ''
+    mac_sec: ''
     memory: ''
     multicast: ''
     network_connectivity: ''
@@ -1867,6 +1904,7 @@ policies:
     unused_disks_state: NoChange
     use_jbod_for_vd_creation: false
   switch_control:
+    aes_primary_key: 0
     description: ''
     fabric_port_channel_vhba_reset: Disabled
     mac_address_table_aging: Default

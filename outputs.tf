@@ -135,6 +135,10 @@ output "local_user" {
   description = "Moid's of the Local User Policies."
   value       = { for k, v in intersight_iam_end_point_user_policy.map : k => v.moid }
 }
+output "mac_sec" {
+  description = "Moid's of the MacSec Policies."
+  value       = { for k, v in intersight_fabric_mac_sec_policy.map : k => v.moid }
+}
 output "memory" {
   description = "Moid's of the Memory Policies."
   value       = { for k, v in intersight_memory_policy.map : k => v.moid }

@@ -11,7 +11,7 @@ resource "intersight_bios_policy" "map" {
   #+++++++++++++++++++++++++++++++
   # Advanced Section
   #+++++++++++++++++++++++++++++++
-  # latency_optimized_mode = each.value.latency_optimized_mode # Latency Optimized Mode configuration
+  latency_optimized_mode = each.value.latency_optimized_mode # Latency Optimized Mode configuration
   #+++++++++++++++++++++++++++++++
   # Boot Options Section
   #+++++++++++++++++++++++++++++++
@@ -40,22 +40,6 @@ resource "intersight_bios_policy" "map" {
   #+++++++++++++++++++++++++++++++
   # LOM and PCIe Slots Section
   #+++++++++++++++++++++++++++++++
-  # slot_front_nvme25link_speed    = each.value.slot_front_nvme25link_speed    # Front NVME 25 Link Speed
-  # slot_front_nvme25option_rom    = each.value.slot_front_nvme25option_rom    # Front NVME 25 OptionROM
-  # slot_front_nvme26link_speed    = each.value.slot_front_nvme26link_speed    # Front NVME 26 Link Speed
-  # slot_front_nvme26option_rom    = each.value.slot_front_nvme26option_rom    # Front NVME 26 OptionROM
-  # slot_front_nvme27link_speed    = each.value.slot_front_nvme27link_speed    # Front NVME 27 Link Speed
-  # slot_front_nvme27option_rom    = each.value.slot_front_nvme27option_rom    # Front NVME 27 OptionROM
-  # slot_front_nvme28link_speed    = each.value.slot_front_nvme28link_speed    # Front NVME 28 Link Speed
-  # slot_front_nvme28option_rom    = each.value.slot_front_nvme28option_rom    # Front NVME 28 OptionROM
-  # slot_front_nvme29link_speed    = each.value.slot_front_nvme29link_speed    # Front NVME 29 Link Speed
-  # slot_front_nvme29option_rom    = each.value.slot_front_nvme29option_rom    # Front NVME 29 OptionROM
-  # slot_front_nvme30link_speed    = each.value.slot_front_nvme30link_speed    # Front NVME 30 Link Speed
-  # slot_front_nvme30option_rom    = each.value.slot_front_nvme30option_rom    # Front NVME 30 OptionROM
-  # slot_front_nvme31link_speed    = each.value.slot_front_nvme31link_speed    # Front NVME 31 Link Speed
-  # slot_front_nvme31option_rom    = each.value.slot_front_nvme31option_rom    # Front NVME 31 OptionROM
-  # slot_front_nvme32link_speed    = each.value.slot_front_nvme32link_speed    # Front NVME 32 Link Speed
-  # slot_front_nvme32option_rom    = each.value.slot_front_nvme32option_rom    # Front NVME 32 OptionROM
   acs_control_gpu1state          = each.value.acs_control_gpu1state          # ACS Control GPU 1
   acs_control_gpu2state          = each.value.acs_control_gpu2state          # ACS Control GPU 2
   acs_control_gpu3state          = each.value.acs_control_gpu3state          # ACS Control GPU 3
@@ -174,6 +158,22 @@ resource "intersight_bios_policy" "map" {
   slot_front_nvme23option_rom    = each.value.slot_front_nvme23option_rom    # Front NVME 23 OptionROM
   slot_front_nvme24link_speed    = each.value.slot_front_nvme24link_speed    # Front NVME 24 Link Speed
   slot_front_nvme24option_rom    = each.value.slot_front_nvme24option_rom    # Front NVME 24 OptionROM
+  slot_front_nvme25link_speed    = each.value.slot_front_nvme25link_speed    # Front NVME 25 Link Speed
+  slot_front_nvme25option_rom    = each.value.slot_front_nvme25option_rom    # Front NVME 25 OptionROM
+  slot_front_nvme26link_speed    = each.value.slot_front_nvme26link_speed    # Front NVME 26 Link Speed
+  slot_front_nvme26option_rom    = each.value.slot_front_nvme26option_rom    # Front NVME 26 OptionROM
+  slot_front_nvme27link_speed    = each.value.slot_front_nvme27link_speed    # Front NVME 27 Link Speed
+  slot_front_nvme27option_rom    = each.value.slot_front_nvme27option_rom    # Front NVME 27 OptionROM
+  slot_front_nvme28link_speed    = each.value.slot_front_nvme28link_speed    # Front NVME 28 Link Speed
+  slot_front_nvme28option_rom    = each.value.slot_front_nvme28option_rom    # Front NVME 28 OptionROM
+  slot_front_nvme29link_speed    = each.value.slot_front_nvme29link_speed    # Front NVME 29 Link Speed
+  slot_front_nvme29option_rom    = each.value.slot_front_nvme29option_rom    # Front NVME 29 OptionROM
+  slot_front_nvme30link_speed    = each.value.slot_front_nvme30link_speed    # Front NVME 30 Link Speed
+  slot_front_nvme30option_rom    = each.value.slot_front_nvme30option_rom    # Front NVME 30 OptionROM
+  slot_front_nvme31link_speed    = each.value.slot_front_nvme31link_speed    # Front NVME 31 Link Speed
+  slot_front_nvme31option_rom    = each.value.slot_front_nvme31option_rom    # Front NVME 31 OptionROM
+  slot_front_nvme32link_speed    = each.value.slot_front_nvme32link_speed    # Front NVME 32 Link Speed
+  slot_front_nvme32option_rom    = each.value.slot_front_nvme32option_rom    # Front NVME 32 OptionROM
   slot_front_slot5link_speed     = each.value.slot_front_slot5link_speed     # PCIe Slot:Front1 Link Speed
   slot_front_slot6link_speed     = each.value.slot_front_slot6link_speed     # PCIe Slot:Front2 Link Speed
   slot_gpu1state                 = each.value.slot_gpu1state                 # GPU 1 OptionROM
@@ -250,9 +250,7 @@ resource "intersight_bios_policy" "map" {
   #+++++++++++++++++++++++++++++++
   # Memory Section
   #+++++++++++++++++++++++++++++++
-  # acpi_srat_sp_flag_en                  = each.value.acpi_srat_sp_flag_en                  # ACPI SRAT L3 Cache As NUMA Domain configuration
-  # pre_boot_dma_protection               = each.value.pre_boot_dma_protection               # PreBoot DMA Protection configuration
-  # uefi_mem_map_sp_flag_en               = each.value.uefi_mem_map_sp_flag_en               # UEFI Memory Map Special Purpose Memory
+  acpi_srat_sp_flag_en                  = each.value.acpi_srat_sp_flag_en                  # ACPI SRAT L3 Cache As NUMA Domain configuration
   adaptive_refresh_mgmt_level           = each.value.adaptive_refresh_mgmt_level           # Adaptive Refresh Management Level
   advanced_mem_test                     = each.value.advanced_mem_test                     # Enhanced Memory Test
   bme_dma_mitigation                    = each.value.bme_dma_mitigation                    # BME DMA Mitigation
@@ -303,6 +301,7 @@ resource "intersight_bios_policy" "map" {
   partial_mirror_value3                 = each.value.partial_mirror_value3                 # Partial Mirror3 Size in GiB
   partial_mirror_value4                 = each.value.partial_mirror_value4                 # Partial Mirror4 Size in GiB
   pc_ie_ras_support                     = each.value.pc_ie_ras_support                     # PCIe RAS Support
+  pre_boot_dma_protection               = each.value.pre_boot_dma_protection               # PreBoot DMA Protection configuration
   post_package_repair                   = each.value.post_package_repair                   # Post Package Repair
   runtime_post_package_repair           = each.value.runtime_post_package_repair           # Runtime Post Package Repair
   select_memory_ras_configuration       = each.value.select_memory_ras_configuration       # Memory RAS Configuration
@@ -313,6 +312,7 @@ resource "intersight_bios_policy" "map" {
   snoopy_mode_for_ad                    = each.value.snoopy_mode_for_ad                    # Snoopy Mode for AD
   sparing_mode                          = each.value.sparing_mode                          # Sparing Mode
   tsme                                  = each.value.tsme                                  # Transparent Secure Memory Encryption
+  uefi_mem_map_sp_flag_en               = each.value.uefi_mem_map_sp_flag_en               # UEFI Memory Map Special Purpose Memory
   uma_based_clustering                  = each.value.uma_based_clustering                  # UMA Based Clustering
   vol_memory_mode                       = each.value.vol_memory_mode                       # Volatile Memory Mode
   #+++++++++++++++++++++++++++++++

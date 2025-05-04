@@ -57,6 +57,10 @@ variable "policies_sensitive" {
     local_user = {
       password = {}
     }
+    mac_sec = {
+      fallback_key_chain = {}
+      primary_key_chain  = {}
+    }
     persistent_memory = {
       passphrase = {}
     }
@@ -65,6 +69,9 @@ variable "policies_sensitive" {
       auth_password           = {}
       privacy_password        = {}
       trap_community_string   = {}
+    }
+    switch_control = {
+      aes_primary_key = {}
     }
     virtual_media = {
       password = {}
@@ -94,6 +101,9 @@ variable "policies_sensitive" {
         - It cannot be more than 254 characters.
     local_user:
       * password: Map of Local User Password(s).
+    mac_sec:
+      * fallback_key_chain: Fallback Key Chain(s).
+      * primary_key_chain: Fallback Key Chain(s).
     persistent_memory:
       * password: Secure passphrase to be applied on the Persistent Memory Modules on the server. The allowed characters are:
         - `a-z`, `A-Z`, `0-9` and special characters: `\u0021`,` &`, `#`, `$`, `%`, `+`, `^`, `@`, `_`, `*`, `-`.
@@ -131,6 +141,10 @@ variable "policies_sensitive" {
     })
     local_user = object({
       password = map(string)
+    })
+    mac_sec = object({
+      fallback_key_chain = map(string)
+      primary_key_chain  = map(string)
     })
     persistent_memory = object({
       passphrase = map(string)

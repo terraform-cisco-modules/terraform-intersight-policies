@@ -4,7 +4,10 @@
 # GUI Location: Policies > Create Policy > Switch Control
 #__________________________________________________________________
 resource "intersight_fabric_switch_control_policy" "map" {
-  for_each                = local.switch_control
+  for_each = local.switch_control
+  additional_properties = each.value.aes_primary_key != 0 ? jsonencode({
+    AesPrimaryKey = local.ps.switch_control.aes_primary_key[each.value.aes_primary_key]
+  }) : jsonencode({})
   description             = coalesce(each.value.description, "${each.value.name} Switch Control Policy.")
   ethernet_switching_mode = each.value.switching_mode_ethernet
   fabric_pc_vhba_reset    = each.value.fabric_port_channel_vhba_reset

@@ -31,7 +31,7 @@ locals {
     "ethernet_adapter", "ethernet_network", "ethernet_network_control", "ethernet_network_group", "ethernet_qos", "fc_zone",
     "fibre_channel_adapter", "fibre_channel_network", "fibre_channel_qos", "firmware", "flow_control", "imc_access",
     "ipmi_over_lan", "iscsi_adapter", "iscsi_boot", "iscsi_static_target", "lan_connectivity", "ldap", "link_aggregation",
-    "link_control", "local_user", "memory", "multicast", "network_connectivity", "ntp", "persistent_memory", "port",
+    "link_control", "local_user", "mac_sec", "memory", "multicast", "network_connectivity", "ntp", "persistent_memory", "port",
     "power", "san_connectivity", "scrub", "sd_card", "serial_over_lan", "smtp", "snmp", "ssh", "storage", "switch_control",
     "syslog", "system_qos", "thermal", "vhba_template", "virtual_kvm", "virtual_media", "vlan", "vnic_template", "vsan"
   ]
@@ -56,7 +56,7 @@ locals {
   #
   # Policy Dictionaries for required Data Lookups
   #____________________________________________________________
-  network_policies = ["flow_control", "link_aggregation", "link_control"]
+  network_policies = ["flow_control", "link_aggregation", "link_control", "mac_sec"]
   pp = merge({ for i in local.network_policies : i => distinct(compact(concat(
     flatten([for v in local.port_channel_appliances : v["${i}_policy"] if element(split("/", v["${i}_policy"]), 1) != "UNUSED"]),
     flatten([for v in local.port_channel_ethernet_uplinks : v["${i}_policy"] if element(split("/", v["${i}_policy"]), 1) != "UNUSED"]),
@@ -160,6 +160,7 @@ locals {
     iscsi_static_target      = { keys = keys(local.iscsi_static_target), object = "vnic.IscsiStaticTargetPolicy" }
     link_aggregation         = { keys = keys(local.link_aggregation), object = "fabric.LinkAggregationPolicy" }
     link_control             = { keys = keys(local.link_control), object = "fabric.LinkControlPolicy" }
+    mac_sec                  = { keys = keys(local.mac_sec), object = "fabric.MacSecPolicy" }
     multicast                = { keys = keys(local.multicast), object = "fabric.MulticastPolicy" }
     vhba_template            = { keys = keys(local.vhba_template), object = "vnic.VhbaTemplate" }
     vnic_template            = { keys = keys(local.vnic_template), object = "vnic.VnicTemplate" }
@@ -167,7 +168,7 @@ locals {
   policy_types = [
     "ethernet_adapter", "ethernet_network", "ethernet_network_control", "ethernet_network_group", "ethernet_qos",
     "fc_zone", "fibre_channel_adapter", "fibre_channel_network", "fibre_channel_qos", "flow_control", "iscsi_adapter",
-    "iscsi_boot", "iscsi_static_target", "link_aggregation", "link_control", "multicast", "vhba_template", "vnic_template"
+    "iscsi_boot", "iscsi_static_target", "link_aggregation", "link_control", "mac_sec", "multicast", "vhba_template", "vnic_template"
   ]
   pool_types    = ["ip", "iqn", "mac", "wwnn", "wwpn"]
   data_policies = { for e in local.policy_types : e => [for v in local.pp[e] : element(split("/", v), 1) if contains(local.policies[e].keys, v) == false] }
@@ -233,28 +234,6 @@ locals {
   # Intersight BIOS Policy
   # GUI Location: Policies > Create Policy > BIOS
   #__________________________________________________________________
-  #bios_additional_attributes = {
-  #  AcpiSratSpFlagEn         = "acpi_srat_sp_flag_en"
-  #  LatencyOptimizedMode     = "latency_optimized_mode"
-  #  PreBootDmaProtection     = "pre_boot_dma_protection"
-  #  SlotFrontNvme25LinkSpeed = "slot_front_nvme25link_speed"
-  #  SlotFrontNvme25OptionRom = "slot_front_nvme25option_rom"
-  #  SlotFrontNvme26LinkSpeed = "slot_front_nvme26link_speed"
-  #  SlotFrontNvme26OptionRom = "slot_front_nvme26option_rom"
-  #  SlotFrontNvme27LinkSpeed = "slot_front_nvme27link_speed"
-  #  SlotFrontNvme27OptionRom = "slot_front_nvme27option_rom"
-  #  SlotFrontNvme28LinkSpeed = "slot_front_nvme28link_speed"
-  #  SlotFrontNvme28OptionRom = "slot_front_nvme28option_rom"
-  #  SlotFrontNvme29LinkSpeed = "slot_front_nvme29link_speed"
-  #  SlotFrontNvme29OptionRom = "slot_front_nvme29option_rom"
-  #  SlotFrontNvme30LinkSpeed = "slot_front_nvme30link_speed"
-  #  SlotFrontNvme30OptionRom = "slot_front_nvme30option_rom"
-  #  SlotFrontNvme31LinkSpeed = "slot_front_nvme31link_speed"
-  #  SlotFrontNvme31OptionRom = "slot_front_nvme31option_rom"
-  #  SlotFrontNvme32LinkSpeed = "slot_front_nvme32link_speed"
-  #  SlotFrontNvme32OptionRom = "slot_front_nvme32option_rom"
-  #  UefiMemMapSpFlagEn       = "uefi_mem_map_sp_flag_en"
-  #}
   bios = { for i in flatten([for org in local.org_keys : [
     for v in lookup(local.model[org], "bios", []) : lookup(v, "bios_template", "UNUSED") != "UNUSED" ? merge(
       local.defaults.bios, local.defaults.bios_templates[replace(replace(v.bios_template, "-tpm", ""), "-Tpm", "")],
@@ -712,43 +691,52 @@ locals {
   fca = local.defaults.fibre_channel_adapter
   fc_adapter_templates = {
     FCNVMeInitiator = {
-      description    = "Recommended adapter settings for NVMe over FC Initiator."
-      error_recovery = { port_down_timeout = 30000, port_down_io_retry = 30 }
+      description       = "Recommended adapter settings for NVMe over FC Initiator."
+      error_recovery    = { port_down_timeout = 30000, port_down_io_retry = 30 }
+      io_throttle_count = 256
     }
     FCNVMeTarget = {
-      description    = "Recommended adapter settings for NVMe over FC Initiator."
-      error_recovery = { port_down_timeout = 30000, port_down_io_retry = 30 }
+      description       = "Recommended adapter settings for NVMe over FC Initiator."
+      error_recovery    = { port_down_timeout = 30000, port_down_io_retry = 30 }
+      io_throttle_count = 256
     }
     EMPTY = {}
     Initiator = {
-      description    = "Recommended adapter settings for SCSI Initiator."
-      error_recovery = { port_down_timeout = 10000, port_down_io_retry = 30 }
+      description       = "Recommended adapter settings for SCSI Initiator."
+      error_recovery    = { port_down_timeout = 10000, port_down_io_retry = 30 }
+      io_throttle_count = 256
     }
     Linux = {
-      description    = "Recommended adapter settings for Linux."
-      error_recovery = { port_down_timeout = 30000, port_down_io_retry = 30 }
+      description       = "Recommended adapter settings for Linux."
+      error_recovery    = { port_down_timeout = 30000, port_down_io_retry = 30 }
+      io_throttle_count = 256
     }
     Solaris = {
-      description    = "Recommended adapter settings for Solaris."
-      error_recovery = { port_down_timeout = 30000, port_down_io_retry = 30 }
-      flogi          = { timeout = 20000 }
+      description       = "Recommended adapter settings for Solaris."
+      error_recovery    = { port_down_timeout = 30000, port_down_io_retry = 30 }
+      flogi             = { timeout = 20000 }
+      io_throttle_count = 256
     }
     Target = {
-      description    = "Recommended adapter settings for SCSI Target."
-      error_recovery = { port_down_timeout = 30000, port_down_io_retry = 30 }
+      description       = "Recommended adapter settings for SCSI Target."
+      error_recovery    = { port_down_timeout = 30000, port_down_io_retry = 30 }
+      io_throttle_count = 256
     }
     VMware = {
-      description    = "Recommended adapter settings for VMware."
-      error_recovery = { port_down_timeout = 10000, port_down_io_retry = 30 }
+      description       = "Recommended adapter settings for VMware."
+      error_recovery    = { port_down_timeout = 10000, port_down_io_retry = 30 }
+      io_throttle_count = 256
     }
     WindowsBoot = {
-      description    = "Recommended adapter settings for Windows Boot.",
-      error_recovery = { port_down_timeout = 5000, port_down_io_retry = 30 }
-      plogi          = { timeout = 4000 }
+      description       = "Recommended adapter settings for Windows Boot.",
+      error_recovery    = { port_down_timeout = 5000, port_down_io_retry = 30 }
+      io_throttle_count = 256
+      plogi             = { timeout = 4000 }
     }
     Windows = {
-      description    = "Recommended adapter settings for Windows."
-      error_recovery = { port_down_timeout = 30000, port_down_io_retry = 30 }
+      description       = "Recommended adapter settings for Windows."
+      error_recovery    = { port_down_timeout = 30000, port_down_io_retry = 30 }
+      io_throttle_count = 256
     }
   }
   fc_adapter_l1 = flatten([for org in local.org_keys : [for v in lookup(local.model[org], "fibre_channel_adapter", []) : merge(
@@ -1149,6 +1137,35 @@ locals {
       tags       = value.tags
     })
   ]]) : "${i.local_user}/${i.name}" => i }
+
+  #__________________________________________________________________
+  #
+  # Intersight MACsec Policy
+  # GUI Location: Policies > Create Policy > MACsec
+  #__________________________________________________________________
+  fkey_chain   = local.defaults.mac_sec.mac_sec_fallback_key_chain
+  pkey_chain   = local.defaults.mac_sec.mac_sec_primary_key_chain
+  key_lifetime = local.defaults.mac_sec.mac_sec_primary_key_chain.add_key.key_lifetime
+  sec_keys     = local.defaults.mac_sec.mac_sec_primary_key_chain.add_key
+  mac_sec = { for i in flatten([for org in local.org_keys : [
+    for v in lookup(local.model[org], "mac_sec", []) : merge(local.defaults.mac_sec, v, {
+      eapol_configurations = merge(local.defaults.mac_sec.eapol_configurations, lookup(v, "eapol_configurations", {}))
+      key                  = v.name
+      name                 = "${local.npfx[org].mac_sec}${v.name}${local.nsfx[org].mac_sec}"
+      org                  = org
+      mac_sec_fallback_key_chain = [
+        for f in [lookup(v, "mac_sec_fallback_key_chain", {})] : merge(local.fkey_chain, f, {
+          add_key = [for e in lookup(f, "add_key", []) : merge(local.sec_keys, e, {
+            key_lifetime = merge(local.key_lifetime, lookup(e, "key_lifetime", {}))
+        })] }) if length(lookup(v, "mac_sec_fallback_key_chain", {})) > 0
+      ]
+      mac_sec_primary_key_chain = merge(local.pkey_chain, lookup(v, "mac_sec_primary_key_chain", {}), {
+        add_key = [for e in lookup(lookup(v, "mac_sec_primary_key_chain", {}), "add_key", []) : merge(local.sec_keys, e, {
+          key_lifetime = merge(local.key_lifetime, lookup(e, "key_lifetime", {}))
+      })] })
+      tags = lookup(v, "tags", var.global_settings.tags)
+    })
+  ] if length(lookup(local.model[org], "mac_sec", [])) > 0]) : "${i.org}/${i.key}" => i }
 
   #__________________________________________________________________
   #
