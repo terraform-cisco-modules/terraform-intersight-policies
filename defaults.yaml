@@ -1044,6 +1044,26 @@ policies:
       pcie_slots_cdn_enable: enabled
       processor_c6report: enabled
       work_load_config: Balanced
+    Virtualization-M8-AMD:
+      cbs_cmn_apbdis: Auto
+      cbs_cmn_cpu_cpb: Auto
+      cbs_cmn_cpu_global_cstate_ctrl: Auto
+      cbs_cmn_cpu_l1stream_hw_prefetcher: Auto
+      cbs_cmn_cpu_l2stream_hw_prefetcher: Auto
+      cbs_cmn_determinism_slider: Auto
+      cbs_cmn_efficiency_mode_en_rs: High Performance Mode
+      cbs_cmn_fixed_soc_pstate: Auto
+      cbs_cmn_gnb_nb_iommu: Auto
+      cbs_cmn_gnb_smucppc: enabled
+      cbs_cmn_gnb_smu_df_cstates: Auto
+      cbs_cpu_smt_ctrl: enabled
+      cbs_df_cmn_acpi_srat_l3numa: Auto
+      cbs_df_cmn_dram_nps: Auto
+      cbs_df_cmn_mem_intlv_control: Auto
+      cisco_xgmi_max_speed: platform-default
+      cpu_perf_enhancement: Disabled
+      pcie_slots_cdn_enable: enabled
+      svm_mode: enabled
     tpm:
       sha1pcr_bank: disabled
       sha256pcr_bank: enabled
@@ -1681,6 +1701,7 @@ policies:
       admin_speed: Auto
       ethernet_network_group_policies: [UNUSED]
       flow_control_policy: UNUSED
+      mac_sec_policy: UNUSED
       link_aggregation_policy: UNUSED
       link_control_policy: UNUSED
       pc_ids: [1]
@@ -1714,6 +1735,7 @@ policies:
       fec: Auto
       flow_control_policy: UNUSED
       link_control_policy: UNUSED
+      mac_sec_policy: UNUSED
       port_list: '1'
       slot_id: 1
     port_role_fc_storage:
