@@ -7,6 +7,7 @@ resource "intersight_vnic_iscsi_static_target_policy" "map" {
   for_each    = local.iscsi_static_target
   description = coalesce(each.value.description, "${each.value.name} iSCSI Static Target Policy.")
   ip_address  = each.value.ip_address
+  # iscsi_ip_type = length(regexall(":", each.value.ip_address)) > 0 ? "IPv6" : "IPv4"
   name        = each.value.name
   port        = each.value.port
   target_name = each.value.target_name

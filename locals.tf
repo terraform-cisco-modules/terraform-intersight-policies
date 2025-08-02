@@ -1271,6 +1271,7 @@ locals {
           interfaces  = [for d in lookup(e, "interfaces", []) : merge(local.lport.pc_interfaces, d)]
           pc_id       = length(e.pc_ids) >= 2 ? element(e.pc_ids, x) : element(e.pc_ids, 0)
           port_policy = "${org}/${local.npfx[org].port}${element(v.names, x)}${local.nsfx[org].port}"
+          user_label  = length(e.user_labels) >= 2 ? element(e.user_labels, x) : length(e.user_labels) == 1 ? element(e.user_labels, 0) : ""
         })]
         port_channel_ethernet_uplinks = [for e in lookup(v, "port_channel_ethernet_uplinks", []) : merge(local.lport.port_channel_ethernet_uplinks, e, {
           for d in local.peths : d => {
@@ -1284,11 +1285,13 @@ locals {
           interfaces  = [for d in lookup(e, "interfaces", []) : merge(local.lport.pc_interfaces, d)]
           pc_id       = length(e.pc_ids) >= 2 ? element(e.pc_ids, x) : element(e.pc_ids, 0)
           port_policy = "${org}/${local.npfx[org].port}${element(v.names, x)}${local.nsfx[org].port}"
+          user_label  = length(e.user_labels) >= 2 ? element(e.user_labels, x) : length(e.user_labels) == 1 ? element(e.user_labels, 0) : ""
         })]
         port_channel_fc_uplinks = [for e in lookup(v, "port_channel_fc_uplinks", []) : merge(local.lport.port_channel_fc_uplinks, e, {
           interfaces  = [for d in lookup(e, "interfaces", []) : merge(local.lport.pc_interfaces, d)]
           pc_id       = length(e.pc_ids) >= 2 ? element(e.pc_ids, x) : element(e.pc_ids, 0)
           port_policy = "${org}/${local.npfx[org].port}${element(v.names, x)}${local.nsfx[org].port}"
+          user_label  = length(e.user_labels) >= 2 ? element(e.user_labels, x) : length(e.user_labels) == 1 ? element(e.user_labels, 0) : ""
           vsan_id     = length(e.vsan_ids) >= 2 ? element(e.vsan_ids, x) : element(e.vsan_ids, 0)
         })]
         port_channel_fcoe_uplinks = [for e in lookup(v, "port_channel_fcoe_uplinks", []) : merge(local.lport.port_channel_fcoe_uplinks, e, {
@@ -1299,6 +1302,7 @@ locals {
           port_policy = "${org}/${local.npfx[org].port}${element(v.names, x)}${local.nsfx[org].port}"
           interfaces  = [for d in lookup(e, "interfaces", []) : merge(local.lport.pc_interfaces, d)]
           pc_id       = length(e.pc_ids) >= 2 ? element(e.pc_ids, x) : element(e.pc_ids, 0)
+          user_label  = length(e.user_labels) >= 2 ? element(e.user_labels, x) : length(e.user_labels) == 1 ? element(e.user_labels, 0) : ""
         })]
         port_modes = [for e in lookup(v, "port_modes", []) : merge(local.lport.port_modes, e, {
           port_list   = e.port_list,
@@ -1313,6 +1317,7 @@ locals {
             ) : length(regexall(",", e.port_list)) > 0 ? tolist(split(",", e.port_list)) : [e.port_list]
             ) : length(regexall("-", d)) > 0 ? [for y in range(tonumber(element(split("-", d), 0)
           ), (tonumber(element(split("-", d), 1)) + 1)) : tonumber(y)] : [d]])
+          user_label = length(e.user_labels) >= 2 ? element(e.user_labels, x) : length(e.user_labels) == 1 ? element(e.user_labels, 0) : ""
         })]
         port_role_ethernet_uplinks = [for e in lookup(v, "port_role_ethernet_uplinks", []) : merge(local.lport.port_role_ethernet_uplinks, e, {
           for d in local.peths : d => {
@@ -1327,20 +1332,23 @@ locals {
             ) : length(regexall(",", e.port_list)) > 0 ? tolist(split(",", e.port_list)) : [e.port_list]
             ) : length(regexall("-", d)) > 0 ? [for y in range(tonumber(element(split("-", d), 0)
           ), (tonumber(element(split("-", d), 1)) + 1)) : tonumber(y)] : [d]])
+          user_label = length(e.user_labels) >= 2 ? element(e.user_labels, x) : length(e.user_labels) == 1 ? element(e.user_labels, 0) : ""
         })]
         port_role_fc_storage = [for e in lookup(v, "port_role_fc_storage", []) : merge(local.lport.port_role_fc_storage, e, {
           port_list = flatten([for d in compact(length(regexall("-", e.port_list)) > 0 ? tolist(split(",", e.port_list)
             ) : length(regexall(",", e.port_list)) > 0 ? tolist(split(",", e.port_list)) : [e.port_list]
             ) : length(regexall("-", d)) > 0 ? [for y in range(tonumber(element(split("-", d), 0)
           ), (tonumber(element(split("-", d), 1)) + 1)) : tonumber(y)] : [d]])
-          vsan_id = length(e.vsan_ids) >= 2 ? element(e.vsan_ids, x) : element(e.vsan_ids, 0)
+          user_label = length(e.user_labels) >= 2 ? element(e.user_labels, x) : length(e.user_labels) == 1 ? element(e.user_labels, 0) : ""
+          vsan_id    = length(e.vsan_ids) >= 2 ? element(e.vsan_ids, x) : element(e.vsan_ids, 0)
         })]
         port_role_fc_uplinks = [for e in lookup(v, "port_role_fc_uplinks", []) : merge(local.lport.port_role_fc_uplinks, e, {
           port_list = flatten([for d in compact(length(regexall("-", e.port_list)) > 0 ? tolist(split(",", e.port_list)
             ) : length(regexall(",", e.port_list)) > 0 ? tolist(split(",", e.port_list)) : [e.port_list]
             ) : length(regexall("-", d)) > 0 ? [for y in range(tonumber(element(split("-", d), 0)
           ), (tonumber(element(split("-", d), 1)) + 1)) : tonumber(y)] : [d]])
-          vsan_id = length(e.vsan_ids) >= 2 ? element(e.vsan_ids, x) : element(e.vsan_ids, 0)
+          user_label = length(e.user_labels) >= 2 ? element(e.user_labels, x) : length(e.user_labels) == 1 ? element(e.user_labels, 0) : ""
+          vsan_id    = length(e.vsan_ids) >= 2 ? element(e.vsan_ids, x) : element(e.vsan_ids, 0)
         })]
         port_role_fcoe_uplinks = [for e in lookup(v, "port_role_fcoe_uplinks", []) : merge(local.lport.port_role_fcoe_uplinks, e, {
           for d in local.pethp : d => {
@@ -1351,12 +1359,14 @@ locals {
             ) : length(regexall(",", e.port_list)) > 0 ? tolist(split(",", e.port_list)) : [e.port_list]
             ) : length(regexall("-", d)) > 0 ? [for y in range(tonumber(element(split("-", d), 0)
           ), (tonumber(element(split("-", d), 1)) + 1)) : tonumber(y)] : [d]])
+          user_label = length(e.user_labels) >= 2 ? element(e.user_labels, x) : length(e.user_labels) == 1 ? element(e.user_labels, 0) : ""
         })]
         port_role_servers = [for e in lookup(v, "port_role_servers", []) : merge(local.lport.port_role_servers, e, {
           port_list = flatten([for d in compact(length(regexall("-", e.port_list)) > 0 ? tolist(split(",", e.port_list)
             ) : length(regexall(",", e.port_list)) > 0 ? tolist(split(",", e.port_list)) : [e.port_list]
             ) : length(regexall("-", d)) > 0 ? [for y in range(tonumber(element(split("-", d), 0)
           ), (tonumber(element(split("-", d), 1)) + 1)) : tonumber(y)] : [d]])
+          user_label = length(e.user_labels) >= 2 ? element(e.user_labels, x) : length(e.user_labels) == 1 ? element(e.user_labels, 0) : ""
         })]
         tags = lookup(v, "tags", var.global_settings.tags)
       })

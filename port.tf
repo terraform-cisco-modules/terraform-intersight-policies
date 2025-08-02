@@ -35,10 +35,11 @@ resource "intersight_fabric_appliance_pc_role" "map" {
   depends_on  = [intersight_fabric_port_policy.map]
   for_each    = local.port_channel_appliances
   admin_speed = each.value.admin_speed
-  # fec         = each.value.fec
-  mode     = each.value.mode
-  pc_id    = each.value.pc_id
-  priority = each.value.priority
+  fec         = each.value.fec
+  mode        = each.value.mode
+  pc_id       = each.value.pc_id
+  priority    = each.value.priority
+  # user_label  = each.value.user_label
   eth_network_control_policy {
     moid = contains(keys(local.ethernet_network_control), each.value.ethernet_network_control_policy
       ) == true ? intersight_fabric_eth_network_control_policy.map[each.value.ethernet_network_control_policy
@@ -85,8 +86,9 @@ resource "intersight_fabric_uplink_pc_role" "map" {
   depends_on  = [intersight_fabric_port_policy.map]
   for_each    = local.port_channel_ethernet_uplinks
   admin_speed = each.value.admin_speed
-  # fec         = each.value.fec
-  pc_id = each.value.pc_id
+  fec         = each.value.fec
+  pc_id       = each.value.pc_id
+  # user_label = each.value.user_label
   port_policy { moid = intersight_fabric_port_policy.map[each.value.port_policy].moid }
   dynamic "eth_network_group_policy" {
     for_each = { for v in each.value.ethernet_network_group_policies : v => v if element(split("/", v), 1) != "UNUSED" }
@@ -150,6 +152,7 @@ resource "intersight_fabric_fc_uplink_pc_role" "map" {
   admin_speed = each.value.admin_speed
   pc_id       = each.value.pc_id
   vsan_id     = each.value.vsan_id
+  # user_label  = each.value.user_label
   port_policy { moid = intersight_fabric_port_policy.map[each.value.port_policy].moid }
   dynamic "ports" {
     for_each = each.value.interfaces
@@ -179,8 +182,9 @@ resource "intersight_fabric_fcoe_uplink_pc_role" "map" {
   depends_on  = [intersight_fabric_port_policy.map]
   for_each    = local.port_channel_fcoe_uplinks
   admin_speed = each.value.admin_speed
-  # fec         = each.value.fec
-  pc_id = each.value.pc_id
+  fec         = each.value.fec
+  pc_id       = each.value.pc_id
+  # user_label = each.value.user_label
   port_policy { moid = intersight_fabric_port_policy.map[each.value.port_policy].moid }
   dynamic "link_aggregation_policy" {
     for_each = { for v in [each.value.link_aggregation_policy] : v => v if element(split("/", v), 1) != "UNUSED" }
@@ -254,6 +258,7 @@ resource "intersight_fabric_appliance_role" "map" {
   port_id           = each.value.port_id
   priority          = each.value.priority
   slot_id           = lookup(each.value, "slot_id", 1)
+  # user_label        = each.value.user_label
   port_policy { moid = intersight_fabric_port_policy.map[each.value.port_policy].moid }
   eth_network_control_policy {
     moid = contains(keys(local.ethernet_network_control), each.value.ethernet_network_control_policy
@@ -288,6 +293,7 @@ resource "intersight_fabric_uplink_role" "map" {
   fec               = each.value.fec
   port_id           = each.value.port_id
   slot_id           = lookup(each.value, "slot_id", 1)
+  # user_label        = each.value.user_label
   port_policy { moid = intersight_fabric_port_policy.map[each.value.port_policy].moid }
   dynamic "eth_network_group_policy" {
     for_each = { for v in each.value.ethernet_network_group_policies : v => v if element(split("/", v), 1) != "UNUSED" }
@@ -338,6 +344,7 @@ resource "intersight_fabric_fc_storage_role" "map" {
   port_id           = each.value.port_id
   slot_id           = lookup(each.value, "slot_id", 1)
   vsan_id           = each.value.vsan_id
+  # user_label        = each.value.user_label
   port_policy { moid = intersight_fabric_port_policy.map[each.value.port_policy].moid }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
@@ -366,6 +373,7 @@ resource "intersight_fabric_fc_uplink_role" "map" {
   port_id           = each.value.port_id
   slot_id           = lookup(each.value, "slot_id", 1)
   vsan_id           = each.value.vsan_id
+  # user_label        = each.value.user_label
   port_policy { moid = intersight_fabric_port_policy.map[each.value.port_policy].moid }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }
@@ -391,6 +399,7 @@ resource "intersight_fabric_fcoe_uplink_role" "map" {
   fec               = each.value.fec
   port_id           = each.value.port_id
   slot_id           = lookup(each.value, "slot_id", 1)
+  # user_label        = each.value.user_label
   port_policy { moid = intersight_fabric_port_policy.map[each.value.port_policy].moid }
   dynamic "link_control_policy" {
     for_each = { for v in [each.value.link_control_policy] : v => v if element(split("/", v), 1) != "UNUSED" }
@@ -425,6 +434,7 @@ resource "intersight_fabric_server_role" "map" {
   preferred_device_id       = lookup(each.value, "device_number", null)
   preferred_device_type     = lookup(each.value, "connected_device_type", "Auto") # Chassis, RackServer
   slot_id                   = lookup(each.value, "slot_id", 1)
+  # user_label                = each.value.user_label
   port_policy { moid = intersight_fabric_port_policy.map[each.value.port_policy].moid }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }

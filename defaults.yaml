@@ -543,12 +543,31 @@ policies:
       pcie_slots_cdn_enable: enabled
       processor_c6report: enabled
       work_load_config: Balanced
-    AnalyticsDatabaseSystems-M5-Intel:
+    AnalyticalDatabaseSystems-M5-Intel:
       cpu_power_management: custom
       intel_vt_for_directed_io: disabled
       pcie_slots_cdn_enable: enabled
       processor_c1e: disabled
       processor_c6report: disabled
+    Analytics-M8-AMD:
+      cbs_cmn_apbdis: '1'
+      cbs_cmn_apbdis_df_pstate_rs: '0'
+      cbs_cmn_cpu_cpb: Auto
+      cbs_cmn_cpu_global_cstate_ctrl: Auto
+      cbs_cmn_cpu_l1stream_hw_prefetcher: Auto
+      cbs_cmn_cpu_l2stream_hw_prefetcher: Auto
+      cbs_cmn_determinism_slider: Auto
+      cbs_cmn_efficiency_mode_en_rs: High Performance Mode
+      cbs_cmn_gnb_nb_iommu: Auto
+      cbs_cmn_gnb_smu_df_cstates: Auto
+      cbs_cmn_gnb_smucppc: enabled
+      cbs_cpu_smt_ctrl: disabled
+      cbs_df_cmn4link_max_xgmi_speed: Auto
+      cbs_df_cmn_acpi_srat_l3numa: disabled
+      cbs_df_cmn_dram_nps: Auto
+      cbs_df_cmn_mem_intlv_control: Auto
+      cpu_perf_enhancement: Disabled
+      pcie_slots_cdn_enable: enabled
     AzureStack-M6-Intel:
       # Boot Options
       ipv4http: disabled
@@ -744,6 +763,26 @@ policies:
       upi_link_enablement: '2'
       upi_power_management: enabled
       xpt_prefetch: enabled
+    CPUIntensive-M8-AMD:
+      cbs_cmn_apbdis: '1'
+      cbs_cmn_apbdis_df_pstate_rs: '0'
+      cbs_cmn_cpu_cpb: Auto
+      cbs_cmn_cpu_global_cstate_ctrl: Auto
+      cbs_cmn_cpu_l1stream_hw_prefetcher: Auto
+      cbs_cmn_cpu_l2stream_hw_prefetcher: Auto
+      cbs_cmn_determinism_slider: Power
+      cbs_cmn_efficiency_mode_en_rs: High Performance Mode
+      cbs_cmn_gnb_nb_iommu: Auto
+      cbs_cmn_gnb_smu_df_cstates: Auto
+      cbs_cmn_gnb_smucppc: Auto
+      cbs_cpu_smt_ctrl: Auto
+      cbs_df_cmn4link_max_xgmi_speed: Auto
+      cbs_df_cmn_acpi_srat_l3numa: enabled
+      cbs_df_cmn_dram_nps: NPS4
+      cbs_df_cmn_mem_intlv_control: Auto
+      cpu_perf_enhancement: Auto
+      pcie_slots_cdn_enable: enabled
+      svm_mode: enabled
     ComputationIntensive-M6-AMD:
       cbs_cmn_apbdis: '1'
       cbs_cmn_cpu_cpb: Auto
@@ -812,6 +851,26 @@ policies:
       processor_c1e: enabled
       processor_c6report: enabled
       work_load_config: Balanced
+    EnergyEfficiency-M8-AMD:
+      cbs_cmn_apbdis: Auto
+      cbs_cmn_apbdis_df_pstate_rs: '0'
+      cbs_cmn_cpu_cpb: Auto
+      cbs_cmn_cpu_global_cstate_ctrl: Auto
+      cbs_cmn_cpu_l1stream_hw_prefetcher: disabled
+      cbs_cmn_cpu_l2stream_hw_prefetcher: disabled
+      cbs_cmn_determinism_slider: Power
+      cbs_cmn_efficiency_mode_en_rs: Efficiency Mode
+      cbs_cmn_gnb_nb_iommu: Auto
+      cbs_cmn_gnb_smu_df_cstates: Auto
+      cbs_cmn_gnb_smucppc: enabled
+      cbs_cpu_smt_ctrl: Auto
+      cbs_df_cmn4link_max_xgmi_speed: Auto
+      cbs_df_cmn_acpi_srat_l3numa: Auto
+      cbs_df_cmn_dram_nps: Auto
+      cbs_df_cmn_mem_intlv_control: Auto
+      cpu_perf_enhancement: Disabled
+      pcie_slots_cdn_enable: enabled
+      svm_mode: enabled
     HighPerformanceComputing-M5-Intel:
       intel_hyper_threading_tech: disabled
       intel_virtualization_technology: disabled
@@ -854,6 +913,25 @@ policies:
       pcie_slots_cdn_enable: enabled
       processor_c6report: enabled
       work_load_config: Balanced
+    HPC-M8-AMD:
+      cbs_cmn_apbdis: '1'
+      cbs_cmn_apbdis_df_pstate_rs: '0'
+      cbs_cmn_cpu_cpb: Auto
+      cbs_cmn_cpu_global_cstate_ctrl: Auto
+      cbs_cmn_cpu_l1stream_hw_prefetcher: Auto
+      cbs_cmn_cpu_l2stream_hw_prefetcher: Auto
+      cbs_cmn_determinism_slider: Power
+      cbs_cmn_efficiency_mode_en_rs: High Performance Mode
+      cbs_cmn_gnb_nb_iommu: Auto
+      cbs_cmn_gnb_smu_df_cstates: Auto
+      cbs_cmn_gnb_smucppc: Auto
+      cbs_cpu_smt_ctrl: disabled
+      cbs_df_cmn4link_max_xgmi_speed: Auto
+      cbs_df_cmn_acpi_srat_l3numa: Auto
+      cbs_df_cmn_dram_nps: NPS4
+      cbs_df_cmn_mem_intlv_control: Auto
+      cpu_perf_enhancement: Auto
+      pcie_slots_cdn_enable: enabled
     IOIntensive-M6-AMD:
       cbs_cmn_apbdis: '1'
       cbs_cmn_cpu_cpb: Auto
@@ -876,6 +954,26 @@ policies:
       llc_prefetch: disabled
       pcie_slots_cdn_enable: enabled
       streamer_prefetch: disabled
+    IOIntensive-M8-AMD:
+      cbs_cmn_apbdis: '1'
+      cbs_cmn_apbdis_df_pstate_rs: '0'
+      cbs_cmn_cpu_cpb: Auto
+      cbs_cmn_cpu_global_cstate_ctrl: Auto
+      cbs_cmn_cpu_l1stream_hw_prefetcher: Auto
+      cbs_cmn_cpu_l2stream_hw_prefetcher: Auto
+      cbs_cmn_determinism_slider: Power
+      cbs_cmn_efficiency_mode_en_rs: Maximum IO Performance Mode
+      cbs_cmn_gnb_nb_iommu: Auto
+      cbs_cmn_gnb_smu_df_cstates: disabled
+      cbs_cmn_gnb_smucppc: Auto
+      cbs_cpu_smt_ctrl: Auto
+      cbs_df_cmn4link_max_xgmi_speed: Auto
+      cbs_df_cmn_acpi_srat_l3numa: Auto
+      cbs_df_cmn_dram_nps: NPS4
+      cbs_df_cmn_mem_intlv_control: Auto
+      cpu_perf_enhancement: Disabled
+      pcie_slots_cdn_enable: enabled
+      svm_mode: enabled
     JavaApplicationServer-M5-Intel:
       cpu_power_management: custom
       intel_virtualization_technology: disabled
@@ -925,6 +1023,26 @@ policies:
       intel_vt_for_directed_io: disabled
       pcie_slots_cdn_enable: enabled
       work_load_config: Balanced
+    LowLatency-M8-AMD:
+      cbs_cmn_apbdis: Auto
+      cbs_cmn_apbdis_df_pstate_rs: '0'
+      cbs_cmn_cpu_cpb: disabled
+      cbs_cmn_cpu_global_cstate_ctrl: Auto
+      cbs_cmn_cpu_l1stream_hw_prefetcher: Auto
+      cbs_cmn_cpu_l2stream_hw_prefetcher: Auto
+      cbs_cmn_determinism_slider: Performance
+      cbs_cmn_efficiency_mode_en_rs: High Performance Mode
+      cbs_cmn_gnb_nb_iommu: disabled
+      cbs_cmn_gnb_smu_df_cstates: disabled
+      cbs_cmn_gnb_smucppc: Auto
+      cbs_cpu_smt_ctrl: disabled
+      cbs_df_cmn4link_max_xgmi_speed: Auto
+      cbs_df_cmn_acpi_srat_l3numa: Auto
+      cbs_df_cmn_dram_nps: Auto
+      cbs_df_cmn_mem_intlv_control: disabled
+      cpu_perf_enhancement: Disabled
+      pcie_slots_cdn_enable: enabled
+      svm_mode: disabled
     M5-amd-virtual:
       cpu_power_management: custom
       nvmdimm_perform_config: Balanced Profile
@@ -979,6 +1097,25 @@ policies:
       pcie_slots_cdn_enable: enabled
       processor_c1e: disabled
       processor_c6report: disabled
+    RDBMS-M8-AMD:
+      cbs_cmn_apbdis: '1'
+      cbs_cmn_apbdis_df_pstate_rs: '0'
+      cbs_cmn_cpu_cpb: Auto
+      cbs_cmn_cpu_global_cstate_ctrl: Auto
+      cbs_cmn_cpu_l1stream_hw_prefetcher: Auto
+      cbs_cmn_cpu_l2stream_hw_prefetcher: Auto
+      cbs_cmn_determinism_slider: Auto
+      cbs_cmn_efficiency_mode_en_rs: Maximum IO Performance Mode
+      cbs_cmn_gnb_nb_iommu: Auto
+      cbs_cmn_gnb_smu_df_cstates: disabled
+      cbs_cmn_gnb_smucppc: Auto
+      cbs_cpu_smt_ctrl: enabled
+      cbs_df_cmn4link_max_xgmi_speed: Auto
+      cbs_df_cmn_acpi_srat_l3numa: Auto
+      cbs_df_cmn_dram_nps: NPS4
+      cbs_df_cmn_mem_intlv_control: Auto
+      cpu_perf_enhancement: Disabled
+      pcie_slots_cdn_enable: enabled
     RelationalDatabaseSystems-M6-Intel:
       cpu_perf_enhancement: Auto
       llc_alloc: disabled
@@ -1045,25 +1182,24 @@ policies:
       processor_c6report: enabled
       work_load_config: Balanced
     Virtualization-M8-AMD:
-      cbs_cmn_apbdis: Auto
+      cbs_cmn_apbdis: '0'
+      cbs_cmn_apbdis_df_pstate_rs: '0'
       cbs_cmn_cpu_cpb: Auto
       cbs_cmn_cpu_global_cstate_ctrl: Auto
       cbs_cmn_cpu_l1stream_hw_prefetcher: Auto
       cbs_cmn_cpu_l2stream_hw_prefetcher: Auto
-      cbs_cmn_determinism_slider: Auto
+      cbs_cmn_determinism_slider: Power
       cbs_cmn_efficiency_mode_en_rs: High Performance Mode
-      cbs_cmn_fixed_soc_pstate: Auto
       cbs_cmn_gnb_nb_iommu: Auto
-      cbs_cmn_gnb_smucppc: enabled
       cbs_cmn_gnb_smu_df_cstates: Auto
+      cbs_cmn_gnb_smucppc: enabled
       cbs_cpu_smt_ctrl: enabled
+      cbs_df_cmn4link_max_xgmi_speed: Auto
       cbs_df_cmn_acpi_srat_l3numa: Auto
       cbs_df_cmn_dram_nps: Auto
       cbs_df_cmn_mem_intlv_control: Auto
-      cisco_xgmi_max_speed: platform-default
       cpu_perf_enhancement: Disabled
       pcie_slots_cdn_enable: enabled
-      svm_mode: enabled
     tpm:
       sha1pcr_bank: disabled
       sha256pcr_bank: enabled
@@ -1322,6 +1458,7 @@ policies:
   iscsi_static_target:
     description: ''
     ip_address: '**REQUIRED**'
+    ip_protocol: IPv4
     lun_id: 0
     name: '**REQUIRED**'
     port: 3260
@@ -1697,6 +1834,7 @@ policies:
       mode: trunk
       pc_ids: [1]
       priority: Best Effort
+      user_labels: []
     port_channel_ethernet_uplinks:
       admin_speed: Auto
       ethernet_network_group_policies: [UNUSED]
@@ -1705,15 +1843,18 @@ policies:
       link_aggregation_policy: UNUSED
       link_control_policy: UNUSED
       pc_ids: [1]
+      user_labels: []
     port_channel_fc_uplinks:
       admin_speed: 32Gbps
       pc_ids: [1]
+      user_labels: []
       vsan_ids: [1]
     port_channel_fcoe_uplinks:
       admin_speed: Auto
       link_aggregation_policy: UNUSED
       link_control_policy: UNUSED
       pc_ids: [1]
+      user_labels: []
     port_modes:
       custom_mode: FibreChannel
       port_list: [1, 4]
@@ -1728,6 +1869,7 @@ policies:
       port_list: '1'
       priority: Best Effort
       slot_id: 1
+      user_labels: []
     port_role_ethernet_uplinks:
       admin_speed: Auto
       breakout_port_id: 0
@@ -1738,17 +1880,20 @@ policies:
       mac_sec_policy: UNUSED
       port_list: '1'
       slot_id: 1
+      user_labels: []
     port_role_fc_storage:
       admin_speed: 16Gbps
       breakout_port_id: 0
       port_list: '1'
       slot_id: 1
+      user_labels: []
       vsan_ids: [1]
     port_role_fc_uplinks:
       admin_speed: 32Gbps
       breakout_port_id: 0
       port_list: '1'
       slot_id: 1
+      user_labels: []
       vsan_ids: [1]
     port_role_fcoe_uplinks:
       admin_speed: Auto
@@ -1756,6 +1901,7 @@ policies:
       fec: Auto
       link_control_policy: UNUSED
       port_list: '1'
+      user_labels: []
       slot_id: 1
     port_role_servers:
       auto_negotiation: false
@@ -1765,6 +1911,7 @@ policies:
       fec: Auto
       port_list: '1'
       slot_id: 1
+      user_labels: []
   power:
     description: ''
     dynamic_power_rebalancing: Enabled
