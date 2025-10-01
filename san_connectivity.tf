@@ -70,6 +70,13 @@ resource "intersight_vnic_vhba_template" "map" {
       ].moid : local.policies_data["fc_zone"][fc_zone_policies.value].moid
     }
   }
+  dynamic "tags" {
+    for_each = { for v in each.value.tags : v.key => v }
+    content {
+      key   = tags.value.key
+      value = tags.value.value
+    }
+  }
   dynamic "wwpn_pool" {
     for_each = { for v in [each.value.wwpn_pool] : v => v if element(split("/", v), 1) != "UNUSED" }
     content {
