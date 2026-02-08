@@ -9,12 +9,13 @@ resource "intersight_fabric_switch_control_policy" "map" {
     AesPrimaryKey = local.ps.switch_control.aes_primary_key[each.value.aes_primary_key]
   }) : jsonencode({})
   description             = coalesce(each.value.description, "${each.value.name} Switch Control Policy.")
+  enable_jumbo_frame      = each.value.target_platform == "Unified Edge" ? each.value.enable_jumbo_frames : false
   ethernet_switching_mode = each.value.switching_mode_ethernet
   fabric_pc_vhba_reset    = each.value.fabric_port_channel_vhba_reset
   fc_switching_mode       = each.value.switching_mode_fc
   name                    = each.value.name
   reserved_vlan_start_id  = each.value.reserved_vlan_start_id
-  #
+  target_platform         = each.value.target_platform
   vlan_port_optimization_enabled = each.value.vlan_port_count_optimization
   mac_aging_settings {
     mac_aging_option = each.value.mac_address_table_aging

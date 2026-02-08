@@ -14,6 +14,11 @@ policies:
       pci_slot: MLOM
     description: ''
     name: '**REQUIRED**'
+  auditd:
+    description: ''
+    enable: true
+    minimum_severity_to_report: warning
+    name: '**REQUIRED**'
   bios:
     bios_template: EMPTY
     description: ''
@@ -255,6 +260,10 @@ policies:
     #+++++++++++++++++++++++++++++++
     # Main Section
     #+++++++++++++++++++++++++++++++
+    gpu_direct_cpu1: platform-default
+    gpu_direct_cpu2: platform-default
+    gpu_direct_cpu3: platform-default
+    gpu_direct_cpu4: platform-default
     pcie_slots_cdn_enable: enabled
     post_error_pause: platform-default
     tpm_support: platform-default
@@ -446,6 +455,7 @@ policies:
     streamer_prefetch: platform-default
     svm_mode: platform-default
     ufs_disable: platform-default
+    ufs_disable_io: platform-default
     work_load_config: platform-default
     xpt_prefetch: platform-default
     #+++++++++++++++++++++++++++++++
@@ -2082,6 +2092,7 @@ policies:
     switching_mode_ethernet: end-host
     switching_mode_fc: end-host
     reserved_vlan_start_id: 3915
+    target_platform: UCS Domain
     udld_global_settings:
       message_interval: 15
       recovery_action: reset
@@ -2297,6 +2308,7 @@ policies:
   vlan:
     description: ''
     name: '**REQUIRED**'
+    target_platform: UCS Domain
     vlans:
       auto_allow_on_uplinks: false
       multicast_policy: ''

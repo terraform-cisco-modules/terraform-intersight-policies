@@ -245,6 +245,10 @@ resource "intersight_bios_policy" "map" {
   #+++++++++++++++++++++++++++++++
   # Main Section
   #+++++++++++++++++++++++++++++++
+  gpu_direct_cpu1       = each.value.gpu_direct_cpu1       # GPU Direct to CPU 1
+  gpu_direct_cpu2       = each.value.gpu_direct_cpu2       # GPU Direct to CPU 2
+  gpu_direct_cpu3       = each.value.gpu_direct_cpu3       # GPU Direct to CPU 3
+  gpu_direct_cpu4       = each.value.gpu_direct_cpu4       # GPU Direct to CPU 4
   pcie_slots_cdn_enable = each.value.pcie_slots_cdn_enable # PCIe Slots CDN Control
   post_error_pause      = each.value.post_error_pause      # POST Error Pause
   #+++++++++++++++++++++++++++++++
@@ -433,6 +437,7 @@ resource "intersight_bios_policy" "map" {
   streamer_prefetch                 = each.value.streamer_prefetch                 # DCU Streamer Prefetch
   svm_mode                          = each.value.svm_mode                          # SVM Mode
   ufs_disable                       = each.value.ufs_disable                       # Uncore Frequency Scaling
+  # ufs_disable_io                    = each.value.ufs_disable_io                    # Uncore Frequency Scaling IO
   work_load_config                  = each.value.work_load_config                  # Workload Configuration
   x2apic_opt_out                    = each.value.x2apic_opt_out                    # X2 APIC Opt-Out Flag
   xpt_prefetch                      = each.value.xpt_prefetch                      # XPT Prefetch

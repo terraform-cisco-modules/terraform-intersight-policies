@@ -4,9 +4,10 @@
 # GUI Location: Policies > Create Policy > VLAN
 #__________________________________________________________________
 resource "intersight_fabric_eth_network_policy" "map" {
-  for_each    = local.vlan
-  description = coalesce(each.value.description, "${each.value.name} VLAN Policy.")
-  name        = each.value.name
+  for_each        = local.vlan
+  description     = coalesce(each.value.description, "${each.value.name} VLAN Policy.")
+  name            = each.value.name
+  target_platform = each.value.target_platform
   organization { moid = var.orgs[each.value.org] }
   dynamic "tags" {
     for_each = { for v in each.value.tags : v.key => v }

@@ -27,12 +27,12 @@ locals {
     ), e, lookup(lookup(lookup(local.model, org, {}), "name_suffix", local.defaults.name_suffix), "default", ""))
   } }
   policy_names = [
-    "adapter_configuration", "bios", "boot_order", "certificate_management", "device_connector", "drive_security",
+    "adapter_configuration", "auditd", "bios", "boot_order", "certificate_management", "device_connector", "drive_security",
     "ethernet_adapter", "ethernet_network", "ethernet_network_control", "ethernet_network_group", "ethernet_qos", "fc_zone",
     "fibre_channel_adapter", "fibre_channel_network", "fibre_channel_qos", "firmware", "flow_control", "imc_access",
     "ipmi_over_lan", "iscsi_adapter", "iscsi_boot", "iscsi_static_target", "lan_connectivity", "ldap", "link_aggregation",
     "link_control", "local_user", "mac_sec", "memory", "multicast", "network_connectivity", "ntp", "persistent_memory", "port",
-    "power", "san_connectivity", "scrub", "sd_card", "serial_over_lan", "smtp", "snmp", "ssh", "storage", "switch_control",
+    "power", "san_connectivity", "schedule_policy", "scrub", "sd_card", "serial_over_lan", "smtp", "snmp", "ssh", "storage", "switch_control",
     "syslog", "system_qos", "thermal", "vhba_template", "virtual_kvm", "virtual_media", "vlan", "vnic_template", "vsan"
   ]
   pool_names = ["ip", "iqn", "mac", "resource", "uuid", "wwnn", "wwpn"]
@@ -229,6 +229,18 @@ locals {
     }
   ] if length(lookup(local.model[org], "adapter_configuration", [])) > 0]) : "${i.org}/${i.name}" => i }
 
+  #_________________________________________________________________
+  #
+  # Intersight AuditD Policy
+  # GUI Location: Policies > Create Policy > AuditD
+  #_________________________________________________________________
+  auditd = { for i in flatten([for org in local.org_keys : [
+    for v in lookup(local.model[org], "auditd", []) : merge(local.defaults.auditd, v, {
+      name         = "${local.npfx[org].auditd}${v.name}${local.nsfx[org].auditd}"
+      org          = org
+      tags         = lookup(v, "tags", var.global_settings.tags)
+    }) if lookup(v, "assigned_sensitive_data", false) == true
+  ] if length(lookup(local.model[org], "auditd", [])) > 0]) : "${i.org}/${i.name}" => i }
   #__________________________________________________________________
   #
   # Intersight BIOS Policy
